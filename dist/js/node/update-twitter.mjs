@@ -118,18 +118,6 @@ const captured = (result) => {
     port.attackHostility = 0;
     port.portBattle = "";
 };
-const npcCaptured = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
-    console.log("      --- captured by NPC", i);
-    port.nation = "NT";
-    port.capturer = "RAIDER";
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-    port.attackerNation = "";
-    port.attackerClan = "";
-    port.attackHostility = 0;
-    port.portBattle = "";
-};
 const defended = (result) => {
     const i = findPortIndex(result[2]);
     const port = ports[i];
@@ -177,15 +165,6 @@ const portBattleScheduled = (result) => {
     port.attackHostility = 1;
     port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
-const npcPortBattleScheduled = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
-    console.log("      --- npcPortBattleScheduled", i);
-    port.attackerNation = "Neutral";
-    port.attackerClan = "NPC";
-    port.attackHostility = 1;
-    port.portBattle = dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
-};
 const portR = "[A-zÀ-ÿ’ -]+";
 const portHashR = "[A-zÀ-ÿ]+";
 const nationR = "[A-zÀ-ÿ -]+";
@@ -195,13 +174,10 @@ const timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}";
 const pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}";
 const percentageR = "\\d*\\.?\\d";
 const capturedRegex = new RegExp(`\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`, "u");
-const npcCapturedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders captured port (${portR}) \\((${nationR})\\)`, "u");
 const defendedRegex = new RegExp(`\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`, "u");
-const npcDefendedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders failed to capture port (${portR}) \\((${nationR})\\)`, "u");
 const hostilityLevelUpRegex = new RegExp(`\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`, "u");
 const hostilityLevelDownRegex = new RegExp(`\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`, "u");
 const portBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`, "u");
-const npcPortBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC port battle for port (${portR})(?: \\(${nationR}\\)) will be started at (${pbTimeR}) UTC`, "u");
 const rumorRegex = new RegExp(`\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`, "u");
 const gainHostilityRegex = new RegExp(`\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`, "u");
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
@@ -220,15 +196,7 @@ const updatePorts = async () => {
                 isPortDataChanged = true;
                 captured(result);
             }
-            else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true;
-                npcCaptured(result);
-            }
             else if ((result = defendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true;
-                defended(result);
-            }
-            else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
                 isPortDataChanged = true;
                 defended(result);
             }
@@ -244,10 +212,6 @@ const updatePorts = async () => {
                 isPortDataChanged = true;
                 portBattleScheduled(result);
             }
-            else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true;
-                npcPortBattleScheduled(result);
-            }
             else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
             }
             else if ((result = rumorRegex.exec(tweet)) === null) {
@@ -262,21 +226,6 @@ const updatePorts = async () => {
                     isPortDataChanged = true;
                     portBattleScheduled(result);
                 }
-            }
-            else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true;
-                npcPortBattleScheduled(result);
-            }
-            else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true;
-                defended(result);
-            }
-        }
-        else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(2, "day"))) {
-            if ((result = npcPortBattleRegex.exec(tweet)) !== null &&
-                dayjs.utc().isBefore(dayjs.utc(result[4], "D MMM YYYY HH:mm"))) {
-                isPortDataChanged = true;
-                npcPortBattleScheduled(result);
             }
         }
     }

@@ -14,14 +14,14 @@ const { nest: d3Nest } = d3Collection;
 import { findNationById, nations, nationShortName } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
-import { distanceMapSize, serverNames } from "../common/common-var";
+import { cleanName, sortBy } from "../common/common-node";
+import { serverNames } from "../common/common-var";
 const minProfit = 30000;
 const frontlinePorts = 2;
 let apiItems;
 let apiPorts;
 let apiShops;
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`);
+const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`);
 const distancesOrig = readJson(distancesFile);
 let distances;
 let numberPorts;
@@ -48,24 +48,16 @@ const setPortFeaturePerServer = (apiPort) => {
             tradingCompany: apiPort.TradingCompany,
             laborHoursDiscount: apiPort.LaborHoursDiscount,
             dropsTrading: [
-                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return itemNames.has(good.Template) && ((_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading); })
-                    .map((good) => { var _a; return (_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.name; })
-                    .sort(simpleStringSort)),
+                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return (_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading; }).map((good) => good.Template)),
             ],
             consumesTrading: [
-                ...new Set(portShop.ResourcesConsumed.filter((good) => { var _a; return itemNames.has(good.Key) && ((_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading); })
-                    .map((good) => { var _a; return (_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.name; })
-                    .sort(simpleStringSort)),
+                ...new Set(portShop.ResourcesConsumed.filter((good) => { var _a; return (_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading; }).map((good) => good.Key)),
             ],
             producesNonTrading: [
-                ...new Set(portShop.ResourcesProduced.filter((good) => { var _a; return itemNames.has(good.Key) && !((_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading); })
-                    .map((good) => { var _a; return (_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.name; })
-                    .sort(simpleStringSort)),
+                ...new Set(portShop.ResourcesProduced.filter((good) => { var _a; return !((_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading); }).map((good) => good.Key)),
             ],
             dropsNonTrading: [
-                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return itemNames.has(good.Template) && !((_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading); })
-                    .map((good) => { var _a; return (_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.name; })
-                    .sort(simpleStringSort)),
+                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return !((_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading); }).map((good) => good.Template)),
             ],
             inventory: portShop.RegularItems.filter((good) => { var _a; return ((_a = itemNames.get(good.TemplateId)) === null || _a === void 0 ? void 0 : _a.itemType) !== "Cannon"; })
                 .map((good) => {
@@ -129,6 +121,22 @@ const setAndSaveTradeData = async (serverName) => {
     }
     trades.sort(sortBy(["profitTotal"]));
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
+};
+const setAndSaveDroppedItems = async (serverName) => {
+    const items = apiItems
+        .filter((item) => item.ItemType === "Material" ||
+        item.SortingGroup === "Resource.Food" ||
+        item.SortingGroup === "Resource.Resources" ||
+        item.SortingGroup === "Resource.Trading" ||
+        item.Name === "American Cotton" ||
+        item.Name === "Tobacco")
+        .map((item) => ({
+        id: item.Id,
+        name: cleanName(item.Name),
+        price: item.BasePrice,
+        distanceFactor: item.PortPrices.RangePct,
+    }));
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items);
 };
 const ticks = 621355968000000000;
 const setAndSavePortBattleData = async (serverName) => {
@@ -213,7 +221,7 @@ const setAndSaveFrontlines = async (serverName) => {
         }
         frontlineDefendingNation[nationShortName].push({
             key: toPortId,
-            value: [...fromPorts].map(Number),
+            value: [...fromPorts].map((element) => Number(element)),
         });
     }
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-frontlines.json`), {
@@ -232,6 +240,7 @@ export const convertServerPortData = () => {
                 name: cleanName(item.Name),
                 weight: item.ItemWeight,
                 itemType: item.ItemType,
+                buyPrice: item.BasePrice,
                 trading: item.SortingGroup === "Resource.Trading" ||
                     item.Name === "American Cotton" ||
                     item.Name === "Tobacco",
@@ -247,6 +256,7 @@ export const convertServerPortData = () => {
         distances = new Map(distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance]));
         setAndSavePortData(serverName);
         setAndSaveTradeData(serverName);
+        setAndSaveDroppedItems(serverName);
         setAndSavePortBattleData(serverName);
         setAndSaveFrontlines(serverName);
     }

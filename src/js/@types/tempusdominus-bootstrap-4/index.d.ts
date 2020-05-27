@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference types="jquery"/>
 
-import { Moment, MomentBuiltinFormat } from "moment"
+import { Dayjs } from "dayjs"
 
 interface Icon {
     time: string
@@ -55,7 +55,7 @@ interface WidgetPositioningOptions {
     vertical?: "auto" | "top" | "bottom"
 }
 
-type ParseInputDateF = (inputDate: Moment) => Moment
+type ParseInputDateF = (inputDate: Dayjs) => Dayjs
 
 interface DatetimepickerOption {
     allowInputToggle?: boolean
@@ -66,15 +66,15 @@ interface DatetimepickerOption {
     daysOfWeekDisabled?: number[] | boolean
     dayViewHeaderFormat?: string
     debug?: boolean
-    defaultDate?: boolean | Moment | Date | string
-    disabledDates?: boolean | Array<Moment | Date | string> | any
+    defaultDate?: boolean | Dayjs | Date | string
+    disabledDates?: boolean | Array<Dayjs | Date | string> | any
     disabledHours?: boolean | number[] | any
-    disabledTimeIntervals?: boolean | Moment[][]
-    enabledDates?: boolean | Array<Moment | Date | string> | any
+    disabledTimeIntervals?: boolean | Dayjs[][]
+    enabledDates?: boolean | Array<Dayjs | Date | string> | any
     enabledHours?: boolean | number[]
-    extraFormats?: boolean | Array<string | MomentBuiltinFormat>
+    extraFormats?: boolean | Array<string | Dayjs>
     focusOnShow?: boolean
-    format?: boolean | string | MomentBuiltinFormat
+    format?: boolean | string | Dayjs
     icons?: Icon
     ignoreReadonly?: boolean
     inline?: boolean
@@ -82,8 +82,8 @@ interface DatetimepickerOption {
     keepOpen?: boolean
     keyBinds?: { [key: string]: (widget: boolean | JQuery) => void }
     locale?: string
-    maxDate?: boolean | Moment | Date | string
-    minDate?: boolean | Moment | Date | string
+    maxDate?: boolean | Dayjs | Date | string
+    minDate?: boolean | Dayjs | Date | string
     multidateSeparator?: string
     parseInputDate?: ParseInputDateF
     sideBySide?: boolean
@@ -93,22 +93,28 @@ interface DatetimepickerOption {
     tooltips?: Tooltip
     useCurrent?: boolean | "year" | "month" | "day" | "hour" | "minute"
     useStrict?: boolean
-    viewDate?: boolean | Moment | Date | string
+    viewDate?: boolean | Dayjs | Date | string
     viewMode?: "times" | "days" | "months" | "years" | "decades"
     widgetParent?: string | JQuery
     widgetPositioning?: WidgetPositioningOptions
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 export interface DatetimepickerEvent extends JQuery.Event {
-    date: Moment
+    date: Dayjs
 }
 
 declare global {
     interface JQuery {
-        datetimepicker(options?: DatetimepickerOption): void
-        datetimepicker(value: "viewDate"): Moment
+        datetimepicker: ((options?: DatetimepickerOption) => void) & ((value: "viewDate") => Dayjs)
+        /*
+        on<TType extends string>(
+            events: TType,
+            handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType> |
+                false
+        ): this;
+        */
 
-        on(events: "change.datetimepicker", handler: (eventobject: DatetimepickerEvent) => any): JQuery
+        // @ts-expect-error
+        on: (events: "change.datetimepicker", handler: (eventobject: DatetimepickerEvent) => any) => JQuery
     }
 }

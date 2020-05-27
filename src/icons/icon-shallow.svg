@@ -1,0 +1,9 @@
+<svg id="i-shallow" width="1em" height="1em" viewBox="0 0 16 16" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(0,8)">
+        <path d="M2,3 Q6,1 8,3 T14,3"/>
+    </g>
+    <g transform="translate(0,6)">
+        <path d="M2,3 Q6,1 8,3 T14,3"/>
+    </g>
+    <rect x="0.5" y="0.5" width="15" height="15" rx="2"/>
+</svg>

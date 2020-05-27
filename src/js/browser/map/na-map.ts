@@ -29,11 +29,11 @@ import DisplayGrid from "../map-tools/display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
-import ShowF11 from "../map-tools/show-f11"
 import ShowTrades from "../map-tools/show-trades"
 import WindRose from "../map-tools/wind-rose"
 import MakeJourney from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
+import { mapSize } from "../../common/common-var"
 
 interface Tile {
     z: number
@@ -47,7 +47,6 @@ interface Tile {
  */
 class NAMap {
     coord: MinMaxCoord
-    f11!: ShowF11
     readonly gridOverlay: HTMLElement
     height = 0
     minScale = 0
@@ -60,7 +59,6 @@ class NAMap {
     yGridBackgroundWidth: number
     private _currentScale = 0
     private _currentTranslate!: d3Zoom.ZoomTransform
-    private _doubleClickAction: string
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
@@ -73,10 +71,6 @@ class NAMap {
     private _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
-    private readonly _doubleClickActionCookie: Cookie
-    private readonly _doubleClickActionId: string
-    private readonly _doubleClickActionRadios: RadioButton
-    private readonly _doubleClickActionValues: string[]
     private readonly _labelZoomThreshold: number
     private readonly _maxScale: number
     private readonly _PBZoneZoomThreshold: number
@@ -119,7 +113,7 @@ class NAMap {
          */
         this.coord = {
             min: 0, // Minimum world coordinate
-            max: 8192, // Maximum world coordinate
+            max: mapSize, // Maximum world coordinate
         }
 
         this._tileSize = 256
@@ -127,27 +121,6 @@ class NAMap {
         this._wheelDelta = 0.5
         this._PBZoneZoomThreshold = 1.5
         this._labelZoomThreshold = 0.5
-
-        /**
-         * DoubleClickAction cookie name
-         */
-        this._doubleClickActionId = "double-click-action"
-
-        /**
-         * DoubleClickAction settings
-         */
-        this._doubleClickActionValues = ["compass", "f11"]
-
-        this._doubleClickActionCookie = new Cookie({
-            id: this._doubleClickActionId,
-            values: this._doubleClickActionValues,
-        })
-        this._doubleClickActionRadios = new RadioButton(this._doubleClickActionId, this._doubleClickActionValues)
-
-        /**
-         * Get DoubleClickAction setting from cookie or use default value
-         */
-        this._doubleClickAction = this._getDoubleClickAction()
 
         /**
          * ShowGrid cookie name
@@ -177,7 +150,7 @@ class NAMap {
     }
 
     static _initModal(id: string): void {
-        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>` })
+        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`, size: "lg" })
 
         const body = d3Selection.select(`#${id} .modal-body`)
         body.html(
@@ -195,17 +168,6 @@ class NAMap {
 
     async MapInit(): Promise<void> {
         await this._setupData()
-    }
-
-    /**
-     * Read cookie for doubleClickAction
-     */
-    _getDoubleClickAction(): string {
-        const r = this._doubleClickActionCookie.get()
-
-        this._doubleClickActionRadios.set(r)
-
-        return r
     }
 
     /**
@@ -228,7 +190,6 @@ class NAMap {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        this.f11 = new ShowF11(this, this.coord)
         this._ports = new DisplayPorts(this)
         await this._ports.init()
 
@@ -260,6 +221,7 @@ class NAMap {
 
     _setupListener(): void {
         this._svg
+            // eslint-disable-next-line unicorn/no-null
             .on("dblclick.zoom", null)
             .on("click", NAMap._stopProperty, true)
             .on(
@@ -284,7 +246,6 @@ class NAMap {
             this._showAbout()
         })
 
-        document.querySelector("#double-click-action")?.addEventListener("change", () => this._doubleClickSelected())
         document.querySelector("#show-grid")?.addEventListener("change", () => this._showGridSelected())
     }
 
@@ -320,14 +281,6 @@ class NAMap {
         this._svg.append<SVGDefsElement>("defs")
 
         this._gMap = this._svg.append("g").classed("map", true)
-    }
-
-    _doubleClickSelected(): void {
-        this._doubleClickAction = this._doubleClickActionRadios.get()
-
-        this._doubleClickActionCookie.set(this._doubleClickAction)
-
-        this._clearMap()
     }
 
     _showGridSelected(): void {
@@ -412,7 +365,6 @@ class NAMap {
     _clearMap(): void {
         this._windPrediction.clearMap()
         this._windRose.clearMap()
-        this.f11.clearMap()
         this._ports.clearMap()
         this._portSelect.clearMap()
         this.showTrades.clearMap()
@@ -441,12 +393,7 @@ class NAMap {
         const x = (mx - tx) / tk
         const y = (my - ty) / tk
 
-        if (this._doubleClickAction === "f11") {
-            this.f11.printCoord(x, y)
-        } else {
-            this._journey.plotCourse(x, y)
-        }
-
+        this._journey.plotCourse(x, y)
         this.zoomAndPan(x, y, 1)
     }
 
@@ -525,22 +472,14 @@ class NAMap {
         this._ports.transform(zoomTransform)
         this._journey.transform(zoomTransform)
         this._pbZone.transform(zoomTransform)
-        this.f11.transform(zoomTransform)
         this.showTrades.transform(zoomTransform)
 
         this._setZoomLevelAndData()
     }
 
-    _checkF11Coord(): void {
-        if (this._searchParams.has("x") && this._searchParams.has("z")) {
-            this.f11.goToF11FromParam(this._searchParams)
-        }
-    }
-
     _init(): void {
         this.zoomLevel = "initial"
         this.initialZoomAndPan()
-        this._checkF11Coord()
         this._setFlexOverlayHeight()
     }
 

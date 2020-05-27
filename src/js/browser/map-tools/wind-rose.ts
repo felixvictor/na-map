@@ -21,16 +21,27 @@ import moment from "moment"
 import "moment/locale/en-gb"
 import "round-slider/src/roundslider"
 
-import "round-slider/src/roundslider.css"
+import "round-slider/src/roundslider"
+
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, degreesToRadians } from "../../common/common-math"
 import { displayCompass, getUserWind, printSmallCompassRose } from "../util"
+
+import dayjs from "dayjs"
+import "dayjs/locale/en-gb"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import utc from "dayjs/plugin/utc"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.locale("en-gb")
+
 import Cookie from "../util/cookie"
 
 export default class WindRose {
     private readonly _line: Line<[number, number]>
-    private _windPath: d3Selection.Selection<SVGPathElement, unknown, HTMLElement, any> | null
+    private _windPath: d3Selection.Selection<SVGPathElement, unknown, HTMLElement, unknown> | undefined = undefined
     private readonly _windArrowWidth: number
     private readonly _intervalSeconds: number
     private readonly _baseName: string
@@ -50,24 +61,23 @@ export default class WindRose {
     private _compassRadius!: number
     private _length!: number
     private _intervalId!: number
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
-    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
+    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor() {
         this._line = d3Line()
             .x((d) => d[0])
             .y((d) => d[1])
-        this._windPath = null
 
         this._windArrowWidth = 4
         this._intervalSeconds = 40
 
         this._baseName = "In-game wind"
         this._baseId = "ingame-wind"
-        this._buttonId =`button-${this._baseId}`
-        this._modalId =`modal-${this._baseId}`
-        this._formId =`form-${this._baseId}`
-        this._sliderId =`slider-${this._baseId}`
+        this._buttonId = `button-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
+        this._formId = `form-${this._baseId}`
+        this._sliderId = `slider-${this._baseId}`
 
         this._cookieExpire = this._getExpire()
 
@@ -75,14 +85,14 @@ export default class WindRose {
          * Wind correctionValueDegrees cookie
          */
         this._cookieWindDegrees = new Cookie({
-            id:`${this._baseId}-degrees`,
+            id: `${this._baseId}-degrees`,
             expire: this._cookieExpire,
         })
 
         /**
          * Wind correctionValueDegrees time cookie
          */
-        this._cookieTime = new Cookie({ id:`${this._baseId}-time`})
+        this._cookieTime = new Cookie({ id: `${this._baseId}-time` })
 
         /**
          * Get current wind from cookie or use default value
@@ -122,8 +132,8 @@ export default class WindRose {
     }
 
     _getExpire(): Date {
-        const now = moment.utc()
-        let end = moment().utc().hour(10).minute(0).second(0)
+        const now = dayjs.utc()
+        let end = dayjs().utc().hour(10).minute(0).second(0)
 
         if (now.hour() >= end.hour()) {
             end = end.add(1, "day")
@@ -173,8 +183,8 @@ export default class WindRose {
             return pos
         }
 
-        // @ts-ignore
-        window.tooltip = (arguments_) =>`${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
+        // @ts-expect-error
+        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
             sliderType: "default",
@@ -188,15 +198,13 @@ export default class WindRose {
             editableTooltip: false,
             tooltipFormat: "tooltip",
             create() {
-                // @ts-ignore
+                // @ts-expect-error
                 this.control.css("display", "block")
             },
         })
     }
 
     _injectModal(): void {
-        moment.locale("en-gb")
-
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
@@ -288,7 +296,7 @@ export default class WindRose {
             .attr("class", "compass")
             .attr("x", this._xCompass)
             .attr("y", this._yCompass)
-        // @ts-ignore
+        // @ts-expect-error
         printSmallCompassRose({ element: compassElement, radius: this._compassRadius })
 
         this._windPath = this._svg.append("path").attr("marker-end", "url(#wind-arrow)")
@@ -300,7 +308,7 @@ export default class WindRose {
             this._div.remove()
         }
 
-        this._windPath = null
+        this._windPath = undefined
         this._cookieWindDegrees.remove()
     }
 }

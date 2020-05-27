@@ -31,7 +31,11 @@ const getLootItemName = (name, type) => {
 const convertLoot = async () => {
     const getItemNames = () => new Map(apiItems.map((item) => [Number(item.Id), getLootItemName(item.Name, item.ItemType)]));
     const itemNames = getItemNames();
-    const getLootItems = (lootItems, itemProbability = []) => lootItems.map((item) => {
+    const getLootItemsChance = (chestLootTableId) => {
+        const lootTable = apiItems.filter((item) => Number(item.Id) === chestLootTableId);
+        return lootTable[0].Items[0].Chance;
+    };
+    const getLootItems = (lootItems, itemProbability) => lootItems.map((item) => {
         var _a, _b, _c;
         return ({
             id: Number(item.Template),
@@ -40,9 +44,17 @@ const convertLoot = async () => {
             amount: { min: Number((_b = item.Stack) === null || _b === void 0 ? void 0 : _b.Min), max: Number((_c = item.Stack) === null || _c === void 0 ? void 0 : _c.Max) },
         });
     });
-    const getLootItemsFromChestLootTable = (chestLootTableId) => apiItems
+    const getChestItems = (lootItems) => lootItems.map((item) => {
+        var _a, _b, _c;
+        return ({
+            id: Number(item.Template),
+            name: (_a = itemNames.get(Number(item.Template))) !== null && _a !== void 0 ? _a : "",
+            amount: { min: Number((_b = item.Stack) === null || _b === void 0 ? void 0 : _b.Min), max: Number((_c = item.Stack) === null || _c === void 0 ? void 0 : _c.Max) },
+        });
+    });
+    const getChestItemsFromChestLootTable = (chestLootTableId) => apiItems
         .filter((item) => Number(item.Id) === chestLootTableId)
-        .flatMap((item) => { var _a; return getLootItems((_a = item.Items) !== null && _a !== void 0 ? _a : []); });
+        .flatMap((item) => { var _a; return getChestItems((_a = item.Items) !== null && _a !== void 0 ? _a : []); });
     const data = {};
     let types = ["ShipLootTableItem"];
     const loot = apiItems.filter((item) => !item.NotUsed && types.includes(item.ItemType));
@@ -66,7 +78,10 @@ const convertLoot = async () => {
             name: cleanName(item.Name),
             weight: Number(item.ItemWeight),
             lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
-            items: (_a = item.ExtendedLootTable) === null || _a === void 0 ? void 0 : _a.map((lootChestLootTableId) => getLootItemsFromChestLootTable(lootChestLootTableId)).reduce((acc, value) => acc.concat(value), []).sort(sortBy(["chance", "id"])),
+            itemGroup: (_a = item.ExtendedLootTable) === null || _a === void 0 ? void 0 : _a.map((lootChestLootTableId) => ({
+                chance: getLootItemsChance(lootChestLootTableId),
+                items: getChestItemsFromChestLootTable(lootChestLootTableId).sort(sortBy(["id"])),
+            })).sort(sortBy(["chance"])),
         });
     })
         .sort(sortBy(["id"]));

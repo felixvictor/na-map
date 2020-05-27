@@ -10,228 +10,281 @@
 
 import * as fs from "fs"
 import * as path from "path"
-import { default as Denque } from "denque"
+import { default as Immutable } from "immutable"
 import { default as PNG } from "pngjs"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { simpleNumberSort, sortBy } from "../common/common-node"
-import { distanceMapSize, serverNames } from "../common/common-var"
+import { simpleNumberSort } from "../common/common-node"
+import { distanceMapSize, mapSize, serverNames } from "../common/common-var"
 
 import { APIPort } from "./api-port"
 
-/**
- * ------------------------------------------------------------------------
- * Constants
- * ------------------------------------------------------------------------
- */
+type Index = number
+type PixelDistance = number
+type SpotType = number
 
-const mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`)
-const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances-${distanceMapSize}.json`)
-
-const spotWater = 0
-const spotLand = -1
-
-/**
- * ------------------------------------------------------------------------
- * Load map and set map related constants
- * ------------------------------------------------------------------------
- */
-
-// Read map file
-const fileData = fs.readFileSync(mapFileName)
-// Read map file content as png
-const png = PNG.PNG.sync.read(fileData)
-
-const mapHeight = png.height // y
-const mapWidth = png.width // x
-const origMapSize = 8192
-const mapScale = mapWidth / origMapSize
-
-/**
- * ------------------------------------------------------------------------
- * Helper functions
- * ------------------------------------------------------------------------
- */
-
-const getIndex = (y: number, x: number): number => y * mapWidth + x
-const getCoordinates = (y: number, x: number): Point => [
-    Math.trunc(convertCoordY(x, y) * mapScale),
-    Math.trunc(convertCoordX(x, y) * mapScale),
-]
-
-/**
- * ------------------------------------------------------------------------
- * Setup map
- * ------------------------------------------------------------------------
- */
-
-const fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
-let apiPorts: APIPort[] = []
-let portIds: number[] = []
-let numPorts = 0
-
-interface GridMap {
-    [index: number]: number // type (spotLand, spotWater, port id)
+interface GridMap extends Array<SpotType> {
+    [index: number]: SpotType // type (spotLand, spotWater, port id)
 }
 
-/**
- * ------------------------------------------------------------------------
- * Global variables
- * ------------------------------------------------------------------------
- */
+class Port {
+    apiPorts: APIPort[] = []
+    #fileName: string
+    numPorts = 0
+    portIds: number[] = []
 
-/**
- * Convert png to map (black -\> spotLand, white -\> spotWater)
- */
-const map: GridMap = new Array(mapWidth * mapHeight)
-    .fill(0)
-    .map((_e, index: number) => (png.data[index << 2] > 127 ? spotWater : spotLand))
+    constructor() {
+        this.#fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
 
-// Outer-grid land borders
-const visitedPositionsDefault = new Set<number>()
+        xz("unxz", `${this.#fileName}.xz`)
+        this.apiPorts = readJson(this.#fileName)
+        xz("xz", this.#fileName)
+        this.portIds = this.apiPorts.map((port: APIPort) => Number(port.Id))
+        this.numPorts = this.portIds.length
+    }
 
-/**
- * Distance between all ports
- */
-const distances: Distance[] = []
+    getCoordinates(y: number, x: number, mapScale: number): Point {
+        return [Math.trunc(convertCoordY(x, y) * mapScale), Math.trunc(convertCoordX(x, y) * mapScale)]
+    }
+}
 
-/**
- * Set of start ports so far
- */
-const startPortIds: Set<number> = new Set()
+class Map {
+    #mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`)
+    #pngData!: Buffer
+    #distances: Distance[] = []
+    #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
+    #map: GridMap = {} as GridMap
+    #mapHeight!: number
+    #mapScale!: number
+    #mapWidth!: number
+    #port: Port = {} as Port
+    #completedPorts: Set<number> = new Set()
+    #LAND = 0
+    #WATER = 0
+    #VISITED = 0
+    #FLAGS = 0
 
-/**
- * Find shortest paths between start port and all other ports (breadth first search).
- */
-const findPaths = (
-    startPortId: number, // Start port id
-    startY: number, // Start port y position
-    startX: number // Start port x position
-): void => {
-    // Add outer-grid land borders
-    const visitedPositions = new Set<number>(visitedPositionsDefault)
-    // Queue holds unchecked positions ([index, distance from start port])
-    const queue = new Denque()
+    constructor() {
+        this.#port = new Port()
 
-    // Add start port
-    const startIndex = getIndex(startY, startX)
-    const foundPortIds = new Set<number>()
-    startPortIds.add(startPortId)
-    visitedPositions.add(startIndex)
-    queue.push([startIndex, 0])
+        this.setBitFlags()
+        this.readMap()
+        this.mapInit()
+        this.setPorts()
+        this.setBorders()
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        this.getAndSaveDistances()
+    }
 
-    while (foundPortIds.size + startPortIds.size < numPorts && !queue.isEmpty()) {
-        let [pos, distance]: [number, number] = queue.shift()
-        distance++
+    setBitFlags(): void {
+        const bitsAvailable = 32
+        const bitsForPortIds = Number(this.#port.numPorts).toString(2).length + 1
 
-        // Check if port is found
-        if (map[pos] > startPortId) {
-            distances.push([startPortId, map[pos], distance])
-            foundPortIds.add(map[pos])
+        if (bitsForPortIds + 3 > bitsAvailable) {
+            throw new Error("Too few bits")
         }
 
-        // Check all nine neighbour positions ([-1, 0, 1][-1, 0, 1])
-        for (let y = -mapWidth; y <= mapWidth; y += mapWidth) {
-            for (let x = -1; x <= 1; x += 1) {
-                const index = pos + y + x
-                // Add not visited non-land neighbour index
-                if (!visitedPositions.has(index) && map[index] !== spotLand) {
-                    visitedPositions.add(index)
-                    queue.push([index, distance])
-                }
+        this.#LAND = 1 << bitsForPortIds
+        this.#WATER = this.#LAND << 1
+        this.#VISITED = this.#WATER << 1
+        this.#FLAGS = this.#LAND | this.#WATER | this.#VISITED
+    }
+
+    readMap(): void {
+        // Read map file
+        const fileData = fs.readFileSync(this.#mapFileName)
+        // Read map file content as png
+        const png = PNG.PNG.sync.read(fileData)
+
+        this.#mapHeight = png.height // y
+        this.#mapWidth = png.width // x
+        this.#mapScale = this.#mapWidth / mapSize
+        this.#pngData = png.data
+
+        console.log(this.#mapHeight, this.#mapWidth)
+    }
+
+    mapInit(): void {
+        /**
+         * Convert png to map (black -\> spotLand, white -\> spotWater)
+         */
+        this.#map = new Array(this.#mapWidth * this.#mapHeight)
+            .fill(0)
+            .map((_e, index: number) => (this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND))
+    }
+
+    /*
+     * Add port id to port entrances
+     */
+    setPorts(): void {
+        this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: APIPort) => {
+            const [portY, portX] = this.#port.getCoordinates(y, x, this.#mapScale)
+            const index = this.getIndex(portY, portX)
+
+            this.setPortSpot(index, Number(Id))
+        })
+    }
+
+    /**
+     *  Set map borders as visited
+     */
+    setBorders(): void {
+        // Define outer bounds (map grid covers [0, mapSize-1])
+        const minY = 0
+        const maxY = this.#mapHeight - 1
+        const minX = 0
+        const maxX = this.#mapWidth - 1
+
+        for (let y = minY; y <= maxY; y += maxY) {
+            for (let x = minX; x <= maxX; x += 1) {
+                this.visit(this.getIndex(y, x))
+            }
+        }
+
+        for (let y = minY; y <= maxY; y += 1) {
+            for (let x = minX; x <= maxX; x += maxX) {
+                this.visit(this.getIndex(y, x))
             }
         }
     }
 
-    if (foundPortIds.size + startPortIds.size < numPorts) {
-        const missingPortIds = portIds
-            .filter((portId: number) => portId > startPortId && !foundPortIds.has(portId))
-            .sort(simpleNumberSort)
-        console.error(
-            "Only",
-            foundPortIds.size + startPortIds.size,
-            "of all",
-            numPorts,
-            "ports found! Ports",
-            missingPortIds,
-            "are missing."
-        )
-        missingPortIds.forEach((missingPortId: number) => {
-            distances.push([startPortId, missingPortId, 0])
-        })
-    }
-}
+    resetVisitedSpots(): void {
+        const minY = 1
+        const maxY = this.#mapHeight - 2
+        const minX = 1
+        const maxX = this.#mapWidth - 2
 
-/**
- *  Set outer-grid borders to land as a barrier
- */
-const setVisitedPositionsDefault = (): void => {
-    // Define outer bounds (map grid covers [0, mapSize-1])
-    const minY = -1
-    const minX = -1
-    const maxY = mapHeight
-    const maxX = mapWidth
-
-    for (let y = minY; y <= maxY; y += maxY + 1) {
-        for (let x = minX; x <= maxX; x += 1) {
-            visitedPositionsDefault.add(getIndex(y, x))
+        for (let y = minY; y <= maxY; y += 1) {
+            for (let x = minX; x <= maxX; x += 1) {
+                this.resetVisit(this.getIndex(y, x))
+            }
         }
     }
 
-    for (let y = minY; y <= maxY; y += 1) {
-        for (let x = minX; x <= maxX; x += maxX + 1) {
-            visitedPositionsDefault.add(getIndex(y, x))
+    /**
+     * Find shortest paths between start port and all other ports (breadth first search).
+     */
+    findPaths(
+        startPortId: number, // Start port id
+        startY: number, // Start port y position
+        startX: number // Start port x position
+    ): void {
+        const foundPortIds = new Set<number>()
+
+        this.resetVisitedSpots()
+
+        // Add start port
+        const startIndex = this.getIndex(startY, startX)
+        this.#completedPorts.add(startPortId)
+        this.visit(startIndex)
+
+        // Queue holds unchecked positions ([index, distance from start port])
+        let queue = Immutable.List<[Index, PixelDistance]>([[startIndex, 0]])
+
+        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && !queue.isEmpty()) {
+            let [index, pixelDistance]: [Index, PixelDistance] = queue.first()
+            queue = queue.shift()
+            const spot = this.getPortId(this.getSpot(index))
+
+            // Check if port is found
+            if (spot > startPortId) {
+                // console.log([startPortId, portId, index, pixelDistance])
+                this.#distances.push([startPortId, spot, pixelDistance])
+                foundPortIds.add(spot)
+            }
+
+            pixelDistance++
+
+            // Check all nine neighbour positions ([-1, 0, 1][-1, 0, 1])
+            for (let y = -this.#mapWidth; y <= this.#mapWidth; y += this.#mapWidth) {
+                for (let x = -1; x <= 1; x += 1) {
+                    const neighbourIndex: Index = index + y + x
+                    // Add not visited non-land neighbour index
+                    if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
+                        this.visit(neighbourIndex)
+                        queue = queue.push([neighbourIndex, pixelDistance])
+                    }
+                }
+            }
         }
-    }
-}
 
-/**
- *  Calculate distances between all ports
- */
-const getDistances = async (): Promise<void> => {
-    setVisitedPositionsDefault()
-    //    const selectedPorts = [4, 176, 201, 256, 287, 355, 374];
-    try {
-        console.time("findPath")
-        apiPorts
-            .sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))
-            //        .filter(fromPort => selectedPorts.includes(Number(fromPort.Id)))
-            .forEach((fromPort: APIPort) => {
-                const fromPortId = Number(fromPort.Id)
-                const {
-                    EntrancePosition: { z: y, x },
-                } = fromPort
-                const [fromPortY, fromPortX] = getCoordinates(y, x)
-
-                findPaths(fromPortId, fromPortY, fromPortX)
-
-                console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`)
+        if (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts) {
+            const missingPortIds = this.#port.portIds
+                .filter((portId: number) => portId > startPortId && !foundPortIds.has(portId))
+                .sort(simpleNumberSort)
+            console.error(
+                "Only",
+                foundPortIds.size + this.#completedPorts.size,
+                "of all",
+                this.#port.numPorts,
+                "ports found! Ports",
+                missingPortIds,
+                "are missing."
+            )
+            missingPortIds.forEach((missingPortId: number) => {
+                this.#distances.push([startPortId, missingPortId, 0])
             })
+        }
+    }
 
-        console.timeEnd("findPath")
+    /**
+     *  Calculate distances between all ports
+     */
+    async getAndSaveDistances(): Promise<void> {
+        try {
+            console.time("findPath")
+            this.#port.apiPorts
+                .sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))
+                .forEach((fromPort: APIPort) => {
+                    const fromPortId = Number(fromPort.Id)
+                    const {
+                        EntrancePosition: { z: y, x },
+                    } = fromPort
+                    const [fromPortY, fromPortX] = this.#port.getCoordinates(y, x, this.#mapScale)
 
-        await saveJsonAsync(distancesFile, distances)
-    } catch (error) {
-        console.error("Map distance error:", error)
+                    this.findPaths(fromPortId, fromPortY, fromPortX)
+
+                    console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`)
+                })
+
+            console.timeEnd("findPath")
+
+            await saveJsonAsync(this.#distancesFile, this.#distances)
+        } catch (error) {
+            console.error("Map distance error:", error)
+        }
+    }
+
+    getIndex(y: number, x: number): Index {
+        return y * this.#mapWidth + x
+    }
+
+    getSpot(index: number): SpotType {
+        return this.#map[index]
+    }
+
+    setPortSpot(index: number, spot: SpotType): void {
+        this.#map[index] = spot
+    }
+
+    visit(index: Index): void {
+        this.#map[index] |= this.#VISITED
+    }
+
+    resetVisit(index: Index): void {
+        this.#map[index] &= ~this.#VISITED
+    }
+
+    getPortId(spot: SpotType): number {
+        return spot & ~this.#FLAGS
+    }
+
+    isSpotNotVisitedNonLand(neighbourIndex: Index): boolean {
+        const spot = this.getSpot(neighbourIndex)
+        return !(spot & this.#VISITED) && !(spot & this.#LAND)
     }
 }
 
-xz("unxz", `${fileName}.xz`)
-apiPorts = readJson(fileName)
-portIds = apiPorts.map((port: APIPort) => Number(port.Id))
-numPorts = portIds.length
-
-// Add port id to port entrances
-apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: APIPort) => {
-    const [portY, portX] = getCoordinates(y, x)
-    const index = getIndex(portY, portX)
-
-    map[index] = Number(Id)
-})
-
-// noinspection JSIgnoredPromiseFromCall
-getDistances()
-
-xz("xz", fileName)
+const map = new Map()

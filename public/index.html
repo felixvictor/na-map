@@ -6,12 +6,12 @@
     <title>Naval Action map</title>
     <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." name="description">
     
-        <link href="https://na-map.netlify.app/" rel="canonical">
+        <meta content="noindex" name="robots">
     
     <meta content="Naval Action map" property="og:title" itemprop="name">
     <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." property="og:description" itemprop="description">
     <meta content="images/icons/firefox_app_512x512.png" property="og:image" itemprop="image">
-    <meta content="https://na-map.netlify.app/" property="og:url" itemprop="url">
+    <meta content="" property="og:url" itemprop="url">
 
     <meta content="en_gb" property="og:locale">
     <meta content="website" property="og:type">
@@ -19,7 +19,7 @@
     <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.google-analytics.com/analytics.js" async></script>
-<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><link href="/images/icons/favicon-48x48.png" rel="icon" sizes="48x48" type="image/png"><link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="main.7a5bc8521e493653e52f.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-nHb5S/h+XjMLbWsiikEuNJAgRyOC0neKmVmos4/iPb9CeisRYc+35K6OU4+DaDri"></head>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><link href="/images/icons/favicon-48x48.png" rel="icon" sizes="48x48" type="image/png"><link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="main.46017700a0bdfbd9eec2.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-dLVMPQnUETBSiUg/JJc+SCZRHQhStdcuYjjfUezXDKPzKZ5nhFXMCze43i2Jhl+b"></head>
 
 <body>
 
@@ -67,14 +67,6 @@
                     <div class="dropdown-item">
                         <label>
                             <select id="frontlines-defending-nation-select" name="frontlines-defending-nation-select" title="Select nation defending"></select>
-                        </label>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Conquest mark</h6>
-                    <div class="dropdown-item">
-                        <label>
-                            <select id="prop-cm-select" name="prop-cm-select" title="Select"></select>
                         </label>
                     </div>
 
@@ -187,22 +179,21 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
-                    Map tools
+                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Map tools" role="button" title="Map tools">
+                    <i class="icon icon-navbar icon-map" aria-hidden="true"></i><span class="sr-only">Map tools</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu" aria-labelledby="map-tools-dropdown">
 
                     <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
                     <a class="dropdown-item" id="button-ingame-wind" href="#">In-game wind</a>
-                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span class="badge badge-pill badge-primary small text-right">shift+<span class="caps">F11</span></span></a>
                     <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
                     <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                 </div>
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
-                    Game tools
+                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Game tools" role="button" title="Game tools">
+                    <i class="icon icon-navbar icon-bar-chart" aria-hidden="true"></i><span class="sr-only">Game tools</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu" aria-labelledby="game-tools-dropdown">
 
@@ -230,7 +221,7 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button" aria-label="Settings" title="Settings">
+                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Settings" role="button" title="Settings">
                     <i class="icon icon-navbar icon-options" aria-hidden="true"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
@@ -303,14 +294,6 @@
                             <label class="custom-control-label" for="show-zones-pb-single">Single port battle</label>
                         </div>
                         <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-raid-all" name="show-zones" type="radio" value="raid-all">
-                            <label class="custom-control-label" for="show-zones-raid-all">All raid</label>
-                        </div>
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="show-zones-raid-single" name="show-zones" type="radio" value="raid-single">
-                            <label class="custom-control-label" for="show-zones-raid-single">Single raid</label>
-                        </div>
-                        <div class="custom-control custom-control-inline custom-radio">
                             <input class="custom-control-input" id="show-zones-off" name="show-zones" type="radio" value="off">
                             <label class="custom-control-label" for="show-zones-off">Off</label>
                         </div>
@@ -341,20 +324,6 @@
                             <label class="custom-control-label" for="show-grid-off">Off</label>
                         </div>
                     </div>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Double click to</h6>
-                    <div class="align-self-center col-auto ml-1 radio-group" id="double-click-action">
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="double-click-action-compass" name="double-click-action" type="radio" value="compass">
-                            <label class="custom-control-label" for="double-click-action-compass">Plot a course</label>
-                        </div>
-                        <div class="custom-control custom-control-inline custom-radio">
-                            <input class="custom-control-input" id="double-click-action-f11" name="double-click-action" type="radio" value="f11">
-                            <label class="custom-control-label" for="double-click-action-f11">Show <span class="caps">F11</span>
-                                coordinates</label>
-                        </div>
-                    </div>
                 </div>
             </li>
         </ul>
@@ -383,10 +352,9 @@
         <div class="summary-column" id="summary-column"></div>
     </div>
     <div id="modal-section"></div>
-
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js" crossorigin="anonymous" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
-<script src="main.630c642a585a8a6675f8.js" crossorigin="anonymous" integrity="sha384-u5vxgC7qREdzd00cKirBYiFal644Id1r+nBHnHZasKekZ1zJycJEC6LhP9gyQrxW"></script></body>
+<script src="main.ce068435fb8bb86ac970.js" crossorigin="anonymous" integrity="sha384-Tq4MS+wm97RstPLXaIl17j1KYsdfN/JXck0E1ufdiBCz5nI8fHdWUiZYX5mllwdY"></script></body>
 </html>

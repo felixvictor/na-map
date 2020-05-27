@@ -83,19 +83,14 @@ const addTwitterData = (data: Twit.Twitter.SearchResults): void => {
  * @param query - Twitter query
  * @param since_id - Last tweet id
  */
-// eslint-disable-next-line @typescript-eslint/camelcase
 const getTwitterData = async (query: string, since_id: string = refresh): Promise<void> => {
     // console.log("getTwitterData", "query:", query, "since_id:", since_id, "refresh:", refresh);
     await Twitter.get("search/tweets", {
         count: 100,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         include_entities: false,
         q: query,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         result_type: "recent",
-        // eslint-disable-next-line @typescript-eslint/camelcase
         since_id,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         tweet_mode: "extended",
     })
         .catch((error) => {
@@ -157,15 +152,10 @@ const getTweets = async (): Promise<void> => {
     tweets = []
     refresh = getRefreshId()
     Twitter = new Twit({
-        // eslint-disable-next-line @typescript-eslint/camelcase
         consumer_key: consumerKey,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         consumer_secret: consumerSecret,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         access_token: accessToken,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         access_token_secret: accessTokenSecret,
-        // eslint-disable-next-line @typescript-eslint/camelcase
         timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
         strictSSL: true, // optional - requires SSL certificates to be valid.
     })
@@ -199,24 +189,6 @@ const captured = (result: RegExpExecArray): void => {
     console.log("      --- captured", i)
     port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
     port.capturer = result[3].trim()
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Port captured by NPC raiders
- * @param result - Result from tweet regex
- */
-const npcCaptured = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
-
-    console.log("      --- captured by NPC", i)
-    port.nation = "NT"
-    port.capturer = "RAIDER"
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
     port.attackerNation = ""
     port.attackerClan = ""
@@ -307,21 +279,6 @@ const portBattleScheduled = (result: RegExpExecArray): void => {
     port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm")
 }
 
-/**
- * NPC port battle scheduled
- * @param result - Result from tweet regex
- */
-const npcPortBattleScheduled = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
-
-    console.log("      --- npcPortBattleScheduled", i)
-    port.attackerNation = "Neutral"
-    port.attackerClan = "NPC"
-    port.attackHostility = 1
-    port.portBattle = dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-}
-
 const portR = "[A-zÀ-ÿ’ -]+"
 const portHashR = "[A-zÀ-ÿ]+"
 const nationR = "[A-zÀ-ÿ -]+"
@@ -337,15 +294,8 @@ const capturedRegex = new RegExp(
     "u"
 )
 // noinspection RegExpRedundantEscape
-const npcCapturedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders captured port (${portR}) \\((${nationR})\\)`, "u")
-// noinspection RegExpRedundantEscape
 const defendedRegex = new RegExp(
     `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
-    "u"
-)
-// noinspection RegExpRedundantEscape
-const npcDefendedRegex = new RegExp(
-    `\\[(${timeR}) UTC\\] NPC Raiders failed to capture port (${portR}) \\((${nationR})\\)`,
     "u"
 )
 // noinspection RegExpRedundantEscape
@@ -361,11 +311,6 @@ const hostilityLevelDownRegex = new RegExp(
 // noinspection RegExpRedundantEscape
 const portBattleRegex = new RegExp(
     `\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`,
-    "u"
-)
-// noinspection RegExpRedundantEscape
-const npcPortBattleRegex = new RegExp(
-    `\\[(${timeR}) UTC\\] NPC port battle for port (${portR})(?: \\(${nationR}\\)) will be started at (${pbTimeR}) UTC`,
     "u"
 )
 // noinspection RegExpRedundantEscape
@@ -402,13 +347,7 @@ const updatePorts = async (): Promise<void> => {
             if ((result = capturedRegex.exec(tweet)) !== null) {
                 isPortDataChanged = true
                 captured(result)
-            } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                npcCaptured(result)
             } else if ((result = defendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                defended(result)
-            } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
                 isPortDataChanged = true
                 defended(result)
             } else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
@@ -420,9 +359,6 @@ const updatePorts = async (): Promise<void> => {
             } else if ((result = portBattleRegex.exec(tweet)) !== null) {
                 isPortDataChanged = true
                 portBattleScheduled(result)
-            } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                npcPortBattleScheduled(result)
             } else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
                 // noop
             } else if ((result = rumorRegex.exec(tweet)) === null) {
@@ -437,21 +373,6 @@ const updatePorts = async (): Promise<void> => {
                     isPortDataChanged = true
                     portBattleScheduled(result)
                 }
-            } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                npcPortBattleScheduled(result)
-            } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                defended(result)
-            }
-        } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(2, "day"))) {
-            // Add scheduled NPC raids (only if battle is in the future)
-            if (
-                (result = npcPortBattleRegex.exec(tweet)) !== null &&
-                dayjs.utc().isBefore(dayjs.utc(result[4], "D MMM YYYY HH:mm"))
-            ) {
-                isPortDataChanged = true
-                npcPortBattleScheduled(result)
             }
         }
     }

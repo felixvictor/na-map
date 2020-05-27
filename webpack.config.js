@@ -43,9 +43,26 @@ const SriPlugin = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
 const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
-const servers = require("./dist/js/common/servers")
+const dirOutput = path.resolve(__dirname, "public")
+const dirSrc = path.resolve(__dirname, "src")
+const dirDist = path.resolve(__dirname, "dist")
+
+const dirFlags = path.resolve(dirSrc, "images", "flags")
+const dirFonts = path.resolve(dirSrc, "fonts")
+const dirIcons = path.resolve(dirSrc, "icons")
+const dirJsSrc = path.resolve(dirSrc, "js")
+const dirLib = path.resolve(dirSrc, "lib")
+const dirMap = path.resolve(dirSrc, "images", "map")
+const dirScssSrc = path.resolve(dirSrc, "scss")
+const dirPrefixIcons = path.join("images", "icons")
+
+const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
+const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
+const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
+
 const PACKAGE = require("./package.json")
-const repairs = require("./lib/gen-generic/repairs.json")
+const repairs = require(`${dirLib}/gen-generic/repairs.json`)
+const servers = require(`${dirDist}/js/common/servers`)
 
 // Environment
 const { TARGET, QUIET } = process.env
@@ -57,20 +74,6 @@ const libraryName = PACKAGE.name
 const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
-
-const dirOutput = path.resolve(__dirname, "public")
-const dirSrc = path.resolve(__dirname, "src")
-const dirFlags = path.resolve(dirSrc, "images", "flags")
-const dirMap = path.resolve(dirSrc, "images", "map")
-const dirFonts = path.resolve(dirSrc, "fonts")
-const dirIcons = path.resolve(dirSrc, "icons")
-const dirJsSrc = path.resolve(dirSrc, "js")
-const dirScssSrc = path.resolve(dirSrc, "scss")
-const dirPrefixIcons = path.join("images", "icons")
-
-const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
-const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
-const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 const setColours = () => {
     const compiledCss = sass
@@ -118,7 +121,7 @@ const babelOpt = {
     plugins: [
         "@babel/plugin-proposal-nullish-coalescing-operator",
         "@babel/plugin-transform-spread",
-        "@babel/proposal-class-properties",
+        "@babel/plugin-proposal-class-properties",
     ],
     presets: [
         [
@@ -126,7 +129,6 @@ const babelOpt = {
             {
                 // debug: true,
                 corejs: { version: 3, proposals: true },
-                loose: true,
                 modules: false,
                 shippedProposals: true,
                 targets: {
@@ -162,6 +164,7 @@ const htmlMinifyOpt = {
 const postcssOpt = {
     config: {
         path: filePostcssConfig,
+        ctx: { isProduction },
     },
     sourceMap: true,
 }
@@ -361,16 +364,18 @@ const config = {
             resourceRegExp: /^\.\/locale$/,
             contextRegExp: /moment$/,
         }),
-        new CopyPlugin([
-            { from: "netlify.toml" },
-            {
-                from: "lib/gen-server",
-                to: `${dirOutput}/data`,
-                flatten: true,
-            },
-            { from: "src/google979f2cf3bed204d6.html" },
-            { from: dirMap, to: `${dirOutput}/images/map` },
-        ]),
+        new CopyPlugin({
+            patterns: [
+                { from: "netlify.toml" },
+                {
+                    from: `${dirLib}/gen-server`,
+                    to: `${dirOutput}/data`,
+                    flatten: true,
+                },
+                { from: `${dirSrc}/google979f2cf3bed204d6.html` },
+                { from: dirMap, to: `${dirOutput}/images/map` },
+            ],
+        }),
         new HtmlPlugin(htmlOpt),
         new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
@@ -401,7 +406,7 @@ const config = {
             {
                 test: /\.(ts|js)$/,
                 include: dirJsSrc,
-                use: [{ loader: "babel-loader", options: babelOpt }],
+                use: [{ loader: require.resolve("babel-loader"), options: babelOpt }],
             },
             {
                 test: /\.scss$/,
@@ -409,15 +414,22 @@ const config = {
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: "css-loader",
+                        loader: require.resolve("string-replace-loader"),
+                        options: {
+                            search: "url(ata:image",
+                            replace: "url(data:image",
+                        },
+                    },
+                    {
+                        loader: require.resolve("css-loader"),
                         options: cssOpt,
                     },
                     {
-                        loader: "postcss-loader",
+                        loader: require.resolve("postcss-loader"),
                         options: postcssOpt,
                     },
                     {
-                        loader: "sass-loader",
+                        loader: require.resolve("sass-loader"),
                         options: sassOpt,
                     },
                 ],
@@ -427,11 +439,11 @@ const config = {
                 use: [
                     ExtractCssChunks.loader,
                     {
-                        loader: "css-loader",
+                        loader: require.resolve("css-loader"),
                         options: cssOpt,
                     },
                     {
-                        loader: "postcss-loader",
+                        loader: require.resolve("postcss-loader"),
                         options: postcssOpt,
                     },
                 ],
@@ -440,7 +452,7 @@ const config = {
                 test: /\.(woff2?|ttf|eot|svg)$/,
                 include: dirFonts,
                 use: {
-                    loader: "file-loader",
+                    loader: require.resolve("file-loader"),
                     options: {
                         name: "[name].[ext]",
                         outputPath: "fonts/",
@@ -452,7 +464,7 @@ const config = {
                 include: dirFlags,
                 use: [
                     {
-                        loader: "svg-url-loader",
+                        loader: require.resolve("svg-url-loader"),
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -460,27 +472,27 @@ const config = {
                         },
                     },
                     {
-                        loader: "image-webpack-loader",
+                        loader: require.resolve("image-webpack-loader"),
                         options: {
                             svgo: svgoOpt,
                         },
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
                             replace: `fill="${primary700}" fill-opacity="0.3"/>`,
                         },
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
                             replace: `fill="${primary200}" fill-opacity="1"/>`,
                         },
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="#fff" fill-opacity=".7"/>',
                             replace: `fill="${primary300}" fill-opacity=".7"/>`,
@@ -493,7 +505,7 @@ const config = {
                 include: dirIcons,
                 use: [
                     {
-                        loader: "svg-url-loader",
+                        loader: require.resolve("svg-url-loader"),
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -501,13 +513,13 @@ const config = {
                         },
                     },
                     {
-                        loader: "image-webpack-loader",
+                        loader: require.resolve("image-webpack-loader"),
                         options: {
                             svgo: svgoOpt,
                         },
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: require.resolve("string-replace-loader"),
                         options: {
                             search: 'fill="$themeColour"',
                             replace: `fill="${themeColour}"`,

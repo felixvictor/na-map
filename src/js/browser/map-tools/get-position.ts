@@ -17,9 +17,7 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { copyF11ToClipboard } from "../util"
 import Toast from "../util/toast"
-import { convertInvCoordX, convertInvCoordY } from "../../common/common-math"
 import DisplayPorts from "../map/display-ports"
 import { circleRadiusFactor, HtmlString, insertBaseModal } from "../../common/common-browser"
 import { sortBy } from "../../common/common-node"
@@ -104,7 +102,7 @@ const vectorCross = (a: Vector, b: Vector): Vector => ({
  * @param returnMiddle - If two solutions found then return the center of them
  * @returns Solution
  */
-const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): Vector | Vector[] | null => {
+const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): Vector | Vector[] | undefined => {
     // based on: https://en.wikipedia.org/wiki/Trilateration
 
     const ex = vectorDivide(vectorSubtract(p2, p1), norm(vectorSubtract(p2, p1)))
@@ -130,7 +128,7 @@ const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): 
 
     // no solution found
     if (Number.isNaN(z)) {
-        return null
+        return
     }
 
     a = vectorAdd(p1, vectorAdd(vectorMultiply(ex, x), vectorMultiply(ey, y)))
@@ -287,12 +285,7 @@ export default class TrilateratePosition {
             position.x = Math.round(position.x)
             position.y = Math.round(position.y)
 
-            this.#ports.map.f11.printCoord(position.x, position.y)
             this.#ports.map.zoomAndPan(position.x, position.y, 1)
-
-            const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000)
-            const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000)
-            copyF11ToClipboard(coordX, coordY, this.#modal$)
 
             // eslint-disable-next-line no-new
             new Toast("Get position", "Coordinates copied to clipboard.")

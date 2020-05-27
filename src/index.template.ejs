@@ -25,7 +25,7 @@
 
 <body>
 
-<% /*     %>
+<% /*      %>
 <div class="row">
     <div class="col-sm-3 colour-palette">
         <div class="colour-slab colour-slab-base primary-500">500 primary</div>
@@ -104,7 +104,7 @@
         <div class="colour-slab colour-slab-base black">black</div>
     </div>
 </div>
-<%     */ %>
+<%      */ %>
 
 <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="/">
@@ -153,14 +153,6 @@
                         <label>
                             <select title="Select nation defending" name="frontlines-defending-nation-select"
                                     id="frontlines-defending-nation-select"></select>
-                        </label>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Conquest mark</h6>
-                    <div class="dropdown-item">
-                        <label>
-                            <select title="Select" name="prop-cm-select" id="prop-cm-select"></select>
                         </label>
                     </div>
 
@@ -289,18 +281,16 @@
 
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
-                   role="button"
+                   role="button" title="Map tools" aria-label="Map tools"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Map tools
+                    <i class="icon icon-map icon-navbar" aria-hidden="true"></i><span
+                            class="sr-only">Map tools</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
                      aria-labelledby="map-tools-dropdown">
 
                     <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
                     <a class="dropdown-item" id="button-ingame-wind" href="#">In-game wind</a>
-                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span
-                                class="small text-right badge badge-pill badge-primary">shift+<span
-                                    class="caps">F11</span></span></a>
                     <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
                     <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                 </div>
@@ -308,9 +298,10 @@
 
             <li class="nav-item dropdown pr-2">
                 <a class="nav-link dropdown-toggle" href="#" id="game-tools-dropdown"
-                   role="button"
+                   role="button" title="Game tools" aria-label="Game tools"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Game tools
+                    <i class="icon icon-bar-chart icon-navbar" aria-hidden="true"></i><span
+                            class="sr-only">Game tools</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
                      aria-labelledby="game-tools-dropdown">
@@ -423,16 +414,6 @@
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input"
-                                   name="show-zones" id="show-zones-raid-all" value="raid-all">
-                            <label class="custom-control-label" for="show-zones-raid-all">All raid</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-zones" id="show-zones-raid-single" value="raid-single">
-                            <label class="custom-control-label" for="show-zones-raid-single">Single raid</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
                                    name="show-zones" id="show-zones-off" value="off">
                             <label class="custom-control-label" for="show-zones-off">Off</label>
                         </div>
@@ -467,23 +448,6 @@
                             <label class="custom-control-label" for="show-grid-off">Off</label>
                         </div>
                     </div>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Double click to</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="double-click-action">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="double-click-action"
-                                   id="double-click-action-compass" value="compass">
-                            <label class="custom-control-label" for="double-click-action-compass">Plot a course</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="double-click-action"
-                                   id="double-click-action-f11" value="f11">
-                            <label class="custom-control-label" for="double-click-action-f11">Show <span
-                                        class="caps">F11</span>
-                                coordinates</label>
-                        </div>
-                    </div>
                 </div>
             </li>
         </ul>
@@ -513,11 +477,10 @@
         <div id="summary-column" class="summary-column"></div>
     </div>
     <div id="modal-section"></div>
-
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
