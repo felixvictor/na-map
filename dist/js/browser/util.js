@@ -196,7 +196,7 @@ const copyToClipboardFallback = (text, modal$) => {
         return false;
     }
 };
-const writeClipboard = (text) => {
+const writeClipboard = async (text) => {
     return navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -211,14 +211,28 @@ export const copyToClipboard = (text, modal$) => {
     if (!navigator.clipboard) {
         copyToClipboardFallback(text, modal$);
     }
-    writeClipboard(text);
+    void writeClipboard(text);
 };
-export const copyF11ToClipboard = (x, z, modal$) => {
-    if (Number.isFinite(x) && Number.isFinite(z)) {
-        const F11Url = new URL(window.location.href);
-        F11Url.searchParams.set("x", String(x));
-        F11Url.searchParams.set("z", String(z));
-        copyToClipboard(F11Url.href, modal$);
+export const colourRamp = (element, colourScale, steps = 512) => {
+    var _a;
+    const height = 200;
+    const width = 1000;
+    const canvas = element.insert("canvas").attr("width", width).attr("height", height);
+    const context = (_a = canvas.node()) === null || _a === void 0 ? void 0 : _a.getContext("2d");
+    canvas.style.imageRendering = "pixelated";
+    const min = colourScale.domain()[0];
+    const max = colourScale.domain()[colourScale.domain().length - 1];
+    const step = (max - min) / steps;
+    const stepWidth = Math.floor(width / steps);
+    let x = 0;
+    console.log(canvas, context);
+    console.log(min, max, steps, step);
+    if (context) {
+        for (let currentStep = min; currentStep < max; currentStep += step) {
+            context.fillStyle = colourScale(currentStep);
+            context.fillRect(x, 0, stepWidth, height);
+            x += stepWidth;
+        }
     }
 };
 export const drawSvgCircle = (x, y, r) => `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`;

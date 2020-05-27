@@ -11,3 +11,5 @@
 /port-distances.json
 /.env
 /.pnp.js
+# Local Netlify folder
+.netlify

@@ -7,6 +7,7 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+import { color as d3Color, rgb as d3Rgb } from "d3-color";
 import { select as d3Select } from "d3-selection";
 import Hashids from "hashids";
 import { html } from "lit-html";
@@ -42,23 +43,36 @@ export const circleRadiusFactor = 5;
 const secondsForFullCircle = 2935;
 export const degreesPerSecond = degreesFullCircle / secondsForFullCircle;
 export const colourList = [
-    "#48355d",
-    "#8bcb19",
-    "#003dc5",
-    "#01c071",
-    "#ff12c8",
-    "#93c590",
-    "#000776",
-    "#b66e00",
-    "#63a6ff",
-    "#984b00",
-    "#acb7ea",
-    "#99001b",
-    "#dfb16a",
-    "#4f0017",
-    "#ff7a6b",
-    "#422b00",
-    "#6f2400",
+    "#f23d3d",
+    "#806060",
+    "#8c3f23",
+    "#f2c6b6",
+    "#bf7c30",
+    "#ffd580",
+    "#403a30",
+    "#73621d",
+    "#9da67c",
+    "#ace639",
+    "#165916",
+    "#b6f2be",
+    "#39e67e",
+    "#30bfb6",
+    "#0d3330",
+    "#5395a6",
+    "#3db6f2",
+    "#397ee6",
+    "#334766",
+    "#404080",
+    "#c6b6f2",
+    "#7033cc",
+    "#39134d",
+    "#e63df2",
+    "#40303d",
+    "#f279ca",
+    "#802053",
+    "#d93662",
+    "#330d12",
+    "#f2b6be",
 ];
 export const initMultiDropdownNavbar = (id) => {
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", (event) => {
@@ -134,4 +148,10 @@ export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) =>
     `;
 };
 export const getCurrencyAmount = (amount) => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
+export const getContrastColour = (colour) => {
+    var _a, _b;
+    const { r, g, b } = d3Rgb(colour);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? (_b = (_a = d3Color(colourWhite)) === null || _a === void 0 ? void 0 : _a.darker(5).toString()) !== null && _b !== void 0 ? _b : "#111" : colourWhite;
+};
 //# sourceMappingURL=common-browser.js.map

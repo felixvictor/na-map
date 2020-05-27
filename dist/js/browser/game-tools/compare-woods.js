@@ -252,6 +252,10 @@ export default class CompareWoods {
         await this._loadAndSetupData();
         this._initData();
     }
+    getWoodName(type, woodId) {
+        var _a, _b;
+        return (_b = (_a = this._woodData[type].find((wood) => wood.id === woodId)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : "";
+    }
     _findWoodId(type, woodName) {
         var _a, _b;
         return (_b = (_a = this._woodData[type].find((wood) => wood.name === woodName)) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 0;

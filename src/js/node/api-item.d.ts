@@ -234,12 +234,12 @@ export interface ModifiersEntity {
     Percentage: number
 }
 interface ItemsEntity {
-    Template?: number
-    Chance?: number
-    Stack?: MinMax<number>
-    StackIsPercOfAmount?: boolean
-    Unique?: boolean
-    ItemTypes?: number[]
+    Template: number
+    Chance: number
+    Stack: MinMax<number>
+    StackIsPercOfAmount: boolean
+    Unique: boolean
+    ItemTypes: number[]
 }
 interface MinMax<amount> {
     Min: amount
@@ -465,9 +465,8 @@ export interface APIRecipeModuleResource extends APIRecipe {
  * Loot
  */
 
-export interface APIShipLootTableItem {
-    __type: "MegaChaka.Services.Items.ShipLootTableItemTemplate, MegaChaka"
-    Items?: ItemsEntity[]
+export interface APIGenericLootTableItem {
+    Items: ItemsEntity[]
     Name: string
     Id: number
     NotUsed: boolean
@@ -490,7 +489,6 @@ export interface APIShipLootTableItem {
     CanBeSoldToShop: true
     ResetStockOnServerStart: false
     SellPriceCoefficient: 0.5
-    ItemType: "ShipLootTableItem"
     MongoID: string
     EventLootTable: boolean
     Class: number
@@ -501,6 +499,15 @@ export interface APIShipLootTableItem {
     ShowInContractsSelector: true
     DeliveryOrderOptions: DeliveryOrderOptions<false, 0>
     PortPrices: PortPrices<false, 0>
+}
+
+export interface APIShipLootTableItem extends APIGenericLootTableItem {
+    __type: "MegaChaka.Services.Items.ShipLootTableItemTemplate, MegaChaka"
+    ItemType: "ShipLootTableItem"
+}
+export interface APILootTableItem extends APIGenericLootTableItem {
+    __type: "MegaChaka.Services.Items.LootTableItemTemplate, MegaChaka"
+    ItemType: "LootTableItem"
 }
 
 export interface APITimeBasedConvertibleItem {
