@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Victory B ARMOR" Type="ARMOR">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Rookie Brig B ARMOR" Type="ARMOR">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2281</Value>
+        <Value>160</Value>
       </Value>
     </Pair>
     <Pair>
@@ -22,7 +22,7 @@
     <Pair>
       <Key>DAMAGE_MULTIPLIER</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>3</Value>
+        <Value>1.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -34,7 +34,7 @@
     <Pair>
       <Key>ARMOR_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>42</Value>
+        <Value>12</Value>
       </Value>
     </Pair>
     <Pair>
@@ -46,7 +46,7 @@
     <Pair>
       <Key>ARMOR_REAR_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>2281</Value>
+        <Value>160</Value>
       </Value>
     </Pair>
     <Pair>
@@ -63,13 +63,13 @@
     </Pair>
     <Pair>
       <Key>CREW_HIT_PROBABILITY</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>0.75</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>FIRE_PROBABILITY</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>0</Value>
       </Value>
     </Pair>
@@ -111,13 +111,7 @@
     <Pair>
       <Key>ARMOR_TYPE</Key>
       <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>1</Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>ARMOR_BONUS_THICKNESS</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>0</Value>
+        <Value>7</Value>
       </Value>
     </Pair>
   </Attributes>

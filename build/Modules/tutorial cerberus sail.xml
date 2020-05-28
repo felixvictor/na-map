@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Victory SAIL" Type="SAIL">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Tutorial Cerberus Sail" Type="SAIL">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value />
+        <Value>Basic Cutter sails</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>22806</Value>
+        <Value>3000</Value>
       </Value>
     </Pair>
     <Pair>
@@ -20,32 +20,38 @@
       </Value>
     </Pair>
     <Pair>
+      <Key>SAIL_ACCELERATION_CURVE</Key>
+      <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>
+          <Time>0</Time>
+          <Value>0</Value>
+          <TangentIn>2</TangentIn>
+          <TangentOut>2</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.2792565</Time>
+          <Value>0.457626462</Value>
+          <TangentIn>1.376271</TangentIn>
+          <TangentOut>1.376271</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.999010861</Time>
+          <Value>0.715544343</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+      </Value>
+    </Pair>
+    <Pair>
       <Key>SHIP_MAX_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>9.54</Value>
+        <Value>12.82</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>DAMAGE_TYPE</Key>
       <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>1</Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>SAIL_ACCELERATION_CURVE</Key>
-      <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>
-          <Time>0</Time>
-          <Value>0</Value>
-          <TangentIn>1.232298</TangentIn>
-          <TangentOut>1.232298</TangentOut>
-        </Value>
-        <Value>
-          <Time>1.00124741</Time>
-          <Value>0.3379397</Value>
-          <TangentIn>0</TangentIn>
-          <TangentOut>0</TangentOut>
-        </Value>
       </Value>
     </Pair>
     <Pair>
@@ -56,14 +62,8 @@
     </Pair>
     <Pair>
       <Key>REPAIR_MODULE_TIME</Key>
-      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>120</Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>MAST_CRIT_PROBABILITY</Key>
-      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>0.015</Value>
       </Value>
     </Pair>
     <Pair>
@@ -73,15 +73,21 @@
       </Value>
     </Pair>
     <Pair>
+      <Key>MAST_CRIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.015</Value>
+      </Value>
+    </Pair>
+    <Pair>
       <Key>SAIL_RISING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>3</Value>
+        <Value>5</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>RHEA_TURN_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>13</Value>
+        <Value>19</Value>
       </Value>
     </Pair>
     <Pair>
@@ -123,7 +129,7 @@
     <Pair>
       <Key>SAILING_CREW_REQUIRED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>218</Value>
+        <Value>62</Value>
       </Value>
     </Pair>
     <Pair>
@@ -135,7 +141,7 @@
     <Pair>
       <Key>MAST_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>139</Value>
+        <Value>50</Value>
       </Value>
     </Pair>
   </Attributes>

@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Victory HULL" Type="HULL">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Victory1765 HULL" Type="HULL">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Ships/Victory.xml</Value>
+        <Value>Ships/Victory1765.xml</Value>
       </Value>
     </Pair>
     <Pair>
@@ -133,7 +133,7 @@
     <Pair>
       <Key>MODULE_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Common/Prefabs/Ships/UniversalVictory.prefab</Value>
+        <Value>Assets/Resources/Common/Prefabs/Ships/UniversalUniversalVictory1765.prefab</Value>
       </Value>
     </Pair>
     <Pair>

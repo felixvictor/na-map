@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Victory HULL" Type="HULL">
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Tutorial BRIG Hull" Type="HULL">
   <Attributes>
     <Pair>
       <Key>MODULE_DESCRIPTION</Key>
       <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Ships/Victory.xml</Value>
+        <Value>Ships/Brig.xml</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4000</Value>
+        <Value>600</Value>
       </Value>
     </Pair>
     <Pair>
@@ -24,19 +24,19 @@
       <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>
           <Time>0</Time>
-          <Value>5.304813E-06</Value>
+          <Value>0.002670215</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.5001774</Time>
-          <Value>0.9995734</Value>
+          <Time>0.5002663</Time>
+          <Value>1.000065</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>1.000018</Time>
-          <Value>4.865974E-05</Value>
+          <Time>1</Time>
+          <Value>-0.0001287945</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -47,15 +47,15 @@
       <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
         <Value>
           <Time>0</Time>
-          <Value>3.668247E-06</Value>
-          <TangentIn>0.7282717</TangentIn>
-          <TangentOut>0.7282717</TangentOut>
+          <Value>0</Value>
+          <TangentIn>1.353688</TangentIn>
+          <TangentOut>1.353688</TangentOut>
         </Value>
         <Value>
-          <Time>0.9998574</Time>
-          <Value>0.2002707</Value>
-          <TangentIn>0.08603368</TangentIn>
-          <TangentOut>0.08603368</TangentOut>
+          <Time>1.00105608</Time>
+          <Value>0.4017765</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
       </Value>
     </Pair>
@@ -69,26 +69,26 @@
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.150569946</Time>
+          <Time>0.0994965658</Time>
           <Value>0.09988511</Value>
-          <TangentIn>1.49966407</TangentIn>
-          <TangentOut>1.49966407</TangentOut>
+          <TangentIn>1.92528081</TangentIn>
+          <TangentOut>1.92528081</TangentOut>
         </Value>
         <Value>
-          <Time>0.3999339</Time>
+          <Time>0.300572962</Time>
           <Value>1.00022149</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
           <Time>0.8506044</Time>
-          <Value>1.00010121</Value>
+          <Value>1.00009632</Value>
           <TangentIn>-0.000596046448</TangentIn>
           <TangentOut>-0.000596046448</TangentOut>
         </Value>
         <Value>
           <Time>1.00011015</Time>
-          <Value>0.899734735</Value>
+          <Value>0.90135324</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -103,13 +103,13 @@
     <Pair>
       <Key>SHIP_ACCELERATION</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.6</Value>
+        <Value>0.9</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_MAX_ROLL_ANGLE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>28</Value>
+        <Value>8</Value>
       </Value>
     </Pair>
     <Pair>
@@ -133,7 +133,7 @@
     <Pair>
       <Key>MODULE_PREFAB_PATH</Key>
       <Value xsi:type="StringAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>Assets/Resources/Common/Prefabs/Ships/UniversalVictory.prefab</Value>
+        <Value>Assets/Resources/Common/Prefabs/Ships/UniversalBrig.prefab</Value>
       </Value>
     </Pair>
     <Pair>
@@ -146,8 +146,8 @@
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>1</Time>
-          <Value>0.2496079</Value>
+          <Time>1.000319</Time>
+          <Value>0.5001711</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -156,7 +156,7 @@
     <Pair>
       <Key>SHIP_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4281</Value>
+        <Value>550</Value>
       </Value>
     </Pair>
     <Pair>
@@ -168,13 +168,13 @@
     <Pair>
       <Key>SHIP_WATERLINE_HEIGHT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>-0.15</Value>
+        <Value>-0.1</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>FIREZONE_HORIZONTAL_WIDTH</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>40</Value>
+        <Value>15</Value>
       </Value>
     </Pair>
     <Pair>
@@ -210,7 +210,7 @@
     <Pair>
       <Key>SINKING_MAX_PROBES_OFFSET</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>1.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -274,7 +274,7 @@
     <Pair>
       <Key>SHIP_TURNING_SPEED_RHEAS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>1</Value>
+        <Value>2.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -358,7 +358,7 @@
     <Pair>
       <Key>SHIP_STRUCTURE_LEAKS_PER_SECOND</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>69.965</Value>
+        <Value>10.495</Value>
       </Value>
     </Pair>
     <Pair>
@@ -466,7 +466,7 @@
     <Pair>
       <Key>SHIP_CLASS_TYPE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>1</Value>
+        <Value>3</Value>
       </Value>
     </Pair>
     <Pair>
@@ -484,13 +484,13 @@
     <Pair>
       <Key>PERK_CONTROL_EXIT_TIMER_OVERRIDE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0</Value>
+        <Value>1</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>PERK_CONTROL_EXIT_TIMER_OVERRIDE_DISTANCE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0</Value>
+        <Value>750</Value>
       </Value>
     </Pair>
     <Pair>
@@ -572,21 +572,9 @@
       </Value>
     </Pair>
     <Pair>
-      <Key>SHIP_PHYSICS_DEC_COEF</Key>
+      <Key>SHIP_PHYSICS_USE_NEW_INERTIA</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.0226</Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>SHIP_PHYSICS_ACC_COEF</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.058</Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>SHIP_PHYSICS_DEC_EXTRA_FORCE_KNOTS</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>6.17</Value>
+        <Value>1</Value>
       </Value>
     </Pair>
     <Pair>
@@ -596,9 +584,33 @@
       </Value>
     </Pair>
     <Pair>
-      <Key>SHIP_PHYSICS_USE_NEW_INERTIA</Key>
+      <Key>SHIP_PHYSICS_DEC_EXTRA_FORCE_KNOTS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1</Value>
+        <Value>6.17</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_PHYSICS_ACC_COEF</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0.206</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_PHYSICS_DEC_COEF</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0.0444</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_PHYSICS_ACC_EXTRA_FORCE_B_KNOTS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0.617</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SHIP_PHYSICS_DEC_EXTRA_FORCE_B_KNOTS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0.617</Value>
       </Value>
     </Pair>
     <Pair>
@@ -616,18 +628,6 @@
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>SHIP_PHYSICS_ACC_EXTRA_FORCE_B_KNOTS</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.617</Value>
-      </Value>
-    </Pair>
-    <Pair>
-      <Key>SHIP_PHYSICS_DEC_EXTRA_FORCE_B_KNOTS</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.617</Value>
       </Value>
     </Pair>
     <Pair>
@@ -651,25 +651,25 @@
     <Pair>
       <Key>CREW_DAMAGE_RECEIVED_DECREASE_PERCENT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0</Value>
+        <Value>-0.2</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>7</Value>
+        <Value>4</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME_RHEAS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>7</Value>
+        <Value>4</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_RHEAS_DRIFT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.25</Value>
+        <Value>0.08</Value>
       </Value>
     </Pair>
     <Pair>
@@ -681,7 +681,7 @@
     <Pair>
       <Key>SHIP_SPEED_YARD_POWER_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>3</Value>
+        <Value>1.5</Value>
       </Value>
     </Pair>
     <Pair>
