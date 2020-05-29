@@ -173,7 +173,7 @@ export default class PredictWind {
             .attr("class", "icon icon-clock")
 
         $(`#${this._timeGroupId}`).datetimepicker({
-            defaultDate: dayjs.utc().format(),
+            defaultDate: dayjs.utc().format().replace("Z", ""),
             format: "H.mm",
         })
     }
