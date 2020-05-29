@@ -25,7 +25,7 @@ import {
 } from "../common/common-math"
 import { serverNames } from "../common/common-var"
 
-import { APIPort, PortElementsSlotGroupsEntity, PortPosition } from "./api-port"
+import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson, PbZone } from "../common/gen-json"
 
 let apiPorts = [] as APIPort[]
@@ -114,6 +114,15 @@ const getJoinCircle = (id: number, rotation: number): Point => {
     return [x1, y1]
 }
 
+const spawnPoints = new Set([1, 2])
+const getSpawnPoints = (portRaidSpawnPoints: PortSpawnPointsEntity[]): Point[] =>
+    portRaidSpawnPoints
+        .filter((raidPoint, i) => spawnPoints.has(i))
+        .map((raidPoint) => [
+            Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
+            Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z)),
+        ])
+
 const setAndSavePBZones = async (): Promise<void> => {
     const ports = apiPorts
         .filter((port) => !port.NonCapturable)
@@ -126,6 +135,7 @@ const setAndSavePBZones = async (): Promise<void> => {
                 forts: getForts(port.PortElementsSlotGroups),
                 towers: getTowers(port.PortElementsSlotGroups),
                 joinCircle: getJoinCircle(Number(port.Id), Number(port.Rotation)),
+                spawnPoints: getSpawnPoints(port.PortRaidSpawnPoints),
             } as PbZone
         })
         .sort(sortBy(["id"]))
