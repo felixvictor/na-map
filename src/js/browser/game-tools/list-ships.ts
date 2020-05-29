@@ -102,7 +102,7 @@ export default class ShipList {
         d3Select(`#${this._baseId} div`).html(this._getList())
 
         const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
-        // @ts-ignore
+        // @ts-expect-error
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const sortTable = new Tablesort(table)
     }
@@ -139,9 +139,7 @@ export default class ShipList {
 
         text += "</tr></thead><tbody>"
 
-        const ships = this._shipData
-            .filter((ship) => !ship.name.startsWith("Rookie "))
-            .sort(sortBy(["class", "-battleRating", "name"]))
+        const ships = this._shipData.sort(sortBy(["class", "-battleRating", "name"]))
         for (const ship of ships) {
             text += "<tr>"
             text += `<td class="text-right">${ship.class}</td>`
