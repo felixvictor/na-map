@@ -9,87 +9,88 @@
  */
 import * as fs from "fs";
 import * as path from "path";
-import mergeAdvanced from "object-merge-advanced";
 import convert from "xml-js";
-import { isEmpty } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file";
 import { roundToThousands, speedConstA, speedConstB } from "../common/common-math";
 import { cleanName, sortBy } from "../common/common-node";
 import { serverNames } from "../common/common-var";
+import { isEmpty } from "../common/common";
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
 const plankingRatio = 0.13;
 const crewSpaceRatio = 0.025;
 const shipNames = new Map([
-    ["agamemnon", { id: 694, master: "" }],
-    ["basiccutter", { id: 413, master: "cutter" }],
-    ["basiclynx", { id: 275, master: "lynx" }],
-    ["bellepoule", { id: 264, master: "" }],
-    ["bellona", { id: 265, master: "" }],
-    ["bellona74", { id: 359, master: "" }],
-    ["brig", { id: 266, master: "" }],
-    ["brigmr", { id: 267, master: "" }],
-    ["bucentaure", { id: 268, master: "" }],
-    ["cerberus", { id: 269, master: "" }],
-    ["christian", { id: 1664, master: "" }],
-    ["constitution", { id: 270, master: "" }],
-    ["constitution2", { id: 1674, master: "" }],
-    ["cutter", { id: 271, master: "" }],
-    ["de_ruyter", { id: 2318, master: "" }],
-    ["diana", { id: 1665, master: "" }],
-    ["endymion", { id: 768, master: "" }],
-    ["essex", { id: 272, master: "" }],
-    ["frigate", { id: 273, master: "" }],
-    ["grosventre", { id: 396, master: "" }],
-    ["grosventrepirate", { id: 1561, master: "" }],
-    ["gunboat", { id: 695, master: "" }],
-    ["hamburg", { id: 970, master: "" }],
-    ["hercules", { id: 1675, master: "" }],
-    ["hermione", { id: 592, master: "" }],
-    ["indefatiable", { id: 787, master: "" }],
-    ["indiaman", { id: 425, master: "" }],
-    ["indiaman rookie", { id: 2223, master: "indiaman" }],
-    ["ingermanland", { id: 395, master: "" }],
-    ["implacable", { id: 2235, master: "" }],
-    ["leopard", { id: 2078, master: "" }],
-    ["lhermione", { id: 986, master: "" }],
-    ["lynx", { id: 274, master: "" }],
-    ["mercury", { id: 276, master: "" }],
-    ["navybrig", { id: 277, master: "" }],
-    ["niagara", { id: 278, master: "" }],
-    ["ocean", { id: 650, master: "" }],
-    ["pandora", { id: 1020, master: "" }],
-    ["pavel", { id: 279, master: "" }],
-    ["pickle", { id: 280, master: "" }],
-    ["piratefrigate", { id: 281, master: "" }],
-    ["princedeneufchatel", { id: 1125, master: "" }],
-    ["privateer", { id: 282, master: "" }],
-    ["rattlesnake", { id: 283, master: "" }],
-    ["rattlesnakeheavy", { id: 284, master: "" }],
-    ["renommee", { id: 285, master: "" }],
-    ["requin", { id: 1676, master: "" }],
-    ["rookie brig", { id: 1535, master: "brig" }],
-    ["rookie snow", { id: 1536, master: "snow" }],
-    ["santisima", { id: 286, master: "" }],
-    ["snow", { id: 287, master: "" }],
-    ["surprise", { id: 288, master: "" }],
-    ["temeraire", { id: 2229, master: "" }],
-    ["trader brig", { id: 289, master: "brig" }],
-    ["trader cutter", { id: 290, master: "cutter" }],
-    ["trader lynx", { id: 291, master: "lynx" }],
-    ["trader snow", { id: 292, master: "snow" }],
-    ["trincomalee", { id: 293, master: "" }],
-    ["tutorial cerberus", { id: 2338, master: "cerberus" }],
-    ["victory", { id: 294, master: "" }],
-    ["victory1765", { id: 2350, master: "" }],
-    ["wasa", { id: 1021, master: "" }],
-    ["wasa_prototype", { id: 1938, master: "" }],
-    ["yacht", { id: 295, master: "" }],
-    ["yachtsilver", { id: 393, master: "" }],
+    ["agamemnon", { id: 694, master: [] }],
+    ["basiccutter", { id: 413, master: ["cutter"] }],
+    ["basiclynx", { id: 275, master: ["lynx"] }],
+    ["bellepoule", { id: 264, master: [] }],
+    ["bellona", { id: 265, master: [] }],
+    ["bellona74", { id: 359, master: [] }],
+    ["brig", { id: 266, master: [] }],
+    ["brigmr", { id: 267, master: [] }],
+    ["bucentaure", { id: 268, master: [] }],
+    ["cerberus", { id: 269, master: [] }],
+    ["christian", { id: 1664, master: [] }],
+    ["constitution", { id: 270, master: [] }],
+    ["constitution2", { id: 1674, master: [] }],
+    ["cutter", { id: 271, master: [] }],
+    ["de_ruyter", { id: 2318, master: [] }],
+    ["diana", { id: 1665, master: [] }],
+    ["endymion", { id: 768, master: [] }],
+    ["essex", { id: 272, master: [] }],
+    ["frigate", { id: 273, master: [] }],
+    ["grosventre", { id: 396, master: [] }],
+    ["grosventrepirate", { id: 1561, master: [] }],
+    ["gunboat", { id: 695, master: [] }],
+    ["hamburg", { id: 970, master: [] }],
+    ["hercules", { id: 1675, master: [] }],
+    ["hermione", { id: 592, master: [] }],
+    ["indefatiable", { id: 787, master: [] }],
+    ["indiaman", { id: 425, master: [] }],
+    ["indiaman rookie", { id: 2223, master: ["indiaman"] }],
+    ["ingermanland", { id: 395, master: [] }],
+    ["implacable", { id: 2235, master: [] }],
+    ["leopard", { id: 2078, master: [] }],
+    ["lhermione", { id: 986, master: [] }],
+    ["lynx", { id: 274, master: [] }],
+    ["mercury", { id: 276, master: [] }],
+    ["navybrig", { id: 277, master: [] }],
+    ["niagara", { id: 278, master: [] }],
+    ["ocean", { id: 650, master: [] }],
+    ["pandora", { id: 1020, master: [] }],
+    ["pavel", { id: 279, master: [] }],
+    ["pickle", { id: 280, master: [] }],
+    ["piratefrigate", { id: 281, master: [] }],
+    ["princedeneufchatel", { id: 1125, master: [] }],
+    ["privateer", { id: 282, master: [] }],
+    ["rattlesnake", { id: 283, master: [] }],
+    ["rattlesnakeheavy", { id: 284, master: [] }],
+    ["renommee", { id: 285, master: [] }],
+    ["requin", { id: 1676, master: [] }],
+    ["rookie brig", { id: 1535, master: ["brig"] }],
+    ["rookie snow", { id: 1536, master: ["snow"] }],
+    ["santisima", { id: 286, master: [] }],
+    ["snow", { id: 287, master: [] }],
+    ["surprise", { id: 288, master: [] }],
+    ["temeraire", { id: 2229, master: [] }],
+    ["trader brig", { id: 289, master: ["brig"] }],
+    ["trader cutter", { id: 290, master: ["cutter"] }],
+    ["trader lynx", { id: 291, master: ["lynx"] }],
+    ["trader snow", { id: 292, master: ["snow"] }],
+    ["trincomalee", { id: 293, master: [] }],
+    ["tutorial trader", { id: 2339, master: ["trader brig", "brig"] }],
+    ["tutorial brig", { id: 2343, master: ["brig"] }],
+    ["tutorial cerberus", { id: 2338, master: ["cerberus"] }],
+    ["victory", { id: 294, master: [] }],
+    ["victory1765", { id: 2350, master: [] }],
+    ["wasa", { id: 1021, master: [] }],
+    ["wasa_prototype", { id: 1938, master: [] }],
+    ["yacht", { id: 295, master: [] }],
+    ["yachtsilver", { id: 393, master: [] }],
 ]);
 const getShipId = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 0; };
-const getShipMaster = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.master) !== null && _b !== void 0 ? _b : ""; };
+const getShipMaster = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.master) !== null && _b !== void 0 ? _b : []; };
 const subFileStructure = [
     {
         ext: "b armor",
@@ -166,11 +167,11 @@ const convertGenericShipData = () => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"]);
-    return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed).map((ship) => {
-        const calcPortSpeed = ship.Specs.MaxSpeed * speedConstA - speedConstB;
-        const speedDegrees = ship.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
-        const { length } = ship.Specs.SpeedToWind;
-        if (shipsWith36lb.has(ship.Name)) {
+    return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed).map((apiShip) => {
+        const calcPortSpeed = apiShip.Specs.MaxSpeed * speedConstA - speedConstB;
+        const speedDegrees = apiShip.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
+        const { length } = apiShip.Specs.SpeedToWind;
+        if (shipsWith36lb.has(apiShip.Name)) {
             cannonWeight[2] = 36;
         }
         else {
@@ -180,11 +181,11 @@ const convertGenericShipData = () => {
             speedDegrees.unshift(speedDegrees[i]);
         }
         speedDegrees.pop();
-        const deckClassLimit = ship.DeckClassLimit.map((deck) => [
+        const deckClassLimit = apiShip.DeckClassLimit.map((deck) => [
             cannonWeight[deck.Limitation1.Min],
             carroWeight[deck.Limitation2.Min],
         ]);
-        const gunsPerDeck = ship.GunsPerDeck;
+        const gunsPerDeck = apiShip.GunsPerDeck;
         gunsPerDeck.pop();
         let guns = 0;
         let cannonBroadside = 0;
@@ -206,52 +207,52 @@ const convertGenericShipData = () => {
             }
         }
         const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside };
-        const frontDeck = ship.FrontDecks
-            ? ship.FrontDeckClassLimit.map((deck) => [
+        const frontDeck = apiShip.FrontDecks
+            ? apiShip.FrontDeckClassLimit.map((deck) => [
                 cannonWeight[deck.Limitation1.Min],
                 carroWeight[deck.Limitation2.Min],
             ])[0]
             : emptyDeck;
         deckClassLimit.push(frontDeck);
-        const backDeck = ship.BackDecks
-            ? ship.BackDeckClassLimit.map((deck) => [
+        const backDeck = apiShip.BackDecks
+            ? apiShip.BackDeckClassLimit.map((deck) => [
                 cannonWeight[deck.Limitation1.Min],
                 carroWeight[deck.Limitation2.Min],
             ])[0]
             : emptyDeck;
         deckClassLimit.push(backDeck);
-        return {
-            id: Number(ship.Id),
-            name: cleanName(ship.Name),
-            class: ship.Class,
+        const ship = {
+            id: Number(apiShip.Id),
+            name: cleanName(apiShip.Name),
+            class: apiShip.Class,
             gunsPerDeck,
             guns,
             broadside,
             deckClassLimit,
-            shipMass: ship.ShipMass,
-            battleRating: ship.BattleRating,
-            decks: ship.Decks,
-            holdSize: ship.HoldSize,
-            maxWeight: ship.MaxWeight,
-            crew: { min: ship.MinCrewRequired, max: ship.HealthInfo.Crew, sailing: 0 },
+            shipMass: apiShip.ShipMass,
+            battleRating: apiShip.BattleRating,
+            decks: apiShip.Decks,
+            holdSize: apiShip.HoldSize,
+            maxWeight: apiShip.MaxWeight,
+            crew: { min: apiShip.MinCrewRequired, max: apiShip.HealthInfo.Crew, sailing: 0 },
             speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
                 max: roundToThousands(calcPortSpeed),
             },
-            sides: { armour: ship.HealthInfo.LeftArmor, thickness: 0 },
-            bow: { armour: ship.HealthInfo.FrontArmor, thickness: 0 },
-            stern: { armour: ship.HealthInfo.BackArmor, thickness: 0 },
-            structure: { armour: ship.HealthInfo.InternalStructure },
-            sails: { armour: ship.HealthInfo.Sails, risingSpeed: 0 },
-            pump: { armour: ship.HealthInfo.Pump },
+            sides: { armour: apiShip.HealthInfo.LeftArmor, thickness: 0 },
+            bow: { armour: apiShip.HealthInfo.FrontArmor, thickness: 0 },
+            stern: { armour: apiShip.HealthInfo.BackArmor, thickness: 0 },
+            structure: { armour: apiShip.HealthInfo.InternalStructure },
+            sails: { armour: apiShip.HealthInfo.Sails, risingSpeed: 0 },
+            pump: { armour: apiShip.HealthInfo.Pump },
             rudder: {
-                armour: ship.HealthInfo.Rudder,
+                armour: apiShip.HealthInfo.Rudder,
                 turnSpeed: 0,
                 halfturnTime: 0,
                 thickness: 0,
             },
-            upgradeXP: ship.OverrideTotalXpForUpgradeSlots,
+            upgradeXP: apiShip.OverrideTotalXpForUpgradeSlots,
             repairTime: { stern: 120, bow: 120, sides: 120, rudder: 30, sails: 120, structure: 60 },
             ship: {
                 waterlineHeight: 0,
@@ -271,17 +272,21 @@ const convertGenericShipData = () => {
                 middleThickness: 0,
                 topThickness: 0,
             },
-            premium: ship.Premium,
-            tradeShip: ship.ShipType === 1,
+            premium: apiShip.Premium,
+            tradeShip: apiShip.ShipType === 1,
         };
+        if (ship.id === 1535) {
+            ship.name = "Rookie Brig";
+        }
+        return ship;
     });
 };
 const baseFileNames = new Set();
 const getBaseFileNames = (dir) => {
     for (const fileName of fs.readdirSync(dir)) {
         let str = fileName.slice(0, fileName.indexOf(" "));
-        if (str === "rookie" || str === "trader") {
-            const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "");
+        if (str === "rookie" || str === "trader" || str === "tutorial") {
+            const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "").replace("tutorial ", "");
             const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "));
             str = str.concat(" ").concat(str2);
         }
@@ -292,8 +297,9 @@ const getBaseFileNames = (dir) => {
     baseFileNames.add("basiccutter");
     baseFileNames.add("basiclynx");
     baseFileNames.add("indiaman rookie");
+    baseFileNames.add("tutorial trader");
 };
-const getAddData = (elements, fileData) => {
+const getAdditionalData = (elements, fileData) => {
     const addData = {};
     for (const pair of fileData.Attributes.Pair) {
         const key = pair.Key._text;
@@ -312,7 +318,7 @@ const getAddData = (elements, fileData) => {
     }
     return addData;
 };
-const addAddData = (addData, id) => {
+const addAdditionalData = (addData, id) => {
     ships
         .filter((ship) => ship.id === id)
         .forEach((ship) => {
@@ -335,31 +341,26 @@ const getFileData = (baseFileName, ext) => {
     }
     return data;
 };
+const getAndAddAdditionalData = (fileName, shipId) => {
+    for (const file of subFileStructure) {
+        const fileData = getFileData(fileName, file.ext);
+        if (!isEmpty(fileData)) {
+            const additionalData = getAdditionalData(file.elements, fileData);
+            addAdditionalData(additionalData, shipId);
+        }
+    }
+};
 const convertAddShipData = (ships) => {
     getBaseFileNames(commonPaths.dirModules);
     for (const baseFileName of baseFileNames) {
-        if (!getShipMaster(baseFileName)) {
-            const id = getShipId(baseFileName);
-            for (const file of subFileStructure) {
-                const fileData = getFileData(baseFileName, file.ext);
-                const addData = getAddData(file.elements, fileData);
-                addAddData(addData, id);
+        const shipId = getShipId(baseFileName);
+        const masterBaseFileName = getShipMaster(baseFileName);
+        if (masterBaseFileName !== []) {
+            for (const master of masterBaseFileName) {
+                getAndAddAdditionalData(master, shipId);
             }
         }
-    }
-    for (const baseFileName of baseFileNames) {
-        if (getShipMaster(baseFileName)) {
-            const id = getShipId(baseFileName);
-            const masterBaseFileName = getShipMaster(baseFileName);
-            for (const file of subFileStructure) {
-                const fileData = getFileData(baseFileName, file.ext);
-                const fileMasterData = getFileData(masterBaseFileName, file.ext);
-                const addData = isEmpty(fileData) ? {} : getAddData(file.elements, fileData);
-                const addMasterData = getAddData(file.elements, fileMasterData);
-                const mergedData = mergeAdvanced(addMasterData, addData);
-                addAddData(mergedData, id);
-            }
-        }
+        getAndAddAdditionalData(baseFileName, shipId);
     }
     return ships;
 };
