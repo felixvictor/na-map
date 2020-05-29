@@ -141,6 +141,19 @@ export default class DisplayPbZones {
                         .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
                         .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
                         .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
+
+                    // Spawn points
+                    g.append("path")
+                        .attr("class", "raid-point")
+                        .attr("d", (d) =>
+                            d.spawnPoints.map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5)).join("")
+                        )
+                    g.append("text")
+                        .attr("class", "pb-text raid-point-text")
+                        .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
+                        .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
+                        .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
+
                     return g
                 }
             )
@@ -185,7 +198,8 @@ export default class DisplayPbZones {
             if (this._isDataLoaded) {
                 this._filterVisible()
             } else {
-                this._loadData().then(() => {
+                // eslint-disable-next-line no-void
+                void this._loadData().then(() => {
                     this._isDataLoaded = true
                     this._filterVisible()
                 })
@@ -214,6 +228,7 @@ export default class DisplayPbZones {
                 id: port.id,
                 pbCircles: port.pbCircles,
                 joinCircle: port.joinCircle,
+                spawnPoints: port.spawnPoints,
             }))
         } else {
             this._pbZonesFiltered = []
