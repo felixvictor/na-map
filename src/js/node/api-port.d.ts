@@ -23,7 +23,7 @@ export interface APIPort {
     SecondEntrancePosition: PortPosition
     PortBattleZonePositions: PortPosition[]
     PortRaidZonePositions: PortPosition[]
-    PortRaidSpawnPoints: PortRaidSpawnPointsEntity[]
+    PortRaidSpawnPoints: PortSpawnPointsEntity[]
     Rotation: number
     Nation: number
     PortBattleBRLimit: number
@@ -72,7 +72,7 @@ export interface PortPosition {
     y: number
     z: number
 }
-export interface PortRaidSpawnPointsEntity {
+export interface PortSpawnPointsEntity {
     Position: PortPosition
     Rotation: PortPosition
 }
