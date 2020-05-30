@@ -291,6 +291,9 @@
 
                     <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
                     <a class="dropdown-item" id="button-ingame-wind" href="#">In-game wind</a>
+                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span
+                                class="small text-right badge badge-pill badge-primary">shift+<span
+                                    class="caps">F11</span></span></a>
                     <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
                     <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                 </div>
@@ -446,6 +449,23 @@
                             <input type="radio" class="custom-control-input"
                                    name="show-grid" id="show-grid-off" value="off">
                             <label class="custom-control-label" for="show-grid-off">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Double click to</h6>
+                    <div class="col-auto align-self-center radio-group ml-1" id="double-click-action">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="double-click-action"
+                                   id="double-click-action-compass" value="compass">
+                            <label class="custom-control-label" for="double-click-action-compass">Plot a course</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="double-click-action"
+                                   id="double-click-action-f11" value="f11">
+                            <label class="custom-control-label" for="double-click-action-f11">Show <span
+                                        class="caps">F11</span>
+                                coordinates</label>
                         </div>
                     </div>
                 </div>
