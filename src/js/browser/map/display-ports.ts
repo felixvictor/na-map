@@ -73,6 +73,7 @@ import { DivDatum, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
+import ShowF11 from "../map-tools/show-f11"
 import { simpleStringSort } from "../../common/common-node"
 
 dayjs.extend(customParseFormat)
@@ -180,6 +181,7 @@ export default class DisplayPorts {
     private readonly _baseId: string
     private readonly _circleSize: number
     private readonly _cookie: Cookie
+    private readonly _f11: ShowF11
     private readonly _fontSize: number
     private readonly _iconSize: number
     private readonly _maxRadiusFactor: number
@@ -196,6 +198,7 @@ export default class DisplayPorts {
         this._serverName = this.map.serverName
         this._minScale = this.map.minScale
         this._scale = this._minScale
+        this._f11 = this.map.f11
 
         this.showCurrentGood = false
         this.showTradePortPartners = false
@@ -441,7 +444,7 @@ export default class DisplayPorts {
 
     _setupSvg(): void {
         this._gPort = d3Select<SVGGElement, SVGGDatum>("#na-svg")
-            .append("g")
+            .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
         this._gRegion = this._gPort.append<SVGGElement>("g").attr("class", "region")
