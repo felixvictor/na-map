@@ -29,8 +29,12 @@ import "round-slider/src/roundslider"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { formatF11 } from "../../common/common-format"
 import {
     compassDirections,
+    convertInvCoordX,
+    convertInvCoordY,
+    Coordinate,
     degreesFullCircle,
     degreesToCompass,
     getDistance,
@@ -80,17 +84,17 @@ export default class MakeJourney {
     private readonly _modalId: HtmlString
     private readonly _sliderId: HtmlString
     private readonly _shipId: string
-    private _g!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
+    private _g!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, any>
     private _journey!: Journey
     private _shipCompare!: CompareShips
-    private _compass!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _compassG!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _divJourneySummary!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryTextShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryTextWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _gJourneyPath!: d3Selection.Selection<SVGPathElement, Segment, HTMLElement, unknown>
+    private _compass!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, any>
+    private _compassG!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, any>
+    private _divJourneySummary!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
+    private _journeySummaryShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
+    private _journeySummaryTextShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
+    private _journeySummaryWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
+    private _journeySummaryTextWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
+    private _gJourneyPath!: d3Selection.Selection<SVGPathElement, Segment, HTMLElement, any>
     private _drag!: d3Drag.DragBehavior<SVGSVGElement | SVGGElement, Segment, unknown>
 
     constructor(fontSize: number) {
@@ -274,7 +278,7 @@ export default class MakeJourney {
             return pos
         }
 
-        // @ts-expect-error
+        // @ts-ignore
         window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
@@ -289,7 +293,7 @@ export default class MakeJourney {
             editableTooltip: false,
             tooltipFormat: "tooltip",
             create() {
-                // @ts-expect-error
+                // @ts-ignore
                 this.control.css("display", "block")
             },
         })
@@ -320,8 +324,7 @@ export default class MakeJourney {
         this._setupWindInput()
 
         this._shipCompare = new CompareShips(this._shipId)
-        // eslint-disable-next-line no-void
-        void this._shipCompare.CompareShipsInit()
+        this._shipCompare.CompareShipsInit()
     }
 
     _useUserInput(): void {
@@ -361,7 +364,7 @@ export default class MakeJourney {
             .attr("y", y)
 
         this._compassG = this._compass.append("g")
-        // @ts-expect-error
+        // @ts-ignore
         printCompassRose({ element: this._compassG, radius: this._compassRadius })
     }
 
@@ -396,7 +399,7 @@ export default class MakeJourney {
     }
 
     _setShipSpeed(): void {
-        let speedDegrees
+        let speedDegrees = []
 
         if (this._journey.shipName === this._defaultShipName) {
             // Dummy ship speed
@@ -541,7 +544,6 @@ export default class MakeJourney {
             .value((d: Segment): string => {
                 const lines = d.label.split("|")
                 // Find longest line (number of characters)
-                // eslint-disable-next-line unicorn/no-reduce
                 const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0)
                 return lines[index]
             })
@@ -567,7 +569,7 @@ export default class MakeJourney {
             .component(textLabel)
 
         // Render
-        // @ts-expect-error
+        // @ts-ignore
         this._g.datum(this._journey.segments.map((segment) => segment)).call(labels)
     }
 
@@ -633,13 +635,15 @@ export default class MakeJourney {
                         : [[0, 0]]
                 )
                 .attr("marker-end", "url(#journey-arrow)")
-                // @ts-expect-error
+                // @ts-ignore
                 .attr("d", this._line)
         }
     }
 
-    _getTextDirection(courseCompass: string): string {
-        return `${displayCompassAndDegrees(courseCompass, true)}`
+    _getTextDirection(courseCompass: string, courseDegrees: number, pt1: Coordinate): string {
+        return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(
+            convertInvCoordX(pt1.x, pt1.y)
+        )}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`
     }
 
     _getTextDistance(distanceK: number, minutes: number, addTotal: boolean): string {
@@ -673,7 +677,7 @@ export default class MakeJourney {
         // console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
         this._journey.totalDistance += distanceK
         this._journey.totalMinutes += minutes
-        const textDirection = this._getTextDirection(courseCompass)
+        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1)
         const textDistance = this._getTextDistance(distanceK, minutes, index > 1)
 
         this._journey.segments[index].label = `${textDirection}|${textDistance}`
@@ -720,6 +724,10 @@ export default class MakeJourney {
         this._printSummary()
         this._printCompass()
         this._gJourneyPath = this._g.append("path")
+    }
+
+    setSummaryPosition(topMargin: number, rightMargin: number) {
+        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
     }
 
     plotCourse(x: number, y: number): void {
