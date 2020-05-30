@@ -316,7 +316,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
  * @param   text - String
  * @returns Clipboard promise
  */
-const writeClipboard = async (text: string): Promise<boolean> => {
+const writeClipboard = (text: string): Promise<boolean> => {
     return navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -339,8 +339,25 @@ export const copyToClipboard = (text: string, modal$: JQuery): void => {
         copyToClipboardFallback(text, modal$)
     }
 
-    // eslint-disable-next-line no-void
-    void writeClipboard(text)
+    // noinspection JSIgnoredPromiseFromCall
+    writeClipboard(text)
+}
+
+/**
+ * Copy F11 coordinates to clipboard
+ * @param x - X Coordinate
+ * @param z - Z Coordinate
+ * @param modal$ - Modal
+ */
+export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void => {
+    if (Number.isFinite(x) && Number.isFinite(z)) {
+        const F11Url = new URL(window.location.href)
+
+        F11Url.searchParams.set("x", String(x))
+        F11Url.searchParams.set("z", String(z))
+
+        copyToClipboard(F11Url.href, modal$)
+    }
 }
 
 /**
@@ -358,8 +375,9 @@ export const colourRamp = (
     const height = 200
     const width = 1000
     const canvas = element.insert("canvas").attr("width", width).attr("height", height)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const context = canvas.node()?.getContext("2d")
-    // @ts-expect-error
+    // @ts-ignore
     canvas.style.imageRendering = "pixelated"
     const min = colourScale.domain()[0]
 
