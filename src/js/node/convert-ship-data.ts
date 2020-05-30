@@ -240,13 +240,16 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
 const convertGenericShipData = (): ShipData[] => {
-    // noinspection MagicNumberJS
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
-    // noinspection MagicNumberJS
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
     const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"])
+    const shipsNotUsed = new Set([
+        2352, // Diana (i)
+    ])
 
-    return ((apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed) as unknown) as APIShip[]).map(
+    return ((apiItems.filter(
+        (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
+    ) as unknown) as APIShip[]).map(
         (apiShip: APIShip): ShipData => {
             const calcPortSpeed = apiShip.Specs.MaxSpeed * speedConstA - speedConstB
             const speedDegrees = apiShip.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed))
@@ -508,8 +511,25 @@ const convertAddShipData = (ships: ShipData[]): ShipData[] => {
  */
 const convertShipBlueprints = async (): Promise<void> => {
     const itemNames = getItemNames()
+    const blueprintsNotUsed = new Set([
+        665, // Santa Cecilia
+        746, // GunBoat
+        1558, // L'Hermione
+        1718, // Diana
+        1719, // Hercules
+        1720, // Pandora
+        1721, // Le Requin
+        2031, // Rättvisan
+        2213, // Leopard
+        2228, // Redoutable
+        2236, // Yacht
+        2239, // Yacht silver
+        2320, // Admiraal de Ruyter
+        2381, // Diana (i)
+        2382, // Victory1765
+    ])
     const apiBlueprints = (apiItems.filter(
-        (apiItem) => apiItem.ItemType === "RecipeShip"
+        (apiItem) => apiItem.ItemType === "RecipeShip" && !blueprintsNotUsed.has(apiItem.Id)
     ) as unknown) as APIShipBlueprint[]
     const shipBlueprints = apiBlueprints
         .map((apiBlueprint) => {
