@@ -81,6 +81,16 @@
 /*!
  * This file is part of na-map.
  *
+ * @file      Show F11 coordinates.
+ * @module    map-tools/show-f11
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
  * @file      Show trades.
  * @module    map-tools/show-trades
  * @author    iB aka Felix Victor
