@@ -167,7 +167,10 @@ const convertGenericShipData = () => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
     const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"]);
-    return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed).map((apiShip) => {
+    const shipsNotUsed = new Set([
+        2352,
+    ]);
+    return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)).map((apiShip) => {
         const calcPortSpeed = apiShip.Specs.MaxSpeed * speedConstA - speedConstB;
         const speedDegrees = apiShip.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
         const { length } = apiShip.Specs.SpeedToWind;
@@ -366,7 +369,25 @@ const convertAddShipData = (ships) => {
 };
 const convertShipBlueprints = async () => {
     const itemNames = getItemNames();
-    const shipBlueprints = apiItems.filter((apiItem) => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip")
+    const blueprintsNotUsed = new Set([
+        665,
+        746,
+        1558,
+        1718,
+        1719,
+        1720,
+        1721,
+        2031,
+        2213,
+        2228,
+        2236,
+        2239,
+        2320,
+        2381,
+        2382,
+    ]);
+    const apiBlueprints = apiItems.filter((apiItem) => apiItem.ItemType === "RecipeShip" && !blueprintsNotUsed.has(apiItem.Id));
+    const shipBlueprints = apiBlueprints
         .map((apiBlueprint) => {
         var _a, _b, _c, _d, _e, _f;
         const shipMass = getShipMass(apiBlueprint.Results[0].Template);

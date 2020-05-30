@@ -19,7 +19,8 @@ import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform, } fro
 import "round-slider/src/roundslider";
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal } from "../../common/common-browser";
-import { compassDirections, degreesFullCircle, degreesToCompass, getDistance, speedFactor, } from "../../common/common-math";
+import { formatF11 } from "../../common/common-format";
+import { compassDirections, convertInvCoordX, convertInvCoordY, degreesFullCircle, degreesToCompass, getDistance, speedFactor, } from "../../common/common-math";
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util";
 import { CompareShips } from "../game-tools/compare-ships";
 export default class MakeJourney {
@@ -186,7 +187,7 @@ export default class MakeJourney {
         this._injectModal();
         this._setupWindInput();
         this._shipCompare = new CompareShips(this._shipId);
-        void this._shipCompare.CompareShipsInit();
+        this._shipCompare.CompareShipsInit();
     }
     _useUserInput() {
         this._resetJourneyData();
@@ -234,7 +235,7 @@ export default class MakeJourney {
         return select$.length > 0 ? currentUserWind : 0;
     }
     _setShipSpeed() {
-        let speedDegrees;
+        let speedDegrees = [];
         if (this._journey.shipName === this._defaultShipName) {
             speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)];
         }
@@ -389,8 +390,8 @@ export default class MakeJourney {
                 .attr("d", this._line);
         }
     }
-    _getTextDirection(courseCompass) {
-        return `${displayCompassAndDegrees(courseCompass, true)}`;
+    _getTextDirection(courseCompass, courseDegrees, pt1) {
+        return `${displayCompassAndDegrees(courseCompass, true)} \u2056 F11: ${formatF11(convertInvCoordX(pt1.x, pt1.y))}\u202F/\u202F${formatF11(convertInvCoordY(pt1.x, pt1.y))}`;
     }
     _getTextDistance(distanceK, minutes, addTotal) {
         let textDistance = `${Math.round(distanceK)}\u2009k ${MakeJourney._getHumanisedDuration(minutes)}`;
@@ -411,7 +412,7 @@ export default class MakeJourney {
         const minutes = this._calculateMinutesForSegment(courseDegrees, this._journey.currentWindDegrees, distanceK * 1000);
         this._journey.totalDistance += distanceK;
         this._journey.totalMinutes += minutes;
-        const textDirection = this._getTextDirection(courseCompass);
+        const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1);
         const textDistance = this._getTextDistance(distanceK, minutes, index > 1);
         this._journey.segments[index].label = `${textDirection}|${textDistance}`;
     }
@@ -452,6 +453,9 @@ export default class MakeJourney {
         this._printSummary();
         this._printCompass();
         this._gJourneyPath = this._g.append("path");
+    }
+    setSummaryPosition(topMargin, rightMargin) {
+        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`);
     }
     plotCourse(x, y) {
         if (this._journey.segments[0].position[0] > 0) {
