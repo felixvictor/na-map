@@ -508,9 +508,10 @@ const convertAddShipData = (ships: ShipData[]): ShipData[] => {
  */
 const convertShipBlueprints = async (): Promise<void> => {
     const itemNames = getItemNames()
-    const shipBlueprints = ((apiItems.filter(
-        (apiItem) => !apiItem.NotUsed && apiItem.ItemType === "RecipeShip"
-    ) as unknown) as APIShipBlueprint[])
+    const apiBlueprints = (apiItems.filter(
+        (apiItem) => apiItem.ItemType === "RecipeShip"
+    ) as unknown) as APIShipBlueprint[]
+    const shipBlueprints = apiBlueprints
         .map((apiBlueprint) => {
             const shipMass = getShipMass(apiBlueprint.Results[0].Template)
             return {
