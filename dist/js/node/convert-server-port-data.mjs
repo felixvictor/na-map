@@ -86,7 +86,7 @@ const setAndSavePortData = async (serverName) => {
     for (const apiPort of apiPorts) {
         setPortFeaturePerServer(apiPort);
     }
-    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData);
+    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData.sort(sortBy(["id"])));
 };
 const setAndSaveTradeData = async (serverName) => {
     const trades = [];
