@@ -37,6 +37,7 @@ const FaviconsPlugin = require("favicons-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlPlugin = require("html-webpack-plugin")
 const parseCss = require("css")
+const PreloadWebpackPlugin = require("preload-webpack-plugin")
 const sass = require("node-sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 const SriPlugin = require("webpack-subresource-integrity")
@@ -74,6 +75,8 @@ const libraryName = PACKAGE.name
 const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
+
+const regExpFont = /\.(woff2?|ttf|eot|svg)$/
 
 const setColours = () => {
     const compiledCss = sass
@@ -377,6 +380,12 @@ const config = {
             ],
         }),
         new HtmlPlugin(htmlOpt),
+        new PreloadWebpackPlugin({
+            rel: "preload",
+            include: "allAssets",
+            fileWhitelist: [regExpFont],
+            as: "font",
+        }),
         new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
         new SriPlugin({
@@ -449,7 +458,7 @@ const config = {
                 ],
             },
             {
-                test: /\.(woff2?|ttf|eot|svg)$/,
+                test: regExpFont,
                 include: dirFonts,
                 use: {
                     loader: require.resolve("file-loader"),
