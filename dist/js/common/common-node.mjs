@@ -27,7 +27,7 @@ export const sortBy = (propertyNames) => (a, b) => {
             r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign;
         }
         else {
-            r = Number(a[propertyName]) - Number(b[propertyName]) * sign;
+            r = (Number(a[propertyName]) - Number(b[propertyName])) * sign;
         }
         return r !== 0;
     });

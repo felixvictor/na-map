@@ -67,7 +67,7 @@ const convertLoot = async () => {
             items: getLootItems((_a = item.Items) !== null && _a !== void 0 ? _a : [], (_b = item.itemProbability) !== null && _b !== void 0 ? _b : [0]).sort(sortBy(["chance", "id"])),
         });
     })
-        .sort(sortBy(["name", "id"]));
+        .sort(sortBy(["id"]));
     types = ["TimeBasedConvertibleItem"];
     const chests = apiItems.filter((item) => !item.NotUsed && types.includes(item.ItemType));
     data.chests = chests
@@ -89,6 +89,6 @@ const convertLoot = async () => {
 };
 export const convertLootData = () => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
-    convertLoot();
+    void convertLoot();
 };
 //# sourceMappingURL=convert-loot.js.map

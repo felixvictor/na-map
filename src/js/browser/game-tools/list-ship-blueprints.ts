@@ -245,12 +245,10 @@ export default class ListShipBlueprints {
                 .join((enter) => enter.append("tr"))
 
             // Data join cells
-            // @ts-ignore
+            // @ts-expect-error
             rows.selectAll("td")
                 .data((d) => d)
-                // @ts-ignore
                 .join((enter) => enter.append("td"))
-                // @ts-ignore
                 .html((d) => d)
         }
 

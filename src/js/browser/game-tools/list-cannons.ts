@@ -75,10 +75,10 @@ export default class ListCannons {
         for (const type of cannonType) {
             this._cannonData[type] = cannonData[type].map(
                 (cannon: CannonEntity): CannonEntity =>
-                    // @ts-ignore
+                    // @ts-expect-error
                     Object.keys(cannon)
                         .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
-                        // @ts-ignore
+                        // @ts-expect-error
                         .reduce((r: CannonEntity, k) => ((r[k] = cannon[k]), r), {}) // eslint-disable-line no-return-assign,no-sequences
             )
         }
@@ -171,7 +171,7 @@ export default class ListCannons {
                 </thead>
                 <tbody>
                     ${repeat(
-                        // @ts-ignore
+                        // @ts-expect-error
                         this._cannonData[type],
                         (cannon: CannonEntity) => cannon.name,
                         (cannon: CannonEntity) => {
@@ -254,7 +254,7 @@ export default class ListCannons {
         for (const type of Object.keys(this._cannonData)) {
             const table = document.querySelector(`#table-${type}-list`) as HTMLTableElement
             if (table) {
-                // @ts-ignore
+                // @ts-expect-error
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const sortTable = new Tablesort(table)
             }
