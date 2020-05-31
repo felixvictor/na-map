@@ -176,8 +176,8 @@ export const convertGenericPortData = () => {
             y: Math.trunc(convertCoordY(apiPort.Position.x, apiPort.Position.z)),
         },
     ]));
-    setAndSavePortData();
-    setAndSavePBZones();
-    setAndSaveCountyRegionData();
+    void setAndSavePortData();
+    void setAndSavePBZones();
+    void setAndSaveCountyRegionData();
 };
 //# sourceMappingURL=convert-generic-port-data.js.map

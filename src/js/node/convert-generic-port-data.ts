@@ -270,10 +270,8 @@ export const convertGenericPortData = (): void => {
         ])
     )
 
-    // noinspection JSIgnoredPromiseFromCall
-    setAndSavePortData()
-    // noinspection JSIgnoredPromiseFromCall
-    setAndSavePBZones()
-    // noinspection JSIgnoredPromiseFromCall
-    setAndSaveCountyRegionData()
+    /* eslint-disable no-void */
+    void setAndSavePortData()
+    void setAndSavePBZones()
+    void setAndSaveCountyRegionData()
 }

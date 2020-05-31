@@ -77,7 +77,6 @@ export default class ListBuildings {
 
     _getOptions(): string {
         return `${this._buildingData
-            // @ts-ignore
             .sort(sortBy(["name"]))
             .map((building: Building): string => `<option value="${building.name}">${building.name}</option>;`)
             .join("")}`

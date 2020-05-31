@@ -278,7 +278,7 @@ export default class MakeJourney {
             return pos
         }
 
-        // @ts-ignore
+        // @ts-expect-error
         window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
 
         $(`#${this._sliderId}`).roundSlider({
@@ -293,7 +293,7 @@ export default class MakeJourney {
             editableTooltip: false,
             tooltipFormat: "tooltip",
             create() {
-                // @ts-ignore
+                // @ts-expect-error
                 this.control.css("display", "block")
             },
         })
@@ -364,7 +364,7 @@ export default class MakeJourney {
             .attr("y", y)
 
         this._compassG = this._compass.append("g")
-        // @ts-ignore
+        // @ts-expect-error
         printCompassRose({ element: this._compassG, radius: this._compassRadius })
     }
 
@@ -569,7 +569,7 @@ export default class MakeJourney {
             .component(textLabel)
 
         // Render
-        // @ts-ignore
+        // @ts-expect-error
         this._g.datum(this._journey.segments.map((segment) => segment)).call(labels)
     }
 
@@ -635,7 +635,7 @@ export default class MakeJourney {
                         : [[0, 0]]
                 )
                 .attr("marker-end", "url(#journey-arrow)")
-                // @ts-ignore
+                // @ts-expect-error
                 .attr("d", this._line)
         }
     }

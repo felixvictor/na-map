@@ -377,7 +377,7 @@ export const colourRamp = (
     const canvas = element.insert("canvas").attr("width", width).attr("height", height)
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const context = canvas.node()?.getContext("2d")
-    // @ts-ignore
+    // @ts-expect-error
     canvas.style.imageRendering = "pixelated"
     const min = colourScale.domain()[0]
 

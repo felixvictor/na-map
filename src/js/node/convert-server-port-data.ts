@@ -136,7 +136,7 @@ const setAndSavePortData = async (serverName: string): Promise<void> => {
         setPortFeaturePerServer(apiPort)
     }
 
-    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData)
+    await saveJsonAsync(`${commonPaths.dirGenServer}/${serverName}-ports.json`, portData.sort(sortBy(["id"])))
 }
 
 const setAndSaveTradeData = async (serverName: string): Promise<void> => {
