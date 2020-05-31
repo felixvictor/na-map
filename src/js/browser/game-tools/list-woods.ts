@@ -98,7 +98,7 @@ export default class ListWoods {
     _injectList(type: WoodType): void {
         $(`#${type}-list`).append(this._getList(type))
         const table = document.querySelector(`#table-${type}-list`) as HTMLTableElement
-        // @ts-ignore
+        // @ts-expect-error
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const sortTable = new Tablesort(table)
     }

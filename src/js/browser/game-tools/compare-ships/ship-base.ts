@@ -307,7 +307,7 @@ export class ShipBase extends Ship {
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate))
 
-        // @ts-ignore
+        // @ts-expect-error
         gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
 
         // Speed marker

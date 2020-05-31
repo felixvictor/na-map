@@ -15,7 +15,7 @@
 import { appName, appVersion } from "../common/common-browser"
 import { GA_TRACKING_ID } from "../common/common-var"
 
-// @ts-ignore
+// @ts-expect-error
 window.ga = function (): void {
     // eslint-disable-next-line prefer-rest-params
     ga.q.push(arguments)
