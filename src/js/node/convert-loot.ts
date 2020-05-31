@@ -96,7 +96,7 @@ const convertLoot = async (): Promise<void> => {
                     items: getLootItems(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
                 } as LootLootEntity)
         )
-        .sort(sortBy(["name", "id"]))
+        .sort(sortBy(["id"]))
 
     types = ["TimeBasedConvertibleItem"]
     const chests = (apiItems.filter(
@@ -124,6 +124,6 @@ const convertLoot = async (): Promise<void> => {
 export const convertLootData = (): void => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
-    // noinspection JSIgnoredPromiseFromCall
-    convertLoot()
+    // eslint-disable-next-line no-void
+    void convertLoot()
 }

@@ -582,7 +582,7 @@ const convertShipBlueprints = async (): Promise<void> => {
                 labourHours: apiBlueprint.LaborPrice,
             }
         })
-        // Sort by name
+        // Sort by id
         .sort(sortBy(["id"]))
 
     await saveJsonAsync(commonPaths.fileShipBlueprint, shipBlueprints)
@@ -622,7 +622,7 @@ resourceRatios.forEach((value, key) => {
 const convertShips = async (): Promise<void> => {
     ships = convertGenericShipData()
     ships = convertAddShipData(ships)
-    ships.sort(sortBy(["class", "name"]))
+    ships.sort(sortBy(["id"]))
     await saveJsonAsync(commonPaths.fileShip, ships)
 }
 

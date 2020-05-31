@@ -17,7 +17,13 @@ import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
-import { ModuleConvertEntity, ModuleEntity, ModulePropertiesEntity, WoodData, WoodTrimOrFrame } from "../common/gen-json"
+import {
+    ModuleConvertEntity,
+    ModuleEntity,
+    ModulePropertiesEntity,
+    WoodData,
+    WoodTrimOrFrame,
+} from "../common/gen-json"
 
 let apiItems: APIItemGeneric[]
 
@@ -353,7 +359,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
         } else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
+                ? `\u202F\u2013\u202F${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
                 : ""
         }
 
@@ -476,12 +482,14 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
     const modulesGrouped = [...groupToMap(result, (module: ModuleEntity): string => module.type)]
 
     await saveJsonAsync(commonPaths.fileModules, modulesGrouped)
+    woods.trim.sort(sortBy(["id"]))
+    woods.frame.sort(sortBy(["id"]))
     await saveJsonAsync(commonPaths.fileWood, woods)
 }
 
 export const convertModules = (): void => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
-    // noinspection JSIgnoredPromiseFromCall
-    convertModulesAndWoodData()
+    // eslint-disable-next-line no-void
+    void convertModulesAndWoodData()
 }
