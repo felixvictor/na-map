@@ -28,7 +28,7 @@ declare global {
     }
 }
 SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): object {
-    // @ts-ignore
+    // @ts-expect-error
     return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params
 }
 
