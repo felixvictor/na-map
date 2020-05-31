@@ -260,7 +260,7 @@ export class Ship {
             .attr("class", "compass-arc")
             .selectAll("path")
             .data(pie)
-            // @ts-ignore
+            // @ts-expect-error
             .join((enter) => enter.append("path").attr("d", arc))
 
         // Add the circles for each speed tick

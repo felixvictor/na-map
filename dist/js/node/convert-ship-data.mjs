@@ -430,7 +430,7 @@ const convertShipBlueprints = async () => {
 const convertShips = async () => {
     ships = convertGenericShipData();
     ships = convertAddShipData(ships);
-    ships.sort(sortBy(["class", "name"]));
+    ships.sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.fileShip, ships);
 };
 export const convertShipData = async () => {

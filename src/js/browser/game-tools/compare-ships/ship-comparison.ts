@@ -248,11 +248,11 @@ export class ShipComparison extends Ship {
             .attr("transform", `rotate(${this._windProfile.initRotate})`)
 
         // Base profile shape
-        // @ts-ignore
+        // @ts-expect-error
         this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
 
         // Comp profile lines
-        // @ts-ignore
+        // @ts-expect-error
         this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp))
     }
 
@@ -267,14 +267,13 @@ export class ShipComparison extends Ship {
     updateDifferenceProfile(): void {
         this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff)
 
-        // @ts-ignore
         this._gWindProfile
             // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
             .selectAll("circle")
             .data(this._arcsComp)
-            // @ts-ignore
+            // @ts-expect-error
             .join((enter) => {
                 enter
                     .append("circle")
@@ -292,7 +291,7 @@ export class ShipComparison extends Ship {
                     )
             })
             .select("circle")
-            // @ts-ignore
+            // @ts-expect-error
             .attr("fill", (_d: number, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
 
         // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
