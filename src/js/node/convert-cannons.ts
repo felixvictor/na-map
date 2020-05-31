@@ -146,7 +146,7 @@ const addData = (fileData: XmlGeneric): void => {
     } as CannonEntity
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
-            // @ts-ignore
+            // @ts-expect-error
             cannon[group] = {}
         }
 
@@ -213,7 +213,7 @@ export const convertCannons = async (): Promise<void> => {
     for (const type of cannonType) {
         for (const cannon of cannons[type]) {
             for (const group of cannonEntityType) {
-                // @ts-ignore
+                // @ts-expect-error
                 for (const [elementKey, elementValue] of Object.entries<CannonValue>(cannon[group])) {
                     maxDigits.set(
                         [type, group, elementKey],
