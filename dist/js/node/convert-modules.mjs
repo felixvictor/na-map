@@ -299,7 +299,7 @@ export const convertModulesAndWoodData = async () => {
         }
         else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202f${capitalizeFirstLetter((_a = module.sortingGroup) !== null && _a !== void 0 ? _a : "").replace("_", "/")}`
+                ? `\u202F\u2013\u202F${capitalizeFirstLetter((_a = module.sortingGroup) !== null && _a !== void 0 ? _a : "").replace("_", "/")}`
                 : "";
         }
         if (permanentType === "Default") {
@@ -394,10 +394,12 @@ export const convertModulesAndWoodData = async () => {
     result = result.filter((module) => Object.keys(module).length).sort(sortBy(["type", "id"]));
     const modulesGrouped = [...groupToMap(result, (module) => module.type)];
     await saveJsonAsync(commonPaths.fileModules, modulesGrouped);
+    woods.trim.sort(sortBy(["id"]));
+    woods.frame.sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.fileWood, woods);
 };
 export const convertModules = () => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
-    convertModulesAndWoodData();
+    void convertModulesAndWoodData();
 };
 //# sourceMappingURL=convert-modules.js.map
