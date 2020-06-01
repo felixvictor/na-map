@@ -93,7 +93,7 @@ export default class ListLoot {
             }
 
             registerEvent("Tools", this.#baseName)
-            event.stopPropagation()
+
             this._sourceListSelected()
         })
     }

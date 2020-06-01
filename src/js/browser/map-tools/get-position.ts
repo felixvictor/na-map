@@ -184,7 +184,7 @@ export default class TrilateratePosition {
 
     _navbarClick(event: Event): void {
         registerEvent("Menu", "Get position")
-        event.stopPropagation()
+
         this._positionSelected()
     }
 

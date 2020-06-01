@@ -91,7 +91,7 @@ export default class PredictWind {
 
     _navbarClick(event: Event): void {
         registerEvent("Menu", this._baseName)
-        event.stopPropagation()
+
         this._windSelected()
     }
 
