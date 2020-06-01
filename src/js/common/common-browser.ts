@@ -181,7 +181,7 @@ export interface BaseModalHtml extends BaseModal {
  * @param size - Modal size, "xl" (default)
  * @param buttonText - Button text, "Close" (default)
  */
-export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }: BaseModalPure): void => {
+export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Close" }: BaseModalPure): void => {
     const modal = d3Select("#modal-section")
         .append("div")
         .attr("id", id)
@@ -191,7 +191,7 @@ export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }
         .attr("aria-labelledby", `title-${id}`)
         .attr("aria-hidden", "true")
         .append("div")
-        .attr("class", `modal-dialog${size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
+        .attr("class", `modal-dialog ${size}`)
         .attr("role", "document")
 
     const content = modal.append("div").attr("class", "modal-content")
@@ -218,12 +218,10 @@ export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }
  * @param body - Body content
  * @param footer - Footer content
  */
-export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }: BaseModalHtml): TemplateResult => {
-    const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""
-
+export const insertBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }: BaseModalHtml): TemplateResult => {
     return html`
         <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
-            <div class="modal-dialog${modalSize}" role="document">
+            <div class="modal-dialog ${size}" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 id="title-${id}" class="modal-title">

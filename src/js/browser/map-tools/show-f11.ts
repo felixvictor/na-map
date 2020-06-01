@@ -87,7 +87,7 @@ export default class ShowF11 {
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" } as BaseModalPure)
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-sm" } as BaseModalPure)
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         const form = body.append("form").attr("id", this._formId).attr("role", "form")
