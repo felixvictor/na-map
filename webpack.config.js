@@ -28,6 +28,7 @@ const { isProduction } = WebpackMode
  */
 
 const path = require("path")
+const glob = require("glob")
 const webpack = require("webpack")
 
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
@@ -38,6 +39,7 @@ const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlPlugin = require("html-webpack-plugin")
 const parseCss = require("css")
 const PreloadWebpackPlugin = require("preload-webpack-plugin")
+const PurgecssPlugin = require("purgecss-webpack-plugin")
 const sass = require("node-sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 const SriPlugin = require("webpack-subresource-integrity")
@@ -330,6 +332,16 @@ const config = {
         new ExtractCssChunks({
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
             orderWarning: true,
+        }),
+        new PurgecssPlugin({
+            whitelistPatternsChildren: [
+                /^rs-/,
+                /bootstrap-select/,
+                /bootstrap-datetimepicker-widget/,
+                /datetimepicker-/,
+                /^list-unstyled/,
+            ],
+            paths: glob.sync(`${dirSrc}/**/*`, { nodir: true }),
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),

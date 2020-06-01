@@ -135,7 +135,7 @@ export default class PredictWind {
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" })
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-sm" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         const form = body.append("form").attr("id", this._formId)

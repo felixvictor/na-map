@@ -192,6 +192,7 @@
         "prettier": "^2.0.5",
         "prettier-plugin-packagejson": "^2.2.4",
         "prettier-stylelint": "^0.4.2",
+        "purgecss-webpack-plugin": "^2.2.0",
         "recursive-readdir": "^2.2.2",
         "remark-parse": "^8.0.2",
         "sass": "^1.26.5",
