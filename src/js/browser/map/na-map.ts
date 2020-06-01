@@ -178,7 +178,7 @@ class NAMap {
     }
 
     static _initModal(id: string): void {
-        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`, size: "lg" })
+        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`, size: "modal-lg" })
 
         const body = d3Selection.select(`#${id} .modal-body`)
         body.html(
