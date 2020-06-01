@@ -117,7 +117,6 @@ export default class ListShipBlueprints {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
             this._listSelected()
         })
     }

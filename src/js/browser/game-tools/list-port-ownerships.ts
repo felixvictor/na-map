@@ -107,7 +107,7 @@ export default class ListPortOwnerships {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._ownershipListSelected()
         })
     }

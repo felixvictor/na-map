@@ -60,7 +60,7 @@ export default class ListWoods {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._woodListSelected()
         })
     }
