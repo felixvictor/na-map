@@ -60,7 +60,7 @@ export default class ShipList {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._shipListSelected()
         })
     }

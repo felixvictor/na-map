@@ -73,7 +73,7 @@ export default class ShowF11 {
 
     _navbarClick(event: Event): void {
         registerEvent("Menu", "Go to F11")
-        event.stopPropagation()
+
         this._f11Selected()
     }
 

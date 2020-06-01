@@ -60,7 +60,7 @@ export default class ListIngredients {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._ingredientListSelected()
         })
     }

@@ -250,7 +250,7 @@ export default class MakeJourney {
 
     _navbarClick(event: Event): void {
         registerEvent("Menu", "MakeJourney")
-        event.stopPropagation()
+
         this._journeySelected()
     }
 
