@@ -126,7 +126,7 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
  */
 const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
+        const gameTools = await import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)
     } catch (error) {
         putImportError(error)
