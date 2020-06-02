@@ -60,13 +60,13 @@ export default class ShipList {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._shipListSelected()
         })
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "lg" })
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-lg" })
 
         d3Select(`#${this._modalId} .modal-body`)
             .append("div")

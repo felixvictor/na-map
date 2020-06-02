@@ -117,13 +117,12 @@ export default class ListShipBlueprints {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
             this._listSelected()
         })
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "lg" })
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-lg" })
 
         const id = `${this._baseId}-ship-select`
         const body = d3Select(`#${this._modalId} .modal-body`)
