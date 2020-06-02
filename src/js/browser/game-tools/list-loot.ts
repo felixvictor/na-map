@@ -93,7 +93,7 @@ export default class ListLoot {
             }
 
             registerEvent("Tools", this.#baseName)
-            event.stopPropagation()
+
             this._sourceListSelected()
         })
     }
@@ -223,7 +223,7 @@ export default class ListLoot {
             insertBaseModalHTML({
                 id: this.#modalId,
                 title: this.#baseName,
-                size: "md",
+                size: "modal-md",
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter,
             }),

@@ -61,7 +61,7 @@ export default class ListBuildings {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._buildingListSelected()
         })
     }

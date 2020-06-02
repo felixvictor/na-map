@@ -184,7 +184,7 @@ export default class TrilateratePosition {
 
     _navbarClick(event: Event): void {
         registerEvent("Menu", "Get position")
-        event.stopPropagation()
+
         this._positionSelected()
     }
 
@@ -196,7 +196,7 @@ export default class TrilateratePosition {
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "", buttonText: "Go" })
+        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-sm", buttonText: "Go" })
 
         const body = d3Select(`#${this.#modalId} .modal-body`)
         body.append("div").attr("class", "alert alert-primary").attr("role", "alert").text("Use in-game trader tool.")
