@@ -73,7 +73,7 @@ export default class ListRecipes {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._recipeListSelected()
         })
     }

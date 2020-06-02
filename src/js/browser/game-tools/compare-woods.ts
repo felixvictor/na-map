@@ -442,7 +442,7 @@ export default class CompareWoods {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._woodCompareSelected()
         })
     }

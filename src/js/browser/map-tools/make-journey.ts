@@ -250,7 +250,7 @@ export default class MakeJourney {
 
     _navbarClick(event: Event): void {
         registerEvent("Menu", "MakeJourney")
-        event.stopPropagation()
+
         this._journeySelected()
     }
 
@@ -300,7 +300,7 @@ export default class MakeJourney {
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" })
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-sm" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         const formGroup = body.append("form").append("div").attr("class", "form-group")
