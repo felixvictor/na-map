@@ -97,7 +97,7 @@ export default class ListCannons {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._cannonListSelected()
         })
     }

@@ -59,7 +59,7 @@ export default class ListModules {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._moduleListSelected()
         })
     }

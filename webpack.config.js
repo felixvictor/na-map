@@ -28,16 +28,19 @@ const { isProduction } = WebpackMode
  */
 
 const path = require("path")
+const glob = require("glob")
 const webpack = require("webpack")
 
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const CopyPlugin = require("copy-webpack-plugin")
-const ExtractCssChunks = require("extract-css-chunks-webpack-plugin")
 const FaviconsPlugin = require("favicons-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlPlugin = require("html-webpack-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const parseCss = require("css")
+const PurgecssPlugin = require("purgecss-webpack-plugin")
 const sass = require("node-sass")
+const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 const SriPlugin = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
@@ -74,6 +77,8 @@ const libraryName = PACKAGE.name
 const descriptionLong =
     "Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance."
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
+
+const regExpFont = /\.(woff2?|ttf|eot|svg)$/
 
 const setColours = () => {
     const compiledCss = sass
@@ -239,6 +244,7 @@ const htmlOpt = {
     lang: "en-GB",
     meta: { viewport: "width=device-width, initial-scale=1, shrink-to-fit=no" },
     minify: htmlMinifyOpt,
+    scriptLoading: "defer",
     servers,
     template: path.resolve(__dirname, dirSrc, "index.template.ejs"),
     title: PACKAGE.description,
@@ -275,6 +281,10 @@ const faviconsOpt = {
     },
 }
 
+const MiniCssExtractPluginOpt = {
+    esModule: true,
+}
+
 const config = {
     devServer: {
         contentBase: dirOutput,
@@ -295,6 +305,8 @@ const config = {
     },
 
     optimization: {
+        maxAsyncRequests: Infinity,
+        maxInitialRequests: Infinity,
         moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
@@ -324,9 +336,20 @@ const config = {
         new CleanWebpackPlugin({
             verbose: false,
         }),
-        new ExtractCssChunks({
+        new MiniCssExtractPlugin({
+            chunkFilename: isProduction ? "[name].[chunkhash].css" : "[name].css",
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
             orderWarning: true,
+        }),
+        new PurgecssPlugin({
+            whitelistPatternsChildren: [
+                /^rs-/,
+                /bootstrap-select/,
+                /bootstrap-datetimepicker-widget/,
+                /datetimepicker-/,
+                /^list-unstyled/,
+            ],
+            paths: glob.sync(`${dirSrc}/**/*`, { nodir: true }),
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
@@ -359,11 +382,6 @@ const config = {
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
         }),
-        // Do not include all moment locale files, certain locales are loaded by import
-        new webpack.IgnorePlugin({
-            resourceRegExp: /^\.\/locale$/,
-            contextRegExp: /moment$/,
-        }),
         new CopyPlugin({
             patterns: [
                 { from: "netlify.toml" },
@@ -377,6 +395,12 @@ const config = {
             ],
         }),
         new HtmlPlugin(htmlOpt),
+        new ScriptExtHtmlWebpackPlugin({
+            defaultAttribute: "defer",
+            chunks: "all",
+            async: /\.js$/,
+            defer: /\.js$/,
+        }),
         new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
         new SriPlugin({
@@ -412,7 +436,10 @@ const config = {
                 test: /\.scss$/,
                 include: dirScssSrc,
                 use: [
-                    ExtractCssChunks.loader,
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: MiniCssExtractPluginOpt,
+                    },
                     {
                         loader: require.resolve("string-replace-loader"),
                         options: {
@@ -437,7 +464,10 @@ const config = {
             {
                 test: /\.css$/,
                 use: [
-                    ExtractCssChunks.loader,
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: MiniCssExtractPluginOpt,
+                    },
                     {
                         loader: require.resolve("css-loader"),
                         options: cssOpt,
@@ -449,7 +479,7 @@ const config = {
                 ],
             },
             {
-                test: /\.(woff2?|ttf|eot|svg)$/,
+                test: regExpFont,
                 include: dirFonts,
                 use: {
                     loader: require.resolve("file-loader"),

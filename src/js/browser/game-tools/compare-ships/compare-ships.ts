@@ -416,7 +416,7 @@ export class CompareShips {
             }
 
             registerEvent("Tools", this._baseName)
-            event.stopPropagation()
+
             this._shipCompareSelected()
         })
     }
