@@ -34,7 +34,7 @@ import ShowTrades from "../map-tools/show-trades"
 import WindRose from "../map-tools/wind-rose"
 import MakeJourney from "../map-tools/make-journey"
 import PredictWind from "../map-tools/predict-wind"
-import { mapSize } from "../../common/common-var";
+import { mapSize } from "../../common/common-var"
 
 interface Tile {
     z: number
@@ -178,7 +178,11 @@ class NAMap {
     }
 
     static _initModal(id: string): void {
-        insertBaseModal({ id, title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`, size: "modal-lg" })
+        insertBaseModal({
+            id,
+            title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`,
+            size: "modal-lg",
+        })
 
         const body = d3Selection.select(`#${id} .modal-body`)
         body.html(
@@ -261,6 +265,7 @@ class NAMap {
 
     _setupListener(): void {
         this._svg
+            // eslint-disable-next-line unicorn/no-null
             .on("dblclick.zoom", null)
             .on("click", NAMap._stopProperty, true)
             .on(

@@ -39,7 +39,8 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
             const version = urlParams.get("v")
             if (version && semver.lte(version, appVersion)) {
                 registerEvent("Menu", "Paste ship compare")
-                shipCompare.initFromClipboard(urlParams)
+                // eslint-disable-next-line no-void
+                void shipCompare.initFromClipboard(urlParams)
             }
         }
     }
