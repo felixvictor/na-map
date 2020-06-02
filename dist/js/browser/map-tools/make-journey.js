@@ -134,7 +134,6 @@ export default class MakeJourney {
     }
     _navbarClick(event) {
         registerEvent("Menu", "MakeJourney");
-        event.stopPropagation();
         this._journeySelected();
     }
     _setupListener() {
@@ -171,7 +170,7 @@ export default class MakeJourney {
         });
     }
     _injectModal() {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "sm" });
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-sm" });
         const body = d3Select(`#${this._modalId} .modal-body`);
         const formGroup = body.append("form").append("div").attr("class", "form-group");
         const slider = formGroup.append("div").attr("class", "alert alert-primary").attr("role", "alert");
