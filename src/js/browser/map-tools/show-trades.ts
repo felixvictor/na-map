@@ -448,14 +448,14 @@ export default class ShowTrades {
             ShowTrades._addDes("weight")
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
-                    this._nodeData.get(trade.source.id)?.nation
+                `${this._nodeData.get(trade.source.id)!.name} <span class="caps">${
+                    this._nodeData.get(trade.source.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`)
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
-                    this._nodeData.get(trade.target.id)?.nation
+                `${this._nodeData.get(trade.target.id)!.name} <span class="caps">${
+                    this._nodeData.get(trade.target.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.target.id)}`)
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
@@ -491,14 +491,14 @@ export default class ShowTrades {
         h += ShowTrades._startBlock("Route")
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.source.id)?.name} <span class="caps">${
-                    this._nodeData.get(trade.source.id)?.nation
+                `${this._nodeData.get(trade.source.id)!.name} <span class="caps">${
+                    this._nodeData.get(trade.source.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`from ${this._getDepth(trade.source.id)}`)
         h +=
             ShowTrades._addInfo(
-                `${this._nodeData.get(trade.target.id)?.name} <span class="caps">${
-                    this._nodeData.get(trade.target.id)?.nation
+                `${this._nodeData.get(trade.target.id)!.name} <span class="caps">${
+                    this._nodeData.get(trade.target.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.source.id)}`)
         h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")

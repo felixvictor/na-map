@@ -804,7 +804,7 @@ export default class SelectPorts {
     }
 
     _nonCapSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => d.nonCapturable)
+        const portData = this._ports.portDataDefault.filter((d) => !d.capturable)
 
         this._ports.portData = portData
         this._ports.showRadius = ""
@@ -848,7 +848,7 @@ export default class SelectPorts {
         }
 
         const portData = this._ports.portDataDefault.filter(
-            (d) => !d.nonCapturable && d.nation !== "FT" && startTimes.has(d.portBattleStartTime)
+            (d) => d.capturable && d.nation !== "FT" && startTimes.has(d.portBattleStartTime)
         )
         this._ports.portData = portData
         this._ports.showRadius = ""
