@@ -40,7 +40,7 @@ const setPortFeaturePerServer = (apiPort) => {
         const portFeaturesPerServer = {
             id: Number(apiPort.Id),
             portBattleStartTime: apiPort.PortBattleStartTime,
-            nonCapturable: apiPort.NonCapturable,
+            availableForAll: apiPort.AvailableForAll,
             conquestMarksPension: apiPort.ConquestMarksPension,
             portTax: Math.round(apiPort.PortTax * 100) / 100,
             taxIncome: apiPort.LastTax,
