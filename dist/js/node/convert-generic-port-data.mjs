@@ -44,8 +44,8 @@ const setAndSavePortData = async () => {
                 : "",
             countyCapital: apiPort.Name === apiPort.CountyCapitalName,
             shallow: apiPort.Depth === 1,
-            availableForAll: apiPort.AvailableForAll,
             brLimit: apiPort.PortBattleBRLimit,
+            capturable: !apiPort.NonCapturable,
             portPoints: apiPort.PortPoints,
             portBattleType: apiPort.PortBattleType,
         };
