@@ -285,6 +285,24 @@ const MiniCssExtractPluginOpt = {
     esModule: true,
 }
 
+const whitelistPatternsChildren = [
+    /active/,
+    /bootstrap-datetimepicker-widget/,
+    /bootstrap-select/,
+    /collaps/,
+    /datetimepicker-/,
+    /disabled/,
+    /dropdown-backdrop/,
+    /fade/,
+    /focus/,
+    /list-unstyled/,
+    /modal/,
+    /^rs-/,
+    /show/,
+    /slide/,
+    /tooltip/,
+]
+
 const config = {
     devServer: {
         contentBase: dirOutput,
@@ -342,13 +360,7 @@ const config = {
             orderWarning: true,
         }),
         new PurgecssPlugin({
-            whitelistPatternsChildren: [
-                /^rs-/,
-                /bootstrap-select/,
-                /bootstrap-datetimepicker-widget/,
-                /datetimepicker-/,
-                /^list-unstyled/,
-            ],
+            whitelistPatternsChildren,
             paths: glob.sync(`${dirSrc}/**/*`, { nodir: true }),
         }),
         new webpack.DefinePlugin({
