@@ -26,7 +26,7 @@ import {
 import { serverNames } from "../common/common-var"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortSpawnPointsEntity } from "./api-port"
-import { FeaturesEntity, GeoJson, PbZone } from "../common/gen-json"
+import { FeaturesEntity, GeoJson, PbZone, PortBasic } from "../common/gen-json"
 
 let apiPorts = [] as APIPort[]
 let apiPortPos: Map<number, Coordinate> = new Map()
@@ -66,11 +66,11 @@ const setAndSavePortData = async (): Promise<void> => {
                     : "",
                 countyCapital: apiPort.Name === apiPort.CountyCapitalName,
                 shallow: apiPort.Depth === 1,
-                availableForAll: apiPort.AvailableForAll,
                 brLimit: apiPort.PortBattleBRLimit,
+                capturable: !apiPort.NonCapturable,
                 portPoints: apiPort.PortPoints,
                 portBattleType: apiPort.PortBattleType,
-            }
+            } as PortBasic
         })
         .sort(sortBy(["id"]))
 
