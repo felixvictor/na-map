@@ -103,7 +103,7 @@ export const initTablesort = () => {
         return compareNumber(bb, aa);
     });
 };
-export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }) => {
+export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Close" }) => {
     const modal = d3Select("#modal-section")
         .append("div")
         .attr("id", id)
@@ -113,7 +113,7 @@ export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }
         .attr("aria-labelledby", `title-${id}`)
         .attr("aria-hidden", "true")
         .append("div")
-        .attr("class", `modal-dialog${size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : ""}`)
+        .attr("class", `modal-dialog ${size}`)
         .attr("role", "document");
     const content = modal.append("div").attr("class", "modal-content");
     const header = content.append("header").attr("class", "modal-header");
@@ -127,11 +127,10 @@ export const insertBaseModal = ({ id, title, size = "xl", buttonText = "Close" }
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
 };
-export const insertBaseModalHTML = ({ id, title, size = "xl", body, footer }) => {
-    const modalSize = size === "xl" || size === "lg" || size === "sm" ? ` modal-${size}` : "";
+export const insertBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }) => {
     return html `
         <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
-            <div class="modal-dialog${modalSize}" role="document">
+            <div class="modal-dialog ${size}" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 id="title-${id}" class="modal-title">
