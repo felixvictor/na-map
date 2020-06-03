@@ -254,8 +254,8 @@ export interface PortBasic {
     county: string
     countyCapital: boolean
     shallow: boolean
-    availableForAll: boolean
     brLimit: number
+    capturable: boolean
     portPoints: number
     portBattleType: PortBattleType
 }
@@ -306,7 +306,7 @@ export interface PortPerServer {
     [index: string]: PortIntersection
     id: number
     portBattleStartTime: number
-    nonCapturable: boolean
+    availableForAll: boolean
     conquestMarksPension: ConquestMarksPension
     portTax: number
     taxIncome: number
