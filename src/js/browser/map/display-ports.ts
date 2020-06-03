@@ -734,7 +734,8 @@ export default class DisplayPorts {
         const displayClanLitHtml = (clan: string): TemplateResult => html`<span class="caps">${clan}</span>`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const formatFromToTime = (from: number, to: number): HtmlString => `${String(from)}\u202F–\u202F${String(to)}`
+        const formatFromToTime = (from: number, to: number): HtmlString =>
+            `${String(from)}\u2009\u2012\u2009${String(to)}`
 
         const formatTime = (from: number, to: number): TemplateResult => {
             const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
