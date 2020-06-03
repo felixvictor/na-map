@@ -289,6 +289,8 @@ const whitelistPatternsChildren = [
     /active/,
     /bootstrap-datetimepicker-widget/,
     /bootstrap-select/,
+    /bs-/,
+    /btn/,
     /collaps/,
     /datetimepicker-/,
     /disabled/,
