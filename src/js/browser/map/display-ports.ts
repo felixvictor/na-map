@@ -734,7 +734,8 @@ export default class DisplayPorts {
         const displayClanLitHtml = (clan: string): TemplateResult => html`<span class="caps">${clan}</span>`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const formatFromToTime = (from: number, to: number): HtmlString => `${String(from)}\u202F–\u202F${String(to)}`
+        const formatFromToTime = (from: number, to: number): HtmlString =>
+            `${String(from)}\u2009\u2012\u2009${String(to)}`
 
         const formatTime = (from: number, to: number): TemplateResult => {
             const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
@@ -765,14 +766,13 @@ export default class DisplayPorts {
             county:
                 (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
             countyCapital: portProperties.countyCapital,
-            capital: portProperties.nonCapturable && portProperties.nation !== "FT",
+            capital: !portProperties.capturable && portProperties.nation !== "FT",
             capturer: portProperties.capturer ? html`${displayClanLitHtml(portProperties.capturer)}` : html``,
             captureTime: portProperties.capturer
                 ? `${capitalizeFirstLetter(dayjs.utc(portProperties.lastPortBattle).fromNow())}`
                 : "",
-            lastPortBattle: portProperties.lastPortBattle,
             attack: portProperties.attackHostility ? attackHostility : html``,
-            pbTimeRange: portProperties.nonCapturable ? "" : portBattleStartTime,
+            pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
             taxIncome: formatSiInt(portProperties.taxIncome),
@@ -973,7 +973,7 @@ export default class DisplayPorts {
                 enter
                     .append("circle")
                     .attr("fill", (d) => {
-                        const appendix = `${d.countyCapital && !d.nonCapturable ? "c" : ""}${
+                        const appendix = `${d.countyCapital && d.capturable ? "c" : ""}${
                             d.availableForAll && d.nation !== "NT" ? "a" : ""
                         }`
                         return `url(#${d.nation}${appendix})`
@@ -1026,19 +1026,19 @@ export default class DisplayPorts {
 
         // noinspection IfStatementWithTooManyBranchesJS
         if (this.showRadius === "tax") {
-            data = this._portDataFiltered.filter((d) => !d.nonCapturable)
+            data = this._portDataFiltered.filter((d) => d.capturable)
             this._portRadius.domain([this._minTaxIncome, this._maxTaxIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
             fill = (d): string => this._colourScaleTax(d.taxIncome)
             r = (d): number => this._portRadius(d.taxIncome)
         } else if (this.showRadius === "net") {
-            data = this._portDataFiltered.filter((d) => !d.nonCapturable)
+            data = this._portDataFiltered.filter((d) => d.capturable)
             this._portRadius.domain([this._minNetIncome, this._maxNetIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
             fill = (d): string => this._colourScaleNet(d.netIncome)
             r = (d): number => this._portRadius(Math.abs(d.netIncome))
         } else if (this.showRadius === "points") {
-            data = this._portDataFiltered.filter((d) => !d.nonCapturable)
+            data = this._portDataFiltered.filter((d) => d.capturable)
             this._portRadius.domain([this._minPortPoints, this._maxPortPoints]).range([rMin, rMax / 2])
             cssClass = (): string => "bubble"
             fill = (d): string => this._colourScalePoints(d.portPoints)
@@ -1058,9 +1058,9 @@ export default class DisplayPorts {
             r = (): number => rMax / 2
         } else if (this.showRadius === "county") {
             cssClass = (d): string =>
-                d.nonCapturable ? "bubble not-capturable" : d.countyCapital ? "bubble capital" : "bubble non-capital"
-            fill = (d): string => (d.nonCapturable ? "" : this._colourScaleCounty(d.county))
-            r = (d): number => (d.nonCapturable ? rMax / 3 : rMax / 2)
+                d.capturable ? (d.countyCapital ? "bubble capital" : "bubble non-capital") : "bubble not-capturable"
+            fill = (d): string => (d.capturable ? this._colourScaleCounty(d.county) : "")
+            r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
         } else if (this.showRadius === "tradePorts") {
             cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
             r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
