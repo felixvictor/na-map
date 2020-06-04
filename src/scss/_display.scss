@@ -133,6 +133,7 @@ text {
 
     thead th {
         border-bottom-color: $white;
+        cursor: s-resize;
     }
 
     tbody {
@@ -142,8 +143,11 @@ text {
     }
 }
 
-.thead-group th {
-    font-style: initial !important;
+.thead-group {
+    th {
+        font-style: initial !important;
+        cursor: default !important;
+    }
 }
 
 table tr,
