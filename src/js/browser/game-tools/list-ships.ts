@@ -14,6 +14,7 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
 import { repeat } from "lit-html/directives/repeat"
 import { html, render, TemplateResult } from "lit-html"
+import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
@@ -24,18 +25,17 @@ import { sortBy } from "../../common/common-node"
 import { ShipData } from "../../common/gen-json"
 
 interface ShipListData {
-    id: number
-    class: number
-    name: string
-    guns: number
-    battleRating: number
-    crew: string
-    maxSpeed: TemplateResult
-    turnSpeed: TemplateResult
-    broadside: string
-    bowChaser: string
-    sternChaser: string
-    sides: string
+    class: [number, number]
+    name: [string, string]
+    guns: [number, number]
+    battleRating: [number, string]
+    crew: [number, string]
+    maxSpeed: [number, TemplateResult]
+    turnSpeed: [number, TemplateResult]
+    broadside: [number, string]
+    bowChaser: [number, string]
+    sternChaser: [number, string]
+    sides: [number, string]
 }
 
 /**
@@ -59,23 +59,22 @@ export default class ShipList {
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            const shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json"))
-                .default as ShipData[]
+            const shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json")).default // @ts-expect-error
+                .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
 
             this._shipListData = shipData.map(
                 (ship: ShipData): ShipListData => ({
-                    id: ship.id,
-                    class: ship.class,
-                    name: ship.name,
-                    guns: ship.guns,
-                    battleRating: ship.battleRating,
-                    crew: formatInt(ship.crew.max),
-                    maxSpeed: formatFloatFixedHTML(ship.ship.maxSpeed),
-                    turnSpeed: formatFloatFixedHTML(ship.rudder.turnSpeed),
-                    broadside: formatInt(ship.broadside.cannons),
-                    bowChaser: ship.gunsPerDeck[4] ? String(ship.gunsPerDeck[4]) : "",
-                    sternChaser: ship.gunsPerDeck[5] ? String(ship.gunsPerDeck[5]) : "",
-                    sides: `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`,
+                    class: [ship.class, ship.class],
+                    name: [ship.name, ship.name],
+                    guns: [ship.guns, ship.guns],
+                    battleRating: [ship.battleRating, formatInt(ship.battleRating)],
+                    crew: [ship.crew.max, formatInt(ship.crew.max)],
+                    maxSpeed: [ship.ship.maxSpeed, formatFloatFixedHTML(ship.ship.maxSpeed)],
+                    turnSpeed: [ship.rudder.turnSpeed, formatFloatFixedHTML(ship.rudder.turnSpeed)],
+                    broadside: [ship.broadside.cannons, formatInt(ship.broadside.cannons)],
+                    bowChaser: [ship.gunsPerDeck[4], ship.gunsPerDeck[4] ? String(ship.gunsPerDeck[4]) : ""],
+                    sternChaser: [ship.gunsPerDeck[5], ship.gunsPerDeck[5] ? String(ship.gunsPerDeck[5]) : ""],
+                    sides: [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
                 })
             )
         } catch (error) {
@@ -124,17 +123,6 @@ export default class ShipList {
         $(`#${this._modalId}`).modal("show")
     }
 
-    /**
-     * Show ships
-     */
-    _injectList(): void {
-        d3Select(`#${this._baseId} div`).remove()
-
-        // Add new ship list
-        const div = d3Select(`#${this._baseId}`).append("div").attr("class", "row")
-        render(this._getList(), div.node() as HTMLDivElement)
-    }
-
     _getHead(): TemplateResult {
         return html`
             <thead>
@@ -150,7 +138,7 @@ export default class ShipList {
                     <th scope="col" class="text-right border-bottom-0"></th>
                 </tr>
 
-                <tr>
+                <tr data-sort-method="thead">
                     <th scope="col" class="text-right border-top-0">Class</th>
                     <th scope="col" class="border-top-0">Name</th>
                     <th scope="col" class="text-right border-top-0">Guns</th>
@@ -167,28 +155,17 @@ export default class ShipList {
         `
     }
 
-    _getBody(sortCols = ["class", "-battleRating", "name"]): TemplateResult {
-        const ships = this._shipListData
-            // @ts-expect-error
-            .sort(sortBy(sortCols))
-
+    _getBody(): TemplateResult {
         return html`
             <tbody>
-                ${repeat(
-                    ships,
-                    (ship: ShipListData) => ship.id,
-                    (ship: ShipListData) => html`<tr>
-                        <td class="text-right">${ship.class}</td>
-                        <td>${ship.name}</td>
-                        <td class="text-right">${ship.guns}</td>
-                        <td class="text-right">${ship.battleRating}</td>
-                        <td class="text-right">${ship.crew}</td>
-                        <td class="text-right">${ship.maxSpeed}</td>
-                        <td class="text-right">${ship.turnSpeed}</td>
-                        <td class="text-right">${ship.broadside}</td>
-                        <td class="text-right">${ship.bowChaser}</td>
-                        <td class="text-right">${ship.sternChaser}</td>
-                        <td class="text-right">${ship.sides}</td>
+                ${this._shipListData.map(
+                    (ship) => html`<tr>
+                        ${Object.entries(ship).map(
+                            (item) =>
+                                html`<td class="${item[0] === "name" ? "" : "text-right"}" data-sort="${item[1][0]}">
+                                    ${item[1][1]}
+                                </td>`
+                        )}
                     </tr>`
                 )}
             </tbody>
@@ -197,9 +174,25 @@ export default class ShipList {
 
     _getList(): TemplateResult {
         return html`
-            <table id="table-${this._baseId}" class="table table-sm small na-table">
+            <table id="table-${this._baseId}" class="table table-sm small tablesort na-table">
                 ${this._getHead()} ${this._getBody()}
             </table>
         `
+    }
+
+    /**
+     * Show ships
+     */
+    _injectList(): void {
+        d3Select(`#${this._baseId} div`).remove()
+
+        // Add new ship list
+        const div = d3Select(`#${this._baseId}`).append("div").attr("class", "row")
+        render(this._getList(), div.node() as HTMLDivElement)
+
+        const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const sortTable = new Tablesort(table)
     }
 }
