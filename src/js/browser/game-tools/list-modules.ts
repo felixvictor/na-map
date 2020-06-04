@@ -202,7 +202,7 @@ export default class ListModules {
         let text = ""
         for (const column of [...new Array(splitRows.length).keys()]) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm small"><thead>'
+            text += '<table class="table table-sm small na-table"><thead>'
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"
@@ -222,7 +222,7 @@ export default class ListModules {
         d3Select(`#${this._baseId} div`).remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("row modules mt-4", true)
+        d3Select(`#${this._baseId}`).append("div").classed("row mt-4", true)
         d3Select(`#${this._baseId} div`).html(this._getText(moduleType))
     }
 }
