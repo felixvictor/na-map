@@ -139,7 +139,7 @@ export default class ListIngredients {
         let text = ""
         for (const column of [...new Array(splitRows.length).keys()]) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm"><thead>'
+            text += '<table class="table table-sm na-table"><thead>'
             text += "<tr><th>Ingredient</th><th>Recipes</th></tr></thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"
@@ -156,7 +156,7 @@ export default class ListIngredients {
         d3Select(`#${this._baseId} div`).remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("row ingredients", true)
+        d3Select(`#${this._baseId}`).append("div").classed("row", true)
         d3Select(`#${this._baseId} div`).html(this._getText())
         $('[data-toggle="tooltip"]').tooltip({
             html: true,

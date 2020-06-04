@@ -124,18 +124,24 @@ const setAndSaveTradeData = async (serverName) => {
 };
 const setAndSaveDroppedItems = async (serverName) => {
     const items = apiItems
-        .filter((item) => item.ItemType === "Material" ||
-        item.SortingGroup === "Resource.Food" ||
-        item.SortingGroup === "Resource.Resources" ||
-        item.SortingGroup === "Resource.Trading" ||
-        item.Name === "American Cotton" ||
-        item.Name === "Tobacco")
-        .map((item) => ({
-        id: item.Id,
-        name: cleanName(item.Name),
-        price: item.BasePrice,
-        distanceFactor: item.PortPrices.RangePct,
-    }));
+        .filter((item) => !item.NotUsed &&
+        (item.ItemType === "Material" ||
+            item.SortingGroup === "Resource.Food" ||
+            item.SortingGroup === "Resource.Resources" ||
+            item.SortingGroup === "Resource.Trading" ||
+            item.Name === "American Cotton" ||
+            item.Name === "Tobacco"))
+        .map((item) => {
+        const tradeItem = {
+            id: item.Id,
+            name: cleanName(item.Name),
+            price: item.BasePrice,
+        };
+        if (item.PortPrices.RangePct) {
+            tradeItem.distanceFactor = item.PortPrices.RangePct;
+        }
+        return tradeItem;
+    });
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items);
 };
 const ticks = 621355968000000000;

@@ -90,7 +90,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement)?.addEventListener("click", async (event) => {
+        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -117,16 +117,18 @@ export default class ListCannons {
 
         const getRowHead = (name: string): TemplateResult => {
             let nameConverted: TemplateResult | string = name
-            const nameSplit = name.split(" (")
+            const nameSplit = name.split(" ")
+            const sortPre = `c${nameSplit[0].padStart(3, "0")}`
+            const sortPost = nameSplit[1] ? nameSplit[1][1] : "0"
 
             if (nameSplit.length > 1) {
-                nameConverted = html`${nameSplit[0]}<br /><em>${nameSplit[1].replace(")", "")}</em>`
+                nameConverted = html`${nameSplit[0]} <em>${nameSplit[1]}</em>`
             }
 
             return html`
-                <th scope="row" class="text-right" data-sort="${Number.parseInt(name, 10)}">
+                <td class="text-right" data-sort="${sortPre}${sortPost}">
                     ${nameConverted}
-                </th>
+                </td>
             `
         }
 
@@ -150,9 +152,9 @@ export default class ListCannons {
         `
 
         return html`
-            <table id="table-${type}-list" class="table table-sm small tablesort">
+            <table id="table-${this._baseId}-${type}-list" class="table table-sm small tablesort na-table">
                 <thead>
-                    <tr>
+                    <tr class="thead-group">
                         <th scope="col" class="border-bottom-0"></th>
                         ${repeat(
                             this._groups,
@@ -222,7 +224,7 @@ export default class ListCannons {
                                 role="tabpanel"
                                 aria-labelledby="tab-${this._baseId}-${type}"
                             >
-                                <div id="${type}-list" class="modules">
+                                <div id="${type}-list">
                                     ${this._getList(type)}
                                 </div>
                             </div>
@@ -252,7 +254,7 @@ export default class ListCannons {
         )
 
         for (const type of Object.keys(this._cannonData)) {
-            const table = document.querySelector(`#table-${type}-list`) as HTMLTableElement
+            const table = document.querySelector(`#table-${this._baseId}-${type}-list`) as HTMLTableElement
             if (table) {
                 // @ts-expect-error
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars

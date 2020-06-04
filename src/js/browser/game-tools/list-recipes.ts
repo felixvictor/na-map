@@ -205,7 +205,7 @@ export default class ListRecipes {
 
         if (properties) {
             text += `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`
-            text += `<table class="table table-sm card-table"><tbody>${properties}</tbody></table>`
+            text += `<table class="table table-sm card-table na-table"><tbody>${properties}</tbody></table>`
         } else {
             text += `<p>${formatInt(currentRecipe.result.amount)} ${currentRecipe.result.name}</p>`
         }
@@ -247,7 +247,7 @@ export default class ListRecipes {
         d3Select(`#${this._baseId} div`).remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("recipes mt-4", true)
+        d3Select(`#${this._baseId}`).append("div").classed("mt-4", true)
         d3Select(`#${this._baseId} div`).html(this._getText(recipeId))
     }
 }
