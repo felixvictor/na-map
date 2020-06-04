@@ -23,6 +23,7 @@ import { formatFloatFixedHTML, formatInt } from "../../common/common-format"
 
 import { sortBy } from "../../common/common-node"
 import { ShipData } from "../../common/gen-json"
+import * as d3Selection from "d3-selection"
 
 interface ShipListData {
     class: [number, number]
@@ -47,6 +48,7 @@ export default class ShipList {
     private readonly _buttonId: HtmlString
     private readonly _modalId: HtmlString
     private _shipListData: ShipListData[] = {} as ShipListData[]
+    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor() {
         this._baseName = "List ships"
@@ -100,10 +102,7 @@ export default class ShipList {
     _injectModal(): void {
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-lg" })
 
-        d3Select(`#${this._modalId} .modal-body`)
-            .append("div")
-            .attr("id", `${this._baseId}`)
-            .attr("class", "container-fluid")
+        this._mainDiv = d3Select(`#${this._modalId} .modal-body`).append("div").attr("id", `${this._baseId}`)
     }
 
     _initModal(): void {
@@ -184,11 +183,8 @@ export default class ShipList {
      * Show ships
      */
     _injectList(): void {
-        d3Select(`#${this._baseId} div`).remove()
-
         // Add new ship list
-        const div = d3Select(`#${this._baseId}`).append("div").attr("class", "row")
-        render(this._getList(), div.node() as HTMLDivElement)
+        render(this._getList(), this._mainDiv.node() as HTMLDivElement)
 
         const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
         // @ts-expect-error
