@@ -86,7 +86,7 @@ export default class ListLoot {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -270,9 +270,8 @@ export default class ListLoot {
     }
 
     _getLootItemsText(items: Array<LootLootItemsEntity | LootChestItemsEntity>, chance = true): TemplateResult {
-        /* eslint-disable no-irregular-whitespace */
         return html`
-            <table class="table table-sm small">
+            <table class="table table-sm small na-table no-sort">
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
@@ -320,7 +319,7 @@ export default class ListLoot {
             ${repeat(
                 currentChest.itemGroup,
                 (group) => group,
-                (group) => html` <h6>Group chance: ${ListLoot._printChance(group.chance)}</h6>
+                (group) => html` <h5>Group chance: ${ListLoot._printChance(group.chance)}</h5>
                     ${this._getLootItemsText(group.items.sort(sortBy(["name"])), false)}`
             )}
         `
@@ -350,7 +349,7 @@ export default class ListLoot {
      */
     _getTable(): TemplateResult {
         return html`
-            <div class="modules mt-4">
+            <div class="mt-4">
                 ${this._getText()}
             </div>
         `

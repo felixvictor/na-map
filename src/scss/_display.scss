@@ -76,7 +76,7 @@ table,
 }
 
 .card-header {
-    background-color: $secondary-200;
+    background-color: $secondary-050;
 }
 
 #na-svg {
@@ -102,8 +102,6 @@ text {
     }
 }
 
-.modules,
-.ingredients,
 .buildings .requirements {
     table {
         thead {
@@ -140,6 +138,12 @@ text {
         tr:nth-of-type(odd) {
             background-color: $primary-050;
         }
+    }
+}
+
+.no-sort {
+    thead th {
+        cursor: default;
     }
 }
 
