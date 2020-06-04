@@ -15,12 +15,14 @@ import { select as d3Select } from "d3-selection"
 import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { putImportError, WoodType } from "../../common/common"
+import { capitalizeFirstLetter, putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixed } from "../../common/common-format"
+import { formatFloatFixedHTML } from "../../common/common-format"
 import { simpleStringSort } from "../../common/common-node"
 
 import { WoodData } from "../../common/gen-json"
+import * as d3Selection from "d3-selection"
+import { html, render, TemplateResult } from "lit-html"
 
 /**
  *
@@ -31,6 +33,7 @@ export default class ListWoods {
     private readonly _buttonId: HtmlString
     private readonly _modalId: HtmlString
     private _woodData: WoodData = {} as WoodData
+    private _div!: WoodTypeList<d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>>
 
     constructor() {
         this._baseName = "List woods"
@@ -53,7 +56,7 @@ export default class ListWoods {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -66,20 +69,23 @@ export default class ListWoods {
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName })
+        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-xl" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
-        body.append("h5").text("Frames")
-        body.append("div").attr("id", "frame-list").attr("class", "modules")
-        body.append("h5").text("Trims")
-        body.append("div").attr("id", "trim-list").attr("class", "modules")
+        this._div = {} as WoodTypeList<d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>>
+        for (const type of woodType) {
+            body.append("h5").text(capitalizeFirstLetter(`${type}s`))
+            this._div[type] = body.append("div").attr("id", `${type}-list`)
+        }
     }
 
     _initModal(): void {
         initTablesort()
         this._injectModal()
-        this._injectList("frame")
-        this._injectList("trim")
+
+        for (const type of woodType) {
+            this._injectList(type)
+        }
     }
 
     _woodListSelected(): void {
@@ -90,17 +96,6 @@ export default class ListWoods {
 
         // Show modal
         $(`#${this._modalId}`).modal("show")
-    }
-
-    /**
-     * Show wood type
-     */
-    _injectList(type: WoodType): void {
-        $(`#${type}-list`).append(this._getList(type))
-        const table = document.querySelector(`#table-${type}-list`) as HTMLTableElement
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const sortTable = new Tablesort(table)
     }
 
     _getModifiers(type: WoodType): string[] {
@@ -115,30 +110,67 @@ export default class ListWoods {
         return [...modifiers].sort(simpleStringSort)
     }
 
-    _getList(type: WoodType): HtmlString {
+    _getList(type: WoodType): TemplateResult {
         const modifiers = this._getModifiers(type)
-        let text = ""
 
-        text += `<table id="table-${type}-list" class="table table-sm small tablesort"><thead><tr><th data-sort-default>Wood</th>`
-        modifiers.forEach((modifier) => {
-            text += `<th class="text-right">${modifier}</th>`
-        })
-        text += "</tr></thead><tbody>"
+        const addLineBreak = (string: string): TemplateResult => {
+            const strings = string.split(" ", 2)
+            const rest = string.slice(strings.join(" ").length)
+            return html`${strings[0]}<br />${strings[1]} ${rest}`
+        }
 
-        this._woodData[type].forEach((wood) => {
-            text += `<tr><td>${wood.name}</td>`
-            modifiers.forEach((modifier) => {
-                const amount = wood.properties
-                    .filter((property) => property.modifier === modifier)
-                    .map((property) => property.amount)[0]
-                text += `<td class="text-right" data-sort="${amount ?? 0}">${
-                    amount ? formatFloatFixed(amount) : ""
-                }</td>`
-            })
-            text += "</tr>"
-        })
-        text += "</tbody></table>"
+        const getHead = () => {
+            return html` <thead>
+                <tr>
+                    <th data-sort-default>Wood</th>
+                    ${modifiers.map(
+                        (modifier) => html`<th class="text-right">
+                            ${addLineBreak(modifier)}
+                        </th>`
+                    )}
+                </tr>
+            </thead>`
+        }
 
-        return text
+        const getBody = (type: WoodType): TemplateResult => {
+            return html`<tbody>
+                ${this._woodData[type].map(
+                    (wood) =>
+                        html`
+                            <tr>
+                                <td>${wood.name}</td>
+
+                                ${modifiers.map((modifier) => {
+                                    const amount = wood.properties
+                                        .filter((property) => property.modifier === modifier)
+                                        .map((property) => property.amount)[0]
+
+                                    return html` <td class="text-right" data-sort="${amount ?? 0}">
+                                        ${amount ? formatFloatFixedHTML(amount) : ""}
+                                    </td>`
+                                })}
+                            </tr>
+                        `
+                )}
+            </tbody>`
+        }
+
+        return html`
+            <table id="table-${this._baseId}-${type}-list" class="table table-sm small tablesort na-table">
+                ${getHead()} ${getBody(type)}
+            </table>
+        `
+    }
+
+    /**
+     * Show wood type
+     */
+    _injectList(type: WoodType): void {
+        render(this._getList(type), this._div[type].node() as HTMLDivElement)
+
+        const table = document.querySelector(`#table-${this._baseId}-${type}-list`) as HTMLTableElement
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const sortTable = new Tablesort(table)
     }
 }

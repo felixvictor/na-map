@@ -75,6 +75,10 @@ table,
     white-space: nowrap;
 }
 
+.card-header {
+    background-color: $secondary-050;
+}
+
 #na-svg {
     background-color: $background-colour;
 }
@@ -98,8 +102,6 @@ text {
     }
 }
 
-.modules,
-.ingredients,
 .buildings .requirements {
     table {
         thead {
@@ -119,6 +121,66 @@ text {
         .name {
             font-style: italic;
         }
+    }
+}
+
+.na-table {
+    thead {
+        background-color: $secondary-050;
+    }
+
+    thead th {
+        border-bottom-color: $white;
+        cursor: s-resize;
+    }
+
+    tbody {
+        tr:nth-of-type(odd) {
+            background-color: $primary-050;
+        }
+    }
+}
+
+.no-sort {
+    thead th {
+        cursor: default;
+    }
+}
+
+.thead-group {
+    th {
+        font-style: initial !important;
+        cursor: default !important;
+    }
+}
+
+table tr,
+p {
+    text-align: left;
+}
+
+.table-sm th,
+.table-sm td {
+    padding-bottom: 0.1rem;
+}
+
+.table {
+    thead th {
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    td {
+        vertical-align: middle;
+        border-top: none;
+    }
+}
+
+p a,
+table a {
+    text-decoration: underline dotted $secondary-600 !important;
+    @include hover-focus() {
+        text-decoration-style: solid !important;
     }
 }
 
@@ -893,4 +955,22 @@ $wind-profile-colour: $overlay-text-colour;
 
 .drag-active {
     stroke-width: 0.5rem;
+}
+
+.tooltip {
+    font-size: smaller;
+    text-align: left;
+    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
+
+    table {
+        margin-bottom: 0;
+    }
+}
+
+.tooltip-inner {
+    min-width: 30rem;
+}
+
+.tooltip-small {
+    min-width: 20rem !important;
 }
