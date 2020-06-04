@@ -8,52 +8,6 @@
 /// @author   iB aka Felix Victor
 ////
 
-.card-header {
-    background-color: $secondary-200;
-}
-
-table tr,
-p {
-    text-align: left;
-}
-
-.table {
-    thead th {
-        font-weight: 400;
-    }
-
-    td {
-        vertical-align: top;
-        border-top: none;
-    }
-}
-
-p a,
-table a {
-    text-decoration: underline dotted $secondary-600 !important;
-    @include hover-focus() {
-        text-decoration-style: solid !important;
-    }
-}
-
-.tooltip {
-    font-size: smaller;
-    text-align: left;
-    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
-
-    table {
-        margin-bottom: 0;
-    }
-}
-
-.tooltip-inner {
-    min-width: 30rem;
-}
-
-.tooltip-small {
-    min-width: 20rem !important;
-}
-
 .bootstrap-select > .dropdown-toggle.bs-placeholder {
     color: $navbar-light-color;
 }

@@ -12,7 +12,6 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
-import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
@@ -53,7 +52,7 @@ export default class ShipList {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -97,22 +96,18 @@ export default class ShipList {
     _injectList(): void {
         d3Select(`#${this._baseId} div`).remove()
 
-        // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("row ingredients", true)
-        d3Select(`#${this._baseId} div`).html(this._getList())
-
-        const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const sortTable = new Tablesort(table)
+        // Add new ship list
+        const div = d3Select(`#${this._baseId}`).append("div").attr("class", "row")
+        div.html(this._getList())
     }
 
     // noinspection FunctionTooLongJS
     _getList(): HtmlString {
         let text = ""
 
-        text += `<table id="table-${this._baseId}" class="table table-sm small tablesort"><thead>`
-        text += "<tr>"
+        text += `<table id="table-${this._baseId}" class="table table-sm small na-table">`
+        text += `<thead>`
+        text += '<tr class="thead-group">'
         text += '<th scope="col" class="border-bottom-0"></th>'
         text += '<th scope="col" class="border-bottom-0"></th>'
         text += '<th scope="col" class="text-right border-bottom-0"></th>'
@@ -137,8 +132,9 @@ export default class ShipList {
         text += '<th scope="col" class="text-right">Stern</th>'
         text += '<th scope="col" class="text-right border-top-0">Sides</th>'
 
-        text += "</tr></thead><tbody>"
+        text += "</tr></thead>"
 
+        text += "<tbody>"
         const ships = this._shipData.sort(sortBy(["class", "-battleRating", "name"]))
         for (const ship of ships) {
             text += "<tr>"

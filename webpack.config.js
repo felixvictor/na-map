@@ -325,8 +325,6 @@ const config = {
     },
 
     optimization: {
-        maxAsyncRequests: Infinity,
-        maxInitialRequests: Infinity,
         moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
