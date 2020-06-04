@@ -120,7 +120,7 @@ export interface TradeItem {
     id: number
     name: string
     price: number
-    distanceFactor: number
+    distanceFactor?: number
 }
 
 /****************************

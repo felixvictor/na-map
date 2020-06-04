@@ -179,19 +179,27 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
     const items = apiItems
         .filter(
             (item) =>
-                item.ItemType === "Material" ||
-                item.SortingGroup === "Resource.Food" ||
-                item.SortingGroup === "Resource.Resources" ||
-                item.SortingGroup === "Resource.Trading" ||
-                item.Name === "American Cotton" ||
-                item.Name === "Tobacco"
+                !item.NotUsed &&
+                (item.ItemType === "Material" ||
+                    item.SortingGroup === "Resource.Food" ||
+                    item.SortingGroup === "Resource.Resources" ||
+                    item.SortingGroup === "Resource.Trading" ||
+                    item.Name === "American Cotton" ||
+                    item.Name === "Tobacco")
         )
-        .map((item) => ({
-            id: item.Id,
-            name: cleanName(item.Name),
-            price: item.BasePrice,
-            distanceFactor: item.PortPrices.RangePct,
-        })) as TradeItem[]
+        .map((item) => {
+            const tradeItem = {
+                id: item.Id,
+                name: cleanName(item.Name),
+                price: item.BasePrice,
+            } as TradeItem
+
+            if (item.PortPrices.RangePct) {
+                tradeItem.distanceFactor = item.PortPrices.RangePct
+            }
+
+            return tradeItem
+        })
 
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items)
 }
