@@ -12,13 +12,17 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
-import { repeat } from "lit-html/directives/repeat"
 import { html, render, TemplateResult } from "lit-html"
 import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
+import {
+    beautifyShipNameHTML,
+    HtmlString,
+    initTablesort,
+    insertBaseModal
+} from "../../common/common-browser";
 import { formatFloatFixedHTML, formatInt } from "../../common/common-format"
 
 import { sortBy } from "../../common/common-node"
@@ -27,7 +31,7 @@ import * as d3Selection from "d3-selection"
 
 interface ShipListData {
     class: [number, number]
-    name: [string, string]
+    name: [string, TemplateResult]
     guns: [number, number]
     battleRating: [number, string]
     crew: [number, string]
@@ -67,7 +71,7 @@ export default class ShipList {
             this._shipListData = shipData.map(
                 (ship: ShipData): ShipListData => ({
                     class: [ship.class, ship.class],
-                    name: [ship.name, ship.name],
+                    name: [ship.name, beautifyShipNameHTML(ship.name)],
                     guns: [ship.guns, ship.guns],
                     battleRating: [ship.battleRating, formatInt(ship.battleRating)],
                     crew: [ship.crew.max, formatInt(ship.crew.max)],
