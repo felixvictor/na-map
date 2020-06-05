@@ -25,6 +25,7 @@ import html2canvas from "html2canvas"
 import { registerEvent } from "../../analytics"
 import {
     appVersion,
+    beautifyShipName,
     colourGreenDark,
     colourRedDark,
     colourWhite,
@@ -32,9 +33,10 @@ import {
     HtmlString,
     hullRepairsPercent,
     insertBaseModal,
+    isImported,
     repairTime,
-    rigRepairsPercent,
-} from "../../../common/common-browser"
+    rigRepairsPercent, stripShipName
+} from "../../../common/common-browser";
 import { isEmpty, putImportError, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
@@ -780,7 +782,9 @@ export class CompareShips {
                     `<optgroup label="${getOrdinal(Number(key.key), false)} rate">${key.values
                         .map(
                             (ship) =>
-                                `<option data-subtext="${ship.battleRating}" value="${ship.id}">${ship.name} (${ship.guns})`
+                                `<option data-subtext="${ship.battleRating} ${
+                                    isImported(ship.name) ? "Imported" : ""
+                                }" value="${ship.id}">${stripShipName(ship.name)} (${ship.guns})`
                         )
                         .join("</option>")}`
             )
