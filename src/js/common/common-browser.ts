@@ -255,3 +255,13 @@ export const getContrastColour = (colour: string): string => {
 
     return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
 }
+
+const importedFlag = " (i)"
+export const isImported = (name: string): boolean => name.includes(importedFlag)
+export const stripShipName = (name: string): string => name.replace(importedFlag, "")
+
+export const beautifyShipName = (name: string): HtmlString =>
+    stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "")
+
+export const beautifyShipNameHTML = (name: string): TemplateResult =>
+    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small">imported</span>` : html``}`
