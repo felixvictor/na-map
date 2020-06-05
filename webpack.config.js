@@ -394,6 +394,11 @@ const config = {
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
         }),
+        // Do not include all moment locale files
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/,
+        }),
         new CopyPlugin({
             patterns: [
                 { from: "netlify.toml" },
