@@ -153,4 +153,9 @@ export const getContrastColour = (colour) => {
     const yiq = (r * 299 + g * 587 + b * 114) / 1000;
     return yiq >= 128 ? (_b = (_a = d3Color(colourWhite)) === null || _a === void 0 ? void 0 : _a.darker(5).toString()) !== null && _b !== void 0 ? _b : "#111" : colourWhite;
 };
+const importedFlag = " (i)";
+export const isImported = (name) => name.includes(importedFlag);
+export const stripShipName = (name) => name.replace(importedFlag, "");
+export const beautifyShipName = (name) => stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "");
+export const beautifyShipNameHTML = (name) => html `${stripShipName(name)} ${isImported(name) ? html `<span class="caps small">imported</span>` : html ``}`;
 //# sourceMappingURL=common-browser.js.map
