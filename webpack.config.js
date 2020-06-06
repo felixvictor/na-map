@@ -333,7 +333,7 @@ const config = {
     },
 
     output: {
-        chunkFilename: isProduction ? "[name].[chunkhash].js" : "[name].js",
+        chunkFilename: isProduction ? "[name].[contenthash].js" : "[name].js",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
         crossOriginLoading: "anonymous",
@@ -355,7 +355,7 @@ const config = {
             verbose: false,
         }),
         new MiniCssExtractPlugin({
-            chunkFilename: isProduction ? "[name].[chunkhash].css" : "[name].css",
+            chunkFilename: isProduction ? "[name].[contenthash].css" : "[name].css",
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
             orderWarning: true,
         }),
