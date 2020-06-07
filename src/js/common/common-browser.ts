@@ -265,3 +265,5 @@ export const beautifyShipName = (name: string): HtmlString =>
 
 export const beautifyShipNameHTML = (name: string): TemplateResult =>
     html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small">imported</span>` : html``}`
+
+export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`
