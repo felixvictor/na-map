@@ -18,7 +18,7 @@ import { line as d3Line } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform, } from "d3-zoom";
 import "round-slider/src/roundslider";
 import { registerEvent } from "../analytics";
-import { degreesPerSecond, insertBaseModal } from "../../common/common-browser";
+import { degreesPerSecond, insertBaseModal, pluralise } from "../../common/common-browser";
 import { formatF11 } from "../../common/common-format";
 import { compassDirections, convertInvCoordX, convertInvCoordY, degreesFullCircle, degreesToCompass, getDistance, speedFactor, } from "../../common/common-math";
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util";
@@ -54,9 +54,6 @@ export default class MakeJourney {
         this._initJourneyData();
         this._setupListener();
     }
-    static _pluralize(number, word) {
-        return `${number} ${word + (number === 1 ? "" : "s")}`;
-    }
     static _getHumanisedDuration(duration) {
         const durationHours = Math.floor(duration / 60);
         const durationMinutes = Math.round(duration % 60);
@@ -65,8 +62,8 @@ export default class MakeJourney {
             s += "less than a minute";
         }
         else {
-            const hourString = durationHours === 0 ? "" : MakeJourney._pluralize(durationHours, "hour");
-            const minuteString = durationMinutes === 0 ? "" : MakeJourney._pluralize(durationMinutes, "minute");
+            const hourString = durationHours === 0 ? "" : pluralise(durationHours, "hour");
+            const minuteString = durationMinutes === 0 ? "" : pluralise(durationMinutes, "minute");
             s += hourString + (hourString === "" ? "" : " ") + minuteString;
         }
         return s;
