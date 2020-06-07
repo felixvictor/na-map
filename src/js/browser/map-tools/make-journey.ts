@@ -28,7 +28,7 @@ import {
 import "round-slider/src/roundslider"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { degreesPerSecond, HtmlString, insertBaseModal, pluralise } from "../../common/common-browser";
 import { formatF11 } from "../../common/common-format"
 import {
     compassDirections,
@@ -135,9 +135,6 @@ export default class MakeJourney {
         this._setupListener()
     }
 
-    static _pluralize(number: number, word: string): string {
-        return `${number} ${word + (number === 1 ? "" : "s")}`
-    }
 
     static _getHumanisedDuration(duration: number): string {
         const durationHours = Math.floor(duration / 60)
@@ -147,8 +144,8 @@ export default class MakeJourney {
         if (duration < 1) {
             s += "less than a minute"
         } else {
-            const hourString = durationHours === 0 ? "" : MakeJourney._pluralize(durationHours, "hour")
-            const minuteString = durationMinutes === 0 ? "" : MakeJourney._pluralize(durationMinutes, "minute")
+            const hourString = durationHours === 0 ? "" : pluralise(durationHours, "hour")
+            const minuteString = durationMinutes === 0 ? "" : pluralise(durationMinutes, "minute")
             s += hourString + (hourString === "" ? "" : " ") + minuteString
         }
 

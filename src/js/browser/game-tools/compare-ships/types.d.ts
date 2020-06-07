@@ -1,5 +1,7 @@
 import * as d3Selection from "d3-selection"
 import { ValuesType } from "utility-types"
+import { ShipGunDeck } from "../../../common/gen-json"
+import { formatIntTrunc } from "../../../common/common-format";
 
 export interface ShipDisplayData {
     [index: string]: ValuesType<ShipDisplayData>
@@ -25,8 +27,8 @@ export interface ShipDisplayData {
     hullRepairAmount: string
     hullRepairsNeeded: string
     leakResistance: string
-    limitBack: number[]
-    limitFront: number[]
+    limitBack: ShipGunDeck
+    limitFront: ShipGunDeck
     mastBottomArmor: string
     mastMiddleArmor: string
     mastTopArmor: string
@@ -36,6 +38,8 @@ export interface ShipDisplayData {
     maxWeight: string
     minSpeed?: string
     minCrew: string
+    cannonCrew: string
+    carroCrew: string
     pump: string
     repairTime: string
     rigRepairAmount: string
@@ -51,6 +55,8 @@ export interface ShipDisplayData {
     structure: string
     upgradeXP: string
     waterlineHeight: string
+    cannonWeight: string
+    carroWeight: string
 }
 
 export interface DragData {
