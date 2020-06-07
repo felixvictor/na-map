@@ -20,10 +20,10 @@ export class Ship {
         this._setupSvg();
         this._setCompass();
     }
-    static pd(limit) {
-        let s = `<span class="badge badge-white">${limit[0]}\u202F/\u202F`;
-        if (limit[1]) {
-            s += `${limit[1]}`;
+    static pd(gunsPerDeck) {
+        let s = `<span class="badge badge-white">${gunsPerDeck.maxCannonLb}\u202F/\u202F`;
+        if (gunsPerDeck.maxCarroLb) {
+            s += `${gunsPerDeck.maxCarroLb}`;
         }
         else {
             s += "\u2013";
@@ -31,12 +31,12 @@ export class Ship {
         s += "\u202Flb</span>";
         return s;
     }
-    static getCannonsPerDeck(deckClassLimit, gunsPerDeck) {
-        let s = `${gunsPerDeck[0]}\u00A0${Ship.pd(deckClassLimit[0])}`;
+    static getCannonsPerDeck(guns) {
+        let s = `${guns.gunsPerDeck[0].amount}\u00A0${Ship.pd(guns.gunsPerDeck[0])}`;
         let br = "";
         for (let i = 1; i < 4; i += 1) {
-            if (gunsPerDeck[i]) {
-                s = `${gunsPerDeck[i]}\u00A0${Ship.pd(deckClassLimit[i])}\u202F<br>${s}`;
+            if (guns.gunsPerDeck[i].amount) {
+                s = `${guns.gunsPerDeck[i].amount}\u00A0${Ship.pd(guns.gunsPerDeck[i])}\u202F<br>${s}`;
             }
             else {
                 br = `${br}<br>`;
@@ -119,6 +119,8 @@ export class Ship {
         text += displayColumn("minCrew", "Minimum", 4);
         text += displayColumn("sailingCrew", "Sailing", 4);
         text += displayColumn("maxCrew", "Maximum", 4);
+        text += displayColumn("cannonCrew", "Cannon", 4);
+        text += displayColumn("carroCrew", "Carronades", 4);
         text += "</div></div></div>";
         text += displayFirstColumn("Resistance");
         text += Ship.displaySecondBlock();
@@ -140,8 +142,14 @@ export class Ship {
         text += "</div></div></div>";
         text += displayFirstColumn("Hold");
         text += Ship.displaySecondBlock();
-        text += displayColumn("maxWeight", "Tons");
         text += displayColumn("holdSize", "Cargo slots");
+        text += displayColumn("maxWeight", "Tons");
+        text += "</div></div></div>";
+        text += displayFirstColumn("Weight");
+        text += Ship.displaySecondBlock();
+        text += displayColumn("cannonWeight", "Cannons", 4);
+        text += displayColumn("carroWeight", "Carronades", 4);
+        text += displayColumn("repairWeight", "Repair Set", 4);
         text += "</div></div></div>";
         text += "</div>";
         return text;

@@ -454,13 +454,9 @@ interface ShipBlueprintShip {
 export interface ShipData extends ObjectIndexer<any> {
     battleRating: number
     bow: ShipHealth
-    broadside: ShipBroadside
     class: number
     crew: ShipCrew
-    deckClassLimit: number[][]
-    decks: number
-    guns: number
-    gunsPerDeck: number[]
+    guns: ShipGuns
     holdSize: number
     id: number
     mast: ShipMast
@@ -483,7 +479,23 @@ export interface ShipData extends ObjectIndexer<any> {
     tradeShip: boolean
     upgradeXP: number
 }
+interface ShipGuns {
+    total: number
+    decks: number
+    broadside: ShipBroadside
+    gunsPerDeck: ShipGunDeck[]
+    weight: ShipGunWeight
+}
+interface ShipGunDeck {
+    amount: number
+    maxCannonLb: number
+    maxCarroLb: number
+}
 interface ShipBroadside {
+    cannons: number
+    carronades: number
+}
+interface ShipGunWeight {
     cannons: number
     carronades: number
 }
@@ -491,6 +503,8 @@ interface ShipCrew {
     min: number
     max: number
     sailing: number
+    cannons: number
+    carronades: number
 }
 interface ShipSpeed {
     min: number
