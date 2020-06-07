@@ -19,10 +19,12 @@ import { roundToThousands, speedConstA, speedConstB } from "../common/common-mat
 import { cleanName, sortBy } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
-import { APIItemGeneric, APIShip, APIShipBlueprint } from "./api-item"
-import { ShipData } from "../common/gen-json"
+import { APIItemGeneric, APIShip, APIShipBlueprint, Limit, Specs } from "./api-item"
+import { Cannon, ShipBroadside, ShipData, ShipGunDeck, ShipGuns, ShipGunWeight } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
 import { isEmpty } from "../common/common"
+import * as webpack from "webpack"
+import normalModuleFactory = webpack.compilation.normalModuleFactory
 
 type ElementMap = Map<string, { [key: string]: string; group: string; element: string }>
 interface SubFileStructure {
@@ -225,6 +227,7 @@ const subFileStructure: SubFileStructure[] = [
 
 let apiItems: APIItemGeneric[]
 let ships: ShipData[]
+let cannons: Cannon
 
 /**
  * Get item names
@@ -239,9 +242,45 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
  */
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
+const getSpeedDegrees = (specs: Specs): { calcPortSpeed: number; speedDegrees: number[] } => {
+    const calcPortSpeed = specs.MaxSpeed * speedConstA - speedConstB
+    const speedDegrees = specs.SpeedToWind.map((speed: number) => roundToThousands(speed * calcPortSpeed))
+    const { length } = specs.SpeedToWind
+
+    // Mirror speed degrees
+    for (let i = 1; i < (length - 1) * 2; i += 2) {
+        speedDegrees.unshift(speedDegrees[i])
+    }
+
+    // Delete last element
+    speedDegrees.pop()
+
+    return { calcPortSpeed, speedDegrees }
+}
+
 const convertGenericShipData = (): ShipData[] => {
-    const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
-    const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
+    const cannonLb = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
+    const carroLb = [0, 0, 68, 42, 32, 24, 0, 18, 12]
+    const sideDeckMaxIndex = 3
+    const frontDeckIndex = sideDeckMaxIndex + 1
+    const backDeckIndex = frontDeckIndex + 1
+    const emptyDeck = { amount: 0, maxCannonLb: 0, maxCarroLb: 0 } as ShipGunDeck
+
+    const cannonData = new Map<number, { weight: number; crew: number }>(
+        cannons.long
+            .filter((cannon) => !Number.isNaN(Number(cannon.name)))
+            .map((cannon) => {
+                return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }]
+            })
+    )
+    const carroData = new Map<number, { weight: number; crew: number }>(
+        cannons.carronade
+            .filter((cannon) => !Number.isNaN(Number(cannon.name)))
+            .map((cannon) => {
+                return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }]
+            })
+    )
+
     // noinspection SpellCheckingInspection
     const shipsWith36lb = new Set([
         2229, // Redoutable (i)
@@ -256,81 +295,88 @@ const convertGenericShipData = (): ShipData[] => {
         (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
     ) as unknown) as APIShip[]).map(
         (apiShip: APIShip): ShipData => {
-            const calcPortSpeed = apiShip.Specs.MaxSpeed * speedConstA - speedConstB
-            const speedDegrees = apiShip.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed))
-            const { length } = apiShip.Specs.SpeedToWind
+            const guns = {
+                total: 0,
+                decks: apiShip.Decks,
+                broadside: { cannons: 0, carronades: 0 },
+                gunsPerDeck: [],
+                weight: { cannons: 0, carronades: 0 },
+            } as ShipGuns
+            let totalCannonCrew = 0
+            let totalCarroCrew = 0
 
-            // Mirror speed degrees
-            for (let i = 1; i < (length - 1) * 2; i += 2) {
-                speedDegrees.unshift(speedDegrees[i])
-            }
+            const { calcPortSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs)
 
-            // Delete last element
-            speedDegrees.pop()
-
-            const deckClassLimit = apiShip.DeckClassLimit.map((deck, index) => {
-                let cw = cannonWeight[deck.Limitation1.Min]
-                // French-build 3rd rates have 36lb cannons on gun deck (instead of 32lb)
-                if (shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1) {
-                    cw = 36
-                }
-
-                return [cw, carroWeight[deck.Limitation2.Min]]
-            })
-            const gunsPerDeck = apiShip.GunsPerDeck
-            // Delete mortar entry
-            gunsPerDeck.pop()
-            let guns = 0
-            let cannonBroadside = 0
-            let carronadesBroadside = 0
-            const emptyDeck = [0, 0]
-            for (let i = 0; i < 4; i += 1) {
-                if (deckClassLimit[i]) {
-                    guns += gunsPerDeck[i]
-                    if (deckClassLimit[i][1]) {
-                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][1]) / 2
-                    } else {
-                        carronadesBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2
+            const addDeck = (deckLimit: Limit, index: number) => {
+                if (deckLimit) {
+                    const gunsPerDeck = apiShip.GunsPerDeck[index]
+                    const currentDeck = {
+                        amount: gunsPerDeck,
+                        // French-build 3rd rates have 36lb cannons on gun deck (instead of 32lb)
+                        maxCannonLb:
+                            shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1
+                                ? 36
+                                : cannonLb[deckLimit.Limitation1.Min],
+                        maxCarroLb: carroLb[deckLimit.Limitation2.Min],
                     }
+                    guns.gunsPerDeck.push(currentDeck)
 
-                    cannonBroadside += (gunsPerDeck[i] * deckClassLimit[i][0]) / 2
+                    const cannonWeight = Math.round(
+                        gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.weight ?? 0)
+                    )
+                    const cannonCrew = gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.crew ?? 0)
+
+                    guns.weight.cannons += cannonWeight
+                    totalCannonCrew += cannonCrew
+
+                    if (currentDeck.maxCarroLb) {
+                        guns.weight.carronades += Math.round(
+                            gunsPerDeck * (cannonData.get(currentDeck.maxCarroLb)?.weight ?? 0)
+                        )
+                        totalCarroCrew += gunsPerDeck * (carroData.get(currentDeck.maxCarroLb)?.crew ?? 0)
+                    } else {
+                        guns.weight.carronades += cannonWeight
+                        totalCarroCrew += cannonCrew
+                    }
                 } else {
-                    deckClassLimit.push(emptyDeck)
+                    guns.gunsPerDeck.push(emptyDeck)
                 }
             }
 
-            const broadside = { cannons: cannonBroadside, carronades: carronadesBroadside }
+            for (let deckIndex = 0; deckIndex <= sideDeckMaxIndex; deckIndex += 1) {
+                addDeck(apiShip.DeckClassLimit[deckIndex], deckIndex)
+                const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount
+                const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2
 
-            const frontDeck = apiShip.FrontDecks
-                ? apiShip.FrontDeckClassLimit.map((deck) => [
-                      cannonWeight[deck.Limitation1.Min],
-                      carroWeight[deck.Limitation2.Min],
-                  ])[0]
-                : emptyDeck
-            deckClassLimit.push(frontDeck)
+                guns.total += gunsPerDeck
+                if (guns.gunsPerDeck[deckIndex].maxCarroLb) {
+                    guns.broadside.carronades += (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
+                } else {
+                    guns.broadside.carronades += cannonBroadside
+                }
 
-            const backDeck = apiShip.BackDecks
-                ? apiShip.BackDeckClassLimit.map((deck) => [
-                      cannonWeight[deck.Limitation1.Min],
-                      carroWeight[deck.Limitation2.Min],
-                  ])[0]
-                : emptyDeck
-            deckClassLimit.push(backDeck)
+                guns.broadside.cannons += cannonBroadside
+            }
+
+            addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex)
+            addDeck(apiShip.BackDeckClassLimit[0], backDeckIndex)
 
             const ship = {
                 id: Number(apiShip.Id),
                 name: cleanName(apiShip.Name),
                 class: apiShip.Class,
-                gunsPerDeck,
                 guns,
-                broadside,
-                deckClassLimit,
                 shipMass: apiShip.ShipMass,
                 battleRating: apiShip.BattleRating,
-                decks: apiShip.Decks,
                 holdSize: apiShip.HoldSize,
                 maxWeight: apiShip.MaxWeight,
-                crew: { min: apiShip.MinCrewRequired, max: apiShip.HealthInfo.Crew, sailing: 0 },
+                crew: {
+                    min: apiShip.MinCrewRequired,
+                    max: apiShip.HealthInfo.Crew,
+                    sailing: 0,
+                    cannons: totalCannonCrew,
+                    carronades: totalCarroCrew,
+                },
                 speedDegrees,
                 speed: {
                     // eslint-disable-next-line unicorn/no-reduce
@@ -633,6 +679,7 @@ const convertShips = async (): Promise<void> => {
 
 export const convertShipData = async (): Promise<void> => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    cannons = readJson(commonPaths.fileCannon)
     await convertShips()
     await convertShipBlueprints()
 }

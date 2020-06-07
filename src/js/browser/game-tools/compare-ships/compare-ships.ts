@@ -25,7 +25,6 @@ import html2canvas from "html2canvas"
 import { registerEvent } from "../../analytics"
 import {
     appVersion,
-    beautifyShipName,
     colourGreenDark,
     colourRedDark,
     colourWhite,
@@ -35,8 +34,9 @@ import {
     insertBaseModal,
     isImported,
     repairTime,
-    rigRepairsPercent, stripShipName
-} from "../../../common/common-browser";
+    rigRepairsPercent,
+    stripShipName,
+} from "../../../common/common-browser"
 import { isEmpty, putImportError, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
@@ -411,7 +411,7 @@ export class CompareShips {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -638,7 +638,7 @@ export class CompareShips {
                                 name: ship.name,
                                 class: ship.class,
                                 battleRating: ship.battleRating,
-                                guns: ship.guns,
+                                guns: ship.guns.total,
                             } as ShipSelectData)
                     )
                     .sort(sortBy(["name"]))
