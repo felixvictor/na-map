@@ -292,6 +292,7 @@ const whitelistPatternsChildren = [
     /bs-/,
     /btn/,
     /collaps/,
+    /col-4/,
     /datetimepicker-/,
     /disabled/,
     /dropdown-backdrop/,
