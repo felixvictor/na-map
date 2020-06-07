@@ -186,7 +186,6 @@ const convertGenericShipData = () => {
             let cw = cannonWeight[deck.Limitation1.Min];
             if (shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1) {
                 cw = 36;
-                console.log(deck, index, apiShip.Decks, apiShip.Decks - 1 === index);
             }
             return [cw, carroWeight[deck.Limitation2.Min]];
         });
