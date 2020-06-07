@@ -242,7 +242,12 @@ const getShipMass = (id: number): number => apiItems.find((apiItem) => id === ap
 const convertGenericShipData = (): ShipData[] => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12]
-    const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"])
+    // noinspection SpellCheckingInspection
+    const shipsWith36lb = new Set([
+        2229, // Redoutable (i)
+        2235, // Implacable
+        2318, // Admiraal de Ruyter
+    ])
     const shipsNotUsed = new Set([
         2352, // Diana (i)
     ])
@@ -254,11 +259,6 @@ const convertGenericShipData = (): ShipData[] => {
             const calcPortSpeed = apiShip.Specs.MaxSpeed * speedConstA - speedConstB
             const speedDegrees = apiShip.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed))
             const { length } = apiShip.Specs.SpeedToWind
-            if (shipsWith36lb.has(apiShip.Name)) {
-                cannonWeight[2] = 36
-            } else {
-                cannonWeight[2] = 32
-            }
 
             // Mirror speed degrees
             for (let i = 1; i < (length - 1) * 2; i += 2) {
@@ -268,10 +268,15 @@ const convertGenericShipData = (): ShipData[] => {
             // Delete last element
             speedDegrees.pop()
 
-            const deckClassLimit = apiShip.DeckClassLimit.map((deck) => [
-                cannonWeight[deck.Limitation1.Min],
-                carroWeight[deck.Limitation2.Min],
-            ])
+            const deckClassLimit = apiShip.DeckClassLimit.map((deck, index) => {
+                let cw = cannonWeight[deck.Limitation1.Min]
+                // French-build 3rd rates have 36lb cannons on gun deck (instead of 32lb)
+                if (shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1) {
+                    cw = 36
+                }
+
+                return [cw, carroWeight[deck.Limitation2.Min]]
+            })
             const gunsPerDeck = apiShip.GunsPerDeck
             // Delete mortar entry
             gunsPerDeck.pop()
