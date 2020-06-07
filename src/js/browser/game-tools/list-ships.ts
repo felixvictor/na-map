@@ -17,12 +17,7 @@ import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import {
-    beautifyShipNameHTML,
-    HtmlString,
-    initTablesort,
-    insertBaseModal
-} from "../../common/common-browser";
+import { beautifyShipNameHTML, HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
 import { formatFloatFixedHTML, formatInt } from "../../common/common-format"
 
 import { sortBy } from "../../common/common-node"
@@ -72,14 +67,20 @@ export default class ShipList {
                 (ship: ShipData): ShipListData => ({
                     class: [ship.class, ship.class],
                     name: [ship.name, beautifyShipNameHTML(ship.name)],
-                    guns: [ship.guns, ship.guns],
+                    guns: [ship.guns.total, ship.guns.total],
                     battleRating: [ship.battleRating, formatInt(ship.battleRating)],
                     crew: [ship.crew.max, formatInt(ship.crew.max)],
                     maxSpeed: [ship.ship.maxSpeed, formatFloatFixedHTML(ship.ship.maxSpeed)],
                     turnSpeed: [ship.rudder.turnSpeed, formatFloatFixedHTML(ship.rudder.turnSpeed)],
-                    broadside: [ship.broadside.cannons, formatInt(ship.broadside.cannons)],
-                    bowChaser: [ship.gunsPerDeck[4], ship.gunsPerDeck[4] ? String(ship.gunsPerDeck[4]) : ""],
-                    sternChaser: [ship.gunsPerDeck[5], ship.gunsPerDeck[5] ? String(ship.gunsPerDeck[5]) : ""],
+                    broadside: [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
+                    bowChaser: [
+                        ship.guns.gunsPerDeck[4].amount,
+                        ship.guns.gunsPerDeck[4] ? String(ship.guns.gunsPerDeck[4].amount) : "",
+                    ],
+                    sternChaser: [
+                        ship.guns.gunsPerDeck[5].amount,
+                        ship.guns.gunsPerDeck[5] ? String(ship.guns.gunsPerDeck[5].amount) : "",
+                    ],
                     sides: [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
                 })
             )
