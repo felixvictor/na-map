@@ -25,6 +25,7 @@ import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/
 import {
     HtmlString,
     hullRepairsVolume,
+    pluralise,
     repairsSetSize,
     rigRepairsVolume,
     rumRepairsFactor,
@@ -53,7 +54,7 @@ export class ShipComparison extends Ship {
     private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, any>
     private _windProfile!: DragData
     private _gWindProfile!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
-    private _arcsComp!: Array<PieArcDatum<number | { valueOf(): number }>>
+    private _arcsComp!: Array<PieArcDatum<number | { valueOf: () => number }>>
 
     constructor(compareId: string, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
         super(compareId, shipCompare)
@@ -133,6 +134,7 @@ export class ShipComparison extends Ship {
             update()
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const dragEnd = (d: DragData): void => {
             d.this.classed("drag-active", false)
         }
@@ -212,6 +214,7 @@ export class ShipComparison extends Ship {
      * Draw difference profile
      */
     _drawDifferenceProfile(): void {
+        // eslint-disable-next-line unicorn/no-null
         const pie = d3Pie().sort(null).value(1)
 
         const arcsBase = pie(this._shipBaseData.speedDegrees)
@@ -348,7 +351,7 @@ export class ShipComparison extends Ship {
                 this._shipBaseData.ship.acceleration,
                 2
             )}`,
-            additionalRow: `${this.shipCompareData.decks < 4 ? "<br>\u00A0" : ""}`,
+            additionalRow: `${this.shipCompareData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatIntTrunc(this.shipCompareData.stern.armour)}\u00A0${getDiff(
                 this.shipCompareData.stern.armour,
                 this._shipBaseData.stern.armour
@@ -360,27 +363,24 @@ export class ShipComparison extends Ship {
                 this.shipCompareData.battleRating,
                 this._shipBaseData.battleRating
             )}`,
-            cannonBroadside: `${this.shipCompareData.broadside.cannons}\u00A0${getDiff(
-                this.shipCompareData.broadside.cannons,
-                this._shipBaseData.broadside.cannons
+            cannonBroadside: `${this.shipCompareData.guns.broadside.cannons}\u00A0${getDiff(
+                this.shipCompareData.guns.broadside.cannons,
+                this._shipBaseData.guns.broadside.cannons
             )}`,
-            cannonsPerDeck: Ship.getCannonsPerDeck(
-                this.shipCompareData.deckClassLimit,
-                this.shipCompareData.gunsPerDeck
-            ),
-            carroBroadside: `${this.shipCompareData.broadside.carronades}\u00A0${getDiff(
-                this.shipCompareData.broadside.carronades,
-                this._shipBaseData.broadside.carronades
+            cannonsPerDeck: Ship.getCannonsPerDeck(this.shipCompareData.guns),
+            carroBroadside: `${this.shipCompareData.guns.broadside.carronades}\u00A0${getDiff(
+                this.shipCompareData.guns.broadside.carronades,
+                this._shipBaseData.guns.broadside.carronades
             )}`,
             deceleration: `${formatFloat(this.shipCompareData.ship.deceleration)}\u00A0${getDiff(
                 this.shipCompareData.ship.deceleration,
                 this._shipBaseData.ship.deceleration,
                 2
             )}`,
-            decks: `${this.shipCompareData.decks}\u00A0${getDiff(
-                this.shipCompareData.decks,
-                this._shipBaseData.decks
-            )} deck${this.shipCompareData.decks > 1 ? "s" : ""}`,
+            decks: `${this.shipCompareData.guns.decks}\u00A0${getDiff(
+                this.shipCompareData.guns.decks,
+                this._shipBaseData.guns.decks
+            )} deck${this.shipCompareData.guns.decks > 1 ? "s" : ""}`,
             fireResistance: `${formatPercent(this.shipCompareData.resistance!.fire, 0)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.fire,
                 this._shipBaseData.resistance!.fire,
@@ -398,9 +398,12 @@ export class ShipComparison extends Ship {
                 this.shipCompareData.bow.thickness,
                 this._shipBaseData.bow.thickness
             )}`,
-            guns: `${this.shipCompareData.guns}\u00A0${getDiff(this.shipCompareData.guns, this._shipBaseData.guns)}`,
-            gunsBack: this.shipCompareData.gunsPerDeck[5],
-            gunsFront: this.shipCompareData.gunsPerDeck[4],
+            guns: `${this.shipCompareData.guns.total}\u00A0${getDiff(
+                this.shipCompareData.guns.total,
+                this._shipBaseData.guns.total
+            )}`,
+            gunsBack: this.shipCompareData.guns.gunsPerDeck[5].amount,
+            gunsFront: this.shipCompareData.guns.gunsPerDeck[4].amount,
             halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime, 4)}\u00A0${getDiff(
                 this.shipCompareData.rudder.halfturnTime,
                 this._shipBaseData.rudder.halfturnTime,
@@ -428,8 +431,8 @@ export class ShipComparison extends Ship {
                 2,
                 true
             )}`,
-            limitBack: this.shipCompareData.deckClassLimit[5],
-            limitFront: this.shipCompareData.deckClassLimit[4],
+            limitBack: this.shipCompareData.guns.gunsPerDeck[5],
+            limitFront: this.shipCompareData.guns.gunsPerDeck[4],
             mastBottomArmor: `${formatIntTrunc(this.shipCompareData.mast.bottomArmour)}\u00A0${getDiff(
                 this.shipCompareData.mast.bottomArmour,
                 this._shipBaseData.mast.bottomArmour
@@ -469,6 +472,14 @@ export class ShipComparison extends Ship {
             minCrew: `${formatIntTrunc(this.shipCompareData.crew.min)}\u00A0${getDiff(
                 this.shipCompareData.crew.min,
                 this._shipBaseData.crew.min
+            )}`,
+            cannonCrew: `${formatIntTrunc(this.shipCompareData.crew.cannons)}\u00A0${getDiff(
+                this._shipBaseData.crew.cannons,
+                this.shipCompareData.crew.cannons
+            )}`,
+            carroCrew: `${formatIntTrunc(this.shipCompareData.crew.carronades)}\u00A0${getDiff(
+                this._shipBaseData.crew.carronades,
+                this.shipCompareData.crew.carronades
             )}`,
             minSpeed: `${formatFloat(this.shipCompareData.speed.min)}\u00A0${getDiff(
                 this.shipCompareData.speed.min,
@@ -541,7 +552,22 @@ export class ShipComparison extends Ship {
                 this._shipBaseData.ship.waterlineHeight,
                 2
             )}`,
+            cannonWeight: `${formatIntTrunc(this.shipCompareData.guns.weight.cannons)}\u00A0${getDiff(
+                this._shipBaseData.guns.weight.cannons,
+                this.shipCompareData.guns.weight.cannons
+            )}`,
+            carroWeight: `${formatIntTrunc(this.shipCompareData.guns.weight.carronades)}\u00A0${getDiff(
+                this._shipBaseData.guns.weight.carronades,
+                this.shipCompareData.guns.weight.carronades
+            )}`,
         } as ShipDisplayData
+
+        ship.repairWeight = `${formatIntTrunc(
+            (hullRepairsNeededCompare + rigRepairsNeededCompare + rumRepairsNeededCompare * 0.1) * repairsSetSize
+        )}\u00A0${getDiff(
+            (hullRepairsNeededBase + rigRepairsNeededBase + rumRepairsNeededBase * 0.1) * repairsSetSize,
+            (hullRepairsNeededCompare + rigRepairsNeededCompare + rumRepairsNeededCompare * 0.1) * repairsSetSize
+        )}`
 
         if (ship.gunsFront) {
             ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`

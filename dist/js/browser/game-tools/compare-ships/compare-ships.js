@@ -19,7 +19,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 import html2canvas from "html2canvas";
 import { registerEvent } from "../../analytics";
-import { appVersion, colourGreenDark, colourRedDark, colourWhite, hashids, hullRepairsPercent, insertBaseModal, isImported, repairTime, rigRepairsPercent, stripShipName } from "../../../common/common-browser";
+import { appVersion, colourGreenDark, colourRedDark, colourWhite, hashids, hullRepairsPercent, insertBaseModal, isImported, repairTime, rigRepairsPercent, stripShipName, } from "../../../common/common-browser";
 import { isEmpty, putImportError, woodType } from "../../../common/common";
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format";
 import { getOrdinal } from "../../../common/common-math";
@@ -257,7 +257,7 @@ export class CompareShips {
     _setupListener() {
         var _a;
         let firstClick = true;
-        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async (event) => {
+        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -429,7 +429,7 @@ export class CompareShips {
             name: ship.name,
             class: ship.class,
             battleRating: ship.battleRating,
-            guns: ship.guns,
+            guns: ship.guns.total,
         }))
             .sort(sortBy(["name"])));
     }

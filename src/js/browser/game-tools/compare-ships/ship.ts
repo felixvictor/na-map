@@ -16,6 +16,7 @@ import { HtmlString, numberSegments } from "../../../common/common-browser"
 
 import { CompareShips } from "./compare-ships"
 import { ShipDisplayData } from "./types"
+import { ShipGunDeck, ShipGuns } from "../../../common/gen-json"
 
 export class Ship {
     readonly ticksSpeed: number[]
@@ -44,12 +45,12 @@ export class Ship {
 
     /**
      * Format cannon pound value
-     * @param limit - Upper limit for [0] cannon and [1] carronades
+     * @param gunsPerDeck - ShipGunDeck
      */
-    static pd(limit: number[]): HtmlString {
-        let s = `<span class="badge badge-white">${limit[0]}\u202F/\u202F`
-        if (limit[1]) {
-            s += `${limit[1]}`
+    static pd(gunsPerDeck: ShipGunDeck): HtmlString {
+        let s = `<span class="badge badge-white">${gunsPerDeck.maxCannonLb}\u202F/\u202F`
+        if (gunsPerDeck.maxCarroLb) {
+            s += `${gunsPerDeck.maxCarroLb}`
         } else {
             s += "\u2013"
         }
@@ -60,16 +61,15 @@ export class Ship {
 
     /**
      * Format cannon/carronade upper limit classes
-     * @param deckClassLimit - Limit per deck
-     * @param gunsPerDeck - Guns per deck
+     * @param guns - Guns
      * @returns Formatted string [0] limits and [1] possibly empty lines at the bottom
      */
-    static getCannonsPerDeck(deckClassLimit: number[][], gunsPerDeck: number[]): [string, string] {
-        let s = `${gunsPerDeck[0]}\u00A0${Ship.pd(deckClassLimit[0])}`
+    static getCannonsPerDeck(guns: ShipGuns): [string, string] {
+        let s = `${guns.gunsPerDeck[0].amount}\u00A0${Ship.pd(guns.gunsPerDeck[0])}`
         let br = ""
         for (let i = 1; i < 4; i += 1) {
-            if (gunsPerDeck[i]) {
-                s = `${gunsPerDeck[i]}\u00A0${Ship.pd(deckClassLimit[i])}\u202F<br>${s}`
+            if (guns.gunsPerDeck[i].amount) {
+                s = `${guns.gunsPerDeck[i].amount}\u00A0${Ship.pd(guns.gunsPerDeck[i])}\u202F<br>${s}`
             } else {
                 br = `${br}<br>`
             }
@@ -186,6 +186,8 @@ export class Ship {
         text += displayColumn("minCrew", "Minimum", 4)
         text += displayColumn("sailingCrew", "Sailing", 4)
         text += displayColumn("maxCrew", "Maximum", 4)
+        text += displayColumn("cannonCrew", "Cannon", 4)
+        text += displayColumn("carroCrew", "Carronades", 4)
         text += "</div></div></div>"
 
         text += displayFirstColumn("Resistance")
@@ -211,8 +213,15 @@ export class Ship {
 
         text += displayFirstColumn("Hold")
         text += Ship.displaySecondBlock()
-        text += displayColumn("maxWeight", "Tons")
         text += displayColumn("holdSize", "Cargo slots")
+        text += displayColumn("maxWeight", "Tons")
+        text += "</div></div></div>"
+
+        text += displayFirstColumn("Weight")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("cannonWeight", "Cannons", 4)
+        text += displayColumn("carroWeight", "Carronades", 4)
+        text += displayColumn("repairWeight", "Repair Set", 4)
         text += "</div></div></div>"
 
         text += "</div>"
