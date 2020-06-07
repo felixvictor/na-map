@@ -158,4 +158,5 @@ export const isImported = (name) => name.includes(importedFlag);
 export const stripShipName = (name) => name.replace(importedFlag, "");
 export const beautifyShipName = (name) => stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "");
 export const beautifyShipNameHTML = (name) => html `${stripShipName(name)} ${isImported(name) ? html `<span class="caps small">imported</span>` : html ``}`;
+export const pluralise = (number, word) => `${number} ${word + (number === 1 ? "" : "s")}`;
 //# sourceMappingURL=common-browser.js.map
