@@ -166,7 +166,11 @@ const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find((apiI
 const convertGenericShipData = () => {
     const cannonWeight = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroWeight = [0, 0, 68, 42, 32, 24, 0, 18, 12];
-    const shipsWith36lb = new Set(["Admiraal de Ruyter", "Implacable", "Redoutable"]);
+    const shipsWith36lb = new Set([
+        2229,
+        2235,
+        2318,
+    ]);
     const shipsNotUsed = new Set([
         2352,
     ]);
@@ -174,20 +178,18 @@ const convertGenericShipData = () => {
         const calcPortSpeed = apiShip.Specs.MaxSpeed * speedConstA - speedConstB;
         const speedDegrees = apiShip.Specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
         const { length } = apiShip.Specs.SpeedToWind;
-        if (shipsWith36lb.has(apiShip.Name)) {
-            cannonWeight[2] = 36;
-        }
-        else {
-            cannonWeight[2] = 32;
-        }
         for (let i = 1; i < (length - 1) * 2; i += 2) {
             speedDegrees.unshift(speedDegrees[i]);
         }
         speedDegrees.pop();
-        const deckClassLimit = apiShip.DeckClassLimit.map((deck) => [
-            cannonWeight[deck.Limitation1.Min],
-            carroWeight[deck.Limitation2.Min],
-        ]);
+        const deckClassLimit = apiShip.DeckClassLimit.map((deck, index) => {
+            let cw = cannonWeight[deck.Limitation1.Min];
+            if (shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1) {
+                cw = 36;
+                console.log(deck, index, apiShip.Decks, apiShip.Decks - 1 === index);
+            }
+            return [cw, carroWeight[deck.Limitation2.Min]];
+        });
         const gunsPerDeck = apiShip.GunsPerDeck;
         gunsPerDeck.pop();
         let guns = 0;
