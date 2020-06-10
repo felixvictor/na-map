@@ -13,6 +13,7 @@ import d3Collection from "d3-collection";
 import d3Array from "d3-array";
 const { nest: d3Nest } = d3Collection;
 const { ascending: d3Ascending } = d3Array;
+import dayjs from "dayjs";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 import { capitalToCounty, nations } from "../common/common";
@@ -54,7 +55,8 @@ const sortFileNames = (fileNames) => {
         return 0;
     });
 };
-function convertOwnership() {
+const getDate = (date) => dayjs(date).format("YYYY-MM-YY");
+const convertOwnership = () => {
     const ports = new Map();
     const numPortsDates = [];
     const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`);
@@ -66,10 +68,13 @@ function convertOwnership() {
             numPorts[nation.short] = 0;
         });
         for (const port of portData) {
-            const getObject = () => ({
-                timeRange: [new Date(date), new Date(date)],
-                val: nations[port.Nation].short,
-            });
+            const getObject = () => {
+                const dateF = getDate(date);
+                return {
+                    timeRange: [dateF, dateF],
+                    val: nations[port.Nation].short,
+                };
+            };
             const initData = () => {
                 var _a;
                 ports.set(port.Id, {
@@ -98,7 +103,7 @@ function convertOwnership() {
             const setNewEndDate = () => {
                 const portData = ports.get(port.Id);
                 if (portData) {
-                    portData.data[portData.data.length - 1].timeRange[1] = new Date(date);
+                    portData.data[portData.data.length - 1].timeRange[1] = getDate(date);
                     ports.set(port.Id, portData);
                 }
             };
@@ -183,7 +188,7 @@ function convertOwnership() {
         .catch((error) => {
         throw new Error(error);
     });
-}
+};
 export const convertOwnershipData = () => {
     convertOwnership();
 };
