@@ -386,8 +386,12 @@ export interface PriceSeasonedWood {
  */
 
 export interface Recipe {
-    recipe: RecipeEntity[]
+    recipe: RecipeGroup[]
     ingredient: RecipeIngredientEntity[]
+}
+interface RecipeGroup {
+    group: string
+    recipes: RecipeEntity[]
 }
 interface RecipeEntity {
     id: number
@@ -397,7 +401,7 @@ interface RecipeEntity {
     goldPrice: number
     itemRequirements: RecipeItemRequirement[]
     result: RecipeResult
-    craftGroup: string
+    craftGroup?: string
     serverType: string
 }
 interface RecipeItemRequirement {
