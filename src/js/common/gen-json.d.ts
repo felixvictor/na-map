@@ -265,7 +265,6 @@ export interface PortBasic {
     name: string
     coordinates: Point
     angle: number
-    textAnchor: string
     region: string
     countyCapitalName: string
     county: string
