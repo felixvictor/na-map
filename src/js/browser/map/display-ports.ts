@@ -50,13 +50,13 @@ import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../c
 import {
     Coordinate,
     defaultCircleSize,
-    defaultFontSize,
+    defaultFontSize, degreesHalfCircle,
     degreesToRadians,
     distancePoints,
     getDistance,
     Point,
-    roundToThousands,
-} from "../../common/common-math"
+    roundToThousands
+} from "../../common/common-math";
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
@@ -1114,7 +1114,7 @@ export default class DisplayPorts {
             this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
         ) {
-            return d.textAnchor
+            return d.angle > 0 && d.angle < degreesHalfCircle ? "start" : "end"
         }
 
         return "middle"
