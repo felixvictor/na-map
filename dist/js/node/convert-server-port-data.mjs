@@ -14,7 +14,7 @@ const { nest: d3Nest } = d3Collection;
 import { findNationById, nations, nationShortName } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { cleanName, sortBy } from "../common/common-node";
+import { cleanName, simpleNumberSort, sortBy } from "../common/common-node";
 import { serverNames } from "../common/common-var";
 const minProfit = 30000;
 const frontlinePorts = 2;
@@ -48,17 +48,20 @@ const setPortFeaturePerServer = (apiPort) => {
             tradingCompany: apiPort.TradingCompany,
             laborHoursDiscount: apiPort.LaborHoursDiscount,
             dropsTrading: [
-                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return (_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading; }).map((good) => good.Template)),
-            ],
+                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return itemNames.get(good.Template) ? (_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading : true; }).map((good) => good.Template)),
+            ].sort(simpleNumberSort),
             consumesTrading: [
-                ...new Set(portShop.ResourcesConsumed.filter((good) => { var _a; return (_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading; }).map((good) => good.Key)),
-            ],
+                ...new Set(portShop.ResourcesConsumed.filter((good) => { var _a; return itemNames.get(good.Key) ? (_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading : true; }).map((good) => good.Key)),
+            ].sort(simpleNumberSort),
             producesNonTrading: [
-                ...new Set(portShop.ResourcesProduced.filter((good) => { var _a; return !((_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading); }).map((good) => good.Key)),
-            ],
+                ...new Set(portShop.ResourcesProduced.filter((good) => {
+                    var _a;
+                    return itemNames.get(good.Key) ? !((_a = itemNames.get(good.Key)) === null || _a === void 0 ? void 0 : _a.trading) : false;
+                }).map((good) => good.Key)),
+            ].sort(simpleNumberSort),
             dropsNonTrading: [
-                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return !((_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading); }).map((good) => good.Template)),
-            ],
+                ...new Set(portShop.ResourcesAdded.filter((good) => { var _a; return itemNames.get(good.Template) ? !((_a = itemNames.get(good.Template)) === null || _a === void 0 ? void 0 : _a.trading) : false; }).map((good) => good.Template)),
+            ].sort(simpleNumberSort),
             inventory: portShop.RegularItems.filter((good) => { var _a; return ((_a = itemNames.get(good.TemplateId)) === null || _a === void 0 ? void 0 : _a.itemType) !== "Cannon"; })
                 .map((good) => {
                 var _a;
@@ -240,7 +243,9 @@ export const convertServerPortData = () => {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
-        itemNames = new Map(apiItems.map((item) => [
+        itemNames = new Map(apiItems
+            .filter((item) => !item.NotUsed)
+            .map((item) => [
             item.Id,
             {
                 name: cleanName(item.Name),
