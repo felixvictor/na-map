@@ -18,7 +18,7 @@ import { findNationById, nations, nationShortName, NationShortName } from "../co
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
-import { cleanName, sortBy } from "../common/common-node"
+import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric } from "./api-item"
@@ -77,32 +77,32 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
             laborHoursDiscount: apiPort.LaborHoursDiscount,
             dropsTrading: [
                 ...new Set(
-                    portShop.ResourcesAdded.filter((good) => itemNames.get(good.Template)?.trading).map(
-                        (good) => good.Template
-                    )
+                    portShop.ResourcesAdded.filter((good) =>
+                        itemNames.get(good.Template) ? itemNames.get(good.Template)?.trading : true
+                    ).map((good) => good.Template)
                 ),
-            ],
+            ].sort(simpleNumberSort),
             consumesTrading: [
                 ...new Set(
-                    portShop.ResourcesConsumed.filter((good) => itemNames.get(good.Key)?.trading).map(
-                        (good) => good.Key
-                    )
+                    portShop.ResourcesConsumed.filter((good) =>
+                        itemNames.get(good.Key) ? itemNames.get(good.Key)?.trading : true
+                    ).map((good) => good.Key)
                 ),
-            ],
+            ].sort(simpleNumberSort),
             producesNonTrading: [
                 ...new Set(
-                    portShop.ResourcesProduced.filter((good) => !itemNames.get(good.Key)?.trading).map(
-                        (good) => good.Key
-                    )
+                    portShop.ResourcesProduced.filter((good) => {
+                        return itemNames.get(good.Key) ? !itemNames.get(good.Key)?.trading : false
+                    }).map((good) => good.Key)
                 ),
-            ],
+            ].sort(simpleNumberSort),
             dropsNonTrading: [
                 ...new Set(
-                    portShop.ResourcesAdded.filter((good) => !itemNames.get(good.Template)?.trading).map(
-                        (good) => good.Template
-                    )
+                    portShop.ResourcesAdded.filter((good) =>
+                        itemNames.get(good.Template) ? !itemNames.get(good.Template)?.trading : false
+                    ).map((good) => good.Template)
                 ),
-            ],
+            ].sort(simpleNumberSort),
             inventory: portShop.RegularItems.filter((good) => itemNames.get(good.TemplateId)?.itemType !== "Cannon")
                 .map(
                     (good) =>
@@ -363,19 +363,21 @@ export const convertServerPortData = (): void => {
          * Item names
          */
         itemNames = new Map(
-            apiItems.map((item) => [
-                item.Id,
-                {
-                    name: cleanName(item.Name),
-                    weight: item.ItemWeight,
-                    itemType: item.ItemType,
-                    buyPrice: item.BasePrice,
-                    trading:
-                        item.SortingGroup === "Resource.Trading" ||
-                        item.Name === "American Cotton" ||
-                        item.Name === "Tobacco",
-                },
-            ])
+            apiItems
+                .filter((item) => !item.NotUsed)
+                .map((item) => [
+                    item.Id,
+                    {
+                        name: cleanName(item.Name),
+                        weight: item.ItemWeight,
+                        itemType: item.ItemType,
+                        buyPrice: item.BasePrice,
+                        trading:
+                            item.SortingGroup === "Resource.Trading" ||
+                            item.Name === "American Cotton" ||
+                            item.Name === "Tobacco",
+                    },
+                ])
         )
 
         // noinspection OverlyComplexBooleanExpressionJS
