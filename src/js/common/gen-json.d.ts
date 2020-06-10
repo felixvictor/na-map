@@ -109,7 +109,7 @@ export interface CannonPenetration extends ObjectIndexer<CannonElementIndex> {
 }
 export interface CannonValue {
     value: number
-    digits: number
+    digits?: number
 }
 
 /****************************
