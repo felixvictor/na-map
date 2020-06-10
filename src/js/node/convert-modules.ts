@@ -11,7 +11,7 @@
 import * as path from "path"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
-import { capitalizeFirstLetter, groupToMap } from "../common/common"
+import { capitalizeFirstLetter, groupToMap, woodType } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
@@ -214,6 +214,17 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
     const setWood = (module: ModuleConvertEntity): void => {
         const wood = {} as WoodTrimOrFrame
         wood.id = module.id
+
+        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
+            wood.type = "Trim"
+            wood.name = module.name.replace(" Planking", "")
+            woods.trim.push(wood)
+        } else {
+            wood.type = "Frame"
+            wood.name = module.name.replace(" Frame", "")
+            woods.frame.push(wood)
+        }
+
         wood.properties = []
         for (const modifier of module.APImodifiers) {
             // Add modifier if in modifier map
@@ -253,18 +264,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
         }
 
-        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
-            wood.type = "Trim"
-            wood.name = module.name.replace(" Planking", "")
-            woods.trim.push(wood)
-        } else {
-            wood.type = "Frame"
-            wood.name = module.name.replace(" Frame", "")
-            woods.frame.push(wood)
-        }
-
         // Sort by modifier
-        for (const type of ["frame", "trim"]) {
+        for (const type of woodType) {
             for (const APIwood of woods[type]) {
                 APIwood.properties.sort(sortBy(["modifier", "id"]))
             }
