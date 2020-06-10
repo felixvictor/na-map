@@ -16,7 +16,6 @@ import { ValuesType } from "utility-types"
 
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
 import { ArrayIndex } from "./interface"
-import { Group } from "timelines-chart"
 import { FrontlinesType, LootType } from "./types"
 
 /****************************
@@ -217,6 +216,24 @@ export interface Ownership {
     region: string
     data: Group[]
 }
+
+export interface Group {
+    group: string
+    data: Line[]
+}
+
+export interface Line {
+    label: string
+    data: Segment[]
+}
+
+export interface Segment {
+    timeRange: [TS, TS]
+    val: Val
+}
+
+type TS = Date | number | string
+type Val = number | string // qualitative vs quantitative
 
 /****************************
  * pb-zones.json
