@@ -86,7 +86,6 @@ const addData = (fileData) => {
         }
         cannon[group][element] = {
             value: Number((_b = ((_a = fileData.Attributes.Pair.find((pair) => pair.Key._text === value)) === null || _a === void 0 ? void 0 : _a.Value.Value)._text) !== null && _b !== void 0 ? _b : 0),
-            digits: 0,
         };
     }
     const penetrations = new Map(((_c = fileData.Attributes.Pair.find((pair) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")) === null || _c === void 0 ? void 0 : _c.Value.Value)
@@ -99,13 +98,11 @@ const addData = (fileData) => {
     for (const distance of peneDistances) {
         cannon.penetration[distance] = {
             value: Math.trunc(((_l = penetrations.get(distance)) !== null && _l !== void 0 ? _l : 0) * ((_o = (_m = cannon.damage.penetration) === null || _m === void 0 ? void 0 : _m.value) !== null && _o !== void 0 ? _o : 0)),
-            digits: 0,
         };
     }
     delete cannon.damage.penetration;
     cannon.damage["per second"] = {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
-        digits: 0,
     };
     cannons[type].push(cannon);
 };
@@ -127,8 +124,10 @@ export const convertCannons = async () => {
         }
     }
     for (const [key, value] of maxDigits) {
-        for (const cannon of cannons[key[0]]) {
-            cannon[key[1]][key[2]].digits = value;
+        if (value > 0) {
+            for (const cannon of cannons[key[0]]) {
+                cannon[key[1]][key[2]].digits = value;
+            }
         }
     }
     for (const type of cannonType) {

@@ -9,7 +9,7 @@
  */
 import * as path from "path";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
-import { capitalizeFirstLetter, groupToMap } from "../common/common";
+import { capitalizeFirstLetter, groupToMap, woodType } from "../common/common";
 import { cleanName, sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { serverNames } from "../common/common-var";
@@ -184,6 +184,16 @@ export const convertModulesAndWoodData = async () => {
     const setWood = (module) => {
         const wood = {};
         wood.id = module.id;
+        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
+            wood.type = "Trim";
+            wood.name = module.name.replace(" Planking", "");
+            woods.trim.push(wood);
+        }
+        else {
+            wood.type = "Frame";
+            wood.name = module.name.replace(" Frame", "");
+            woods.frame.push(wood);
+        }
         wood.properties = [];
         for (const modifier of module.APImodifiers) {
             if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
@@ -213,17 +223,7 @@ export const convertModulesAndWoodData = async () => {
                 });
             }
         }
-        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
-            wood.type = "Trim";
-            wood.name = module.name.replace(" Planking", "");
-            woods.trim.push(wood);
-        }
-        else {
-            wood.type = "Frame";
-            wood.name = module.name.replace(" Frame", "");
-            woods.frame.push(wood);
-        }
-        for (const type of ["frame", "trim"]) {
+        for (const type of woodType) {
             for (const APIwood of woods[type]) {
                 APIwood.properties.sort(sortBy(["modifier", "id"]));
             }
