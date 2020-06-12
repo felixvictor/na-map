@@ -27,7 +27,7 @@ import { defaultFontSize, roundToThousands } from "../../common/common-math"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
-import SelectPorts from "../map/select-ports"
+import SelectPorts from "./select-ports"
 import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import * as d3Selection from "d3-selection"
 import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"

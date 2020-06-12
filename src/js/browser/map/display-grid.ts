@@ -14,7 +14,7 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
 import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
 import { formatF11 } from "../../common/common-format"
-import { NAMap } from "../map/na-map"
+import { NAMap } from "./na-map"
 import * as d3Zoom from "d3-zoom"
 import * as d3Selection from "d3-selection"
 
