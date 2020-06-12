@@ -73,7 +73,7 @@ import { DivDatum, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
-import ShowF11 from "../map-tools/show-f11"
+import ShowF11 from "./show-f11"
 import { simpleStringSort } from "../../common/common-node"
 
 dayjs.extend(customParseFormat)

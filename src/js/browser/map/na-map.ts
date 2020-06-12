@@ -25,14 +25,14 @@ import { displayClan } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
-import DisplayGrid from "../map-tools/display-grid"
+import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
-import ShowF11 from "../map-tools/show-f11"
-import ShowTrades from "../map-tools/show-trades"
+import ShowF11 from "./show-f11"
+import ShowTrades from "./show-trades"
 import WindRose from "../map-tools/wind-rose"
-import MakeJourney from "../map-tools/make-journey"
+import MakeJourney from "./make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import { mapSize } from "../../common/common-var"
 
@@ -241,8 +241,6 @@ class NAMap {
         this._grid = new DisplayGrid(this)
 
         this._journey = new MakeJourney(this.rem)
-        this._windPrediction = new PredictWind()
-        this._windRose = new WindRose()
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
         this.showTrades = new ShowTrades(
@@ -554,7 +552,7 @@ class NAMap {
         return this._zoomLevel
     }
 
-    set zoomLevel(zoomLevel) {
+    set zoomLevel(zoomLevel: string) {
         this._zoomLevel = zoomLevel
         this._ports.zoomLevel = zoomLevel
         this._grid.zoomLevel = zoomLevel
