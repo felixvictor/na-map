@@ -79,6 +79,7 @@ import { simpleStringSort } from "../../common/common-node"
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
+dayjs.locale("en-gb")
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
