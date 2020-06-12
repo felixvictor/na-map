@@ -2,7 +2,7 @@ declare module "@d3fc/d3fc-label-layout" {
     interface Strategy {}
 
     type Point = import("../../common/common-math").Point
-    type Segment = import("../../browser/map-tools/make-journey").Segment
+    type Segment = import("../../browser/map/make-journey").Segment
 
     type SizeF = (d: Segment, i: number, nodes: any) => Point
     type PositionF = (d: Segment) => Point

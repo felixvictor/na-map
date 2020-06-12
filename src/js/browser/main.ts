@@ -24,10 +24,10 @@ import "../../scss/main.scss"
  */
 declare global {
     interface SVGAnimatedString {
-        indexOf: () => object
+        indexOf: () => Record<string, unknown>
     }
 }
-SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): object {
+SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): Record<string, unknown> {
     // @ts-expect-error
     return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params
 }
@@ -126,8 +126,20 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
  */
 const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const gameTools = await import(/* webpackPrefetch: true, webpackChunkName: "game-tools" */ "./game-tools")
+        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)
+    } catch (error) {
+        putImportError(error)
+    }
+}
+
+/**
+ * Load map tools
+ */
+const loadMapTools = async (): Promise<void> => {
+    try {
+        const mapTools = await import(/* webpackChunkName: "map-tools" */ "./map-tools")
+        mapTools.init()
     } catch (error) {
         putImportError(error)
     }
@@ -142,6 +154,7 @@ const load = async (): Promise<void> => {
     history.replaceState("", document.title, window.location.origin + window.location.pathname)
 
     await loadMap(serverId, searchParams)
+
     if (searchParams.get("v")) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         loadGameTools(serverId, searchParams)
@@ -150,6 +163,8 @@ const load = async (): Promise<void> => {
             .querySelector("#game-tools-dropdown")
             ?.addEventListener("click", async () => loadGameTools(serverId, searchParams), { once: true })
     }
+
+    await loadMapTools()
 }
 
 /**
