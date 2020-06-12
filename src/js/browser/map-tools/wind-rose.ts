@@ -16,10 +16,6 @@ import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
-import moment from "moment"
-
-import "moment/locale/en-gb"
-import "round-slider/src/roundslider"
 
 import "round-slider/src/roundslider"
 
