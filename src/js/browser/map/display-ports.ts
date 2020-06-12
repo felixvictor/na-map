@@ -50,13 +50,14 @@ import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../c
 import {
     Coordinate,
     defaultCircleSize,
-    defaultFontSize, degreesHalfCircle,
+    defaultFontSize,
+    degreesHalfCircle,
     degreesToRadians,
     distancePoints,
     getDistance,
     Point,
-    roundToThousands
-} from "../../common/common-math";
+    roundToThousands,
+} from "../../common/common-math"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
