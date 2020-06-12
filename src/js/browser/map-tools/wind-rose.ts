@@ -25,13 +25,11 @@ import { compassDirections, degreesToRadians } from "../../common/common-math"
 import { displayCompass, getUserWind, printSmallCompassRose } from "../util"
 
 import dayjs from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
-dayjs.locale("en-gb")
 
 import Cookie from "../util/cookie"
 

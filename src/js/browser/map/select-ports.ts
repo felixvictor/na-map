@@ -15,7 +15,6 @@ import "bootstrap/js/dist/dropdown"
 import "bootstrap-select/js/bootstrap-select"
 
 import dayjs, { Dayjs } from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import isBetween from "dayjs/plugin/isBetween"
 import utc from "dayjs/plugin/utc"

@@ -25,13 +25,11 @@ import * as d3Selection from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import dayjs from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
-dayjs.locale("en-gb")
 
 /**
  * ShowF11
