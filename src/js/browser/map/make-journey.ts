@@ -28,7 +28,7 @@ import {
 import "round-slider/src/roundslider"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal, pluralise } from "../../common/common-browser";
+import { degreesPerSecond, HtmlString, insertBaseModal, pluralise } from "../../common/common-browser"
 import { formatF11 } from "../../common/common-format"
 import {
     compassDirections,
@@ -84,17 +84,17 @@ export default class MakeJourney {
     private readonly _modalId: HtmlString
     private readonly _sliderId: HtmlString
     private readonly _shipId: string
-    private _g!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, any>
+    private _g!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
     private _journey!: Journey
     private _shipCompare!: CompareShips
-    private _compass!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, any>
-    private _compassG!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, any>
-    private _divJourneySummary!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _journeySummaryShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _journeySummaryTextShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _journeySummaryWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _journeySummaryTextWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _gJourneyPath!: d3Selection.Selection<SVGPathElement, Segment, HTMLElement, any>
+    private _compass!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
+    private _compassG!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
+    private _divJourneySummary!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryTextShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryTextWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _gJourneyPath!: d3Selection.Selection<SVGPathElement, Segment, HTMLElement, unknown>
     private _drag!: d3Drag.DragBehavior<SVGSVGElement | SVGGElement, Segment, unknown>
 
     constructor(fontSize: number) {
@@ -134,7 +134,6 @@ export default class MakeJourney {
         this._initJourneyData()
         this._setupListener()
     }
-
 
     static _getHumanisedDuration(duration: number): string {
         const durationHours = Math.floor(duration / 60)
@@ -245,7 +244,7 @@ export default class MakeJourney {
         this._journey.totalMinutes = 0
     }
 
-    _navbarClick(event: Event): void {
+    _navbarClick(): void {
         registerEvent("Menu", "MakeJourney")
 
         this._journeySelected()
@@ -255,7 +254,7 @@ export default class MakeJourney {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => this._navbarClick())
         document
             .querySelector(`#${this._deleteLastLegButtonId}`)
             ?.addEventListener("mouseup", () => this._deleteLastLeg())
@@ -321,7 +320,7 @@ export default class MakeJourney {
         this._setupWindInput()
 
         this._shipCompare = new CompareShips(this._shipId)
-        this._shipCompare.CompareShipsInit()
+        void this._shipCompare.CompareShipsInit()
     }
 
     _useUserInput(): void {
@@ -396,7 +395,7 @@ export default class MakeJourney {
     }
 
     _setShipSpeed(): void {
-        let speedDegrees = []
+        let speedDegrees: number[]
 
         if (this._journey.shipName === this._defaultShipName) {
             // Dummy ship speed
@@ -541,6 +540,7 @@ export default class MakeJourney {
             .value((d: Segment): string => {
                 const lines = d.label.split("|")
                 // Find longest line (number of characters)
+                // eslint-disable-next-line unicorn/no-reduce
                 const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0)
                 return lines[index]
             })
@@ -723,7 +723,7 @@ export default class MakeJourney {
         this._gJourneyPath = this._g.append("path")
     }
 
-    setSummaryPosition(topMargin: number, rightMargin: number) {
+    setSummaryPosition(topMargin: number, rightMargin: number): void {
         this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
     }
 
