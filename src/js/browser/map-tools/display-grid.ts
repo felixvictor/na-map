@@ -17,6 +17,7 @@ import { formatF11 } from "../../common/common-format"
 import { NAMap } from "../map/na-map"
 import * as d3Zoom from "d3-zoom"
 import * as d3Selection from "d3-selection"
+
 import { SVGGDatum, SVGSVGDatum } from "../../common/interface"
 
 /**
@@ -37,11 +38,11 @@ export default class DisplayGrid {
     #xAxis!: Axis<number>
     #yAxis!: Axis<number>
     #zoomLevel!: string
-    #svgMap!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    #svgXAxis!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    #svgYAxis!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    #gXAxis!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    #gYAxis!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    #svgMap!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
+    #svgXAxis!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
+    #svgYAxis!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
+    #gXAxis!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gYAxis!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
 
     constructor(map: NAMap) {
         this.#map = map
@@ -196,6 +197,7 @@ export default class DisplayGrid {
      */
     _setupXAxis(): void {
         this.#gXAxis.selectAll(".tick text").attr("dx", "-0.3em").attr("dy", "2em")
+        // eslint-disable-next-line unicorn/no-null
         this.#gXAxis.attr("text-anchor", "end").attr("fill", null).attr("font-family", null)
     }
 
@@ -203,6 +205,7 @@ export default class DisplayGrid {
      * Setup y axis
      */
     _setupYAxis(): void {
+        // eslint-disable-next-line unicorn/no-null
         this.#gYAxis.attr("text-anchor", "end").attr("fill", null).attr("font-family", null)
         this.#gYAxis.selectAll(".tick text").attr("dx", "3.5em").attr("dy", "-.3em")
     }
@@ -246,7 +249,7 @@ export default class DisplayGrid {
      * Set show status
      * @param show - True if grid is shown
      */
-    set show(show) {
+    set show(show: boolean) {
         this.#isShown = show
     }
 
