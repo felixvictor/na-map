@@ -31,7 +31,7 @@ const path = require("path")
 const glob = require("glob")
 const webpack = require("webpack")
 
-// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const CopyPlugin = require("copy-webpack-plugin")
 const FaviconsPlugin = require("favicons-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
@@ -297,6 +297,10 @@ const whitelistPatternsChildren = [
     /disabled/,
     /dropdown-backdrop/,
     /fade/,
+    /flatpickr/,
+    /numInputWrapper/,
+    /rangeMode/,
+    /dayContainer/,
     /focus/,
     /list-unstyled/,
     /modal/,
@@ -341,7 +345,6 @@ const config = {
     },
 
     plugins: [
-        /*
         new BundleAnalyzerPlugin({
             analyzerMode: isProduction ? "static" : "disabled",
             generateStatsFile: true,
@@ -350,7 +353,6 @@ const config = {
             statsFilename: path.resolve(__dirname, "webpack-stats.json"),
             reportFilename: path.resolve(__dirname, "report.html")
         }),
-        */
         new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin({
             verbose: false,

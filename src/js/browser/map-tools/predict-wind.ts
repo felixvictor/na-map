@@ -35,6 +35,28 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
+
+/*
+
+import flatpickr from "flatpickr"
+import "flatpickr/dist/flatpickr.css"
+
+
+        flatpickr("#prop-pb-from-input", {
+            dateFormat: "H:i",
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+           // wrap: true,
+        })
+        flatpickr("#prop-pb-to", {
+            dateFormat: "H:i",
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+            wrap: true,
+        })
+ */
 export default class PredictWind {
     private readonly _height: number
     private readonly _width: number
