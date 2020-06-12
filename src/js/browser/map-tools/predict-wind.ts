@@ -24,7 +24,6 @@ import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/comm
 import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math"
 import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util"
 import dayjs from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
 
