@@ -212,7 +212,7 @@ export default class MakeJourney {
         const doubleWidth = this._courseArrowWidth * 2
 
         this._g = d3Select<SVGGElement, Segment>("#ports").append("g").attr("class", "journey")
-        console.log(this._g, this._g.node())
+
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "journey-arrow")

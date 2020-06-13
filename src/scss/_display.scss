@@ -9,8 +9,6 @@
 ////
 
 $background-colour: $primary-600;
-$padding-half: map-get($spacers, 2);
-$padding-third: map-get($spacers, 1);
 
 $dark-overlay-background-colour: $primary-800;
 $dark-overlay-background-colour-contrast: $primary-700;
@@ -35,7 +33,9 @@ body {
     font-variant-ligatures: common-ligatures contextual; // liga calt
     font-variant-numeric: oldstyle-nums; // onum
 }
-
+text {
+    cursor: default;
+}
 table,
 .page-link {
     font-variant-numeric: normal; // onum off
@@ -83,10 +83,6 @@ table,
     background-color: $background-colour;
 }
 
-text {
-    cursor: default;
-}
-
 .position {
     path {
         fill: $green;
@@ -124,58 +120,6 @@ text {
     }
 }
 
-.na-table {
-    thead {
-        background-color: $secondary-050;
-    }
-
-    thead th {
-        border-bottom-color: $white;
-        cursor: s-resize;
-    }
-
-    tbody {
-        tr:nth-of-type(odd) {
-            background-color: $primary-050;
-        }
-    }
-}
-
-.no-sort {
-    thead th {
-        cursor: default;
-    }
-}
-
-.thead-group {
-    th {
-        font-style: initial !important;
-        cursor: default !important;
-    }
-}
-
-table tr,
-p {
-    text-align: left;
-}
-
-.table-sm th,
-.table-sm td {
-    padding-bottom: 0.1rem;
-}
-
-.table {
-    thead th {
-        font-style: italic;
-        font-weight: 400;
-    }
-
-    td {
-        vertical-align: middle;
-        border-top: none;
-    }
-}
-
 p a,
 table a {
     text-decoration: underline dotted $secondary-600 !important;
@@ -184,64 +128,12 @@ table a {
     }
 }
 
-.buildings .requirements table {
-    width: auto;
-
-    td {
-        text-align: right;
-    }
-}
-
-.wood table {
-    thead {
-        background-color: $secondary-100;
-    }
-
-    tbody {
-        td + td {
-            text-align: right;
-        }
-
-        td:nth-child(1) {
-            width: 50%;
-        }
-
-        td:nth-child(2) {
-            width: 50%;
-        }
-    }
-}
-
-.gun-decks {
-    height: 83px;
-}
-
-.badge {
-    padding-top: 0.15rem;
-}
-
-.mm {
-    color: $red;
-}
-
-.pp {
-    color: $green;
-}
-
 #input-toggle {
     display: flex;
 
     .item {
         padding-right: 1em;
     }
-}
-
-.extralarge-width {
-    min-width: 25em;
-}
-
-.large-width {
-    min-width: 18em;
 }
 
 .left-margin {
@@ -288,33 +180,6 @@ table a {
 .large {
     font-size: large;
     font-variant-numeric: normal;
-}
-
-.rate {
-    display: flex;
-
-    .bar {
-        position: relative;
-        top: 0;
-        float: left;
-        height: 1.618rem;
-    }
-
-    .basis {
-        @include colour($primary-600);
-    }
-
-    .pos {
-        @include colour($green-dark);
-    }
-
-    .neg {
-        @include colour($red-dark);
-    }
-
-    .diff {
-        opacity: 0.5;
-    }
 }
 
 .dropdown-submenu {
@@ -536,62 +401,6 @@ svg {
     text {
         font-style: italic;
         fill: $primary-100;
-    }
-}
-
-////
-//// Ship compare
-////
-
-.compass-arc,
-.speed-circle {
-    stroke: $primary-200;
-}
-
-.speed-text {
-    user-select: none;
-    fill: $primary-300;
-}
-
-.base-profile,
-.comp-profile {
-    opacity: 0.5;
-}
-
-.base-profile {
-    fill: $primary-500;
-}
-
-.comp-profile {
-    stroke-width: 3px;
-    stroke: $secondary-800;
-}
-
-.column-base {
-    background-color: $primary-050;
-    font-variant-numeric: normal; // onum off
-}
-
-.column-comp {
-    background-color: $secondary-050;
-    border-left: $white solid medium;
-    font-variant-numeric: normal; // onum off
-}
-
-.row-small {
-    @extend .small;
-    padding: $padding-third 0;
-}
-
-.ship-base {
-    .row-light {
-        background-color: $primary-100;
-    }
-}
-
-.ship-compare {
-    .row-light {
-        background-color: $secondary-100;
     }
 }
 
