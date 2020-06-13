@@ -62,16 +62,17 @@ class NAMap {
     private _currentScale = 0
     private _currentTranslate!: d3Zoom.ZoomTransform
     private _doubleClickAction: string
-    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    private _mainG!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
     private _showGrid!: string
-    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    private _windPrediction!: PredictWind
-    private _windRose!: WindRose
+    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
+    private readonly _windPrediction!: PredictWind
+    private readonly _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
     private readonly _doubleClickActionCookie: Cookie
@@ -322,8 +323,8 @@ class NAMap {
             .call(this._zoom)
 
         this._svg.append<SVGDefsElement>("defs")
-
-        this._gMap = this._svg.append("g").classed("map", true)
+        this._gMap = this._svg.append("g").attr("class", "map-tiles")
+        this._mainG = this._svg.append("g").attr("id", "map")
     }
 
     _doubleClickSelected(): void {
@@ -525,12 +526,9 @@ class NAMap {
         this.showTrades.setBounds(lowerBound, upperBound)
 
         this._displayMap(zoomTransform)
-        this._grid.transform(zoomTransform)
-        this._ports.transform(zoomTransform)
-        this._journey.transform(zoomTransform)
-        this._pbZone.transform(zoomTransform)
-        this.f11.transform(zoomTransform)
+        this._grid.transform()
         this.showTrades.transform(zoomTransform)
+        this._mainG.attr("transform", zoomTransform.toString())
 
         this._setZoomLevelAndData()
     }

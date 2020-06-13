@@ -18,6 +18,7 @@ import * as d3Selection from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
+import "../../../scss/roundslider.scss"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"

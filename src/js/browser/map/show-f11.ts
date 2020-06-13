@@ -17,12 +17,11 @@ import { registerEvent } from "../analytics"
 import { formatF11 } from "../../common/common-format"
 import { BaseModalPure, HtmlString, insertBaseModal } from "../../common/common-browser"
 import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math"
-import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
+import { MinMaxCoord } from "../../common/interface"
 import { copyF11ToClipboard } from "../util"
 
 import { NAMap } from "./na-map"
 import * as d3Selection from "d3-selection"
-import * as d3Zoom from "d3-zoom"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -47,8 +46,7 @@ export default class ShowF11 {
     private readonly _copyButtonId: HtmlString
     private readonly _submitButtonId: HtmlString
     private _modal$!: JQuery
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _formSel!: HTMLFormElement
     private _xInputSel!: HTMLInputElement
     private _zInputSel!: HTMLInputElement
@@ -73,7 +71,7 @@ export default class ShowF11 {
     }
 
     _setupSvg(): void {
-        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg").append("g").classed("f11", true)
+        this._g = d3Select<SVGSVGElement, unknown>("#map").append("g").attr("class", "f11")
     }
 
     _navbarClick(): void {
@@ -332,10 +330,6 @@ export default class ShowF11 {
         const F11Y = convertInvCoordY(x, y)
 
         this._printF11Coord(x, y, F11X, F11Y)
-    }
-
-    transform(transform: d3Zoom.ZoomTransform): void {
-        this._g.attr("transform", transform.toString())
     }
 
     clearMap(): void {

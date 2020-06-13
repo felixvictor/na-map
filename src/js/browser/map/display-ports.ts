@@ -445,7 +445,7 @@ export default class DisplayPorts {
     }
 
     _setupSvg(): void {
-        this._gPort = d3Select<SVGGElement, SVGGDatum>("#na-svg")
+        this._gPort = d3Select<SVGGElement, SVGGDatum>("#map")
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
@@ -1292,10 +1292,6 @@ export default class DisplayPorts {
         this.showRadius = showRadius
         this._radios.set(this.showRadius)
         this._cookie.set(this.showRadius)
-    }
-
-    transform(transform: d3Zoom.ZoomTransform): void {
-        this._gPort.attr("transform", transform.toString())
     }
 
     clearMap(scale?: number): void {

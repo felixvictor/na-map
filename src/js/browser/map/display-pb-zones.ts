@@ -10,12 +10,10 @@
 
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
-import * as d3Zoom from "d3-zoom"
 
 import { putImportError } from "../../common/common"
 import { Bound } from "../../common/common-browser"
 import { PbZone, PbZoneBasic, PbZoneDefence } from "../../common/gen-json"
-import { SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { drawSvgCircle, drawSvgRect } from "../util"
 
 import Cookie from "../util/cookie"
@@ -35,7 +33,7 @@ export default class DisplayPbZones {
     private _upperBound!: Bound
     private _defencesFiltered!: PbZoneDefence[]
     private _pbZonesFiltered!: PbZoneBasic[]
-    private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
 
     constructor(ports: DisplayPorts) {
         this._ports = ports
@@ -69,7 +67,7 @@ export default class DisplayPbZones {
     }
 
     _setupSvg(): void {
-        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg").insert<SVGGElement>("g", "#ports").attr("class", "pb")
+        this._g = d3Select<SVGSVGElement, unknown>("#map").insert<SVGGElement>("g", "#ports").attr("class", "pb")
     }
 
     async _loadData(): Promise<void> {
@@ -118,7 +116,7 @@ export default class DisplayPbZones {
             .selectAll<SVGGElement, PbZoneBasic>("g.pb-zones")
             .data(this._pbZonesFiltered, (d) => String(d.id))
             .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneBasic, SVGGElement, any> => {
+                (enter): d3Selection.Selection<SVGGElement, PbZoneBasic, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "pb-zones")
 
                     // Port battle join circles
@@ -162,7 +160,7 @@ export default class DisplayPbZones {
             .selectAll<SVGGElement, PbZoneDefence>("g.defence")
             .data(this._defencesFiltered, (d) => String(d.id))
             .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneDefence, SVGGElement, any> => {
+                (enter): d3Selection.Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "defence")
 
                     // Forts
@@ -198,7 +196,6 @@ export default class DisplayPbZones {
             if (this._isDataLoaded) {
                 this._filterVisible()
             } else {
-                // eslint-disable-next-line no-void
                 void this._loadData().then(() => {
                     this._isDataLoaded = true
                     this._filterVisible()
@@ -248,9 +245,5 @@ export default class DisplayPbZones {
     refresh(): void {
         this._setData()
         this._update()
-    }
-
-    transform(transform: d3Zoom.ZoomTransform): void {
-        this._g.attr("transform", transform.toString())
     }
 }

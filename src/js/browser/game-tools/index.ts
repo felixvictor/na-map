@@ -26,6 +26,8 @@ import ListShips from "./list-ships"
 import ListShipBlueprints from "./list-ship-blueprints"
 import ListWoods from "./list-woods"
 
+import "../../../scss/game-tools.scss"
+
 /**
  * Init
  * @param serverId - Server id

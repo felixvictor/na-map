@@ -11,6 +11,8 @@
 import PredictWind from "./predict-wind"
 import WindRose from "./wind-rose"
 
+import "../../../scss/map-tools.scss"
+
 /**
  * Init
  */
