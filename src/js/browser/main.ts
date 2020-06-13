@@ -156,15 +156,14 @@ const load = async (): Promise<void> => {
     await loadMap(serverId, searchParams)
 
     if (searchParams.get("v")) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        loadGameTools(serverId, searchParams)
+        void loadGameTools(serverId, searchParams)
     } else {
         document
             .querySelector("#game-tools-dropdown")
             ?.addEventListener("click", async () => loadGameTools(serverId, searchParams), { once: true })
     }
 
-    await loadMapTools()
+    document.querySelector("#map-tools-dropdown")?.addEventListener("click", async () => loadMapTools(), { once: true })
 }
 
 /**
