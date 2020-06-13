@@ -26,6 +26,7 @@ import {
 } from "d3-zoom"
 
 import "round-slider/src/roundslider"
+import "../../../scss/roundslider.scss"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, HtmlString, insertBaseModal, pluralise } from "../../common/common-browser"
@@ -210,8 +211,8 @@ export default class MakeJourney {
         const width = this._courseArrowWidth
         const doubleWidth = this._courseArrowWidth * 2
 
-        this._g = d3Select<SVGGElement, Segment>("#na-svg").insert("g", "g.pb").attr("class", "journey")
-
+        this._g = d3Select<SVGGElement, Segment>("#ports").append("g").attr("class", "journey")
+        console.log(this._g, this._g.node())
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "journey-arrow")
@@ -441,7 +442,7 @@ export default class MakeJourney {
     }
 
     _setShipName(): void {
-        if (this._shipCompare && this._shipCompare.singleShipData && this._shipCompare.singleShipData.name) {
+        if (this._shipCompare?.singleShipData?.name) {
             this._journey.shipName = `${this._shipCompare.singleShipData.name}`
         } else {
             this._journey.shipName = this._defaultShipName
@@ -735,10 +736,5 @@ export default class MakeJourney {
             this._journey.segments[0] = { position: [x, y], label: "" }
             this._initJourney()
         }
-    }
-
-    transform(transform: D3ZoomTransform): void {
-        this._g.attr("transform", transform.toString())
-        this._correctJourney()
     }
 }
