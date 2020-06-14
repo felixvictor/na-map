@@ -35,9 +35,11 @@ import TimelinesChart from "timelines-chart"
 
 import { registerEvent } from "../analytics"
 import { NationFullName, nations, NationShortName, putImportError } from "../../common/common"
-import { colourList, getContrastColour, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { colourList, insertBaseModal } from "../../common/common-browser"
+import { getContrastColour } from "../../common/common-game-tools"
 
-import { Group, Ownership, OwnershipNation } from "../../common/gen-json";
+import { Group, Ownership, OwnershipNation } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 /**
  *
@@ -51,9 +53,9 @@ export default class ListPortOwnerships {
     // noinspection JSMismatchedCollectionQueryUpdate
     private _nationData: Array<OwnershipNation<number>> = {} as Array<OwnershipNation<number>>
     private readonly _colourScale: ScaleOrdinal<string, string>
-    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
+    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
 
     constructor() {
         this._baseName = "Port ownership"

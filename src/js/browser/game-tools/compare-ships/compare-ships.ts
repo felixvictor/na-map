@@ -28,27 +28,29 @@ import {
     colourGreenDark,
     colourRedDark,
     colourWhite,
-    hashids,
-    HtmlString,
-    hullRepairsPercent,
     insertBaseModal,
-    repairTime,
-    rigRepairsPercent,
 } from "../../../common/common-browser"
 import { isEmpty, putImportError, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
-import { isImported, stripShipName } from "../../../common/common-game-tools"
-import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
+import {
+    hashids,
+    hullRepairsPercent,
+    isImported,
+    repairTime,
+    rigRepairsPercent,
+    stripShipName,
+} from "../../../common/common-game-tools"
+import { ArrayIndex, HtmlString, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
-import CompareWoods, { WoodColumnType } from "../compare-woods"
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
+import { WoodColumnType } from "../../../common/types"
 
+import CompareWoods from "../compare-woods"
 import { ShipBase } from "./ship-base"
 import { ShipComparison } from "./ship-comparison"
-
-import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)

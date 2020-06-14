@@ -37,15 +37,7 @@ import {
     NationShortNameAlternative,
     putImportError,
 } from "../../common/common"
-import {
-    Bound,
-    colourGreenDark,
-    colourList,
-    colourOrange,
-    colourRedDark,
-    colourWhite,
-    HtmlString,
-} from "../../common/common-browser"
+import { colourGreenDark, colourList, colourOrange, colourRedDark, colourWhite } from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import {
     Coordinate,
@@ -54,7 +46,6 @@ import {
     degreesHalfCircle,
     degreesToRadians,
     distancePoints,
-    getDistance,
     Point,
     roundToThousands,
 } from "../../common/common-math"
@@ -70,13 +61,12 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "../../common/gen-json"
-import { DivDatum, SVGGDatum } from "../../common/interface"
+import { Bound, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 import { simpleStringSort } from "../../common/common-node"
-import { HtmlResult } from "../../common/common-game-tools"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -724,17 +714,18 @@ export default class DisplayPorts {
     }
 
     _getText(portProperties: PortWithTrades): PortForDisplay {
+        /*
         const getCoord = (portId: number): Coordinate => {
             const port = this.portDataDefault.find((port) => port.id === portId)!
             return { x: port.coordinates[0], y: port.coordinates[1] }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const getKDistance = (fromPortId: number, toPortId: number): number => {
             const fromPortCoord = getCoord(fromPortId)
             const toPortCoord = getCoord(toPortId)
             return getDistance(fromPortCoord, toPortCoord)
         }
+        */
 
         const displayClanLitHtml = (clan: string): HtmlResult => html`<span class="caps">${clan}</span>`
 

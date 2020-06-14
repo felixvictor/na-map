@@ -19,10 +19,10 @@ import htm from "htm"
 import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { CannonType, cannonType, capitalizeFirstLetter, putImportError } from "../../common/common";
-import { HtmlString, initTablesort } from "../../common/common-browser"
+import { CannonType, cannonType, capitalizeFirstLetter, putImportError } from "../../common/common"
+import { formatFloatFixedHTML, getBaseModalHTML, initTablesort } from "../../common/common-game-tools"
 import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
-import { BaseModalHtml, formatFloatFixedHTML, HtmlResult, getBaseModalHTML } from "../../common/common-game-tools"
+import { BaseModalHtml, HtmlResult, HtmlString } from "../../common/interface"
 
 type GroupKey = string
 type GroupData = { values: string; count?: number }
