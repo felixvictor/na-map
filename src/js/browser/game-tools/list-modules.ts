@@ -73,7 +73,7 @@ export default class ListModules {
         const body = d3Select(`#${this._modalId} .modal-body`)
         body.append("label").attr("for", id)
         body.append("select").attr("name", id).attr("id", id)
-        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")
+        body.append("div").attr("id", `${this._baseId}`)
     }
 
     _getOptions(): HtmlString {
