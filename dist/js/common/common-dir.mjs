@@ -7,13 +7,12 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-var _a;
 import path from "path";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(utc);
 import { serverMaintenanceHour } from "./common-var";
-const appRoot = (_a = process.env.PWD) !== null && _a !== void 0 ? _a : "";
+const appRoot = process.env.PWD ?? "";
 const dirOut = path.resolve(appRoot, "public", "data");
 const dirBuild = path.resolve(appRoot, "build");
 const dirAPI = path.resolve(dirBuild, "API");

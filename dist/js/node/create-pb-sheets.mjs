@@ -24,23 +24,20 @@ let portsOrig;
 let shipsOrig;
 const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss");
 const setColours = () => {
-    var _a;
     const compiledCss = sass
         .renderSync({
         file: fileScssPreCompile,
     })
         .css.toString();
     const parsedCss = css.parse(compiledCss);
-    return new Map(((_a = parsedCss.stylesheet) === null || _a === void 0 ? void 0 : _a.rules.filter((rule) => { var _a; return (_a = rule.selectors) === null || _a === void 0 ? void 0 : _a[0].startsWith(".colour-palette "); }))
-        .filter((rule) => { var _a; return (_a = rule === null || rule === void 0 ? void 0 : rule.declarations) === null || _a === void 0 ? void 0 : _a.find((declaration) => declaration.property === "background-color"); })
+    return new Map(parsedCss.stylesheet?.rules.filter((rule) => rule.selectors?.[0].startsWith(".colour-palette "))
+        .filter((rule) => rule?.declarations?.find((declaration) => declaration.property === "background-color"))
         .map((rule) => {
-        var _a, _b, _c, _d;
-        const d = (_a = rule === null || rule === void 0 ? void 0 : rule.declarations) === null || _a === void 0 ? void 0 : _a.find((declaration) => declaration.property === "background-color");
-        return [(_c = (_b = rule.selectors) === null || _b === void 0 ? void 0 : _b[0].replace(".colour-palette .", "")) !== null && _c !== void 0 ? _c : "", (_d = d.value) !== null && _d !== void 0 ? _d : ""];
+        const d = rule?.declarations?.find((declaration) => declaration.property === "background-color");
+        return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""];
     }));
 };
 const createPortBattleSheets = () => {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
     const portsDeepWater = portsOrig
         .filter((port) => !port.shallow)
         .map((port) => ({
@@ -56,14 +53,14 @@ const createPortBattleSheets = () => {
     }))
         .sort((a, b) => a.name.localeCompare(b.name));
     const colours = setColours();
-    const colourPrimaryWhite = (_a = colours.get("primary-050")) !== null && _a !== void 0 ? _a : "";
-    const colourContrastWhite = (_b = colours.get("secondary-050")) !== null && _b !== void 0 ? _b : "";
-    const colourContrastNearWhite = (_c = colours.get("secondary-100")) !== null && _c !== void 0 ? _c : "";
-    const colourContrastLight = (_d = colours.get("secondary-200")) !== null && _d !== void 0 ? _d : "";
-    const colourContrastMiddle = (_e = colours.get("secondary-400")) !== null && _e !== void 0 ? _e : "";
-    const colourText = (_f = colours.get("secondary-800")) !== null && _f !== void 0 ? _f : "";
-    const colourHighlight = (_g = colours.get("info")) !== null && _g !== void 0 ? _g : "";
-    const colourRed = (_h = colours.get("pink")) !== null && _h !== void 0 ? _h : "";
+    const colourPrimaryWhite = colours.get("primary-050") ?? "";
+    const colourContrastWhite = colours.get("secondary-050") ?? "";
+    const colourContrastNearWhite = colours.get("secondary-100") ?? "";
+    const colourContrastLight = colours.get("secondary-200") ?? "";
+    const colourContrastMiddle = colours.get("secondary-400") ?? "";
+    const colourText = colours.get("secondary-800") ?? "";
+    const colourHighlight = colours.get("info") ?? "";
+    const colourRed = colours.get("pink") ?? "";
     const wsOptions = {
         sheetView: {
             showGridLines: false,
