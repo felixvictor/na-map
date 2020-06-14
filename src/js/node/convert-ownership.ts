@@ -17,6 +17,8 @@ import d3Array from "d3-array"
 const { nest: d3Nest } = d3Collection
 const { ascending: d3Ascending } = d3Array
 
+import dayjs from "dayjs"
+
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
@@ -27,8 +29,7 @@ import { serverNames } from "../common/common-var"
 import { cleanName } from "../common/common-node"
 
 import { APIPort } from "./api-port"
-import { NationList, Ownership, OwnershipNation } from "../common/gen-json"
-import { Group, Line, Segment } from "timelines-chart"
+import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json";
 
 const fileExtension = ".json.xz"
 
@@ -53,8 +54,10 @@ interface CountyNested {
  * @param compressedContent - Compressed file content
  * @returns Decompressed file content or void
  */
-const decompress = (compressedContent: Buffer): Buffer | void => {
-    return lzma.decompress(compressedContent, {}, (decompressedContent: Buffer | void, error?: string) => {
+// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+const decompress = (compressedContent: Buffer): void | Buffer => {
+    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+    return lzma.decompress(compressedContent, {}, (decompressedContent: void | Buffer, error?: string) => {
         if (error) {
             throw new Error(error)
         }
@@ -101,10 +104,12 @@ const sortFileNames = (fileNames: string[]): string[] => {
     })
 }
 
+const getDate = (date: string): string => dayjs(date).format("YYYY-MM-YY")
+
 /**
  * Retrieve port data for nation/clan ownership
  */
-function convertOwnership(): void {
+const convertOwnership = (): void => {
     const ports = new Map() as Map<string, Port>
     const numPortsDates: Array<OwnershipNation<number>> = []
     const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
@@ -128,10 +133,13 @@ function convertOwnership(): void {
             /**
              * Get data object
              */
-            const getObject = (): Segment => ({
-                timeRange: [new Date(date), new Date(date)],
-                val: nations[port.Nation].short,
-            })
+            const getObject = (): Segment => {
+                const dateF = getDate(date)
+                return {
+                    timeRange: [dateF, dateF],
+                    val: nations[port.Nation].short,
+                }
+            }
 
             /**
              * Set initial data
@@ -178,7 +186,7 @@ function convertOwnership(): void {
                 const portData = ports.get(port.Id)
                 if (portData) {
                     // console.log("setNewEndDate -> ", ports.get(port.Id), values);
-                    portData.data[portData.data.length - 1].timeRange[1] = new Date(date)
+                    portData.data[portData.data.length - 1].timeRange[1] = getDate(date)
                     ports.set(port.Id, portData)
                 }
             }
@@ -219,6 +227,7 @@ function convertOwnership(): void {
      * @returns Resolved promise
      */
     const processFiles = async (fileNames: string[]): Promise<any> => {
+        // eslint-disable-next-line unicorn/no-reduce
         return fileNames.reduce(
             async (sequence, fileName) =>
                 sequence

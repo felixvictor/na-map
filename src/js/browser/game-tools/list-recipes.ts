@@ -14,23 +14,24 @@ import "bootstrap/js/dist/modal"
 
 import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
-import { nest as d3Nest } from "d3-collection"
-import { ascending as d3Ascending } from "d3-array"
 
 import { registerEvent } from "../analytics"
-import { formatInt, formatSignPercent } from "../../common/common-format"
-import { getOrdinal } from "../../common/common-math"
 import { putImportError } from "../../common/common"
-import { getCurrencyAmount, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
+import { formatInt, formatSignPercent } from "../../common/common-format"
+import { getCurrencyAmount } from "../../common/common-game-tools"
+import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
+
 import { Server } from "../../common/servers"
-import { Module, RecipeEntity } from "../../common/gen-json"
+import { Module, RecipeEntity, RecipeGroup } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const servers: Server[] = require("../../common/servers")
 
 const replacer = (match: string, p1: number, p2: number): string =>
-    `${getOrdinal(p1)}\u202F\u2013\u202f${getOrdinal(p2)}`
+    `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`
 
 export default class ListRecipes {
     private readonly _serverType: string
@@ -38,8 +39,9 @@ export default class ListRecipes {
     private readonly _baseId: HtmlString
     private readonly _buttonId: HtmlString
     private readonly _modalId: HtmlString
-    private _moduleData: Module[] = {} as Module[]
-    private _recipeData: RecipeEntity[] = {} as RecipeEntity[]
+    private _moduleData = [] as Module[]
+    private _recipeData = [] as RecipeGroup[]
+    private _recipes!: Map<number, RecipeEntity>
 
     constructor(serverId: string) {
         this._serverType = servers.find((server) => server.id === serverId)!.type
@@ -57,7 +59,10 @@ export default class ListRecipes {
             this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
                 .default as Module[]
             this._recipeData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json"))
-                .default.recipe as RecipeEntity[]
+                .default.recipe as RecipeGroup[]
+            this._recipes = new Map<number, RecipeEntity>(
+                this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))
+            )
         } catch (error) {
             putImportError(error)
         }
@@ -66,7 +71,7 @@ export default class ListRecipes {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -93,20 +98,12 @@ export default class ListRecipes {
     }
 
     _getOptions(): HtmlString {
-        const recipeData = d3Nest<RecipeEntity, RecipeEntity>()
-            .key((recipe) => recipe.craftGroup)
-            .sortKeys(d3Ascending)
-            .sortValues(sortBy(["name"]))
-            .entries(
-                this._recipeData.filter(
-                    (recipe) => recipe.serverType === "Any" || recipe.serverType === this._serverType
-                )
-            )
-
-        return recipeData
+        return this._recipeData
             .map(
-                (key) =>
-                    `<optgroup label="${key.key}">${key.values
+                (group) =>
+                    `<optgroup label="${group.group}">${group.recipes
+                        .filter((recipe) => recipe.serverType === "Any" || recipe.serverType === this._serverType)
+                        .sort(sortBy(["name"]))
                         .map(
                             (recipe: RecipeEntity) =>
                                 `<option value="${recipe.id}">${recipe.name.replace(/(\d)-(\d)(st|rd|th)/, replacer)}`
@@ -159,7 +156,7 @@ export default class ListRecipes {
      * @param selectedRecipeId - Selected recipe
      */
     _getRecipeData(selectedRecipeId: number): RecipeEntity {
-        return this._recipeData.find((recipe) => recipe.id === selectedRecipeId)!
+        return this._recipes.get(selectedRecipeId)!
     }
 
     _getRequirementText(currentRecipe: RecipeEntity): HtmlString {

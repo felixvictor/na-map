@@ -14,10 +14,8 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
 import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
 import { formatF11 } from "../../common/common-format"
-import { NAMap } from "../map/na-map"
-import * as d3Zoom from "d3-zoom"
+import { NAMap } from "./na-map"
 import * as d3Selection from "d3-selection"
-import { SVGGDatum, SVGSVGDatum } from "../../common/interface"
 
 /**
  * Display grid
@@ -37,11 +35,10 @@ export default class DisplayGrid {
     #xAxis!: Axis<number>
     #yAxis!: Axis<number>
     #zoomLevel!: string
-    #svgMap!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    #svgXAxis!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    #svgYAxis!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    #gXAxis!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    #gYAxis!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    #gMainXAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gMainYAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gXAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gYAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
 
     constructor(map: NAMap) {
         this.#map = map
@@ -140,13 +137,13 @@ export default class DisplayGrid {
             .tickSize(this.#maxCoord)
 
         // svg groups
-        this.#svgMap = d3Select("#na-svg")
+        const gMap = d3Select<SVGGElement, unknown>("#map")
 
-        this.#svgXAxis = this.#svgMap.insert("svg", "g.pb").attr("class", "axis d-none")
-        this.#gXAxis = this.#svgXAxis.append("g")
+        this.#gMainXAxis = gMap.insert("g", "g.pb").attr("class", "axis d-none")
+        this.#gXAxis = this.#gMainXAxis.append("g")
 
-        this.#svgYAxis = this.#svgMap.insert("svg", "g.pb").attr("class", "axis d-none")
-        this.#gYAxis = this.#svgYAxis.append("g")
+        this.#gMainYAxis = gMap.insert("g", "g.pb").attr("class", "axis d-none")
+        this.#gYAxis = this.#gMainYAxis.append("g")
 
         // Initialise both axis first
         this._displayAxis()
@@ -196,6 +193,7 @@ export default class DisplayGrid {
      */
     _setupXAxis(): void {
         this.#gXAxis.selectAll(".tick text").attr("dx", "-0.3em").attr("dy", "2em")
+        // eslint-disable-next-line unicorn/no-null
         this.#gXAxis.attr("text-anchor", "end").attr("fill", null).attr("font-family", null)
     }
 
@@ -203,6 +201,7 @@ export default class DisplayGrid {
      * Setup y axis
      */
     _setupYAxis(): void {
+        // eslint-disable-next-line unicorn/no-null
         this.#gYAxis.attr("text-anchor", "end").attr("fill", null).attr("font-family", null)
         this.#gYAxis.selectAll(".tick text").attr("dx", "3.5em").attr("dy", "-.3em")
     }
@@ -246,7 +245,7 @@ export default class DisplayGrid {
      * Set show status
      * @param show - True if grid is shown
      */
-    set show(show) {
+    set show(show: boolean) {
         this.#isShown = show
     }
 
@@ -276,17 +275,14 @@ export default class DisplayGrid {
         this.#map.gridOverlay.classList.toggle("overlay-no-grid", !show)
 
         // Show or hide axis
-        this.#svgXAxis.classed("d-none", !show)
-        this.#svgYAxis.classed("d-none", !show)
+        this.#gMainXAxis.classed("d-none", !show)
+        this.#gMainYAxis.classed("d-none", !show)
     }
 
     /**
      * Set axis transform
-     * @param transform - Current transformation
      */
-    transform(transform: d3Zoom.ZoomTransform): void {
-        this.#gXAxis.attr("transform", transform.toString())
-        this.#gYAxis.attr("transform", transform.toString())
+    transform(): void {
         this._displayAxis()
     }
 }

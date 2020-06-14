@@ -12,11 +12,12 @@ import { select as d3Select } from "d3-selection"
 import { arc as d3Arc, pie as d3Pie } from "d3-shape"
 import * as d3Selection from "d3-selection"
 
-import { HtmlString, numberSegments } from "../../../common/common-browser"
+import { numberSegments } from "../../../common/common-browser"
 
 import { CompareShips } from "./compare-ships"
 import { ShipDisplayData } from "./types"
 import { ShipGunDeck, ShipGuns } from "../../../common/gen-json"
+import { HtmlString } from "../../../common/interface"
 
 export class Ship {
     readonly ticksSpeed: number[]
@@ -24,10 +25,10 @@ export class Ship {
     // Class instance of the ship to be compared to
     readonly _shipCompare: CompareShips
     readonly select!: HtmlString
-    _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
+    _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     // Column id
     private readonly _id: string
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
+    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     constructor(id: string, shipCompare: CompareShips) {
         this._id = id
         this._shipCompare = shipCompare
@@ -112,7 +113,7 @@ export class Ship {
          * @returns HTML formatted column
          */
         function displayColumn(element: keyof ShipDisplayData, description: string, col = 6): HtmlString {
-            let elementText = ""
+            let elementText: string
             let br = ""
 
             if (element === "cannonsPerDeck") {
@@ -257,6 +258,7 @@ export class Ship {
         // Compass
         const data = new Array(numberSegments / 2)
         data.fill(1, 0)
+        // eslint-disable-next-line unicorn/no-null
         const pie = d3Pie().sort(null).value(1)(data)
 
         const arc = d3Arc<number, number>()
