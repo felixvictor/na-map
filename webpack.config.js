@@ -79,7 +79,6 @@ const descriptionLong =
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
 const regExpFont = /\.(woff2?|ttf)$/
-const regExpMainCss = /^(main|map)\..+\.css$/
 
 const setColours = () => {
     const compiledCss = sass
@@ -134,12 +133,10 @@ const babelOpt = {
             "@babel/preset-env",
             {
                 // debug: true,
-                corejs: { version: 3, proposals: true },
+                corejs: { version: 3 },
                 modules: false,
                 shippedProposals: true,
-                targets: {
-                    browsers: PACKAGE.browserslist,
-                },
+                targets: PACKAGE.browserslist,
                 useBuiltIns: "usage",
             },
         ],
