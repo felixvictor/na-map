@@ -816,7 +816,7 @@ export default class DisplayPorts {
 
     _tooltipData(port: PortForDisplay): HtmlResult {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
-        console.log(port.attack, port.attack.toString())
+
         const h = html`
             <div class="d-flex align-items-center mb-4">
                 <img
@@ -852,9 +852,9 @@ export default class DisplayPorts {
                 </div>
             </div>
 
-            ${port.attack.toString()
-                ? html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
-                : html``}
+            ${port.attack === undefined
+                ? html``
+                : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
 
             <div class="d-flex text-left mb-2">
                 ${port.capital
