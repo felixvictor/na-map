@@ -36,7 +36,6 @@ const setAndSavePortData = async () => {
             name: cleanName(apiPort.Name),
             coordinates: [coordinates.x, coordinates.y],
             angle,
-            textAnchor: angle > 0 && angle < degreesHalfCircle ? "start" : "end",
             region: apiPort.Location,
             countyCapitalName: cleanName(apiPort.CountyCapitalName),
             county: capitalToCounty.has(apiPort.CountyCapitalName)

@@ -35,55 +35,43 @@ const convertLoot = async () => {
         const lootTable = apiItems.filter((item) => Number(item.Id) === chestLootTableId);
         return lootTable[0].Items[0].Chance;
     };
-    const getLootItems = (lootItems, itemProbability) => lootItems.map((item) => {
-        var _a, _b, _c;
-        return ({
-            id: Number(item.Template),
-            name: (_a = itemNames.get(Number(item.Template))) !== null && _a !== void 0 ? _a : "",
-            chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
-            amount: { min: Number((_b = item.Stack) === null || _b === void 0 ? void 0 : _b.Min), max: Number((_c = item.Stack) === null || _c === void 0 ? void 0 : _c.Max) },
-        });
-    });
-    const getChestItems = (lootItems) => lootItems.map((item) => {
-        var _a, _b, _c;
-        return ({
-            id: Number(item.Template),
-            name: (_a = itemNames.get(Number(item.Template))) !== null && _a !== void 0 ? _a : "",
-            amount: { min: Number((_b = item.Stack) === null || _b === void 0 ? void 0 : _b.Min), max: Number((_c = item.Stack) === null || _c === void 0 ? void 0 : _c.Max) },
-        });
-    });
+    const getLootItems = (lootItems, itemProbability) => lootItems.map((item) => ({
+        id: Number(item.Template),
+        name: itemNames.get(Number(item.Template)) ?? "",
+        chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
+        amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) },
+    }));
+    const getChestItems = (lootItems) => lootItems.map((item) => ({
+        id: Number(item.Template),
+        name: itemNames.get(Number(item.Template)) ?? "",
+        amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) },
+    }));
     const getChestItemsFromChestLootTable = (chestLootTableId) => apiItems
         .filter((item) => Number(item.Id) === chestLootTableId)
-        .flatMap((item) => { var _a; return getChestItems((_a = item.Items) !== null && _a !== void 0 ? _a : []); });
+        .flatMap((item) => getChestItems(item.Items ?? []));
     const data = {};
     let types = ["ShipLootTableItem"];
     const loot = apiItems.filter((item) => !item.NotUsed && types.includes(item.ItemType));
     data.loot = loot
-        .map((item) => {
-        var _a, _b;
-        return ({
-            id: Number(item.Id),
-            name: getLootName(Number(item.Class), item.EventLootTable),
-            items: getLootItems((_a = item.Items) !== null && _a !== void 0 ? _a : [], (_b = item.itemProbability) !== null && _b !== void 0 ? _b : [0]).sort(sortBy(["chance", "id"])),
-        });
-    })
+        .map((item) => ({
+        id: Number(item.Id),
+        name: getLootName(Number(item.Class), item.EventLootTable),
+        items: getLootItems(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
+    }))
         .sort(sortBy(["id"]));
     types = ["TimeBasedConvertibleItem"];
     const chests = apiItems.filter((item) => !item.NotUsed && types.includes(item.ItemType));
     data.chests = chests
-        .map((item) => {
-        var _a;
-        return ({
-            id: Number(item.Id),
-            name: cleanName(item.Name),
-            weight: Number(item.ItemWeight),
-            lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
-            itemGroup: (_a = item.ExtendedLootTable) === null || _a === void 0 ? void 0 : _a.map((lootChestLootTableId) => ({
-                chance: getLootItemsChance(lootChestLootTableId),
-                items: getChestItemsFromChestLootTable(lootChestLootTableId).sort(sortBy(["id"])),
-            })).sort(sortBy(["chance"])),
-        });
-    })
+        .map((item) => ({
+        id: Number(item.Id),
+        name: cleanName(item.Name),
+        weight: Number(item.ItemWeight),
+        lifetime: Number(item.LifetimeSeconds) / secondsPerHour,
+        itemGroup: item.ExtendedLootTable?.map((lootChestLootTableId) => ({
+            chance: getLootItemsChance(lootChestLootTableId),
+            items: getChestItemsFromChestLootTable(lootChestLootTableId).sort(sortBy(["id"])),
+        })).sort(sortBy(["chance"])),
+    }))
         .sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.fileLoot, data);
 };

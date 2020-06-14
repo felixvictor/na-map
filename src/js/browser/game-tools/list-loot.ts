@@ -12,13 +12,13 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import "bootstrap-select/js/bootstrap-select"
-import { html, render, TemplateResult } from "lit-html"
-import { repeat } from "lit-html/directives/repeat"
+import { h, render } from "preact"
+import htm from "htm"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { HtmlString, insertBaseModalHTML } from "../../common/common-browser"
 import { formatInt } from "../../common/common-format"
+import { getBaseModalHTML } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
 
 import {
@@ -30,15 +30,18 @@ import {
     LootTypeList,
     LootChestItemsEntity,
 } from "../../common/gen-json"
-import { LootType } from "../../common/types"
+import { lootType, LootType } from "../../common/types"
+import { HtmlResult, HtmlString } from "../../common/interface"
+
+const html = htm.bind(h)
 
 export default class ListLoot {
     readonly #baseName: string
     readonly #baseId: HtmlString
     readonly #buttonId: HtmlString
     readonly #modalId: HtmlString
-    readonly #types: LootType[] = ["loot", "chests", "items"]
-    #selectedType: LootType
+    readonly #types = lootType
+    #selectedType: LootType = "" as LootType
     readonly #selectId: LootTypeList<HtmlString> = {} as LootTypeList<HtmlString>
     #select$: LootTypeList<JQuery> = {} as LootTypeList<JQuery>
     #selectedItemId = 0
@@ -56,8 +59,6 @@ export default class ListLoot {
         for (const type of this.#types) {
             this.#selectId[type] = `${this.#baseId}-${type}-select`
         }
-
-        this.#selectedType = "" as LootType
 
         this._setupListener()
     }
@@ -98,27 +99,23 @@ export default class ListLoot {
         })
     }
 
-    _getLootOptions(): TemplateResult {
+    _getLootOptions(): HtmlResult {
         return html`
-            ${repeat(
-                this.#lootData.sort(sortBy(["name"])),
-                (item) => item.id,
-                (item) => html`<option value="${item.id}">${item.name}</option>`
-            )}
+            ${this.#lootData
+                .sort(sortBy(["name"]))
+                .map((item) => html`<option value="${item.id}">${item.name}</option>`)}
         `
     }
 
-    _getChestsOptions(): TemplateResult {
+    _getChestsOptions(): HtmlResult {
         return html`
-            ${repeat(
-                this.#chestsData.sort(sortBy(["name"])),
-                (item) => item.id,
-                (item) => html`<option value="${item.id}">${item.name}</option>`
-            )}
+            ${this.#chestsData
+                .sort(sortBy(["name"]))
+                .map((item) => html`<option value="${item.id}">${item.name}</option>`)}
         `
     }
 
-    _getItemsOptions(): TemplateResult {
+    _getItemsOptions(): HtmlResult {
         interface SourceDetail {
             id: number
             name: string
@@ -165,38 +162,30 @@ export default class ListLoot {
         // Sort by name
         this.#items = new Map([...optionItems.entries()].sort((a, b) => a[1].name.localeCompare(b[1].name)))
 
-        return html`
-            ${repeat(
-                this.#items,
-                (value, key) => key,
-                (value) => {
-                    return html`<option value="${value[0]}">${value[1].name}</option>`
-                }
-            )};
-        `
+        return html`${[...this.#items].map((value) => html`<option value="${value[0]}">${value[1].name}</option>`)}`
     }
 
-    _getOptions(type: LootType): TemplateResult {
+    _getOptions(type: LootType): HtmlResult {
+        let h = html``
+
         if (type === "items") {
-            return this._getItemsOptions()
+            h = this._getItemsOptions()
         }
 
         if (type === "chests") {
-            return this._getChestsOptions()
+            h = this._getChestsOptions()
         }
 
         if (type === "loot") {
-            return this._getLootOptions()
+            h = this._getLootOptions()
         }
 
-        return html``
+        return h
     }
 
-    _getModalBody(): TemplateResult {
+    _getModalBody(): HtmlResult {
         return html`
-            ${repeat(
-                this.#types,
-                (type) => type,
+            ${this.#types.map(
                 (type) =>
                     html`
                         <label>
@@ -210,7 +199,7 @@ export default class ListLoot {
         `
     }
 
-    _getModalFooter(): TemplateResult {
+    _getModalFooter(): HtmlResult {
         return html`
             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 Close
@@ -220,7 +209,7 @@ export default class ListLoot {
 
     _injectModal(): void {
         render(
-            insertBaseModalHTML({
+            getBaseModalHTML({
                 id: this.#modalId,
                 title: this.#baseName,
                 size: "modal-md",
@@ -269,7 +258,7 @@ export default class ListLoot {
         $(`#${this.#modalId}`).modal("show")
     }
 
-    _getLootItemsText(items: Array<LootLootItemsEntity | LootChestItemsEntity>, chance = true): TemplateResult {
+    _getLootItemsText(items: Array<LootLootItemsEntity | LootChestItemsEntity>, chance = true): HtmlResult {
         return html`
             <table class="table table-sm small na-table no-sort">
                 <thead>
@@ -280,9 +269,7 @@ export default class ListLoot {
                     </tr>
                 </thead>
                 <tbody>
-                    ${repeat(
-                        items,
-                        (item) => item.id,
+                    ${items.map(
                         (item) =>
                             html`
                                 <tr>
@@ -303,7 +290,7 @@ export default class ListLoot {
         `
     }
 
-    _getSourceText(): TemplateResult {
+    _getSourceText(): HtmlResult {
         const items = [...this.#items.get(this.#selectedItemId)!.sources]
             .map((value) => value[1])
             .sort(sortBy(["chance", "name"]))
@@ -311,28 +298,26 @@ export default class ListLoot {
         return html`${this._getLootItemsText(items)}`
     }
 
-    _getChestsText(): TemplateResult {
+    _getChestsText(): HtmlResult {
         const currentChest = this.#chestsData.find((item) => item.id === this.#selectedItemId)!
 
         return html`
             <p>Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(currentChest.lifetime)} hours</p>
-            ${repeat(
-                currentChest.itemGroup,
-                (group) => group,
+            ${currentChest.itemGroup.map(
                 (group) => html` <h5>Group chance: ${ListLoot._printChance(group.chance)}</h5>
                     ${this._getLootItemsText(group.items.sort(sortBy(["name"])), false)}`
             )}
         `
     }
 
-    _getLootText(): TemplateResult {
+    _getLootText(): HtmlResult {
         const currentItem = this.#lootData.find((item) => item.id === this.#selectedItemId)!
         const items = currentItem.items.sort(sortBy(["chance", "name"]))
 
         return html`${this._getLootItemsText(items)}`
     }
 
-    _getText(): TemplateResult {
+    _getText(): HtmlResult {
         if (this.#selectedType === "items") {
             return this._getSourceText()
         }
@@ -347,7 +332,7 @@ export default class ListLoot {
     /**
      * Construct item table
      */
-    _getTable(): TemplateResult {
+    _getTable(): HtmlResult {
         return html`
             <div class="mt-4">
                 ${this._getText()}

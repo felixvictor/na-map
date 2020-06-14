@@ -16,26 +16,22 @@ import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
-import moment from "moment"
-
-import "moment/locale/en-gb"
-import "round-slider/src/roundslider"
 
 import "round-slider/src/roundslider"
+import "../../../scss/roundslider.scss"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, degreesToRadians } from "../../common/common-math"
 import { displayCompass, getUserWind, printSmallCompassRose } from "../util"
+import { HtmlString } from "../../common/interface"
 
 import dayjs from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
-dayjs.locale("en-gb")
 
 import Cookie from "../util/cookie"
 
@@ -159,14 +155,14 @@ export default class WindRose {
         this._svg = this._div.append("svg").attr("class", "ingame-wind small")
     }
 
-    _navbarClick(event: Event): void {
+    _navbarClick(): void {
         registerEvent("Menu", this._baseName)
 
         this._windRoseSelected()
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => this._navbarClick())
     }
 
     _setupWindInput(): void {

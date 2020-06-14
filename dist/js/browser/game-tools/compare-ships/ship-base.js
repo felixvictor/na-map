@@ -15,9 +15,10 @@ import { event as d3Event } from "d3-selection";
 import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util";
 import * as d3Drag from "d3-drag";
 import { isEmpty } from "../../../common/common";
-import { hullRepairsVolume, pluralise, repairsSetSize, rigRepairsVolume, rumRepairsFactor, segmentRadians, } from "../../../common/common-browser";
+import { pluralise, segmentRadians } from "../../../common/common-browser";
 import { default as shipIcon } from "Icons/icon-ship.svg";
 import { Ship } from "./ship";
+import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, } from "../../../common/common-game-tools";
 export class ShipBase extends Ship {
     constructor(id, shipData, shipCompare) {
         super(id, shipCompare);
@@ -233,7 +234,6 @@ export class ShipBase extends Ship {
         gWindProfile.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`);
     }
     _printText() {
-        var _a;
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.guns);
         const hullRepairsNeeded = Math.round((this.shipData.sides.armour * this.shipData.repairAmount.armour) / hullRepairsVolume);
         const rigRepairsNeeded = Math.round((this.shipData.sails.armour * this.shipData.repairAmount.sails) / rigRepairsVolume);
@@ -278,7 +278,7 @@ export class ShipBase extends Ship {
             rigRepairsNeeded: `${formatIntTrunc(rigRepairsNeeded)}\u00A0<span class="badge badge-white">${formatIntTrunc(rigRepairsNeeded * repairsSetSize)}</span>`,
             rudder: `${formatIntTrunc(this.shipData.rudder.armour)}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.rudder.thickness)}</span>`,
             rumRepairsNeeded: `${formatIntTrunc(rumRepairsNeeded)}\u00A0<span class="badge badge-white">${formatIntTrunc(rumRepairsNeeded * repairsSetSize)}</span>`,
-            sailingCrew: formatIntTrunc((_a = this.shipData.crew.sailing) !== null && _a !== void 0 ? _a : 0),
+            sailingCrew: formatIntTrunc(this.shipData.crew.sailing ?? 0),
             sails: formatIntTrunc(this.shipData.sails.armour),
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
             sideArmor: `${formatIntTrunc(this.shipData.sides.armour)}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.sides.thickness)}</span>`,

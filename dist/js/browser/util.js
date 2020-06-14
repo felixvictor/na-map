@@ -103,10 +103,7 @@ export const printCompassRose = ({ element, radius, }) => {
         .data(data)
         .join((enter) => enter
         .append("g")
-        .attr("transform", (d) => {
-        var _a;
-        return `rotate(${Math.round(((_a = xScale(d)) !== null && _a !== void 0 ? _a : 0) + xScale.bandwidth() / 2 - degreesQuarterCircle)})translate(${innerRadius},0)`;
-    }));
+        .attr("transform", (d) => `rotate(${Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2 - degreesQuarterCircle)})translate(${innerRadius},0)`));
     label
         .filter((_d, i) => i % 3 !== 0)
         .append("line")
@@ -115,12 +112,11 @@ export const printCompassRose = ({ element, radius, }) => {
         .filter((_d, i) => i % 3 === 0)
         .append("text")
         .attr("transform", (d) => {
-        var _a, _b, _c, _f, _g;
-        let rotate = Math.round(((_a = xScale(d)) !== null && _a !== void 0 ? _a : 0) + xScale.bandwidth() / 2);
+        let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2);
         let translate = "";
         dummy.text(d);
-        const textHeight = (_c = (_b = dummy.node()) === null || _b === void 0 ? void 0 : _b.getBBox().height) !== null && _c !== void 0 ? _c : 0;
-        const textWidth = (_g = (_f = dummy.node()) === null || _f === void 0 ? void 0 : _f.getBBox().width) !== null && _g !== void 0 ? _g : 0;
+        const textHeight = dummy.node()?.getBBox().height ?? 0;
+        const textWidth = dummy.node()?.getBBox().width ?? 0;
         if ((rotate >= 0 && rotate <= 45) || rotate === 315) {
             rotate = 90;
             translate = `0,-${textHeight / 2}`;
@@ -167,7 +163,7 @@ export const printSmallCompassRose = ({ element, radius, }) => {
         }
         return x2;
     })
-        .attr("transform", (d) => { var _a; return `rotate(${Math.round(((_a = xScale(d)) !== null && _a !== void 0 ? _a : 0) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`; }));
+        .attr("transform", (d) => `rotate(${Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)})translate(${innerRadius},0)`));
 };
 export const displayClan = (clan) => `<span class="caps">${clan}</span>`;
 const copyToClipboardFallback = (text, modal$) => {
@@ -222,11 +218,10 @@ export const copyF11ToClipboard = (x, z, modal$) => {
     }
 };
 export const colourRamp = (element, colourScale, steps = 512) => {
-    var _a;
     const height = 200;
     const width = 1000;
     const canvas = element.insert("canvas").attr("width", width).attr("height", height);
-    const context = (_a = canvas.node()) === null || _a === void 0 ? void 0 : _a.getContext("2d");
+    const context = canvas.node()?.getContext("2d");
     canvas.style.imageRendering = "pixelated";
     const min = colourScale.domain()[0];
     const max = colourScale.domain()[colourScale.domain().length - 1];
