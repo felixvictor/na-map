@@ -33,9 +33,15 @@ body {
     font-variant-ligatures: common-ligatures contextual; // liga calt
     font-variant-numeric: oldstyle-nums; // onum
 }
+
 text {
     cursor: default;
 }
+
+p {
+    text-align: left;
+}
+
 table,
 .page-link {
     font-variant-numeric: normal; // onum off
