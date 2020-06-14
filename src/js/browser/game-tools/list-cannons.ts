@@ -14,20 +14,22 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tab"
 import "bootstrap/js/dist/modal"
 
-import { html, render, TemplateResult } from "lit-html"
-import { repeat } from "lit-html/directives/repeat"
+import { h, render } from "preact"
+import htm from "htm"
 import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
-import { cannonType, capitalizeFirstLetter, putImportError } from "../../common/common"
-import { BaseModalHtml, HtmlString, initTablesort, insertBaseModalHTML } from "../../common/common-browser"
-import { formatFloatFixedHTML } from "../../common/common-format"
+import { CannonType, cannonType, capitalizeFirstLetter, putImportError } from "../../common/common"
+import { formatFloatFixedHTML, getBaseModalHTML, initTablesort } from "../../common/common-game-tools"
 import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
+import { BaseModalHtml, HtmlResult, HtmlString } from "../../common/interface"
 
 type GroupKey = string
 type GroupData = { values: string; count?: number }
 type GroupObject = [GroupKey, GroupData]
 type GroupMap = Map<GroupKey, GroupData>
+
+const html = htm.bind(h)
 
 /**
  *
@@ -79,7 +81,7 @@ export default class ListCannons {
                     Object.keys(cannon)
                         .sort((a, b) => groupOrder.indexOf(a) - groupOrder.indexOf(b))
                         // @ts-expect-error
-                        .reduce((r: CannonEntity, k) => ((r[k] = cannon[k]), r), {}) // eslint-disable-line no-return-assign,no-sequences
+                        .reduce((r: CannonEntity, k) => ((r[k] = cannon[k]), r), {}) // eslint-disable-line no-return-assign,no-sequences,unicorn/no-reduce
             )
         }
 
@@ -102,21 +104,21 @@ export default class ListCannons {
         })
     }
 
-    _getList(type: string): TemplateResult {
-        const getColumnGroupHeads = (groupValue: GroupObject): TemplateResult => html`
+    _getList(type: CannonType): HtmlResult {
+        const getColumnGroupHeads = (groupValue: GroupObject): HtmlResult => html`
             <th scope="col" class="text-center" colspan="${groupValue[1].count}">
                 ${capitalizeFirstLetter(groupValue[0])}
             </th>
         `
 
-        const getColumnHeads = (groupValue: GroupObject): TemplateResult => html`
+        const getColumnHeads = (groupValue: GroupObject): HtmlResult => html`
             ${Object.entries(groupValue[1].values).map(
                 (modifierValue) => html`<th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>`
             )}
         `
 
-        const getRowHead = (name: string): TemplateResult => {
-            let nameConverted: TemplateResult | string = name
+        const getRowHead = (name: string): HtmlResult => {
+            let nameConverted: HtmlResult | string = name
             const nameSplit = name.split(" ")
             const sortPre = `c${nameSplit[0].padStart(3, "0")}`
             const sortPost = nameSplit[1] ? nameSplit[1][1] : "0"
@@ -132,8 +134,8 @@ export default class ListCannons {
             `
         }
 
-        const getRow = (cannon: CannonEntity): TemplateResult => html`
-            ${Object.entries(cannon).map((groupValue): TemplateResult | TemplateResult[] => {
+        const getRow = (cannon: CannonEntity): HtmlResult => html`
+            ${Object.entries(cannon).map((groupValue): HtmlResult | HtmlResult[] => {
                 if (groupValue[0] === "name") {
                     return html``
                 }
@@ -143,7 +145,7 @@ export default class ListCannons {
                         html`
                             <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
                                 ${modifierValue[1]
-                                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits)
+                                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits ?? 0)
                                     : ""}
                             </td>
                         `
@@ -156,23 +158,16 @@ export default class ListCannons {
                 <thead>
                     <tr class="thead-group">
                         <th scope="col" class="border-bottom-0"></th>
-                        ${repeat(
-                            this._groups,
-                            (groupValue, groupKey) => groupKey,
-                            (groupValue) => getColumnGroupHeads(groupValue)
-                        )}
+                        ${[...this._groups].map((groupValue) => getColumnGroupHeads(groupValue))}
                     </tr>
                     <tr data-sort-method="thead">
                         <th scope="col" class="text-right border-top-0" data-sort-default>Lb</th>
-                        ${repeat(
-                            this._groups,
-                            (groupValue, groupKey) => groupKey,
-                            (groupValue) => getColumnHeads(groupValue)
-                        )}
+                        ${[...this._groups].map((groupValue) => getColumnHeads(groupValue))}
                     </tr>
                 </thead>
                 <tbody>
-                    ${repeat(
+                    ${/*
+            repeat(
                         // @ts-expect-error
                         this._cannonData[type],
                         (cannon: CannonEntity) => cannon.name,
@@ -183,18 +178,45 @@ export default class ListCannons {
                                 </tr>
                             `
                         }
-                    )}
+                    )
+            */
+                    this._cannonData[type].map((cannon: CannonEntity) => {
+                        return html`
+                            <tr>
+                                ${getRowHead(cannon.name)}${getRow(cannon)}
+                            </tr>
+                        `
+                    })}
                 </tbody>
             </table>
         `
     }
 
-    _getModalBody(): TemplateResult {
+    _getModalBody(): HtmlResult {
         return html`
             <ul class="nav nav-pills" role="tablist">
-                ${repeat(
-                    Object.keys(this._cannonData),
+                ${/*
+            repeat(
+                                 Object.keys(this._cannonData),
                     (type: string): string => type,
+                    (type, index) =>
+                        html`
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link${index === 0 ? " active" : ""}"
+                                    id="tab-${this._baseId}-${type}"
+                                    data-toggle="tab"
+                                    href="#tab-content-${this._baseId}-${type}"
+                                    role="tab"
+                                    aria-controls="home"
+                                    aria-selected="true"
+                                    >${capitalizeFirstLetter(type)}</a
+                                >
+                            </li>
+                        `
+                )
+            */
+                cannonType.map(
                     (type, index) =>
                         html`
                             <li class="nav-item">
@@ -213,9 +235,27 @@ export default class ListCannons {
                 )}
             </ul>
             <div class="tab-content pt-2">
-                ${repeat(
+                ${/*
+            repeat(
+            
                     Object.keys(this._cannonData),
                     (type: string): string => type,
+                    (type, index) =>
+                        html`
+                            <div
+                                class="tab-pane fade${index === 0 ? " show active" : ""}"
+                                id="tab-content-${this._baseId}-${type}"
+                                role="tabpanel"
+                                aria-labelledby="tab-${this._baseId}-${type}"
+                            >
+                                <div id="${type}-list">
+                                    ${this._getList(type)}
+                                </div>
+                            </div>
+                        `
+                )
+                */
+                cannonType.map(
                     (type, index) =>
                         html`
                             <div
@@ -234,7 +274,7 @@ export default class ListCannons {
         `
     }
 
-    _getModalFooter(): TemplateResult {
+    _getModalFooter(): HtmlResult {
         return html`
             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                 Close
@@ -244,7 +284,7 @@ export default class ListCannons {
 
     _injectModal(): void {
         render(
-            insertBaseModalHTML({
+            getBaseModalHTML({
                 id: this._modalId,
                 title: this._baseName,
                 body: this._getModalBody.bind(this),
@@ -253,12 +293,11 @@ export default class ListCannons {
             document.querySelector("#modal-section") as HTMLElement
         )
 
-        for (const type of Object.keys(this._cannonData)) {
+        for (const type of cannonType) {
             const table = document.querySelector(`#table-${this._baseId}-${type}-list`) as HTMLTableElement
             if (table) {
                 // @ts-expect-error
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const sortTable = new Tablesort(table)
+                void new Tablesort(table)
             }
         }
     }

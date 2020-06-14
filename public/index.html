@@ -6,12 +6,12 @@
     <title>Naval Action map</title>
     <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." name="description">
     
-        <link href="https://na-map.netlify.app/" rel="canonical">
+        <meta content="noindex" name="robots">
     
     <meta content="Naval Action map" property="og:title" itemprop="name">
     <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." property="og:description" itemprop="description">
     <meta content="images/icons/firefox_app_512x512.png" property="og:image" itemprop="image">
-    <meta content="https://na-map.netlify.app/" property="og:url" itemprop="url">
+    <meta content="" property="og:url" itemprop="url">
 
     <meta content="en_gb" property="og:locale">
     <meta content="website" property="og:type">
@@ -19,7 +19,7 @@
     <meta content="summary_large_image" name="twitter:card">
 
     <script src="https://www.google-analytics.com/analytics.js" async></script>
-<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><link href="/images/icons/favicon-48x48.png" rel="icon" sizes="48x48" type="image/png"><link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="main.f48ebafaa032a8f7c5a2.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-UpSRBZmsXkHK/I6X1vdh/M44C7IKF1mqTBeBavo3nPlCcF+2a6AYb5E+sOOKasHO"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"></head>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="/images/icons/favicon.ico" rel="shortcut icon"><link href="/images/icons/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"><link href="/images/icons/favicon-48x48.png" rel="icon" sizes="48x48" type="image/png"><link href="/images/icons/manifest.json" rel="manifest"><meta content="yes" name="mobile-web-app-capable"><meta content="#6a7153" name="theme-color"><meta content="na-map" name="application-name"><meta content="#a99d89" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="main.05c5025d2a4a31120a76.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-yACQ9mkHkk+cLPm2CkMj13RpHSb3ut0CqWnzS/Pxyo+vTriMvUNn/BssD+qfFiAE"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular-italic.woff2" rel="preload"><link as="font" crossorigin="anonymous" href="fonts/Junicode-regular.woff2" rel="preload"></head>
 
 <body>
 
@@ -29,35 +29,17 @@
     <a class="navbar-brand" href="/">
         <img alt="Brand" height="32" src="images/icons/android-chrome-48x48.png" width="32">
     </a>
-    <button class="navbar-toggler" type="button" aria-label="Toggle navigation" aria-controls="navbarSupportedContent" aria-expanded="false" data-target="#navbarSupportedContent" data-toggle="collapse">
+    <button aria-label="Toggle navigation" class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" data-target="#navbarSupportedContent" data-toggle="collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item pr-2 dropdown" id="selectPortNavbar">
-                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+                <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown">
                     Select ports on
                 </a>
                 <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <h6 class="dropdown-header">Property</h6>
-                    <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" id="dropdown-select" href="#" data-toggle="dropdown" role="button">Select</a>
-                        <div class="dropdown-menu" aria-labelledby="dropdown-select">
-                            <a class="dropdown-item" id="menu-prop-deep" href="#">Deep water</a>
-                            <a class="dropdown-item" id="menu-prop-shallow" href="#">Shallow water</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" id="menu-prop-all" href="#">Available to all</a>
-                            <a class="dropdown-item" id="menu-prop-non-capturable" href="#">Non-capturable</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" id="menu-prop-large" href="#">1st rate AI</a>
-                            <a class="dropdown-item" id="menu-prop-medium" href="#">4th rate AI</a>
-                            <a class="dropdown-item" id="menu-prop-small" href="#">6th rate AI</a>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
-
                     <h6 class="dropdown-header">Front lines</h6>
                     <div class="dropdown-item">
                         <label>
@@ -84,82 +66,19 @@
                     </div>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port battle</h6>
-
-                    <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Time range set by port
-                            owner</a>
-                        <div class="dropdown-menu col-sm-10">
-                            <div class="dropdown-item" id="menu-prop-pb-range">
-                                <form id="prop-pb-range">
-                                    <div class="form-group row">
-                                        <label class="col-form-label col-sm-4" for="prop-pb-from-input">From</label>
-                                        <div class="date input-group col-sm-8" id="prop-pb-from" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-pb-from-input" aria-label="prop-pb-from" data-target="#prop-pb-from" required>
-                                            <div class="input-group-append" data-target="#prop-pb-from" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="icon icon-clock"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-form-label col-sm-4" for="prop-pb-to-input">To</label>
-                                        <div class="date input-group col-sm-8" id="prop-pb-to" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-pb-to-input" aria-label="prop-pb-to" data-target="#prop-pb-to" required>
-                                            <div class="input-group-append" data-target="#prop-pb-to" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="icon icon-clock"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-outline-secondary float-right" type="submit">Go
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    <h6 class="dropdown-header">Port property</h6>
+                    <a class="dropdown-item" id="menu-prop-deep">Deep water</a>
+                    <a class="dropdown-item" id="menu-prop-shallow">Shallow water</a>
+                    <a class="dropdown-item" id="menu-prop-all">Available to all</a>
+                    <a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a>
 
                     <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port capture</h6>
+                    <h6 class="dropdown-header">Port capture time</h6>
+                    <a class="dropdown-item" id="menu-prop-today">Today</a>
+                    <a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
+                    <a class="dropdown-item" id="menu-prop-this-week">This week</a>
+                    <a class="dropdown-item" id="menu-prop-last-week">Last week</a>
 
-
-                    <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Fixed date range</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" id="menu-prop-today" href="#">Today</a>
-                            <a class="dropdown-item" id="menu-prop-yesterday" href="#">Yesterday</a>
-                            <a class="dropdown-item" id="menu-prop-this-week" href="#">This week</a>
-                            <a class="dropdown-item" id="menu-prop-last-week" href="#">Last week</a>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-submenu">
-                        <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Free date range</a>
-                        <div class="dropdown-menu col-sm-10">
-                            <div class="dropdown-item" id="menu-prop-range">
-                                <form id="prop-range">
-                                    <div class="form-group row">
-                                        <label class="col-form-label col-sm-3" for="prop-from-input">From</label>
-                                        <div class="date input-group col-sm-9" id="prop-from" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-from-input" aria-label="prop-from" data-target="#prop-from" required>
-                                            <div class="input-group-append" data-target="#prop-from" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="icon icon-calendar"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-
-                                        <label class="col-form-label col-sm-3" for="prop-to-input">To</label>
-                                        <div class="date input-group col-sm-9" id="prop-to" data-target-input="nearest">
-                                            <input class="datetimepicker-input form-control" id="prop-to-input" aria-label="prop-to" data-target="#prop-to" required>
-                                            <div class="input-group-append" data-target="#prop-to" data-toggle="datetimepicker">
-                                                <span class="input-group-text"><i class="icon icon-calendar"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-outline-primary" type="submit">Go</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </li>
 
@@ -179,8 +98,8 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Map tools" role="button" title="Map tools">
-                    <i class="icon icon-navbar icon-map" aria-hidden="true"></i><span class="sr-only">Map tools</span>
+                <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" aria-label="Map tools" role="button" title="Map tools">
+                    <i aria-hidden="true" class="icon icon-navbar icon-map"></i><span class="sr-only">Map tools</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu" aria-labelledby="map-tools-dropdown">
 
@@ -193,8 +112,8 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Game tools" role="button" title="Game tools">
-                    <i class="icon icon-navbar icon-bar-chart" aria-hidden="true"></i><span class="sr-only">Game tools</span>
+                <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" aria-label="Game tools" role="button" title="Game tools">
+                    <i aria-hidden="true" class="icon icon-navbar icon-bar-chart"></i><span class="sr-only">Game tools</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu" aria-labelledby="game-tools-dropdown">
 
@@ -222,8 +141,8 @@
             </li>
 
             <li class="nav-item pr-2 dropdown">
-                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Settings" role="button" title="Settings">
-                    <i class="icon icon-navbar icon-options" aria-hidden="true"></i><span class="sr-only">Settings</span>
+                <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" aria-haspopup="true" data-toggle="dropdown" aria-label="Settings" role="button" title="Settings">
+                    <i aria-hidden="true" class="icon icon-navbar icon-options"></i><span class="sr-only">Settings</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu" aria-labelledby="settingsDropdown">
 
@@ -344,14 +263,14 @@
         </ul>
 
         <div class="btn-group" role="group">
-            <button class="btn px-2" type="button" aria-label="Clear" id="reset" title="Clear">
-                <i class="icon icon-navbar icon-clear" aria-hidden="true"></i><span class="sr-only">Clear</span>
+            <button aria-label="Clear" class="btn px-2" type="button" id="reset" title="Clear">
+                <i aria-hidden="true" class="icon icon-navbar icon-clear"></i><span class="sr-only">Clear</span>
             </button>
-            <a class="btn px-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" role="button" aria-label="Donate" title="Donate" rel="”noopener”" target="_blank">
-                <i class="icon icon-navbar icon-gift" aria-hidden="true"></i><span class="sr-only">Donate</span>
+            <a class="btn px-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" aria-label="Donate" role="button" title="Donate" rel="”noopener”" target="_blank">
+                <i aria-hidden="true" class="icon icon-navbar icon-gift"></i><span class="sr-only">Donate</span>
             </a>
-            <button class="btn px-2" type="button" aria-label="About" id="about" title="About">
-                <i class="icon icon-navbar icon-info" aria-hidden="true"></i><span class="sr-only">About</span>
+            <button aria-label="About" class="btn px-2" type="button" id="about" title="About">
+                <i aria-hidden="true" class="icon icon-navbar icon-info"></i><span class="sr-only">About</span>
             </button>
         </div>
     </div>
@@ -371,5 +290,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" crossorigin="anonymous" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"></script>
-<script src="main.3392910d5185c4e6bed0.js" crossorigin="anonymous" integrity="sha384-IVhtvlMVAevcS9+MGQeBBLsVlu4+83sUd26X6EET0DaFbDooeAuAL5QrDqr+hJwa" defer></script></body>
+<script src="main.43b27d4e81dae90202c2.js" crossorigin="anonymous" integrity="sha384-l/p12/Z+xQkqWlXfjYNxx/iiRoROzlAWiW+R948Z7LuXNukLnoEVcbN3hSwGaQ48" defer></script></body>
 </html>

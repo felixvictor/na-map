@@ -7,7 +7,6 @@
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-var _a;
 import * as path from "path";
 import Twit from "twit";
 import xss from "xss";
@@ -25,7 +24,7 @@ const consumerKey = process.argv[2];
 const consumerSecret = process.argv[3];
 const accessToken = process.argv[4];
 const accessTokenSecret = process.argv[5];
-const runType = (_a = process.argv[6]) !== null && _a !== void 0 ? _a : "full";
+const runType = process.argv[6] ?? "full";
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverNames[0]}-pb.json`);
 let ports = [];
 let Twitter;
@@ -41,11 +40,10 @@ const saveRefreshId = (refresh) => {
     saveTextFile(commonPaths.fileTwitterRefreshId, refresh);
 };
 const addTwitterData = (data) => {
-    var _a;
     tweets.push(...data.statuses
-        .flatMap((status) => { var _a; return cleanName(xss.filterXSS((_a = status.full_text) !== null && _a !== void 0 ? _a : "")); })
+        .flatMap((status) => cleanName(xss.filterXSS(status.full_text ?? "")))
         .sort(simpleStringSort));
-    refresh = (_a = data.search_metadata.max_id_str) !== null && _a !== void 0 ? _a : "";
+    refresh = data.search_metadata.max_id_str ?? "";
 };
 const getTwitterData = async (query, since_id = refresh) => {
     await Twitter.get("search/tweets", {
@@ -106,11 +104,10 @@ const getTweets = async () => {
 };
 const findPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
 const captured = (result) => {
-    var _a, _b;
     const i = findPortIndex(result[2]);
     const port = ports[i];
     console.log("      --- captured", i);
-    port.nation = (_b = (_a = findNationByName(result[4])) === null || _a === void 0 ? void 0 : _a.short) !== null && _b !== void 0 ? _b : "";
+    port.nation = findNationByName(result[4])?.short ?? "";
     port.capturer = result[3].trim();
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
     port.attackerNation = "";
@@ -145,9 +142,8 @@ const hostilityLevelDown = (result) => {
 };
 const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
 const guessNationFromClanName = (clanName) => {
-    var _a, _b;
     const port = findPortByClanName(clanName);
-    const nation = port ? (_b = (_a = findNationByNationShortName(port.nation)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : "" : "n/a";
+    const nation = port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a";
     return nation;
 };
 const portBattleScheduled = (result) => {

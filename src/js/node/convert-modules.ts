@@ -11,7 +11,7 @@
 import * as path from "path"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
-import { capitalizeFirstLetter, groupToMap } from "../common/common"
+import { capitalizeFirstLetter, groupToMap, woodType } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
@@ -82,7 +82,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
 
         // Modules
-        ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Side armour repair time"],
+        ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Repair time"],
         ["ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness"],
         ["ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness"],
         ["DECK_ALL CANNON_BASIC_PENETRATION", "Cannon ball penetration"],
@@ -152,7 +152,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge"],
         ["NONE PERK_ENABLE_DOUBLE_SHOT", "Double shot"],
         ["NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fishing efficiency"],
-        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correctionValueDegrees"],
+        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correction"],
         ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold capacity"],
         ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)"],
         ["NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation"],
@@ -192,19 +192,19 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE SHIP_TURNING_SPEED_RHEAS", "Yard power"],
         ["NONE WATER_PUMP_BAILING", "Water pump bailing"],
         ["POWDER POWDER_RADIUS", "Explosion power"],
-        ["POWDER REPAIR_MODULE_TIME", "Powder repair module time"],
-        ["REPAIR_ARMOR REPAIR_PERCENT", "Armour repair amount"],
-        ["REPAIR_GENERIC REPAIR_PERCENT", "Generic repair amount"],
-        ["REPAIR_SAIL REPAIR_PERCENT", "Sail repair amount"],
+        ["POWDER REPAIR_MODULE_TIME", ""],
+        ["REPAIR_ARMOR REPAIR_PERCENT", ""],
+        ["REPAIR_GENERIC REPAIR_PERCENT", "Repair amount"],
+        ["REPAIR_SAIL REPAIR_PERCENT", ""],
         ["RUDDER MODULE_BASE_HP", "Rudder hitpoints"],
-        ["RUDDER REPAIR_MODULE_TIME", "Rudder repair time"],
+        ["RUDDER REPAIR_MODULE_TIME", ""],
         ["SAIL MODULE_BASE_HP", "Sail hitpoints"],
-        ["SAIL REPAIR_MODULE_TIME", "Sail repair time"],
+        ["SAIL REPAIR_MODULE_TIME", ""],
         ["SAIL SAILING_CREW_REQUIRED", "Sailing crew"],
         ["STRUCTURE CANNON_MASS", "Cannon weight"],
         ["STRUCTURE SHIP_CANNON_DESTROY_PROBABILITY", "Cannon destroy probability"],
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hitpoints"],
-        ["WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time"],
+        ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ])
 
     /**
@@ -214,6 +214,17 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
     const setWood = (module: ModuleConvertEntity): void => {
         const wood = {} as WoodTrimOrFrame
         wood.id = module.id
+
+        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
+            wood.type = "Trim"
+            wood.name = module.name.replace(" Planking", "")
+            woods.trim.push(wood)
+        } else {
+            wood.type = "Frame"
+            wood.name = module.name.replace(" Frame", "")
+            woods.frame.push(wood)
+        }
+
         wood.properties = []
         for (const modifier of module.APImodifiers) {
             // Add modifier if in modifier map
@@ -253,18 +264,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
         }
 
-        if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
-            wood.type = "Trim"
-            wood.name = module.name.replace(" Planking", "")
-            woods.trim.push(wood)
-        } else {
-            wood.type = "Frame"
-            wood.name = module.name.replace(" Frame", "")
-            woods.frame.push(wood)
-        }
-
         // Sort by modifier
-        for (const type of ["frame", "trim"]) {
+        for (const type of woodType) {
             for (const APIwood of woods[type]) {
                 APIwood.properties.sort(sortBy(["modifier", "id"]))
             }
@@ -277,12 +278,18 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      * @returns Module modifier properties
      */
     const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
-        return APImodifiers.map((modifier) => {
-            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
-                console.log(`${modifier.Slot} ${modifier.MappingIds.join()} modifier undefined`)
+        return APImodifiers.filter((modifier) => {
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+            if (modifiers.get(apiModifierName) === undefined) {
+                console.log(`${apiModifierName} modifier not defined`)
+                return true
             }
 
-            const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`) ?? ""
+            return modifiers.get(apiModifierName) !== ""
+        }).map((modifier) => {
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+            const modifierName = modifiers.get(apiModifierName) ?? ""
+
             let amount = modifier.Percentage
             let isPercentage = true
 
@@ -412,7 +419,11 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 setWood(module)
                 dontSave = true
             } else {
-                module.properties = getModuleProperties(module.APImodifiers)
+                const properties = getModuleProperties(module.APImodifiers)
+                if (properties) {
+                    module.properties = properties
+                }
+
                 delete module.APImodifiers
 
                 module.type = getModuleType(module)
@@ -490,6 +501,5 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
 export const convertModules = (): void => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
-    // eslint-disable-next-line no-void
     void convertModulesAndWoodData()
 }

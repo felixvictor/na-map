@@ -21,9 +21,8 @@ const moveFileAsync = async (oldFileName, newFileName) => {
     });
 };
 const moveAPIFile = async (fileName) => {
-    var _a, _b;
-    const year = (_a = yearRegex.exec(fileName)) === null || _a === void 0 ? void 0 : _a[1];
-    const month = (_b = monthRegex.exec(fileName)) === null || _b === void 0 ? void 0 : _b[1];
+    const year = yearRegex.exec(fileName)?.[1];
+    const month = monthRegex.exec(fileName)?.[1];
     if (year && month) {
         const dirNew = path.resolve(commonPaths.dirAPI, year, month);
         const fileNameNew = fileName.replace("api-", "");

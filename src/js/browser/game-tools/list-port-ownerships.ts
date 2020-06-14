@@ -31,13 +31,15 @@ import {
     stack as d3Stack,
     stackOffsetNone as d3StackOffsetNone,
 } from "d3-shape"
-import TimelinesChart, { Group } from "timelines-chart"
+import TimelinesChart from "timelines-chart"
 
 import { registerEvent } from "../analytics"
 import { NationFullName, nations, NationShortName, putImportError } from "../../common/common"
-import { colourList, getContrastColour, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { colourList, insertBaseModal } from "../../common/common-browser"
+import { getContrastColour } from "../../common/common-game-tools"
 
-import { Ownership, OwnershipNation } from "../../common/gen-json"
+import { Group, Ownership, OwnershipNation } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 /**
  *
@@ -51,9 +53,9 @@ export default class ListPortOwnerships {
     // noinspection JSMismatchedCollectionQueryUpdate
     private _nationData: Array<OwnershipNation<number>> = {} as Array<OwnershipNation<number>>
     private readonly _colourScale: ScaleOrdinal<string, string>
-    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, any>
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
+    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
 
     constructor() {
         this._baseName = "Port ownership"
@@ -85,7 +87,6 @@ export default class ListPortOwnerships {
         try {
             this._nationData = (await import(/* webpackChunkName: "data-nations" */ "Lib/gen-generic/nations.json"))
                 .default as Array<OwnershipNation<number>>
-            // @ts-expect-error
             this._ownershipData = (
                 await import(/* webpackChunkName: "data-ownership" */ "Lib/gen-generic/ownership.json")
             ).default as Ownership[]
@@ -100,7 +101,7 @@ export default class ListPortOwnerships {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -302,6 +303,7 @@ export default class ListPortOwnerships {
      */
     _injectChart(data: Group[]): void {
         TimelinesChart()
+            // @ts-expect-error
             .data(data)
             .enableAnimations(false)
             .timeFormat("%-d %B %Y")
