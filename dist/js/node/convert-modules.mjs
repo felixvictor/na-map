@@ -57,7 +57,7 @@ export const convertModulesAndWoodData = async () => {
         ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
         ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
-        ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Side armour repair time"],
+        ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Repair time"],
         ["ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness"],
         ["ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness"],
         ["DECK_ALL CANNON_BASIC_PENETRATION", "Cannon ball penetration"],
@@ -127,7 +127,7 @@ export const convertModulesAndWoodData = async () => {
         ["NONE PERK_ENABLE_DOUBLE_CHARGE", "Double charge"],
         ["NONE PERK_ENABLE_DOUBLE_SHOT", "Double shot"],
         ["NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fishing efficiency"],
-        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correctionValueDegrees"],
+        ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correction"],
         ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold capacity"],
         ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)"],
         ["NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation"],
@@ -167,19 +167,19 @@ export const convertModulesAndWoodData = async () => {
         ["NONE SHIP_TURNING_SPEED_RHEAS", "Yard power"],
         ["NONE WATER_PUMP_BAILING", "Water pump bailing"],
         ["POWDER POWDER_RADIUS", "Explosion power"],
-        ["POWDER REPAIR_MODULE_TIME", "Powder repair module time"],
-        ["REPAIR_ARMOR REPAIR_PERCENT", "Armour repair amount"],
-        ["REPAIR_GENERIC REPAIR_PERCENT", "Generic repair amount"],
-        ["REPAIR_SAIL REPAIR_PERCENT", "Sail repair amount"],
+        ["POWDER REPAIR_MODULE_TIME", ""],
+        ["REPAIR_ARMOR REPAIR_PERCENT", ""],
+        ["REPAIR_GENERIC REPAIR_PERCENT", "Repair amount"],
+        ["REPAIR_SAIL REPAIR_PERCENT", ""],
         ["RUDDER MODULE_BASE_HP", "Rudder hitpoints"],
-        ["RUDDER REPAIR_MODULE_TIME", "Rudder repair time"],
+        ["RUDDER REPAIR_MODULE_TIME", ""],
         ["SAIL MODULE_BASE_HP", "Sail hitpoints"],
-        ["SAIL REPAIR_MODULE_TIME", "Sail repair time"],
+        ["SAIL REPAIR_MODULE_TIME", ""],
         ["SAIL SAILING_CREW_REQUIRED", "Sailing crew"],
         ["STRUCTURE CANNON_MASS", "Cannon weight"],
         ["STRUCTURE SHIP_CANNON_DESTROY_PROBABILITY", "Cannon destroy probability"],
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hitpoints"],
-        ["WATER_PUMP REPAIR_MODULE_TIME", "Water pump repair time"],
+        ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ]);
     const setWood = (module) => {
         const wood = {};
@@ -217,7 +217,7 @@ export const convertModulesAndWoodData = async () => {
                     isPercentage = true;
                 }
                 wood.properties.push({
-                    modifier: modifierName !== null && modifierName !== void 0 ? modifierName : "",
+                    modifier: modifierName ?? "",
                     amount,
                     isPercentage,
                 });
@@ -230,12 +230,16 @@ export const convertModulesAndWoodData = async () => {
         }
     };
     const getModuleProperties = (APImodifiers) => {
-        return APImodifiers.map((modifier) => {
-            var _a;
-            if (!modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
-                console.log(`${modifier.Slot} ${modifier.MappingIds.join()} modifier undefined`);
+        return APImodifiers.filter((modifier) => {
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            if (modifiers.get(apiModifierName) === undefined) {
+                console.log(`${apiModifierName} modifier not defined`);
+                return true;
             }
-            const modifierName = (_a = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`)) !== null && _a !== void 0 ? _a : "";
+            return modifiers.get(apiModifierName) !== "";
+        }).map((modifier) => {
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const modifierName = modifiers.get(apiModifierName) ?? "";
             let amount = modifier.Percentage;
             let isPercentage = true;
             if (modifier.Absolute) {
@@ -266,7 +270,6 @@ export const convertModulesAndWoodData = async () => {
         });
     };
     const getModuleType = (module) => {
-        var _a;
         let type;
         let { permanentType, sortingGroup } = module;
         if (module.usageType === "All" &&
@@ -299,7 +302,7 @@ export const convertModulesAndWoodData = async () => {
         }
         else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202F${capitalizeFirstLetter((_a = module.sortingGroup) !== null && _a !== void 0 ? _a : "").replace("_", "/")}`
+                ? `\u202F\u2013\u202F${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
                 : "";
         }
         if (permanentType === "Default") {
@@ -336,7 +339,10 @@ export const convertModulesAndWoodData = async () => {
                 dontSave = true;
             }
             else {
-                module.properties = getModuleProperties(module.APImodifiers);
+                const properties = getModuleProperties(module.APImodifiers);
+                if (properties) {
+                    module.properties = properties;
+                }
                 delete module.APImodifiers;
                 module.type = getModuleType(module);
                 delete module.moduleType;
