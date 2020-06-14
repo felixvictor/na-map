@@ -27,8 +27,8 @@
     }
 
     thead th {
-        border-bottom-color: $white;
         cursor: s-resize;
+        border-bottom-color: $white;
     }
 
     tbody {
@@ -70,6 +70,15 @@ table tr {
         vertical-align: middle;
         border-top: none;
     }
+}
+
+.card-table {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.card-header {
+    background-color: $secondary-050;
 }
 
 .buildings .requirements table {
@@ -114,14 +123,6 @@ table tr {
 
 .pp {
     color: $green;
-}
-
-.extralarge-width {
-    min-width: 25em;
-}
-
-.large-width {
-    min-width: 18em;
 }
 
 .rate {
