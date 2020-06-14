@@ -15,10 +15,11 @@ import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { formatF11 } from "../../common/common-format"
-import { BaseModalPure, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
 import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math"
-import { MinMaxCoord } from "../../common/interface"
 import { copyF11ToClipboard } from "../util"
+
+import { BaseModalPure, HtmlString, MinMaxCoord } from "../../common/interface"
 
 import { NAMap } from "./na-map"
 import * as d3Selection from "d3-selection"

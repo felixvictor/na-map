@@ -19,17 +19,13 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { event as d3Event, select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
-import {
-    zoomIdentity as d3ZoomIdentity,
-    zoomTransform as d3ZoomTransform,
-    ZoomTransform as D3ZoomTransform,
-} from "d3-zoom"
+import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
 
 import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal, pluralise } from "../../common/common-browser"
+import { degreesPerSecond, insertBaseModal, pluralise } from "../../common/common-browser"
 import { formatF11 } from "../../common/common-format"
 import {
     compassDirections,
@@ -43,6 +39,8 @@ import {
     speedFactor,
 } from "../../common/common-math"
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util"
+
+import { HtmlString } from "../../common/interface"
 
 import { CompareShips } from "../game-tools/compare-ships"
 

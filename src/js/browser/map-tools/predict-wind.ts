@@ -20,13 +20,15 @@ import { line as d3Line } from "d3-shape"
 import "round-slider/src/roundslider"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math"
 import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util"
+
+import { HtmlString } from "../../common/interface"
+
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
-
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.locale("en-gb")

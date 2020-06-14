@@ -18,11 +18,12 @@ import htm from "htm"
 
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
-import { HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixedHTML, HtmlResult } from "../../common/common-game-tools"
+import { insertBaseModal } from "../../common/common-browser"
+import { formatFloatFixedHTML, initTablesort } from "../../common/common-game-tools"
 import { simpleStringSort } from "../../common/common-node"
 
 import { WoodData } from "../../common/gen-json"
+import { HtmlResult, HtmlString } from "../../common/interface"
 import * as d3Selection from "d3-selection"
 
 const html = htm.bind(h)

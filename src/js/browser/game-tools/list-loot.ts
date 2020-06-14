@@ -17,9 +17,8 @@ import htm from "htm"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { HtmlString } from "../../common/common-browser"
 import { formatInt } from "../../common/common-format"
-import { HtmlResult, getBaseModalHTML } from "../../common/common-game-tools"
+import { getBaseModalHTML } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
 
 import {
@@ -32,6 +31,7 @@ import {
     LootChestItemsEntity,
 } from "../../common/gen-json"
 import { lootType, LootType } from "../../common/types"
+import { HtmlResult, HtmlString } from "../../common/interface"
 
 const html = htm.bind(h)
 

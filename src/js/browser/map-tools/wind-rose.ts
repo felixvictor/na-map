@@ -21,9 +21,10 @@ import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, degreesToRadians } from "../../common/common-math"
 import { displayCompass, getUserWind, printSmallCompassRose } from "../util"
+import { HtmlString } from "../../common/interface"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -154,14 +155,14 @@ export default class WindRose {
         this._svg = this._div.append("svg").attr("class", "ingame-wind small")
     }
 
-    _navbarClick(event: Event): void {
+    _navbarClick(): void {
         registerEvent("Menu", this._baseName)
 
         this._windRoseSelected()
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => this._navbarClick())
     }
 
     _setupWindInput(): void {

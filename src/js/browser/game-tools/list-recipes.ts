@@ -14,17 +14,18 @@ import "bootstrap/js/dist/modal"
 
 import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
-import { nest as d3Nest } from "d3-collection"
-import { ascending as d3Ascending } from "d3-array"
 
 import { registerEvent } from "../analytics"
-import { formatInt, formatSignPercent } from "../../common/common-format"
-import { getOrdinal } from "../../common/common-math"
 import { putImportError } from "../../common/common"
-import { getCurrencyAmount, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
+import { formatInt, formatSignPercent } from "../../common/common-format"
+import { getCurrencyAmount } from "../../common/common-game-tools"
+import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
+
 import { Server } from "../../common/servers"
 import { Module, RecipeEntity, RecipeGroup } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const servers: Server[] = require("../../common/servers")
@@ -70,7 +71,7 @@ export default class ListRecipes {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()

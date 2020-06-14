@@ -12,13 +12,13 @@ import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
 
 import { putImportError } from "../../common/common"
-import { Bound } from "../../common/common-browser"
-import { PbZone, PbZoneBasic, PbZoneDefence } from "../../common/gen-json"
 import { drawSvgCircle, drawSvgRect } from "../util"
-
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import DisplayPorts from "./display-ports"
+
+import { PbZone, PbZoneBasic, PbZoneDefence } from "../../common/gen-json"
+import { Bound } from "../../common/interface"
 
 export default class DisplayPbZones {
     showPB: string

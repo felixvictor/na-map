@@ -21,15 +21,15 @@ import { select as d3Select } from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import { nations, NationShortName, putImportError } from "../../common/common"
-import { Bound, HtmlString } from "../../common/common-browser"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { defaultFontSize, roundToThousands } from "../../common/common-math"
+import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
+import { Bound, HtmlString } from "../../common/interface"
+import * as d3Selection from "d3-selection"
+
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
-
 import SelectPorts from "./select-ports"
-import * as d3Selection from "d3-selection"
-import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
 
 interface Node {
     name: string
