@@ -76,19 +76,17 @@ const convertOwnership = () => {
                 };
             };
             const initData = () => {
-                var _a;
                 ports.set(port.Id, {
                     name: cleanName(port.Name),
                     region: port.Location,
-                    county: (_a = capitalToCounty.get(port.CountyCapitalName)) !== null && _a !== void 0 ? _a : "",
+                    county: capitalToCounty.get(port.CountyCapitalName) ?? "",
                     data: [getObject()],
                 });
             };
             const getPreviousNation = () => {
-                var _a;
                 const portData = ports.get(port.Id);
                 if (portData) {
-                    const index = (_a = portData.data.length - 1) !== null && _a !== void 0 ? _a : 0;
+                    const index = portData.data.length - 1 ?? 0;
                     return portData.data[index].val;
                 }
                 return "";
@@ -138,9 +136,8 @@ const convertOwnership = () => {
             .then(async () => readFileContent(fileName))
             .then((compressedContent) => decompress(compressedContent))
             .then((decompressedContent) => {
-            var _a;
             if (decompressedContent) {
-                const currentDate = ((_a = fileBaseNameRegex.exec(path.basename(fileName))) !== null && _a !== void 0 ? _a : [])[1];
+                const currentDate = (fileBaseNameRegex.exec(path.basename(fileName)) ?? [])[1];
                 parseData(JSON.parse(decompressedContent.toString()), currentDate);
             }
         })

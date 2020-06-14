@@ -14,10 +14,11 @@ import { event as d3Event } from "d3-selection";
 import { curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
 import { formatFloat, formatIntTrunc, formatPercent, formatSignFloat } from "../../../common/common-format";
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math";
-import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, segmentRadians, } from "../../../common/common-browser";
 import { rotationAngleInDegrees } from "../../util";
 import { default as shipIcon } from "Icons/icon-ship.svg";
 import { Ship } from "./ship";
+import { segmentRadians } from "../../../common/common-browser";
+import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, } from "../../../common/common-game-tools";
 export class ShipComparison extends Ship {
     constructor(compareId, shipBaseData, shipCompareData, shipCompare) {
         super(compareId, shipCompare);
@@ -140,13 +141,12 @@ export class ShipComparison extends Ship {
         gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`);
     }
     _drawDifferenceProfile() {
-        var _a, _b;
         const pie = d3Pie().sort(null).value(1);
         const arcsBase = pie(this._shipBaseData.speedDegrees);
         this._arcsComp = pie(this.shipCompareData.speedDegrees);
         this._speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) => roundToThousands(speedShipCompare - this._shipBaseData.speedDegrees[i]));
-        this._minSpeedDiff = (_a = d3Min(this._speedDiff)) !== null && _a !== void 0 ? _a : 0;
-        this._maxSpeedDiff = (_b = d3Max(this._speedDiff)) !== null && _b !== void 0 ? _b : 0;
+        this._minSpeedDiff = d3Min(this._speedDiff) ?? 0;
+        this._maxSpeedDiff = d3Max(this._speedDiff) ?? 0;
         const curve = d3CurveCatmullRomClosed;
         const line = d3LineRadial()
             .angle((d, i) => i * segmentRadians)
