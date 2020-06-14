@@ -76,13 +76,13 @@ table,
     @include caps();
 }
 
-.card-table {
-    margin-bottom: 0;
-    white-space: nowrap;
+
+.extralarge-width {
+    min-width: 25em;
 }
 
-.card-header {
-    background-color: $secondary-050;
+.large-width {
+    min-width: 18em;
 }
 
 #na-svg {
