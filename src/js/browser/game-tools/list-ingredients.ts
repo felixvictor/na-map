@@ -16,12 +16,13 @@ import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { HtmlString, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
 import { formatSignInt, formatSignPercent } from "../../common/common-format"
 import { sortBy } from "../../common/common-node"
 import { chunkify } from "../util"
 
 import { Module, RecipeIngredientEntity } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 export default class ListIngredients {
     private readonly _baseName: string
@@ -53,7 +54,7 @@ export default class ListIngredients {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -89,7 +90,7 @@ export default class ListIngredients {
     }
 
     _getProperties(recipeName: string): HtmlString {
-        let text = ""
+        let text: string
         let moduleType = ""
         let properties = ""
         for (const type of this._moduleData) {

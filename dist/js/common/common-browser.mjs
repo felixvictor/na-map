@@ -7,11 +7,7 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import { color as d3Color, rgb as d3Rgb } from "d3-color";
 import { select as d3Select } from "d3-selection";
-import Hashids from "hashids";
-import { html } from "lit-html";
-import { default as Tablesort } from "tablesort";
 import { degreesFullCircle } from "./common-math";
 export const appDescription = DESCRIPTION;
 export const appName = NAME;
@@ -25,20 +21,10 @@ export const colourRed = CRED;
 export const colourRedDark = CREDDARK;
 export const colourRedLight = CREDLIGHT;
 export const colourWhite = CWHITE;
-export const hullRepairsPercent = Number(REPAIR_ARMOR_PERCENT);
-export const hullRepairsVolume = Number(REPAIR_ARMOR_VOLUME);
 export const iconSmallSrc = ICONSMALL;
 export const primary300 = CPRIMARY300;
-export const repairTime = Number(REPAIR_ARMOR_TIME);
-export const rigRepairsPercent = Number(REPAIR_SAIL_PERCENT);
-export const rigRepairsVolume = Number(REPAIR_SAIL_VOLUME);
-export const rumRepairsPercent = Number(REPAIR_CREW_PERCENT);
-export const rumRepairsVolume = Number(REPAIR_CREW_VOLUME);
-export const hashids = new Hashids("My salt: Yet another Naval Action map");
 export const numberSegments = 24;
 export const segmentRadians = (2 * Math.PI) / numberSegments;
-export const rumRepairsFactor = Number(rumRepairsPercent) / Number(rumRepairsVolume);
-export const repairsSetSize = 5;
 export const circleRadiusFactor = 5;
 const secondsForFullCircle = 2935;
 export const degreesPerSecond = degreesFullCircle / secondsForFullCircle;
@@ -88,21 +74,6 @@ export const initMultiDropdownNavbar = (id) => {
         $(event.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show");
     });
 };
-const cleanNumber = (i) => i.replace(/[^\d-.?]/g, "");
-const compareNumber = (a, b) => {
-    let aa = Number.parseFloat(a);
-    let bb = Number.parseFloat(b);
-    aa = Number.isNaN(aa) ? 0 : aa;
-    bb = Number.isNaN(bb) ? 0 : bb;
-    return aa - bb;
-};
-export const initTablesort = () => {
-    Tablesort.extend("number", (item) => { var _a, _b; return (_b = (_a = /^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/.exec(item)) !== null && _a !== void 0 ? _a : /^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/.exec(item)) !== null && _b !== void 0 ? _b : /^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/.exec(item); }, (a, b) => {
-        const aa = cleanNumber(a);
-        const bb = cleanNumber(b);
-        return compareNumber(bb, aa);
-    });
-};
 export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Close" }) => {
     const modal = d3Select("#modal-section")
         .append("div")
@@ -127,36 +98,5 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal");
 };
-export const insertBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }) => {
-    return html `
-        <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
-            <div class="modal-dialog ${size}" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="title-${id}" class="modal-title">
-                            ${title}
-                        </h5>
-                    </div>
-                    <div class="modal-body">${body()}</div>
-                    <div class="modal-footer">
-                        ${footer()}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-};
-export const getCurrencyAmount = (amount) => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
-export const getContrastColour = (colour) => {
-    var _a, _b;
-    const { r, g, b } = d3Rgb(colour);
-    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-    return yiq >= 128 ? (_b = (_a = d3Color(colourWhite)) === null || _a === void 0 ? void 0 : _a.darker(5).toString()) !== null && _b !== void 0 ? _b : "#111" : colourWhite;
-};
-const importedFlag = " (i)";
-export const isImported = (name) => name.includes(importedFlag);
-export const stripShipName = (name) => name.replace(importedFlag, "");
-export const beautifyShipName = (name) => stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "");
-export const beautifyShipNameHTML = (name) => html `${stripShipName(name)} ${isImported(name) ? html `<span class="caps small">imported</span>` : html ``}`;
 export const pluralise = (number, word) => `${number} ${word + (number === 1 ? "" : "s")}`;
 //# sourceMappingURL=common-browser.js.map

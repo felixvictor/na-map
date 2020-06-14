@@ -16,7 +16,6 @@ import { ValuesType } from "utility-types"
 
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
 import { ArrayIndex } from "./interface"
-import { Group } from "timelines-chart"
 import { FrontlinesType, LootType } from "./types"
 
 /****************************
@@ -109,7 +108,7 @@ export interface CannonPenetration extends ObjectIndexer<CannonElementIndex> {
 }
 export interface CannonValue {
     value: number
-    digits: number
+    digits?: number
 }
 
 /****************************
@@ -218,6 +217,24 @@ export interface Ownership {
     data: Group[]
 }
 
+export interface Group {
+    group: string
+    data: Line[]
+}
+
+export interface Line {
+    label: string
+    data: Segment[]
+}
+
+export interface Segment {
+    timeRange: [TS, TS]
+    val: Val
+}
+
+type TS = Date | number | string
+type Val = number | string // qualitative vs quantitative
+
 /****************************
  * pb-zones.json
  */
@@ -248,7 +265,6 @@ export interface PortBasic {
     name: string
     coordinates: Point
     angle: number
-    textAnchor: string
     region: string
     countyCapitalName: string
     county: string
@@ -370,8 +386,12 @@ export interface PriceSeasonedWood {
  */
 
 export interface Recipe {
-    recipe: RecipeEntity[]
+    recipe: RecipeGroup[]
     ingredient: RecipeIngredientEntity[]
+}
+interface RecipeGroup {
+    group: string
+    recipes: RecipeEntity[]
 }
 interface RecipeEntity {
     id: number
@@ -381,7 +401,7 @@ interface RecipeEntity {
     goldPrice: number
     itemRequirements: RecipeItemRequirement[]
     result: RecipeResult
-    craftGroup: string
+    craftGroup?: string
     serverType: string
 }
 interface RecipeItemRequirement {

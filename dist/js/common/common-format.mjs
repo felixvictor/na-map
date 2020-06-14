@@ -8,8 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { formatLocale as d3FormatLocale } from "d3-format";
-import { html } from "lit-html";
-const formatLocale = d3FormatLocale({
+export const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u2009",
     grouping: [3],
@@ -24,22 +23,6 @@ export const formatFloatFixed = (x, f = 2) => formatLocale
     .format(`.${f}f`)(x)
     .replace(".00", '<span class="hidden">.00</span>')
     .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>');
-export const formatFloatFixedHTML = (x, f = 2) => {
-    const [number, decimals] = formatLocale.format(`.${f}f`)(x).split(".");
-    let formattedFloat = html `${decimals}`;
-    if (decimals) {
-        if (decimals === "0" || decimals === "00") {
-            formattedFloat = html `<span class="hidden">.${decimals}</span>`;
-        }
-        else if (decimals.endsWith("0")) {
-            formattedFloat = html `.${decimals.replace("0", "")}<span class="hidden">0</span>`;
-        }
-        else {
-            formattedFloat = html `.${decimals}`;
-        }
-    }
-    return html `${number}${formattedFloat}`;
-};
 export const formatF11 = (x) => formatPrefix(x * -1).replace("k", "\u2009k");
 export const formatInt = (x) => formatLocale.format(",d")(x);
 export const formatIntTrunc = (x) => formatLocale.format(",d")(x - 0.5);
