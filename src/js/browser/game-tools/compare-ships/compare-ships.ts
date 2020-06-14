@@ -301,7 +301,7 @@ export class CompareShips {
                 { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true },
             ],
             ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
-            ["Armour repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
+            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
             [
                 "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true },
@@ -326,18 +326,14 @@ export class CompareShips {
                 },
             ],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
-            ["Rudder repair time", { properties: ["repairTime.rudder"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
-            ["Sail repair amount", { properties: ["repairAmount.sails"], isBaseValueAbsolute: true }],
-            ["Sail repair time", { properties: ["repairTime.sails"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
             ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Side armour repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
+            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
             ["Speed decrease", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
-            ["Water repair time", { properties: ["repairTime.pump"], isBaseValueAbsolute: true }],
         ])
 
         this._moduleAndWoodCaps = new Map<string, PropertyWithCap>([
