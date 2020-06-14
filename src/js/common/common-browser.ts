@@ -11,7 +11,6 @@
 import { color as d3Color, rgb as d3Rgb } from "d3-color"
 import { select as d3Select } from "d3-selection"
 import Hashids from "hashids"
-import { html, TemplateResult } from "lit-html"
 import { default as Tablesort } from "tablesort"
 
 import { degreesFullCircle } from "./common-math"
@@ -169,10 +168,7 @@ export interface BaseModal {
 export interface BaseModalPure extends BaseModal {
     buttonText?: HtmlString
 }
-export interface BaseModalHtml extends BaseModal {
-    body: () => TemplateResult
-    footer: () => TemplateResult
-}
+
 
 /**
  * Insert bootstrap modal
@@ -210,33 +206,7 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
         .attr("data-dismiss", "modal")
 }
 
-/**
- * Insert bootstrap modal with html-lit
- * @param id - Modal id
- * @param title - Modal title
- * @param size - Modal size, "xl" (default)
- * @param body - Body content
- * @param footer - Footer content
- */
-export const insertBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }: BaseModalHtml): TemplateResult => {
-    return html`
-        <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
-            <div class="modal-dialog ${size}" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="title-${id}" class="modal-title">
-                            ${title}
-                        </h5>
-                    </div>
-                    <div class="modal-body">${body()}</div>
-                    <div class="modal-footer">
-                        ${footer()}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `
-}
+
 
 /**
  * Get formatted currency string
@@ -255,15 +225,5 @@ export const getContrastColour = (colour: string): string => {
 
     return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
 }
-
-const importedFlag = " (i)"
-export const isImported = (name: string): boolean => name.includes(importedFlag)
-export const stripShipName = (name: string): string => name.replace(importedFlag, "")
-
-export const beautifyShipName = (name: string): HtmlString =>
-    stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "")
-
-export const beautifyShipNameHTML = (name: string): TemplateResult =>
-    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small">imported</span>` : html``}`
 
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`
