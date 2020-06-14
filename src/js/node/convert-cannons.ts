@@ -155,7 +155,6 @@ const addData = (fileData: XmlGeneric): void => {
                 (fileData.Attributes.Pair.find((pair) => pair.Key._text === value)?.Value.Value as TextEntity)._text ??
                     0
             ),
-            digits: 0,
         } as CannonValue
     }
 
@@ -181,7 +180,6 @@ const addData = (fileData: XmlGeneric): void => {
     for (const distance of peneDistances) {
         cannon.penetration[distance] = {
             value: Math.trunc((penetrations.get(distance) ?? 0) * (cannon.damage.penetration?.value ?? 0)),
-            digits: 0,
         }
     }
 
@@ -190,7 +188,6 @@ const addData = (fileData: XmlGeneric): void => {
     // Calculate damage per second
     cannon.damage["per second"] = {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
-        digits: 0,
     }
 
     cannons[type].push(cannon)
@@ -225,8 +222,10 @@ export const convertCannons = async (): Promise<void> => {
     }
 
     for (const [key, value] of maxDigits) {
-        for (const cannon of cannons[key[0]]) {
-            cannon[key[1]][key[2]]!.digits = value
+        if (value > 0) {
+            for (const cannon of cannons[key[0]]) {
+                cannon[key[1]][key[2]]!.digits = value
+            }
         }
     }
 

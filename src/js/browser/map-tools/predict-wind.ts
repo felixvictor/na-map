@@ -19,18 +19,16 @@ import { line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
 
-import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
-import "tempusdominus-core/build/js/tempusdominus-core"
-
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math"
 import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util"
+
+import { HtmlString } from "../../common/interface"
+
 import dayjs from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
-
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
@@ -89,14 +87,14 @@ export default class PredictWind {
             .attr("class", "wind-predict-arrow-head")
     }
 
-    _navbarClick(event: Event): void {
+    _navbarClick(): void {
         registerEvent("Menu", this._baseName)
 
         this._windSelected()
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => this._navbarClick())
     }
 
     _setupWindInput(): void {
@@ -156,26 +154,13 @@ export default class PredictWind {
             .attr("data-target-input", "nearest")
         inputGroup
             .append("input")
-            .classed("form-control datetimepicker-input", true)
-            .attr("type", "text")
+            .attr("class", "form-control")
+            .attr("type", "time")
             .attr("id", this._timeInputId)
+            .attr("value", dayjs.utc().format("HH:mm"))
             .attr("data-target", `#${this._timeGroupId}`)
             .attr("aria-label", this._timeGroupId)
             .attr("required", "")
-        inputGroup
-            .append("div")
-            .classed("input-group-append", true)
-            .attr("data-target", `#${this._timeGroupId}`)
-            .attr("data-toggle", "datetimepicker")
-            .append("span")
-            .attr("class", "input-group-text")
-            .append("i")
-            .attr("class", "icon icon-clock")
-
-        $(`#${this._timeGroupId}`).datetimepicker({
-            defaultDate: dayjs.utc().format().replace("Z", ""),
-            format: "H.mm",
-        })
     }
 
     /**

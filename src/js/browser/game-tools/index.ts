@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { default as semver } from "semver"
-
 import { registerEvent } from "../analytics"
 import { appVersion } from "../../common/common-browser"
 
@@ -26,6 +24,8 @@ import ListShips from "./list-ships"
 import ListShipBlueprints from "./list-ship-blueprints"
 import ListWoods from "./list-woods"
 
+import "../../../scss/game-tools.scss"
+
 /**
  * Init
  * @param serverId - Server id
@@ -37,9 +37,9 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     const checkShipCompareData = (): void => {
         if (urlParams.has("cmp") && urlParams.has("v")) {
             const version = urlParams.get("v")
-            if (version && semver.lte(version, appVersion)) {
+            // Compare main versions
+            if (version && version.split(".")[0] === appVersion.split(".")[0]) {
                 registerEvent("Menu", "Paste ship compare")
-                // eslint-disable-next-line no-void
                 void shipCompare.initFromClipboard(urlParams)
             }
         }
@@ -47,38 +47,17 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
 
     checkShipCompareData()
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const woodCompare = new CompareWoods("wood")
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const woodList = new ListWoods()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const buildingList = new ListBuildings()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const cannonList = new ListCannons()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const ingredientList = new ListIngredients()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const lootList = new ListLoot()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const moduleList = new ListModules()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const ownershipList = new ListPortOwnerships()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const recipeList = new ListRecipes(serverId)
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const shipList = new ListShips()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const blueprintList = new ListShipBlueprints()
+    void new CompareWoods("wood")
+    void new ListWoods()
+    void new ListBuildings()
+    void new ListCannons()
+    void new ListIngredients()
+    void new ListLoot()
+    void new ListModules()
+    void new ListPortOwnerships()
+    void new ListRecipes(serverId)
+    void new ListShips()
+    void new ListShipBlueprints()
 }
 
 export { init }

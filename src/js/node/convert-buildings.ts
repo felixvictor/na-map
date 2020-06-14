@@ -49,7 +49,7 @@ let apiItems: APIItemGeneric[]
 
 const getItemsCrafted = (buildingId: number): BuildingResult[] =>
     apiItems
-        .filter((item) => item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
+        .filter((item) => !item.NotUsed && item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
         .map((recipe) => ({
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0,

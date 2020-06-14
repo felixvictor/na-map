@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { VNode } from "preact"
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SVGSVGDatum {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -34,4 +36,25 @@ export interface Index<T> {
 
 export interface NestedIndex<T> {
     [index: string]: Index<T>
+}
+
+export type HtmlResult = VNode<unknown> | Array<VNode<unknown>>
+
+export type HtmlString = string
+export interface BaseModal {
+    id: HtmlString
+    title: HtmlString
+    size?: string
+}
+export interface BaseModalPure extends BaseModal {
+    buttonText?: HtmlString
+}
+/**
+ * Lower or upper bound coordinates
+ */
+export type Bound = [number, number]
+
+export interface BaseModalHtml extends BaseModal {
+    body: () => HtmlResult
+    footer: () => HtmlResult
 }
