@@ -8,6 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as path from "path";
+import d3Collection from "d3-collection";
+import d3Array from "d3-array";
+const { nest: d3Nest } = d3Collection;
+const { ascending: d3Ascending, group: d3Group } = d3Array;
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
@@ -27,19 +31,20 @@ const groups = new Map([
 ]);
 const convertRecipes = async () => {
     const data = {};
+    const recipes = [];
     const ingredients = new Map();
     data.recipe = [];
     data.ingredient = [];
     const getItemNames = () => new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]));
     const itemNames = getItemNames();
-    const getModuleNames = () => new Map(apiItems.filter((item) => item.ItemType === "ShipUpgradeBookItem").map((item) => { var _a; return [item.Id, (_a = itemNames.get(item.Upgrade)) !== null && _a !== void 0 ? _a : ""]; }));
+    const getModuleNames = () => new Map(apiItems.filter((item) => item.ItemType === "ShipUpgradeBookItem").map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""]));
     const moduleNames = getModuleNames();
     const getIngredientIds = () => new Map(apiItems
         .filter((item) => !item.NotUsed &&
         (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"))
         .map((item) => [item.Id, item.Id]));
     const ingredientIds = getIngredientIds();
-    const getUpgradeIds = () => new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => { var _a; return [item.Id, (_a = item.Upgrade) !== null && _a !== void 0 ? _a : 0]; }));
+    const getUpgradeIds = () => new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0]));
     const upgradeIds = getUpgradeIds();
     apiItems.filter((apiRecipe) => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed).forEach((apiRecipe) => {
         const resultReference = apiRecipe.ItemType === "Recipe"
@@ -70,7 +75,7 @@ const convertRecipes = async () => {
             serverType: apiRecipe.ServerType,
         };
         if (recipe.result.name) {
-            data.recipe.push(recipe);
+            recipes.push(recipe);
         }
         apiRecipe.FullRequirements.filter((APIingredient) => ingredientIds.has(APIingredient.Template)).forEach((apiIngredient) => {
             const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
@@ -90,7 +95,17 @@ const convertRecipes = async () => {
             }
         });
     });
-    data.recipe.sort(sortBy(["craftGroup", "id"]));
+    data.recipe = [...d3Group(recipes, (recipe) => recipe.craftGroup)]
+        .sort(sortBy(["id"]))
+        .map(([group, recipes]) => {
+        return {
+            group,
+            recipes: recipes.map((recipe) => {
+                const { craftGroup, ...recipeCleaned } = recipe;
+                return recipeCleaned;
+            }),
+        };
+    });
     const result = [...ingredients.values()];
     data.ingredient = result.sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.fileRecipe, data);

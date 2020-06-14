@@ -9,13 +9,19 @@
  */
 
 import * as path from "path"
+
+import d3Collection from "d3-collection"
+import d3Array from "d3-array"
+const { nest: d3Nest } = d3Collection
+const { ascending: d3Ascending, group: d3Group } = d3Array
+
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
-import { Recipe, RecipeEntity } from "../common/gen-json"
+import { Recipe, RecipeEntity, RecipeGroup } from "../common/gen-json";
 
 interface Ingredient {
     id: number
@@ -41,6 +47,7 @@ const groups = new Map([
 
 const convertRecipes = async (): Promise<void> => {
     const data = {} as Recipe
+    const recipes = [] as RecipeEntity[]
     const ingredients = new Map<number, Ingredient>()
 
     data.recipe = []
@@ -115,7 +122,7 @@ const convertRecipes = async (): Promise<void> => {
             } as RecipeEntity
             // if result exists
             if (recipe.result.name) {
-                data.recipe.push(recipe)
+                recipes.push(recipe)
             }
 
             apiRecipe.FullRequirements.filter((APIingredient) => ingredientIds.has(APIingredient.Template)).forEach(
@@ -139,8 +146,18 @@ const convertRecipes = async (): Promise<void> => {
         }
     )
 
-    data.recipe.sort(sortBy(["craftGroup", "id"]))
-
+    data.recipe = [...d3Group(recipes, (recipe) => recipe.craftGroup)]
+        // @ts-expect-error
+        .sort(sortBy(["id"]))
+        .map(([group, recipes]) => {
+            return {
+                group,
+                recipes: recipes.map((recipe) => {
+                    const { craftGroup, ...recipeCleaned } = recipe
+                    return recipeCleaned
+                }),
+            } as RecipeGroup
+        })
     const result = [...ingredients.values()]
     data.ingredient = result.sort(sortBy(["id"]))
 

@@ -15,8 +15,9 @@ import * as d3Drag from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event, select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
-import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform, } from "d3-zoom";
+import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import "round-slider/src/roundslider";
+import "../../../scss/roundslider.scss";
 import { registerEvent } from "../analytics";
 import { degreesPerSecond, insertBaseModal, pluralise } from "../../common/common-browser";
 import { formatF11 } from "../../common/common-format";
@@ -99,7 +100,7 @@ export default class MakeJourney {
     _setupSvg() {
         const width = this._courseArrowWidth;
         const doubleWidth = this._courseArrowWidth * 2;
-        this._g = d3Select("#na-svg").insert("g", "g.pb").attr("class", "journey");
+        this._g = d3Select("#ports").append("g").attr("class", "journey");
         d3Select("#na-svg defs")
             .append("marker")
             .attr("id", "journey-arrow")
@@ -129,15 +130,15 @@ export default class MakeJourney {
         this._journey.totalDistance = 0;
         this._journey.totalMinutes = 0;
     }
-    _navbarClick(event) {
+    _navbarClick() {
         registerEvent("Menu", "MakeJourney");
         this._journeySelected();
     }
     _setupListener() {
-        var _a, _b;
-        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("mouseup", (event) => this._navbarClick(event));
-        (_b = document
-            .querySelector(`#${this._deleteLastLegButtonId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("mouseup", () => this._deleteLastLeg());
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => this._navbarClick());
+        document
+            .querySelector(`#${this._deleteLastLegButtonId}`)
+            ?.addEventListener("mouseup", () => this._deleteLastLeg());
     }
     _setupWindInput() {
         const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;
@@ -183,7 +184,7 @@ export default class MakeJourney {
         this._injectModal();
         this._setupWindInput();
         this._shipCompare = new CompareShips(this._shipId);
-        this._shipCompare.CompareShipsInit();
+        void this._shipCompare.CompareShipsInit();
     }
     _useUserInput() {
         this._resetJourneyData();
@@ -231,7 +232,7 @@ export default class MakeJourney {
         return select$.length > 0 ? currentUserWind : 0;
     }
     _setShipSpeed() {
-        let speedDegrees = [];
+        let speedDegrees;
         if (this._journey.shipName === this._defaultShipName) {
             speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)];
         }
@@ -262,7 +263,7 @@ export default class MakeJourney {
         return totalMinutesSegment;
     }
     _setShipName() {
-        if (this._shipCompare && this._shipCompare.singleShipData && this._shipCompare.singleShipData.name) {
+        if (this._shipCompare?.singleShipData?.name) {
             this._journey.shipName = `${this._shipCompare.singleShipData.name}`;
         }
         else {
@@ -462,10 +463,6 @@ export default class MakeJourney {
             this._journey.segments[0] = { position: [x, y], label: "" };
             this._initJourney();
         }
-    }
-    transform(transform) {
-        this._g.attr("transform", transform.toString());
-        this._correctJourney();
     }
 }
 //# sourceMappingURL=make-journey.js.map

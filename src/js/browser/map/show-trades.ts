@@ -21,16 +21,15 @@ import { select as d3Select } from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import { nations, NationShortName, putImportError } from "../../common/common"
-import { Bound, HtmlString } from "../../common/common-browser"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { defaultFontSize, roundToThousands } from "../../common/common-math"
+import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
+import { Bound, HtmlString } from "../../common/interface"
+import * as d3Selection from "d3-selection"
+
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
-
-import SelectPorts from "../map/select-ports"
-import { DivDatum, SVGGDatum, SVGSVGDatum } from "../../common/interface"
-import * as d3Selection from "d3-selection"
-import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
+import SelectPorts from "./select-ports"
 
 interface Node {
     name: string
@@ -70,12 +69,12 @@ export default class ShowTrades {
     private _upperBound!: Bound
     private _profitText!: string
 
-    private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _labelG!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _tradeDetailsDiv!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _tradeDetailsHead!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _labelG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _tradeDetailsDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _tradeDetailsHead!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _nationSelector!: HTMLSelectElement
-    private _list!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
+    private _list!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _linkDataDefault!: Trade[]
     private _linkData!: Trade[]
     private _portData!: PortWithTrades[]
@@ -83,6 +82,7 @@ export default class ShowTrades {
     private _linkDataFiltered!: Trade[]
     private _portDataFiltered!: Set<number>
 
+    // eslint-disable-next-line max-params
     constructor(serverName: string, portSelect: SelectPorts, minScale: number, lowerBound: Bound, upperBound: Bound) {
         this._serverName = serverName
         this._portSelect = portSelect
@@ -185,16 +185,16 @@ export default class ShowTrades {
         $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
     }
 
-    static _showElem(elem: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>): void {
+    static _showElem(elem: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         elem.classed("d-none", false)
     }
 
-    static _hideElem(elem: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>): void {
+    static _hideElem(elem: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         elem.classed("d-none", true)
     }
 
     _setupSvg(): void {
-        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg").insert("g", "g.pb").attr("class", "trades")
+        this._g = d3Select<SVGGElement, unknown>("#map").insert("g", "g.pb").attr("class", "trades")
         this._labelG = this._g.append("g")
 
         d3Select("#na-svg defs")
@@ -210,7 +210,7 @@ export default class ShowTrades {
             .attr("d", `M0,0L0,${this._arrowY}L${this._arrowX},${this._arrowY / 2}z`)
             .attr("class", "trade-arrow-head")
 
-        this._tradeDetailsDiv = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
+        this._tradeDetailsDiv = d3Select<HTMLDivElement, unknown>("main #summary-column")
             .append("div")
             .attr("id", "trade-details")
             .attr("class", "trade-details")
@@ -620,7 +620,7 @@ export default class ShowTrades {
         return this._listType
     }
 
-    set listType(type) {
+    set listType(type: string) {
         this._listType = type
         switch (this._listType) {
             case "inventory":
@@ -667,13 +667,10 @@ export default class ShowTrades {
     }
 
     _updateTradeList(): void {
-        let highlightLink: d3Selection.Selection<SVGPathElement, SVGSVGDatum, HTMLElement, any>
+        let highlightLink: d3Selection.Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
         const highlightOn = (d: Trade): void => {
-            highlightLink = d3Select<SVGPathElement, SVGSVGDatum>(`path#${ShowTrades._getId(d)}`).classed(
-                "highlight",
-                true
-            )
+            highlightLink = d3Select<SVGPathElement, unknown>(`path#${ShowTrades._getId(d)}`).attr("class", "highlight")
             highlightLink.dispatch("click")
         }
 
@@ -783,7 +780,6 @@ export default class ShowTrades {
     }
 
     transform(transform: d3Zoom.ZoomTransform): void {
-        this._g.attr("transform", transform.toString())
         this._scale = transform.k
         this.update()
     }

@@ -1,13 +1,12 @@
 ////
 /// This file is part of na-map.
-/// Pre-bootstrap definitions.
+/// config.scss
 ///
-/// copyright 2017-18
+/// copyright 2020
 /// license   http://www.gnu.org/licenses/gpl.html
 /// @group    main
 /// @author   iB aka Felix Victor
 ////
 
-@import "mixins";
-@import "colour";
-@import "variables";
+$padding-half: map-get($spacers, 2);
+$padding-third: map-get($spacers, 1);

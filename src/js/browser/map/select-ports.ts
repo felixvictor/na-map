@@ -13,12 +13,8 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/dropdown"
 
 import "bootstrap-select/js/bootstrap-select"
-import "tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4"
-import { DatetimepickerEvent, DatetimepickerOption } from "../../@types/tempusdominus-bootstrap-4"
-import "tempusdominus-core/build/js/tempusdominus-core"
 
 import dayjs, { Dayjs } from "dayjs"
-import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import isBetween from "dayjs/plugin/isBetween"
 import utc from "dayjs/plugin/utc"
@@ -29,8 +25,8 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
-import { Nation, nations, NationShortName, putImportError, range, validNationShortName } from "../../common/common"
-import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser"
+import { Nation, nations, NationShortName, putImportError, validNationShortName } from "../../common/common"
+import { initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
 import { simpleStringSort, sortBy } from "../../common/common-node"
@@ -40,13 +36,14 @@ import {
     GoodList,
     InventoryEntity,
     Port,
-    PortBattleType,
     PortIntersection,
     PortPerServer,
     PortWithTrades,
     TradeGoodProfit,
     TradeProfit,
 } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
+
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
 import DisplayPbZones from "./display-pb-zones"
@@ -71,7 +68,6 @@ export default class SelectPorts {
     private _ports: DisplayPorts
     private readonly _buyGoodsId: string
     private readonly _buyGoodsSelector: HTMLSelectElement
-    private readonly _dateFormat: string
     private readonly _frontlineAttackingNationId: string
     private readonly _frontlineAttackingNationSelector: HTMLSelectElement
     private readonly _frontlineDefendingNationId: string
@@ -88,7 +84,6 @@ export default class SelectPorts {
     private readonly _propNationId: string
     private readonly _propNationSelector: HTMLSelectElement
     private readonly _sellProfit: Map<string, TradeProfit> = new Map()
-    private readonly _timeFormat: string
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
         this._ports = ports
@@ -96,9 +91,6 @@ export default class SelectPorts {
         this._map = map
 
         this._numberPorts = this._ports.portData.length
-
-        this._dateFormat = "D MMM"
-        this._timeFormat = "HH.00"
 
         this._frontlineAttackingNationId = "frontlines-attacking-nation-select"
         this._frontlineAttackingNationSelector = document.querySelector(
@@ -246,67 +238,13 @@ export default class SelectPorts {
 
         document.querySelector("#menu-prop-deep")?.addEventListener("click", () => this._depthSelected("deep"))
         document.querySelector("#menu-prop-shallow")?.addEventListener("click", () => this._depthSelected("shallow"))
-
         document.querySelector("#menu-prop-all")?.addEventListener("click", () => this._allSelected())
         document.querySelector("#menu-prop-non-capturable")?.addEventListener("click", () => this._nonCapSelected())
-
-        document.querySelector("#menu-prop-large")?.addEventListener("click", () => this._portSizeSelected("Large"))
-        document.querySelector("#menu-prop-medium")?.addEventListener("click", () => this._portSizeSelected("Medium"))
-        document.querySelector("#menu-prop-small")?.addEventListener("click", () => this._portSizeSelected("Small"))
-
-        // @ts-expect-error
-        $.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
-            icons: {
-                time: "icon icon-clock",
-                date: "icon icon-calendar",
-                up: "icon icon-chevron-top",
-                down: "icon icon-chevron-bottom",
-                previous: "icon icon-chevron-left",
-                next: "icon icon-chevron-right",
-                clear: "icon icon-clear",
-                close: "icon icon-close",
-            },
-            timeZone: "UTC",
-        })
-
-        $("#prop-pb-from").datetimepicker({
-            format: this._timeFormat,
-        } as DatetimepickerOption)
-        $("#prop-pb-to").datetimepicker({
-            format: this._timeFormat,
-        })
-        document.querySelector("#prop-pb-range")?.addEventListener("submit", (event) => {
-            this._capturePBRange()
-            event.preventDefault()
-        })
 
         document.querySelector("#menu-prop-today")?.addEventListener("click", () => this._capturedToday())
         document.querySelector("#menu-prop-yesterday")?.addEventListener("click", () => this._capturedYesterday())
         document.querySelector("#menu-prop-this-week")?.addEventListener("click", () => this._capturedThisWeek())
         document.querySelector("#menu-prop-last-week")?.addEventListener("click", () => this._capturedLastWeek())
-
-        const portFrom = $("#prop-from")
-        const portTo = $("#prop-to")
-        portFrom.datetimepicker({
-            format: this._dateFormat,
-        })
-        portTo.datetimepicker({
-            format: this._dateFormat,
-            useCurrent: false,
-        })
-        // @ts-expect-error
-        portFrom.on("change.datetimepicker", (event: DatetimepickerEvent) =>
-            portTo.datetimepicker({ minDate: event.date })
-        )
-        // @ts-expect-error
-        portTo.on("change.datetimepicker", (event: DatetimepickerEvent) =>
-            portFrom.datetimepicker({ maxDate: event.date })
-        )
-
-        document.querySelector("#prop-range")?.addEventListener("submit", (event) => {
-            this._captureRange()
-            event.preventDefault()
-        })
 
         initMultiDropdownNavbar("selectPortNavbar")
     }
@@ -628,11 +566,11 @@ export default class SelectPorts {
             JSON.stringify(
                 this._ports.portDataDefault.filter(
                     (port) =>
-                        (port.dropsTrading && port.dropsTrading.some((good: number) => good === goodSelectedId)) ||
-                        (port.dropsNonTrading &&
-                            port.dropsNonTrading.some((good: number) => good === goodSelectedId)) ||
-                        (port.producesNonTrading &&
-                            port.producesNonTrading.some((good: number) => good === goodSelectedId))
+                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                        port.dropsTrading?.some((good: number) => good === goodSelectedId) ||
+                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                        port.dropsNonTrading?.some((good: number) => good === goodSelectedId) ||
+                        port.producesNonTrading?.some((good: number) => good === goodSelectedId)
                 )
             )
         ) as PortWithTrades[]).map((port) => {
@@ -641,8 +579,8 @@ export default class SelectPorts {
         })
         const consumingPorts = (JSON.parse(
             JSON.stringify(
-                this._ports.portDataDefault.filter(
-                    (port) => port.consumesTrading && port.consumesTrading.some((good) => good === goodSelectedId)
+                this._ports.portDataDefault.filter((port) =>
+                    port.consumesTrading?.some((good) => good === goodSelectedId)
                 )
             )
         ) as PortWithTrades[]).map((port) => {
@@ -811,50 +749,6 @@ export default class SelectPorts {
         this._ports.update()
     }
 
-    _portSizeSelected(size: PortBattleType): void {
-        const portData = this._ports.portDataDefault.filter((d) => size === d.portBattleType)
-
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
-    }
-
-    _capturePBRange(): void {
-        const blackOutTimes = range(serverMaintenanceHour - 2, serverMaintenanceHour)
-        // 24 hours minus black-out hours
-        const maxStartTime = 24 - (blackOutTimes.length + 1)
-        const startTimes = new Set()
-        const begin = dayjs(
-            (document.querySelector("#prop-pb-from-input") as HTMLSelectElement)?.value,
-            this._timeFormat
-        ).hour()
-        let end = dayjs(
-            (document.querySelector("#prop-pb-to-input") as HTMLSelectElement)?.value,
-            this._timeFormat
-        ).hour()
-
-        // console.log("Between %d and %d", begin, end);
-
-        // Range not in black-out range of 9 to 10
-        if (!(blackOutTimes.includes(begin) && blackOutTimes.includes(end) && begin <= end)) {
-            startTimes.add(0)
-            if (end < begin) {
-                end += 24
-            }
-
-            for (let i = begin - 2; i <= end - 3; i += 1) {
-                startTimes.add((i - 10) % maxStartTime)
-            }
-        }
-
-        const portData = this._ports.portDataDefault.filter(
-            (d) => d.capturable && d.nation !== "FT" && startTimes.has(d.portBattleStartTime)
-        )
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
-    }
-
     _filterCaptured(begin: Dayjs, end: Dayjs): void {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portData = this._ports.portDataDefault.filter((port) =>
@@ -902,15 +796,6 @@ export default class SelectPorts {
         const begin = dayjs(currentMondayOfWeek).utc().subtract(7, "day").hour(serverMaintenanceHour)
         // This Monday
         const end = currentMondayOfWeek.utc().hour(serverMaintenanceHour)
-
-        this._filterCaptured(begin, end)
-    }
-
-    _captureRange(): void {
-        const from = $("#prop-from").datetimepicker("viewDate")
-        const to = $("#prop-to").datetimepicker("viewDate")
-        const begin = from.utc().hour(serverMaintenanceHour).minute(0)
-        const end = to.utc().add(1, "day").hour(serverMaintenanceHour).minute(0)
 
         this._filterCaptured(begin, end)
     }

@@ -89,8 +89,8 @@ const shipNames = new Map([
     ["yacht", { id: 295, master: [] }],
     ["yachtsilver", { id: 393, master: [] }],
 ]);
-const getShipId = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : 0; };
-const getShipMaster = (baseFileName) => { var _a, _b; return (_b = (_a = shipNames.get(baseFileName)) === null || _a === void 0 ? void 0 : _a.master) !== null && _b !== void 0 ? _b : []; };
+const getShipId = (baseFileName) => shipNames.get(baseFileName)?.id ?? 0;
+const getShipMaster = (baseFileName) => shipNames.get(baseFileName)?.master ?? [];
 const subFileStructure = [
     {
         ext: "b armor",
@@ -163,7 +163,7 @@ let apiItems;
 let ships;
 let cannons;
 const getItemNames = () => new Map(apiItems.map((item) => [item.Id, cleanName(item.Name)]));
-const getShipMass = (id) => { var _a, _b; return (_b = (_a = apiItems.find((apiItem) => id === apiItem.Id)) === null || _a === void 0 ? void 0 : _a.ShipMass) !== null && _b !== void 0 ? _b : 0; };
+const getShipMass = (id) => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0;
 const getSpeedDegrees = (specs) => {
     const calcPortSpeed = specs.MaxSpeed * speedConstA - speedConstB;
     const speedDegrees = specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
@@ -211,7 +211,6 @@ const convertGenericShipData = () => {
         let totalCarroCrew = 0;
         const { calcPortSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs);
         const addDeck = (deckLimit, index) => {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
             if (deckLimit) {
                 const gunsPerDeck = apiShip.GunsPerDeck[index];
                 const currentDeck = {
@@ -222,13 +221,13 @@ const convertGenericShipData = () => {
                     maxCarroLb: carroLb[deckLimit.Limitation2.Min],
                 };
                 guns.gunsPerDeck.push(currentDeck);
-                const cannonWeight = Math.round(gunsPerDeck * ((_b = (_a = cannonData.get(currentDeck.maxCannonLb)) === null || _a === void 0 ? void 0 : _a.weight) !== null && _b !== void 0 ? _b : 0));
-                const cannonCrew = gunsPerDeck * ((_d = (_c = cannonData.get(currentDeck.maxCannonLb)) === null || _c === void 0 ? void 0 : _c.crew) !== null && _d !== void 0 ? _d : 0);
+                const cannonWeight = Math.round(gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.weight ?? 0));
+                const cannonCrew = gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.crew ?? 0);
                 guns.weight.cannons += cannonWeight;
                 totalCannonCrew += cannonCrew;
                 if (currentDeck.maxCarroLb) {
-                    guns.weight.carronades += Math.round(gunsPerDeck * ((_f = (_e = cannonData.get(currentDeck.maxCarroLb)) === null || _e === void 0 ? void 0 : _e.weight) !== null && _f !== void 0 ? _f : 0));
-                    totalCarroCrew += gunsPerDeck * ((_h = (_g = carroData.get(currentDeck.maxCarroLb)) === null || _g === void 0 ? void 0 : _g.crew) !== null && _h !== void 0 ? _h : 0);
+                    guns.weight.carronades += Math.round(gunsPerDeck * (cannonData.get(currentDeck.maxCarroLb)?.weight ?? 0));
+                    totalCarroCrew += gunsPerDeck * (carroData.get(currentDeck.maxCarroLb)?.crew ?? 0);
                 }
                 else {
                     guns.weight.carronades += cannonWeight;
@@ -421,7 +420,6 @@ const convertShipBlueprints = async () => {
     const apiBlueprints = apiItems.filter((apiItem) => apiItem.ItemType === "RecipeShip" && !blueprintsNotUsed.has(apiItem.Id));
     const shipBlueprints = apiBlueprints
         .map((apiBlueprint) => {
-        var _a, _b, _c, _d, _e, _f;
         const shipMass = getShipMass(apiBlueprint.Results[0].Template);
         return {
             id: apiBlueprint.Id,
@@ -431,20 +429,15 @@ const convertShipBlueprints = async () => {
                 { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
                 { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
             ],
-            resources: apiBlueprint.FullRequirements.filter((requirement) => {
-                var _a, _b;
-                return !(((_b = (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit")) !== null && _b !== void 0 ? _b : itemNames.get(requirement.Template) === "Doubloons") ||
-                    itemNames.get(requirement.Template) === "Provisions");
-            }).map((requirement) => {
-                var _a;
-                return ({
-                    name: (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.replace(" Log", ""),
-                    amount: requirement.Amount,
-                });
-            }),
-            provisions: (_b = ((_a = apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Provisions")) !== null && _a !== void 0 ? _a : {}).Amount) !== null && _b !== void 0 ? _b : 0,
-            doubloons: (_d = ((_c = apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Doubloons")) !== null && _c !== void 0 ? _c : {}).Amount) !== null && _d !== void 0 ? _d : 0,
-            permit: (_f = ((_e = apiBlueprint.FullRequirements.find((requirement) => { var _a; return (_a = itemNames.get(requirement.Template)) === null || _a === void 0 ? void 0 : _a.endsWith(" Permit"); })) !== null && _e !== void 0 ? _e : {}).Amount) !== null && _f !== void 0 ? _f : 0,
+            resources: apiBlueprint.FullRequirements.filter((requirement) => !((itemNames.get(requirement.Template)?.endsWith(" Permit") ??
+                itemNames.get(requirement.Template) === "Doubloons") ||
+                itemNames.get(requirement.Template) === "Provisions")).map((requirement) => ({
+                name: itemNames.get(requirement.Template)?.replace(" Log", ""),
+                amount: requirement.Amount,
+            })),
+            provisions: (apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Provisions") ?? {}).Amount ?? 0,
+            doubloons: (apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Doubloons") ?? {}).Amount ?? 0,
+            permit: (apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template)?.endsWith(" Permit")) ?? {}).Amount ?? 0,
             ship: {
                 id: apiBlueprint.Results[0].Template,
                 name: itemNames.get(apiBlueprint.Results[0].Template),

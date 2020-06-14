@@ -19,9 +19,10 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 import html2canvas from "html2canvas";
 import { registerEvent } from "../../analytics";
-import { appVersion, colourGreenDark, colourRedDark, colourWhite, hashids, hullRepairsPercent, insertBaseModal, isImported, repairTime, rigRepairsPercent, stripShipName, } from "../../../common/common-browser";
+import { appVersion, colourGreenDark, colourRedDark, colourWhite, insertBaseModal, } from "../../../common/common-browser";
 import { isEmpty, putImportError, woodType } from "../../../common/common";
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format";
+import { hashids, hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShipName, } from "../../../common/common-game-tools";
 import { getOrdinal } from "../../../common/common-math";
 import { sortBy } from "../../../common/common-node";
 import { copyToClipboard } from "../../util";
@@ -125,9 +126,8 @@ export class CompareShips {
         this._initSelects();
     }
     async initFromClipboard(urlParams) {
-        var _a;
         await this._loadAndSetupData();
-        const shipAndWoodsIds = hashids.decode((_a = urlParams.get("cmp")) !== null && _a !== void 0 ? _a : "");
+        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp") ?? "");
         if (shipAndWoodsIds.length > 0) {
             this._shipCompareSelected();
             this._setShipAndWoodsSelects(shipAndWoodsIds);
@@ -148,7 +148,6 @@ export class CompareShips {
         defs.append(arrowNew);
     }
     _setupData() {
-        var _a, _b, _c;
         this._moduleAndWoodChanges = new Map([
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
@@ -156,7 +155,7 @@ export class CompareShips {
                 { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true },
             ],
             ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
-            ["Armour repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
+            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
             [
                 "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true },
@@ -181,18 +180,14 @@ export class CompareShips {
                 },
             ],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
-            ["Rudder repair time", { properties: ["repairTime.rudder"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
-            ["Sail repair amount", { properties: ["repairAmount.sails"], isBaseValueAbsolute: true }],
-            ["Sail repair time", { properties: ["repairTime.sails"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
             ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Side armour repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
+            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
             ["Speed decrease", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
-            ["Water repair time", { properties: ["repairTime.pump"], isBaseValueAbsolute: true }],
         ]);
         this._moduleAndWoodCaps = new Map([
             [
@@ -227,7 +222,7 @@ export class CompareShips {
             ["Max speed", { properties: ["speed.max"], cap: { amount: 16, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
         ]);
-        const theoreticalMinSpeed = ((_a = d3Min(this._shipData, (ship) => ship.speed.min)) !== null && _a !== void 0 ? _a : 0) * 1.2;
+        const theoreticalMinSpeed = (d3Min(this._shipData, (ship) => ship.speed.min) ?? 0) * 1.2;
         const theoreticalMaxSpeed = this._moduleAndWoodCaps.get("Max speed").cap.amount;
         this._minSpeed = theoreticalMinSpeed;
         this._maxSpeed = theoreticalMaxSpeed;
@@ -235,8 +230,8 @@ export class CompareShips {
             .domain([this._minSpeed, 0, this._maxSpeed])
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl);
-        const minShipMass = (_b = d3Min(this._shipData, (ship) => ship.shipMass)) !== null && _b !== void 0 ? _b : 0;
-        const maxShipMass = (_c = d3Max(this._shipData, (ship) => ship.shipMass)) !== null && _c !== void 0 ? _c : 0;
+        const minShipMass = d3Min(this._shipData, (ship) => ship.shipMass) ?? 0;
+        const maxShipMass = d3Max(this._shipData, (ship) => ship.shipMass) ?? 0;
         this.shipMassScale = d3ScaleLinear().domain([minShipMass, maxShipMass]).range([100, 150]);
     }
     async _loadAndSetupData() {
@@ -255,9 +250,8 @@ export class CompareShips {
         }
     }
     _setupListener() {
-        var _a;
         let firstClick = true;
-        (_a = document.querySelector(`#${this._buttonId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async () => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false;
                 await this._loadAndSetupData();
@@ -267,8 +261,7 @@ export class CompareShips {
         });
     }
     _setGraphicsParameters() {
-        var _a;
-        this.svgWidth = (_a = $(`#${this._modalId} .column-base`).width()) !== null && _a !== void 0 ? _a : 0;
+        this.svgWidth = $(`#${this._modalId} .column-base`).width() ?? 0;
         this.svgHeight = this.svgWidth;
         this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2);
         this.innerRadius = Math.floor(this.outerRadius * 0.3);
@@ -277,11 +270,9 @@ export class CompareShips {
             .range([10, this.innerRadius, this.outerRadius]);
     }
     _getShipName(id) {
-        var _a, _b;
-        return (_b = (_a = this._shipData.find((ship) => ship.id === id)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : "";
+        return this._shipData.find((ship) => ship.id === id)?.name ?? "";
     }
     _getSelectedData(columnId) {
-        var _a, _b;
         const selectedData = {
             moduleData: new Map(),
             ship: "",
@@ -296,7 +287,7 @@ export class CompareShips {
                 for (const type of [...this._moduleTypes]) {
                     const text = [];
                     for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
-                        text.push((_b = (_a = this._moduleProperties.get(id)) === null || _a === void 0 ? void 0 : _a.name.replace(" Bonus", "")) !== null && _b !== void 0 ? _b : "");
+                        text.push(this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? "");
                     }
                     selectedData.moduleData.set(type, text.join(", "));
                 }
@@ -364,19 +355,18 @@ export class CompareShips {
         }
     }
     _shipCompareSelected() {
-        var _a, _b, _c;
         if (isEmpty(this._modal$)) {
             this._initModal();
             this._modal$ = $(`#${this._modalId}`);
-            (_a = document.querySelector(`#${this._modalId}`)) === null || _a === void 0 ? void 0 : _a.addEventListener("keydown", (event) => {
+            document.querySelector(`#${this._modalId}`)?.addEventListener("keydown", (event) => {
                 if (event.key === "KeyC" && event.ctrlKey) {
                     this._copyDataClicked(event);
                 }
             });
-            (_b = document.querySelector(`#${this._copyButtonId}`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", (event) => {
+            document.querySelector(`#${this._copyButtonId}`)?.addEventListener("click", (event) => {
                 this._copyDataClicked(event);
             });
-            (_c = document.querySelector(`#${this._imageButtonId}`)) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async (event) => {
+            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", async (event) => {
                 await this._makeImage(event);
             });
         }
@@ -409,7 +399,7 @@ export class CompareShips {
                     for (const type of [...this._moduleTypes]) {
                         const typeIndex = [...this._moduleTypes].indexOf(type);
                         const moduleIds = this._selectedUpgradeIdsPerType[columnId][type];
-                        if (moduleIds === null || moduleIds === void 0 ? void 0 : moduleIds.length) {
+                        if (moduleIds?.length) {
                             const param = `${columnIndex}${typeIndex}`;
                             ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds));
                         }
@@ -647,25 +637,23 @@ export class CompareShips {
         return shipDataUpdated;
     }
     _adjustValue(value, key, isBaseValueAbsolute) {
-        var _a, _b;
         let adjustedValue = value;
-        if ((_a = this._modifierAmount.get(key)) === null || _a === void 0 ? void 0 : _a.absolute) {
+        if (this._modifierAmount.get(key)?.absolute) {
             const { absolute } = this._modifierAmount.get(key);
             adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
         }
-        if ((_b = this._modifierAmount.get(key)) === null || _b === void 0 ? void 0 : _b.percentage) {
+        if (this._modifierAmount.get(key)?.percentage) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
             adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute);
         }
         return Math.trunc(adjustedValue * 100) / 100;
     }
     _setModifier(property) {
-        var _a, _b, _c, _d;
         let absolute = property.isPercentage ? 0 : property.amount;
         let percentage = property.isPercentage ? property.amount : 0;
         if (this._modifierAmount.has(property.modifier)) {
-            absolute += (_b = (_a = this._modifierAmount.get(property.modifier)) === null || _a === void 0 ? void 0 : _a.absolute) !== null && _b !== void 0 ? _b : 0;
-            percentage += (_d = (_c = this._modifierAmount.get(property.modifier)) === null || _c === void 0 ? void 0 : _c.percentage) !== null && _d !== void 0 ? _d : 0;
+            absolute += this._modifierAmount.get(property.modifier)?.absolute ?? 0;
+            percentage += this._modifierAmount.get(property.modifier)?.percentage ?? 0;
         }
         this._modifierAmount.set(property.modifier, {
             absolute,
@@ -673,7 +661,6 @@ export class CompareShips {
         });
     }
     _showCappingAdvice(compareId, modifiers) {
-        var _a;
         const id = `${this._baseId}-${compareId}-capping`;
         let div = document.querySelector(`#${id}`);
         if (!div) {
@@ -681,7 +668,7 @@ export class CompareShips {
             div.id = id;
             div.className = "alert alert-warning";
             const element = document.querySelector(`#${this._baseId}-${compareId}`);
-            (_a = element === null || element === void 0 ? void 0 : element.firstChild) === null || _a === void 0 ? void 0 : _a.after(div);
+            element?.firstChild?.after(div);
         }
         div.innerHTML = `${[...modifiers].join(", ")} capped`;
     }
@@ -718,9 +705,8 @@ export class CompareShips {
             }
         };
         const adjustDataByModifiers = () => {
-            var _a;
             for (const [key] of this._modifierAmount.entries()) {
-                if ((_a = this._moduleAndWoodChanges.get(key)) === null || _a === void 0 ? void 0 : _a.properties) {
+                if (this._moduleAndWoodChanges.get(key)?.properties) {
                     const { properties, isBaseValueAbsolute } = this._moduleAndWoodChanges.get(key);
                     for (const modifier of properties) {
                         const index = modifier.split(".");

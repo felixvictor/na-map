@@ -54,7 +54,7 @@ export class Ship {
             return `<div class="row row-small ${row % 2 ? "row-light" : ""}"><div class="col-3">${element}</div>`;
         }
         function displayColumn(element, description, col = 6) {
-            let elementText = "";
+            let elementText;
             let br = "";
             if (element === "cannonsPerDeck") {
                 ;
