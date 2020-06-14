@@ -158,11 +158,11 @@ export default class ListCannons {
                 <thead>
                     <tr class="thead-group">
                         <th scope="col" class="border-bottom-0"></th>
-                        ${[...this._groups].forEach((groupValue) => getColumnGroupHeads(groupValue))}
+                        ${[...this._groups].map((groupValue) => getColumnGroupHeads(groupValue))}
                     </tr>
                     <tr data-sort-method="thead">
                         <th scope="col" class="text-right border-top-0" data-sort-default>Lb</th>
-                        ${[...this._groups].forEach((groupValue) => getColumnHeads(groupValue))}
+                        ${[...this._groups].map((groupValue) => getColumnHeads(groupValue))}
                     </tr>
                 </thead>
                 <tbody>
@@ -180,7 +180,7 @@ export default class ListCannons {
                         }
                     )
             */
-                    this._cannonData[type].forEach((cannon: CannonEntity) => {
+                    this._cannonData[type].map((cannon: CannonEntity) => {
                         return html`
                             <tr>
                                 ${getRowHead(cannon.name)}${getRow(cannon)}
@@ -216,7 +216,7 @@ export default class ListCannons {
                         `
                 )
             */
-                cannonType.forEach(
+                cannonType.map(
                     (type, index) =>
                         html`
                             <li class="nav-item">
@@ -255,7 +255,7 @@ export default class ListCannons {
                         `
                 )
                 */
-                cannonType.forEach(
+                cannonType.map(
                     (type, index) =>
                         html`
                             <div
