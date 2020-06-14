@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { default as semver } from "semver"
-
 import { registerEvent } from "../analytics"
 import { appVersion } from "../../common/common-browser"
 
@@ -39,7 +37,8 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     const checkShipCompareData = (): void => {
         if (urlParams.has("cmp") && urlParams.has("v")) {
             const version = urlParams.get("v")
-            if (version && semver.lte(version, appVersion)) {
+            // Compare main versions
+            if (version && version.split(".")[0] === appVersion.split(".")[0]) {
                 registerEvent("Menu", "Paste ship compare")
                 void shipCompare.initFromClipboard(urlParams)
             }

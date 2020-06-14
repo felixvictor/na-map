@@ -90,7 +90,6 @@
         "js-cookie": "^2.2.1",
         "lit-html": "^1.2.1",
         "round-slider": "^1.5.2",
-        "semver": "^7.3.2",
         "tablesort": "^5.2.1",
         "timelines-chart": "^2.10.0"
     },
