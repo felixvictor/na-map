@@ -19,8 +19,8 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
-import * as d3Zoom from "d3-zoom"
-import { html, render, TemplateResult } from "lit-html"
+import { h, render } from "preact"
+import htm from "htm"
 
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
@@ -76,11 +76,14 @@ import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 import { simpleStringSort } from "../../common/common-node"
+import { HtmlResult } from "../../common/common-game-tools"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
+
+const html = htm.bind(h)
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -104,11 +107,11 @@ interface PortForDisplay {
     county: string
     countyCapital: boolean
     capital: boolean
-    capturer: TemplateResult
+    capturer: HtmlResult
     captureTime: string
     lastPortBattle: string
-    attack: TemplateResult
-    pbTimeRange: TemplateResult
+    attack: HtmlResult
+    pbTimeRange: HtmlResult
     brLimit: string
     portPoints: string
     taxIncome: string
@@ -733,13 +736,13 @@ export default class DisplayPorts {
             return getDistance(fromPortCoord, toPortCoord)
         }
 
-        const displayClanLitHtml = (clan: string): TemplateResult => html`<span class="caps">${clan}</span>`
+        const displayClanLitHtml = (clan: string): HtmlResult => html`<span class="caps">${clan}</span>`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const formatFromToTime = (from: number, to: number): HtmlString =>
             `${String(from)}\u2009\u2012\u2009${String(to)}`
 
-        const formatTime = (from: number, to: number): TemplateResult => {
+        const formatTime = (from: number, to: number): HtmlResult => {
             const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
             const toLocal = Number(dayjs.utc().hour(to).local().format("H"))
             return html`${formatFromToTime(from, to)} (${formatFromToTime(fromLocal, toLocal)})`
@@ -820,9 +823,9 @@ export default class DisplayPorts {
         return port
     }
 
-    _tooltipData(port: PortForDisplay): TemplateResult {
+    _tooltipData(port: PortForDisplay): HtmlResult {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
-
+        console.log(port.attack, port.attack.toString())
         const h = html`
             <div class="d-flex align-items-center mb-4">
                 <img
@@ -858,7 +861,7 @@ export default class DisplayPorts {
                 </div>
             </div>
 
-            ${port.attack.values.length > 0
+            ${port.attack.toString()
                 ? html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
                 : html``}
 

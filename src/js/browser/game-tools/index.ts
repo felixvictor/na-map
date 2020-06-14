@@ -41,7 +41,6 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
             const version = urlParams.get("v")
             if (version && semver.lte(version, appVersion)) {
                 registerEvent("Menu", "Paste ship compare")
-                // eslint-disable-next-line no-void
                 void shipCompare.initFromClipboard(urlParams)
             }
         }
@@ -49,38 +48,17 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
 
     checkShipCompareData()
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const woodCompare = new CompareWoods("wood")
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const woodList = new ListWoods()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const buildingList = new ListBuildings()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const cannonList = new ListCannons()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const ingredientList = new ListIngredients()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const lootList = new ListLoot()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const moduleList = new ListModules()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const ownershipList = new ListPortOwnerships()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const recipeList = new ListRecipes(serverId)
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const shipList = new ListShips()
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const blueprintList = new ListShipBlueprints()
+    void new CompareWoods("wood")
+    void new ListWoods()
+    void new ListBuildings()
+    void new ListCannons()
+    void new ListIngredients()
+    void new ListLoot()
+    void new ListModules()
+    void new ListPortOwnerships()
+    void new ListRecipes(serverId)
+    void new ListShips()
+    void new ListShipBlueprints()
 }
 
 export { init }

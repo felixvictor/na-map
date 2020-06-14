@@ -13,16 +13,19 @@ import "bootstrap/js/dist/modal"
 
 import { select as d3Select } from "d3-selection"
 import Tablesort from "tablesort"
+import { h, render } from "preact"
+import htm from "htm"
 
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixedHTML } from "../../common/common-format"
+import { formatFloatFixedHTML, HtmlResult } from "../../common/common-game-tools"
 import { simpleStringSort } from "../../common/common-node"
 
 import { WoodData } from "../../common/gen-json"
 import * as d3Selection from "d3-selection"
-import { html, render, TemplateResult } from "lit-html"
+
+const html = htm.bind(h)
 
 /**
  *
@@ -110,10 +113,10 @@ export default class ListWoods {
         return [...modifiers].sort(simpleStringSort)
     }
 
-    _getList(type: WoodType): TemplateResult {
+    _getList(type: WoodType): HtmlResult {
         const modifiers = this._getModifiers(type)
 
-        const addLineBreak = (string: string): TemplateResult => {
+        const addLineBreak = (string: string): HtmlResult => {
             const strings = string.split(" ", 2)
             const rest = string.slice(strings.join(" ").length)
             return html`${strings[0]}<br />${strings[1]} ${rest}`
@@ -132,7 +135,7 @@ export default class ListWoods {
             </thead>`
         }
 
-        const getBody = (type: WoodType): TemplateResult => {
+        const getBody = (type: WoodType): HtmlResult => {
             return html`<tbody>
                 ${this._woodData[type].map(
                     (wood) =>
@@ -170,7 +173,6 @@ export default class ListWoods {
 
         const table = document.querySelector(`#table-${this._baseId}-${type}-list`) as HTMLTableElement
         // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const sortTable = new Tablesort(table)
+        void new Tablesort(table)
     }
 }

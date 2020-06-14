@@ -12,26 +12,30 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
-import { html, render, TemplateResult } from "lit-html"
+import { h, render } from "preact"
+import htm from "htm"
 import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { beautifyShipNameHTML, HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixedHTML, formatInt } from "../../common/common-format"
+import { HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
+import { formatInt } from "../../common/common-format"
+import { beautifyShipNameHTML, formatFloatFixedHTML, HtmlResult } from "../../common/common-game-tools"
 
 import { sortBy } from "../../common/common-node"
 import { ShipData } from "../../common/gen-json"
 import * as d3Selection from "d3-selection"
 
+const html = htm.bind(h)
+
 interface ShipListData {
     class: [number, number]
-    name: [string, TemplateResult]
+    name: [string, HtmlResult]
     guns: [number, number]
     battleRating: [number, string]
     crew: [number, string]
-    maxSpeed: [number, TemplateResult]
-    turnSpeed: [number, TemplateResult]
+    maxSpeed: [number, HtmlResult]
+    turnSpeed: [number, HtmlResult]
     broadside: [number, string]
     bowChaser: [number, string]
     sternChaser: [number, string]
@@ -127,7 +131,7 @@ export default class ShipList {
         $(`#${this._modalId}`).modal("show")
     }
 
-    _getHead(): TemplateResult {
+    _getHead(): HtmlResult {
         return html`
             <thead>
                 <tr class="thead-group">
@@ -159,7 +163,7 @@ export default class ShipList {
         `
     }
 
-    _getBody(): TemplateResult {
+    _getBody(): HtmlResult {
         return html`
             <tbody>
                 ${this._shipListData.map(
@@ -176,7 +180,7 @@ export default class ShipList {
         `
     }
 
-    _getList(): TemplateResult {
+    _getList(): HtmlResult {
         return html`
             <table id="table-${this._baseId}" class="table table-sm small tablesort na-table">
                 ${this._getHead()} ${this._getBody()}

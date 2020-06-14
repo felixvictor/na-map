@@ -32,13 +32,12 @@ import {
     HtmlString,
     hullRepairsPercent,
     insertBaseModal,
-    isImported,
     repairTime,
     rigRepairsPercent,
-    stripShipName,
 } from "../../../common/common-browser"
 import { isEmpty, putImportError, woodType } from "../../../common/common"
 import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
+import { isImported, stripShipName } from "../../../common/common-game-tools"
 import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
