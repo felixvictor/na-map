@@ -12,19 +12,24 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
-import moment from "moment"
-import "moment/locale/en-gb"
 
 import { registerEvent } from "../analytics"
 import { formatF11 } from "../../common/common-format"
-import { BaseModalPure, HtmlString, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
 import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math"
-import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { copyF11ToClipboard } from "../util"
 
-import { NAMap } from "../map/na-map"
+import { BaseModalPure, HtmlString, MinMaxCoord } from "../../common/interface"
+
+import { NAMap } from "./na-map"
 import * as d3Selection from "d3-selection"
-import * as d3Zoom from "d3-zoom"
+
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import utc from "dayjs/plugin/utc"
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
 
 /**
  * ShowF11
@@ -42,8 +47,7 @@ export default class ShowF11 {
     private readonly _copyButtonId: HtmlString
     private readonly _submitButtonId: HtmlString
     private _modal$!: JQuery
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private _g!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _formSel!: HTMLFormElement
     private _xInputSel!: HTMLInputElement
     private _zInputSel!: HTMLInputElement
@@ -55,33 +59,33 @@ export default class ShowF11 {
 
         this._baseName = "Go to F11"
         this._baseId = "go-to-f11"
-        this._buttonId =`button-${this._baseId}`
-        this._modalId =`modal-${this._baseId}`
-        this._formId =`form-${this._baseId}`
-        this._xInputId =`input-x-${this._baseId}`
-        this._zInputId =`input-z-${this._baseId}`
-        this._copyButtonId =`copy-coord-${this._baseId}`
-        this._submitButtonId =`submit-${this._baseId}`
+        this._buttonId = `button-${this._baseId}`
+        this._modalId = `modal-${this._baseId}`
+        this._formId = `form-${this._baseId}`
+        this._xInputId = `input-x-${this._baseId}`
+        this._zInputId = `input-z-${this._baseId}`
+        this._copyButtonId = `copy-coord-${this._baseId}`
+        this._submitButtonId = `submit-${this._baseId}`
 
         this._setupSvg()
         this._setupListener()
     }
 
     _setupSvg(): void {
-        this._g = d3Select<SVGSVGElement, SVGSVGDatum>("#na-svg").append("g").classed("f11", true)
+        this._g = d3Select<SVGSVGElement, unknown>("#map").append("g").attr("class", "f11")
     }
 
-    _navbarClick(event: Event): void {
+    _navbarClick(): void {
         registerEvent("Menu", "Go to F11")
 
         this._f11Selected()
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", (event) => this._navbarClick(event))
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => this._navbarClick())
         window.addEventListener("keydown", (event) => {
             if (event.code === "F11" && event.shiftKey) {
-                this._navbarClick(event)
+                this._navbarClick()
             }
         })
     }
@@ -238,7 +242,7 @@ export default class ShowF11 {
 
     _printF11Coord(x: number, y: number, F11X: number, F11Y: number): void {
         let circleSize = 10
-        const g = this._g.append("g").attr("transform",`translate(${x},${y})`)
+        const g = this._g.append("g").attr("transform", `translate(${x},${y})`)
         const coordRect = g.append("rect")
         const timeRect = g.append("rect")
         g.append("circle").attr("r", circleSize)
@@ -247,31 +251,31 @@ export default class ShowF11 {
         circleSize *= 1.6
         const F11XText = g
             .append("text")
-            .attr("dx",`${-circleSize}px`)
-            .attr("dy",`${-circleSize / 2 - 2}px`)
+            .attr("dx", `${-circleSize}px`)
+            .attr("dy", `${-circleSize / 2 - 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11X))
         const F11YText = g
             .append("text")
-            .attr("dx",`${-circleSize}px`)
-            .attr("dy",`${circleSize / 2 + 2}px`)
+            .attr("dx", `${-circleSize}px`)
+            .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11Y))
         const F11XDim = F11XText.node()?.getBBox()
         const F11YDim = F11YText.node()?.getBBox()
 
-        const timeStamp = moment().utc()
-        const timeStampLocal = moment()
+        const timeStamp = dayjs().utc()
+        const timeStampLocal = dayjs()
         const timeStampText = g
             .append("text")
-            .attr("dx",`${circleSize}px`)
-            .attr("dy",`${-circleSize / 2 - 2}px`)
+            .attr("dx", `${circleSize}px`)
+            .attr("dy", `${-circleSize / 2 - 2}px`)
             .attr("class", "f11-time")
             .text(timeStamp.format("H.mm"))
         const timeStampLocalText = g
             .append("text")
-            .attr("dx",`${circleSize}px`)
-            .attr("dy",`${circleSize / 2 + 2}px`)
+            .attr("dx", `${circleSize}px`)
+            .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`)
         const timeStampDim = timeStampText.node()?.getBBox()
@@ -327,10 +331,6 @@ export default class ShowF11 {
         const F11Y = convertInvCoordY(x, y)
 
         this._printF11Coord(x, y, F11X, F11Y)
-    }
-
-    transform(transform: d3Zoom.ZoomTransform): void {
-        this._g.attr("transform", transform.toString())
     }
 
     clearMap(): void {

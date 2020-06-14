@@ -30,7 +30,7 @@ const obsoleteBuildings = new Set([
 ]);
 let apiItems;
 const getItemsCrafted = (buildingId) => apiItems
-    .filter((item) => { var _a, _b; return ((_b = (_a = item.BuildingRequirements) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.BuildingTemplate) === buildingId; })
+    .filter((item) => !item.NotUsed && item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
     .map((recipe) => ({
     name: cleanName(recipe.Name).replace(" Blueprint", ""),
     price: 0,
@@ -68,13 +68,10 @@ const getBuildings = () => {
                 production: level.ProductionLevel * apiBuilding.BaseProduction,
                 maxStorage: level.MaxStorage,
                 price: level.UpgradePriceGold,
-                materials: level.UpgradePriceMaterials.map((material) => {
-                    var _a, _b;
-                    return ({
-                        item: (_b = (_a = buildingResources.get(material.Template)) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : "",
-                        amount: material.Amount,
-                    });
-                }),
+                materials: level.UpgradePriceMaterials.map((material) => ({
+                    item: buildingResources.get(material.Template)?.name ?? "",
+                    amount: material.Amount,
+                })),
             })),
         };
         if (!buildings.has(building.name)) {
@@ -109,29 +106,29 @@ const getAPISeasonedItem = (name) => apiItems.find((item) => item.ItemType === "
     item.Name.replace(" Log", "") === name.replace(/\s/g, " ").replace("White Oak", "White oak"));
 const getPrices = (buildings) => {
     const prices = { standard: [], seasoned: [] };
-    const getStandardPrices = (name) => { var _a; return (_a = prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))) === null || _a === void 0 ? void 0 : _a.real; };
+    const getStandardPrices = (name) => prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.real;
     prices.standard = buildings.filter((building) => building.result && building.result[0] && building.result[0].price)
         .map((building) => {
-        var _a, _b;
         const result = building.result[0];
         return {
             name: result.name.replace(" Log", ""),
             real: result.price,
-            labour: (_b = (_a = building === null || building === void 0 ? void 0 : building.batch) === null || _a === void 0 ? void 0 : _a.labour) !== null && _b !== void 0 ? _b : 0,
+            labour: building?.batch?.labour ?? 0,
         };
     })
         .sort((a, b) => a.name.localeCompare(b.name));
     prices.seasoned = getItemsCraftedBySeasoningShed()
         .map((seasonedItem) => {
-        var _a, _b, _c, _d, _e;
         const name = seasonedItem.name.replace(" Log", "");
         const apiSeasonedItem = getAPISeasonedItem(name);
         return {
             name,
-            real: (_a = getStandardPrices(name)) !== null && _a !== void 0 ? _a : 0,
+            real: getStandardPrices(name) ?? 0,
             labour: apiSeasonedItem.LaborPrice,
-            doubloon: (_c = (_b = apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)) === null || _b === void 0 ? void 0 : _b.Amount) !== null && _c !== void 0 ? _c : 0,
-            tool: (_e = (_d = apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)) === null || _d === void 0 ? void 0 : _d.Amount) !== null && _e !== void 0 ? _e : 0,
+            doubloon: apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
+                ?.Amount ?? 0,
+            tool: apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)
+                ?.Amount ?? 0,
         };
     })
         .sort((a, b) => a.name.localeCompare(b.name));

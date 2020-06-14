@@ -16,13 +16,14 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { formatInt } from "../../common/common-format"
-
-import { HtmlString, insertBaseModal } from "../../common/common-browser"
-import { Price, ShipBlueprint, WoodData } from "../../common/gen-json"
 import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
+import { insertBaseModal } from "../../common/common-browser"
+import { formatInt } from "../../common/common-format"
 import { sortBy } from "../../common/common-node"
+
 import * as d3Selection from "d3-selection"
+import { Price, ShipBlueprint, WoodData } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 interface ItemNeeded {
     // item
@@ -78,7 +79,7 @@ export default class ListShipBlueprints {
         this._setupListener()
     }
 
-    async _loadAndSetupData() {
+    async _loadAndSetupData(): Promise<void> {
         try {
             this._blueprintData = (
                 await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/ship-blueprints.json")
@@ -110,7 +111,7 @@ export default class ListShipBlueprints {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()

@@ -17,22 +17,23 @@ import * as d3Selection from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import { registerEvent } from "../analytics"
-import { appDescription, appTitle, appVersion, Bound, insertBaseModal } from "../../common/common-browser"
+import { appDescription, appTitle, appVersion, insertBaseModal } from "../../common/common-browser"
 import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
-import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { displayClan } from "../util"
+
+import { Bound, MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
-import DisplayGrid from "../map-tools/display-grid"
+import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
-import ShowF11 from "../map-tools/show-f11"
-import ShowTrades from "../map-tools/show-trades"
+import ShowF11 from "./show-f11"
+import ShowTrades from "./show-trades"
 import WindRose from "../map-tools/wind-rose"
-import MakeJourney from "../map-tools/make-journey"
+import MakeJourney from "./make-journey"
 import PredictWind from "../map-tools/predict-wind"
 import { mapSize } from "../../common/common-var"
 
@@ -62,16 +63,17 @@ class NAMap {
     private _currentScale = 0
     private _currentTranslate!: d3Zoom.ZoomTransform
     private _doubleClickAction: string
-    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
+    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    private _mainG!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
     private _showGrid!: string
-    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, any>
-    private _windPrediction!: PredictWind
-    private _windRose!: WindRose
+    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
+    private readonly _windPrediction!: PredictWind
+    private readonly _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
     private readonly _doubleClickActionCookie: Cookie
@@ -241,8 +243,6 @@ class NAMap {
         this._grid = new DisplayGrid(this)
 
         this._journey = new MakeJourney(this.rem)
-        this._windPrediction = new PredictWind()
-        this._windRose = new WindRose()
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
         this.showTrades = new ShowTrades(
@@ -324,8 +324,8 @@ class NAMap {
             .call(this._zoom)
 
         this._svg.append<SVGDefsElement>("defs")
-
-        this._gMap = this._svg.append("g").classed("map", true)
+        this._gMap = this._svg.append("g").attr("class", "map-tiles")
+        this._mainG = this._svg.append("g").attr("id", "map")
     }
 
     _doubleClickSelected(): void {
@@ -527,12 +527,9 @@ class NAMap {
         this.showTrades.setBounds(lowerBound, upperBound)
 
         this._displayMap(zoomTransform)
-        this._grid.transform(zoomTransform)
-        this._ports.transform(zoomTransform)
-        this._journey.transform(zoomTransform)
-        this._pbZone.transform(zoomTransform)
-        this.f11.transform(zoomTransform)
+        this._grid.transform()
         this.showTrades.transform(zoomTransform)
+        this._mainG.attr("transform", zoomTransform.toString())
 
         this._setZoomLevelAndData()
     }
@@ -554,7 +551,7 @@ class NAMap {
         return this._zoomLevel
     }
 
-    set zoomLevel(zoomLevel) {
+    set zoomLevel(zoomLevel: string) {
         this._zoomLevel = zoomLevel
         this._ports.zoomLevel = zoomLevel
         this._grid.zoomLevel = zoomLevel

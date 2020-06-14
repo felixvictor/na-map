@@ -8,15 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { color as d3Color, rgb as d3Rgb } from "d3-color"
 import { select as d3Select } from "d3-selection"
-import Hashids from "hashids"
-import { html, TemplateResult } from "lit-html"
-import { default as Tablesort } from "tablesort"
 
 import { degreesFullCircle } from "./common-math"
+import { BaseModalPure } from "./interface"
 
-// noinspection SpellCheckingInspection
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
     CGREENDARK: string,
@@ -31,19 +27,13 @@ declare const CGREEN: string,
     NAME: string,
     TITLE: string,
     VERSION: string,
-    ICONSMALL: string,
-    REPAIR_ARMOR_PERCENT: string,
-    REPAIR_ARMOR_TIME: string,
-    REPAIR_ARMOR_VOLUME: string,
-    REPAIR_CREW_PERCENT: string,
-    REPAIR_CREW_VOLUME: string,
-    REPAIR_SAIL_PERCENT: string,
-    REPAIR_SAIL_VOLUME: string
+    ICONSMALL: string
 
 export const appDescription = DESCRIPTION
 export const appName = NAME
 export const appTitle = TITLE
 export const appVersion = VERSION
+
 export const colourGreen = CGREEN
 export const colourGreenDark = CGREENDARK
 export const colourGreenLight = CGREENLIGHT
@@ -52,23 +42,13 @@ export const colourRed = CRED
 export const colourRedDark = CREDDARK
 export const colourRedLight = CREDLIGHT
 export const colourWhite = CWHITE
-export const hullRepairsPercent = Number(REPAIR_ARMOR_PERCENT)
-export const hullRepairsVolume = Number(REPAIR_ARMOR_VOLUME)
+
 export const iconSmallSrc = ICONSMALL
 export const primary300 = CPRIMARY300
-export const repairTime = Number(REPAIR_ARMOR_TIME)
-export const rigRepairsPercent = Number(REPAIR_SAIL_PERCENT)
-export const rigRepairsVolume = Number(REPAIR_SAIL_VOLUME)
-export const rumRepairsPercent = Number(REPAIR_CREW_PERCENT)
-export const rumRepairsVolume = Number(REPAIR_CREW_VOLUME)
-
-export const hashids = new Hashids("My salt: Yet another Naval Action map")
 
 export const numberSegments = 24
 export const segmentRadians = (2 * Math.PI) / numberSegments
 
-export const rumRepairsFactor = Number(rumRepairsPercent) / Number(rumRepairsVolume)
-export const repairsSetSize = 5
 export const circleRadiusFactor = 5
 const secondsForFullCircle = 2935 // 48 * 60 + 55
 export const degreesPerSecond = degreesFullCircle / secondsForFullCircle
@@ -132,48 +112,6 @@ export const initMultiDropdownNavbar = (id: string): void => {
     })
 }
 
-const cleanNumber = (i: string): string => i.replace(/[^\d-.?]/g, "")
-
-const compareNumber = (a: string, b: string): number => {
-    let aa = Number.parseFloat(a)
-    let bb = Number.parseFloat(b)
-
-    aa = Number.isNaN(aa) ? 0 : aa
-    bb = Number.isNaN(bb) ? 0 : bb
-
-    return aa - bb
-}
-
-export const initTablesort = (): void => {
-    Tablesort.extend(
-        "number",
-        (item: string) =>
-            /^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/.exec(item) ?? // Prefixed currency
-            /^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/.exec(item) ?? // Suffixed currency
-            /^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/.exec(item), // Number
-        (a: string, b: string) => {
-            const aa = cleanNumber(a)
-            const bb = cleanNumber(b)
-
-            return compareNumber(bb, aa)
-        }
-    )
-}
-
-export type HtmlString = string
-export interface BaseModal {
-    id: HtmlString
-    title: HtmlString
-    size?: string
-}
-export interface BaseModalPure extends BaseModal {
-    buttonText?: HtmlString
-}
-export interface BaseModalHtml extends BaseModal {
-    body: () => TemplateResult
-    footer: () => TemplateResult
-}
-
 /**
  * Insert bootstrap modal
  * @param id - Modal id
@@ -209,61 +147,5 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
         .attr("class", "btn btn-secondary")
         .attr("data-dismiss", "modal")
 }
-
-/**
- * Insert bootstrap modal with html-lit
- * @param id - Modal id
- * @param title - Modal title
- * @param size - Modal size, "xl" (default)
- * @param body - Body content
- * @param footer - Footer content
- */
-export const insertBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }: BaseModalHtml): TemplateResult => {
-    return html`
-        <div id="${id}" class="modal" tabindex="-1" role="dialog" aria-labelledby="title-${id}" aria-hidden="true">
-            <div class="modal-dialog ${size}" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 id="title-${id}" class="modal-title">
-                            ${title}
-                        </h5>
-                    </div>
-                    <div class="modal-body">${body()}</div>
-                    <div class="modal-footer">
-                        ${footer()}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `
-}
-
-/**
- * Get formatted currency string
- */
-export const getCurrencyAmount = (amount: number | string): string =>
-    `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`
-
-/**
- * Lower or upper bound coordinates
- */
-export type Bound = [number, number]
-
-export const getContrastColour = (colour: string): string => {
-    const { r, g, b } = d3Rgb(colour)
-    const yiq = (r * 299 + g * 587 + b * 114) / 1000
-
-    return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
-}
-
-const importedFlag = " (i)"
-export const isImported = (name: string): boolean => name.includes(importedFlag)
-export const stripShipName = (name: string): string => name.replace(importedFlag, "")
-
-export const beautifyShipName = (name: string): HtmlString =>
-    stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "")
-
-export const beautifyShipNameHTML = (name: string): TemplateResult =>
-    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small">imported</span>` : html``}`
 
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`

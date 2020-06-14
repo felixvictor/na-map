@@ -1,7 +1,6 @@
 import * as d3Selection from "d3-selection"
 import { ValuesType } from "utility-types"
 import { ShipGunDeck } from "../../../common/gen-json"
-import { formatIntTrunc } from "../../../common/common-format";
 
 export interface ShipDisplayData {
     [index: string]: ValuesType<ShipDisplayData>
@@ -64,8 +63,8 @@ export interface DragData {
     initY: number
     initRotate: number
     rotate: number
-    compassText: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, any>
-    this: d3Selection.Selection<SVGGElement, DragData, HTMLElement, any>
+    compassText: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, unknown>
+    this: d3Selection.Selection<SVGGElement, DragData, HTMLElement, unknown>
     correctionValueDegrees: number
     compassTextX: number
     compassTextY: number
