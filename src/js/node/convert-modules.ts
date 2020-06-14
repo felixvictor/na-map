@@ -285,12 +285,10 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 return true
             }
 
-            console.log(" ** 1", apiModifierName, modifiers.get(apiModifierName), modifiers.get(apiModifierName) !== "")
             return modifiers.get(apiModifierName) !== ""
         }).map((modifier) => {
             const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
             const modifierName = modifiers.get(apiModifierName) ?? ""
-            console.log(" ** 2", apiModifierName, modifiers.get(apiModifierName), modifiers.get(apiModifierName) !== "")
 
             let amount = modifier.Percentage
             let isPercentage = true
