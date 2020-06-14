@@ -31,7 +31,7 @@ const path = require("path")
 const glob = require("glob")
 const webpack = require("webpack")
 
-// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const CopyPlugin = require("copy-webpack-plugin")
 const FaviconsPlugin = require("favicons-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
@@ -133,12 +133,10 @@ const babelOpt = {
             "@babel/preset-env",
             {
                 // debug: true,
-                corejs: { version: 3, proposals: true },
+                corejs: { version: 3 },
                 modules: false,
                 shippedProposals: true,
-                targets: {
-                    browsers: PACKAGE.browserslist,
-                },
+                targets: PACKAGE.browserslist,
                 useBuiltIns: "usage",
             },
         ],
@@ -314,7 +312,7 @@ const config = {
 
     devtool: false,
 
-    entry: [path.resolve(dirJsSrc, "browser/main.ts")],
+    entry: [path.resolve(dirJsSrc, "browser/main.ts"), path.resolve(dirJsSrc, "browser/map-tools")],
 
     externals: {
         jquery: "jQuery",
@@ -341,16 +339,6 @@ const config = {
     },
 
     plugins: [
-        /*
-        new BundleAnalyzerPlugin({
-            analyzerMode: isProduction ? "static" : "disabled",
-            generateStatsFile: true,
-            logLevel: "warn",
-            openAnalyzer: isProduction,
-            statsFilename: path.resolve(__dirname, "webpack-stats.json"),
-            reportFilename: path.resolve(__dirname, "report.html")
-        }),
-        */
         new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin({
             verbose: false,
@@ -394,11 +382,6 @@ const config = {
             moment: "moment",
             "window.moment": "moment",
             Popper: ["popper.js", "default"],
-        }),
-        // Do not include all moment locale files
-        new webpack.IgnorePlugin({
-            resourceRegExp: /^\.\/locale$/,
-            contextRegExp: /moment$/,
         }),
         new CopyPlugin({
             patterns: [
@@ -581,6 +564,19 @@ const config = {
 
 if (isQuiet) {
     config.stats = "errors-only"
+}
+
+if (isProduction && !isQuiet) {
+    config.plugins.push(
+        new BundleAnalyzerPlugin({
+            analyzerMode: "static",
+            generateStatsFile: true,
+            logLevel: "warn",
+            openAnalyzer: true,
+            statsFilename: path.resolve(__dirname, "webpack-stats.json"),
+            reportFilename: path.resolve(__dirname, "report.html"),
+        })
+    )
 }
 
 if (isProduction) {

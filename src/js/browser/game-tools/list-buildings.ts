@@ -17,10 +17,12 @@ import { select as d3Select } from "d3-selection"
 import "bootstrap-select/js/bootstrap-select"
 
 import { registerEvent } from "../analytics"
-import { getCurrencyAmount, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
 import { putImportError } from "../../common/common"
 import { formatInt } from "../../common/common-format"
+import { getCurrencyAmount } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
+
 import { Building, BuildingResult } from "../../common/gen-json"
 
 export default class ListBuildings {
@@ -54,7 +56,7 @@ export default class ListBuildings {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement).addEventListener("click", async (event) => {
+        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement).addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
