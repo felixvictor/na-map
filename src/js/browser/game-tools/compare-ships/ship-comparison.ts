@@ -22,23 +22,23 @@ import {
 
 import { formatFloat, formatIntTrunc, formatPercent, formatSignFloat } from "../../../common/common-format"
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math"
-import {
-    HtmlString,
-    hullRepairsVolume,
-    pluralise,
-    repairsSetSize,
-    rigRepairsVolume,
-    rumRepairsFactor,
-    segmentRadians,
-} from "../../../common/common-browser"
 import { rotationAngleInDegrees } from "../../util"
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
 
+import { segmentRadians } from "../../../common/common-browser"
+import {
+    hullRepairsVolume,
+    repairsSetSize,
+    rigRepairsVolume,
+    rumRepairsFactor,
+} from "../../../common/common-game-tools"
+
 import { ShipData } from "../../../common/gen-json"
 import { DragData, ShipDisplayData } from "./types"
+import { HtmlString } from "../../../common/interface"
 
 export class ShipComparison extends Ship {
     // Ship data of the ship to be compared to
@@ -50,10 +50,10 @@ export class ShipComparison extends Ship {
     private _minSpeedDiff!: number
     private _maxSpeedDiff!: number
     private _shipRotate!: number
-    private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, any>
-    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, any>
+    private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, unknown>
+    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, unknown>
     private _windProfile!: DragData
-    private _gWindProfile!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, any>
+    private _gWindProfile!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _arcsComp!: Array<PieArcDatum<number | { valueOf: () => number }>>
 
     constructor(compareId: string, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
@@ -189,7 +189,7 @@ export class ShipComparison extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, any>)
+            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, unknown>)
 
         const compassText = gShip
             .append("text")

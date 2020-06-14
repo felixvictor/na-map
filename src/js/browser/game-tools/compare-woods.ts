@@ -18,16 +18,15 @@ import { min as d3Min, max as d3Max } from "d3-array"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
+import { insertBaseModal } from "../../common/common-browser"
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format"
-import { HtmlString, insertBaseModal } from "../../common/common-browser"
-import * as d3Selection from "d3-selection"
 import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { simpleStringSort, sortBy } from "../../common/common-node"
-import { WoodData, WoodTrimOrFrame } from "../../common/gen-json"
-import { ArrayIndex, Index, NestedIndex } from "../../common/interface"
 
-const woodColumnType = ["Base", "C1", "C2", "C3"] as const
-export type WoodColumnType = typeof woodColumnType[number]
+import { WoodData, WoodTrimOrFrame } from "../../common/gen-json"
+import { ArrayIndex, HtmlString, Index, NestedIndex } from "../../common/interface"
+import { WoodColumnType } from "../../common/types"
+import * as d3Selection from "d3-selection"
 
 type ColumnArray<T> = {
     [K in WoodColumnType]: T[]
@@ -435,7 +434,7 @@ export default class CompareWoods {
 
     _setupListener(): void {
         let firstClick = true
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()

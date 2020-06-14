@@ -9,7 +9,6 @@
  */
 
 import { formatLocale as d3FormatLocale } from "d3-format"
-import { html, TemplateResult } from "lit-html"
 
 /**
  * Specification of locale to use when creating a new FormatLocaleObject
@@ -53,7 +52,7 @@ interface FormatLocaleDefinition {
 /**
  * Default format
  */
-const formatLocale = d3FormatLocale({
+export const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u2009",
     grouping: [3],
@@ -96,29 +95,6 @@ export const formatFloatFixed = (x: number, f = 2): string =>
         .format(`.${f}f`)(x)
         .replace(".00", '<span class="hidden">.00</span>')
         .replace(/\.(\d)0/g, '.$1<span class="hidden">0</span>')
-
-/**
- * Format float for lit-html
- * @param   x - Float
- * @param   f - digits following decimal point
- * @returns Formatted float
- */
-export const formatFloatFixedHTML = (x: number, f = 2): TemplateResult => {
-    const [number, decimals] = formatLocale.format(`.${f}f`)(x).split(".")
-    let formattedFloat: TemplateResult = html`${decimals}`
-
-    if (decimals) {
-        if (decimals === "0" || decimals === "00") {
-            formattedFloat = html`<span class="hidden">.${decimals}</span>`
-        } else if (decimals.endsWith("0")) {
-            formattedFloat = html`.${decimals.replace("0", "")}<span class="hidden">0</span>`
-        } else {
-            formattedFloat = html`.${decimals}`
-        }
-    }
-
-    return html`${number}${formattedFloat}`
-}
 
 /**
  * Format ShowF11 coordinate

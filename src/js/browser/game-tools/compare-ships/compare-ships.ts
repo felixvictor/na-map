@@ -28,28 +28,29 @@ import {
     colourGreenDark,
     colourRedDark,
     colourWhite,
-    hashids,
-    HtmlString,
-    hullRepairsPercent,
     insertBaseModal,
+} from "../../../common/common-browser"
+import { isEmpty, putImportError, woodType } from "../../../common/common"
+import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
+import {
+    hashids,
+    hullRepairsPercent,
     isImported,
     repairTime,
     rigRepairsPercent,
     stripShipName,
-} from "../../../common/common-browser"
-import { isEmpty, putImportError, woodType } from "../../../common/common"
-import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
-import { ArrayIndex, Index, NestedIndex } from "../../../common/interface"
+} from "../../../common/common-game-tools"
+import { ArrayIndex, HtmlString, Index, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
-import CompareWoods, { WoodColumnType } from "../compare-woods"
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
+import { WoodColumnType } from "../../../common/types"
 
+import CompareWoods from "../compare-woods"
 import { ShipBase } from "./ship-base"
 import { ShipComparison } from "./ship-comparison"
-
-import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -300,7 +301,7 @@ export class CompareShips {
                 { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true },
             ],
             ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
-            ["Armour repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
+            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
             [
                 "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true },
@@ -325,18 +326,14 @@ export class CompareShips {
                 },
             ],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
-            ["Rudder repair time", { properties: ["repairTime.rudder"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
-            ["Sail repair amount", { properties: ["repairAmount.sails"], isBaseValueAbsolute: true }],
-            ["Sail repair time", { properties: ["repairTime.sails"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
             ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Side armour repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
+            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
             ["Speed decrease", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
-            ["Water repair time", { properties: ["repairTime.pump"], isBaseValueAbsolute: true }],
         ])
 
         this._moduleAndWoodCaps = new Map<string, PropertyWithCap>([

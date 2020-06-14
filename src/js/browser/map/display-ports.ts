@@ -19,8 +19,8 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
-import * as d3Zoom from "d3-zoom"
-import { html, render, TemplateResult } from "lit-html"
+import { h, render } from "preact"
+import htm from "htm"
 
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
@@ -37,23 +37,15 @@ import {
     NationShortNameAlternative,
     putImportError,
 } from "../../common/common"
-import {
-    Bound,
-    colourGreenDark,
-    colourList,
-    colourOrange,
-    colourRedDark,
-    colourWhite,
-    HtmlString,
-} from "../../common/common-browser"
+import { colourGreenDark, colourList, colourOrange, colourRedDark, colourWhite } from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import {
     Coordinate,
     defaultCircleSize,
     defaultFontSize,
+    degreesHalfCircle,
     degreesToRadians,
     distancePoints,
-    getDistance,
     Point,
     roundToThousands,
 } from "../../common/common-math"
@@ -69,16 +61,19 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "../../common/gen-json"
-import { DivDatum, SVGGDatum } from "../../common/interface"
+import { Bound, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
-import ShowF11 from "../map-tools/show-f11"
+import ShowF11 from "./show-f11"
 import { simpleStringSort } from "../../common/common-node"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
+dayjs.locale("en-gb")
+
+const html = htm.bind(h)
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -102,11 +97,11 @@ interface PortForDisplay {
     county: string
     countyCapital: boolean
     capital: boolean
-    capturer: TemplateResult
+    capturer: HtmlResult
     captureTime: string
     lastPortBattle: string
-    attack: TemplateResult
-    pbTimeRange: TemplateResult
+    attack: HtmlResult
+    pbTimeRange: HtmlResult
     brLimit: string
     portPoints: string
     taxIncome: string
@@ -443,7 +438,7 @@ export default class DisplayPorts {
     }
 
     _setupSvg(): void {
-        this._gPort = d3Select<SVGGElement, SVGGDatum>("#na-svg")
+        this._gPort = d3Select<SVGGElement, SVGGDatum>("#map")
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
@@ -719,25 +714,26 @@ export default class DisplayPorts {
     }
 
     _getText(portProperties: PortWithTrades): PortForDisplay {
+        /*
         const getCoord = (portId: number): Coordinate => {
             const port = this.portDataDefault.find((port) => port.id === portId)!
             return { x: port.coordinates[0], y: port.coordinates[1] }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const getKDistance = (fromPortId: number, toPortId: number): number => {
             const fromPortCoord = getCoord(fromPortId)
             const toPortCoord = getCoord(toPortId)
             return getDistance(fromPortCoord, toPortCoord)
         }
+        */
 
-        const displayClanLitHtml = (clan: string): TemplateResult => html`<span class="caps">${clan}</span>`
+        const displayClanLitHtml = (clan: string): HtmlResult => html`<span class="caps">${clan}</span>`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const formatFromToTime = (from: number, to: number): HtmlString =>
             `${String(from)}\u2009\u2012\u2009${String(to)}`
 
-        const formatTime = (from: number, to: number): TemplateResult => {
+        const formatTime = (from: number, to: number): HtmlResult => {
             const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
             const toLocal = Number(dayjs.utc().hour(to).local().format("H"))
             return html`${formatFromToTime(from, to)} (${formatFromToTime(fromLocal, toLocal)})`
@@ -818,7 +814,7 @@ export default class DisplayPorts {
         return port
     }
 
-    _tooltipData(port: PortForDisplay): TemplateResult {
+    _tooltipData(port: PortForDisplay): HtmlResult {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
@@ -856,9 +852,9 @@ export default class DisplayPorts {
                 </div>
             </div>
 
-            ${port.attack.values.length > 0
-                ? html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`
-                : html``}
+            ${port.attack === undefined
+                ? html``
+                : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
 
             <div class="d-flex text-left mb-2">
                 ${port.capital
@@ -1114,7 +1110,7 @@ export default class DisplayPorts {
             this.zoomLevel === "pbZone" &&
             (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
         ) {
-            return d.textAnchor
+            return d.angle > 0 && d.angle < degreesHalfCircle ? "start" : "end"
         }
 
         return "middle"
@@ -1290,10 +1286,6 @@ export default class DisplayPorts {
         this.showRadius = showRadius
         this._radios.set(this.showRadius)
         this._cookie.set(this.showRadius)
-    }
-
-    transform(transform: d3Zoom.ZoomTransform): void {
-        this._gPort.attr("transform", transform.toString())
     }
 
     clearMap(scale?: number): void {
