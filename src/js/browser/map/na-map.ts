@@ -17,10 +17,11 @@ import * as d3Selection from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import { registerEvent } from "../analytics"
-import { appDescription, appTitle, appVersion, Bound, insertBaseModal } from "../../common/common-browser"
+import { appDescription, appTitle, appVersion, insertBaseModal } from "../../common/common-browser"
 import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
-import { MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 import { displayClan } from "../util"
+
+import { Bound, MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"

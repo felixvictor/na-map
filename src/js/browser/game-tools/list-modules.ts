@@ -17,13 +17,14 @@ import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { HtmlString, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
 import { formatPP, formatSignInt, formatSignPercent } from "../../common/common-format"
 import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
 import { chunkify } from "../util"
 
 import { Module } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 export default class ListModules {
     private readonly _baseName: string
@@ -122,9 +123,9 @@ export default class ListModules {
          * Rate code mapped into human readable string
          */
         const rates = new Map<string, string>([
-            ["L", `${getOrdinal(1)}\u202F\u2013\u202f${getOrdinal(3)}`],
-            ["M", `${getOrdinal(4)}\u202F\u2013\u202f${getOrdinal(5)}`],
-            ["S", `${getOrdinal(6)}\u202F\u2013\u202f${getOrdinal(7)}`],
+            ["L", `${getOrdinal(1)}\u202F\u2013\u202F${getOrdinal(3)}`],
+            ["M", `${getOrdinal(4)}\u202F\u2013\u202F${getOrdinal(5)}`],
+            ["S", `${getOrdinal(6)}\u202F\u2013\u202F${getOrdinal(7)}`],
         ])
 
         /**
@@ -165,9 +166,7 @@ export default class ListModules {
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td><span class="name">${
-                                module.name
-                            }<br>${rate}</span></td><td>${module.properties
+                            `<tr><td><span class="name">${module.name}<br>${rate}</span></td><td>${module.properties
                                 .map((property) => {
                                     let amount
                                     if (property.isPercentage) {

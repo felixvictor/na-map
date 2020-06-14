@@ -18,12 +18,13 @@ import Tablesort from "tablesort"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
-import { HtmlString, initTablesort, insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal } from "../../common/common-browser"
 import { formatInt } from "../../common/common-format"
-import { beautifyShipNameHTML, formatFloatFixedHTML, HtmlResult } from "../../common/common-game-tools"
-
+import { beautifyShipNameHTML, formatFloatFixedHTML, initTablesort } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
+
 import { ShipData } from "../../common/gen-json"
+import { HtmlResult, HtmlString } from "../../common/interface"
 import * as d3Selection from "d3-selection"
 
 const html = htm.bind(h)
@@ -197,7 +198,6 @@ export default class ShipList {
 
         const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
         // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const sortTable = new Tablesort(table)
+        void new Tablesort(table)
     }
 }

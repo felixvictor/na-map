@@ -26,7 +26,7 @@ dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
 import { Nation, nations, NationShortName, putImportError, validNationShortName } from "../../common/common"
-import { HtmlString, initMultiDropdownNavbar } from "../../common/common-browser";
+import { initMultiDropdownNavbar } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
 import { simpleStringSort, sortBy } from "../../common/common-node"
@@ -42,6 +42,8 @@ import {
     TradeGoodProfit,
     TradeProfit,
 } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
+
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"
 import DisplayPbZones from "./display-pb-zones"

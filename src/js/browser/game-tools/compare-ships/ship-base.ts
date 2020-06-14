@@ -23,19 +23,19 @@ import { event as d3Event } from "d3-selection"
 import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util"
 import * as d3Drag from "d3-drag"
 import { isEmpty } from "../../../common/common"
-import {
-    hullRepairsVolume,
-    pluralise,
-    repairsSetSize,
-    rigRepairsVolume,
-    rumRepairsFactor,
-    segmentRadians,
-} from "../../../common/common-browser"
+import { pluralise, segmentRadians } from "../../../common/common-browser"
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
 import { ShipComparison } from "./ship-comparison"
+
+import {
+    hullRepairsVolume,
+    repairsSetSize,
+    rigRepairsVolume,
+    rumRepairsFactor,
+} from "../../../common/common-game-tools"
 
 import { ShipData } from "../../../common/gen-json"
 import { DragData, ShipDisplayData } from "./types"
@@ -47,8 +47,8 @@ export class ShipBase extends Ship {
     readonly shipData: ShipData
     private _speedScale!: ScaleLinear<number, number>
     private _shipRotate!: number
-    private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, any>
-    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, any>
+    private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, unknown>
+    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, unknown>
 
     /**
      * @param id - Ship id
@@ -231,7 +231,7 @@ export class ShipBase extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, any>)
+            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, unknown>)
 
         const compassText = gShip
             .append("text")
@@ -295,7 +295,7 @@ export class ShipBase extends Ship {
 
             .attr("class", "wind-profile-arrow")
             .attr("marker-end", "url(#wind-profile-arrow-head)")
-            .call(this._drag as d3Drag.DragBehavior<SVGPathElement, DragData, any>)
+            .call(this._drag as d3Drag.DragBehavior<SVGPathElement, DragData, unknown>)
 
         gWindProfile
             .append("circle")
