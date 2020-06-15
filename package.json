@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "10.3.0",
+    "version": "10.3.1",
     "private": true,
     "description": "Naval Action map",
     "license": "ISC",
@@ -32,7 +32,7 @@
         "main:develop-test": "                run-s build:load build:js 'build:data:* full-client'          build:deploy-test",
         "main:develop-test2": "               run-s build:load build:js 'build:data:* full-client'          build:deploy-test2",
         "main:development": "                 run-s build:load build:js 'build:data:* full-client'          build:deploy-main",
-        "main:maintenance": "yarn --silent && run-s build:load          'build:data:* full-server'          build:deploy-main",
+        "main:maintenance": "yarn --silent && run-s build:load          'build:data:* full-server'          build:deploy-main-quiet",
         "pre-build:distances": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances.mjs",
         "pre-build:distances-cut": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-cut.mjs",
         "pre-build:distances-test": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-test.mjs",
@@ -45,8 +45,8 @@
         "pre-build:tiles:1:pre": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/",
         "pre-build:tiles:2:build": "yarn node --experimental-specifier-resolution=node dist/js/node/make-tiles.mjs src/images/map.tif",
         "pre-build:tiles:3:post": "rm src/images/map.tif",
-        "prod": "webpack --env.production --mode=production --colors --config webpack.config.js",
-        "prod-quiet": "QUIET=true webpack --env.production --mode=production --config webpack.config.js",
+        "prod": "                 webpack --env.production --mode=production --colors --config webpack.config.js",
+        "prod-quiet": "QUIET=true webpack --env.production --mode=production          --config webpack.config.js",
         "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.js",
         "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.js"
     },
