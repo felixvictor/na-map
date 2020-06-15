@@ -194,7 +194,7 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness", "bow.thickness", "stern.thickness"],
-                    cap: { amount: 0.4, isPercentage: true },
+                    cap: { amount: 0.5, isPercentage: true },
                 },
             ],
             [
@@ -636,17 +636,23 @@ export class CompareShips {
         shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId);
         return shipDataUpdated;
     }
+    _roundPropertyValue(baseValue, value) {
+        if (Number.isInteger(baseValue)) {
+            return Math.round(value);
+        }
+        return Math.trunc(value * 100) / 100;
+    }
     _adjustValue(value, key, isBaseValueAbsolute) {
         let adjustedValue = value;
-        if (this._modifierAmount.get(key)?.absolute) {
-            const { absolute } = this._modifierAmount.get(key);
-            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
-        }
         if (this._modifierAmount.get(key)?.percentage) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
             adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute);
         }
-        return Math.trunc(adjustedValue * 100) / 100;
+        if (this._modifierAmount.get(key)?.absolute) {
+            const { absolute } = this._modifierAmount.get(key);
+            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
+        }
+        return this._roundPropertyValue(value, adjustedValue);
     }
     _setModifier(property) {
         let absolute = property.isPercentage ? 0 : property.amount;
@@ -722,9 +728,9 @@ export class CompareShips {
         };
         const adjustDataByCaps = () => {
             const valueCapped = { isCapped: false, modifiers: new Set() };
-            const adjustValue = (modifier, uncappedValue, baseValue, { amount: capAmount, isPercentage }) => {
-                const valueRespectingCap = Math.min(uncappedValue, isPercentage ? baseValue * (1 + capAmount) : capAmount);
-                if (uncappedValue !== valueRespectingCap) {
+            const adjustValue = (modifier, valueUncapped, valueBase, { amount: capAmount, isPercentage }) => {
+                const valueRespectingCap = Math.min(valueUncapped, isPercentage ? this._roundPropertyValue(valueBase, valueBase * (1 + capAmount)) : capAmount);
+                if (valueUncapped > valueRespectingCap) {
                     valueCapped.isCapped = true;
                     valueCapped.modifiers.add(modifier);
                 }
@@ -762,7 +768,9 @@ export class CompareShips {
         };
         this._modifierAmount = new Map();
         setModifierAmounts();
+        console.log(this._modifierAmount.get("Armor thickness"));
         adjustDataByModifiers();
+        console.log(data.sides.thickness);
         adjustDataByCaps();
         if (this._modifierAmount.has("Max speed")) {
             setSpeedDegrees();
