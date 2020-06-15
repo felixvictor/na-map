@@ -341,7 +341,7 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness", "bow.thickness", "stern.thickness"],
-                    cap: { amount: 0.4, isPercentage: true },
+                    cap: { amount: 0.5, isPercentage: true },
                 },
             ],
             [
@@ -975,20 +975,28 @@ export class CompareShips {
         return shipDataUpdated
     }
 
+    _roundPropertyValue(baseValue: number, value: number): number {
+        if (Number.isInteger(baseValue)) {
+            return Math.round(value)
+        }
+
+        return Math.trunc(value * 100) / 100
+    }
+
     _adjustValue(value: number, key: string, isBaseValueAbsolute: boolean): number {
         let adjustedValue = value
-
-        if (this._modifierAmount.get(key)?.absolute) {
-            const { absolute } = this._modifierAmount.get(key)!
-            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute)
-        }
 
         if (this._modifierAmount.get(key)?.percentage) {
             const percentage = this._modifierAmount.get(key)!.percentage / 100
             adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute)
         }
 
-        return Math.trunc(adjustedValue * 100) / 100
+        if (this._modifierAmount.get(key)?.absolute) {
+            const { absolute } = this._modifierAmount.get(key)!
+            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute)
+        }
+
+        return this._roundPropertyValue(value, adjustedValue)
     }
 
     _setModifier(property: ModulePropertiesEntity): void {
@@ -1096,15 +1104,15 @@ export class CompareShips {
 
             const adjustValue = (
                 modifier: string,
-                uncappedValue: number,
-                baseValue: number,
+                valueUncapped: number,
+                valueBase: number,
                 { amount: capAmount, isPercentage }: Amount
             ): number => {
                 const valueRespectingCap = Math.min(
-                    uncappedValue,
-                    isPercentage ? baseValue * (1 + capAmount) : capAmount
+                    valueUncapped,
+                    isPercentage ? this._roundPropertyValue(valueBase, valueBase * (1 + capAmount)) : capAmount
                 )
-                if (uncappedValue !== valueRespectingCap) {
+                if (valueUncapped > valueRespectingCap) {
                     valueCapped.isCapped = true
                     valueCapped.modifiers.add(modifier)
                 }
@@ -1152,7 +1160,9 @@ export class CompareShips {
 
         this._modifierAmount = new Map()
         setModifierAmounts()
+        console.log(this._modifierAmount.get("Armor thickness"))
         adjustDataByModifiers()
+        console.log(data.sides.thickness)
         adjustDataByCaps()
         if (this._modifierAmount.has("Max speed")) {
             setSpeedDegrees()
