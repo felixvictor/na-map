@@ -18,7 +18,6 @@ import { serverNames } from "../common/common-var";
 import { isEmpty } from "../common/common";
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
-const plankingRatio = 0.13;
 const crewSpaceRatio = 0.025;
 const shipNames = new Map([
     ["agamemnon", { id: 694, master: [] }],
@@ -426,7 +425,6 @@ const convertShipBlueprints = async () => {
             name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
             wood: [
                 { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
-                { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
                 { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
             ],
             resources: apiBlueprint.FullRequirements.filter((requirement) => !((itemNames.get(requirement.Template)?.endsWith(" Permit") ??
@@ -436,7 +434,7 @@ const convertShipBlueprints = async () => {
                 amount: requirement.Amount,
             })),
             provisions: (apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Provisions") ?? {}).Amount ?? 0,
-            doubloons: (apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template) === "Doubloons") ?? {}).Amount ?? 0,
+            price: apiBlueprint.GoldRequirements,
             permit: (apiBlueprint.FullRequirements.find((requirement) => itemNames.get(requirement.Template)?.endsWith(" Permit")) ?? {}).Amount ?? 0,
             ship: {
                 id: apiBlueprint.Results[0].Template,
