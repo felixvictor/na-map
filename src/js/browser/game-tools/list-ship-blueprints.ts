@@ -320,8 +320,8 @@ export default class ListShipBlueprints {
          */
         let extraResources = [] as ItemNeeded[]
 
-        if (this._currentBlueprint.doubloons) {
-            extraResources.push(["Doubloons", this._currentBlueprint.doubloons])
+        if (this._currentBlueprint.price) {
+            extraResources.push(["Reals", this._currentBlueprint.price])
         }
 
         extraResources.push(["Provisions", this._currentBlueprint.provisions])
