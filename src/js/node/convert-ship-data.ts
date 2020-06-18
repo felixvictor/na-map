@@ -20,11 +20,9 @@ import { cleanName, sortBy } from "../common/common-node"
 import { serverNames } from "../common/common-var"
 
 import { APIItemGeneric, APIShip, APIShipBlueprint, Limit, Specs } from "./api-item"
-import { Cannon, ShipBroadside, ShipData, ShipGunDeck, ShipGuns, ShipGunWeight } from "../common/gen-json"
+import { Cannon, ShipBlueprint, ShipData, ShipGunDeck, ShipGuns } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
 import { isEmpty } from "../common/common"
-import * as webpack from "webpack"
-import normalModuleFactory = webpack.compilation.normalModuleFactory
 
 type ElementMap = Map<string, { [key: string]: string; group: string; element: string }>
 interface SubFileStructure {
@@ -41,11 +39,6 @@ const middleMastThicknessRatio = 0.75
  * Ratio of bottom mast thickness
  */
 const topMastThicknessRatio = 0.5
-
-/**
- * Logs needed for planking as a ratio of ship mass
- */
-const plankingRatio = 0.13
 
 /**
  * Hemp needed for crew space trim as a ratio of ship mass
@@ -590,7 +583,6 @@ const convertShipBlueprints = async (): Promise<void> => {
                 name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
                 wood: [
                     { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
-                    { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
                     { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
                 ],
                 resources: apiBlueprint.FullRequirements.filter(
@@ -610,12 +602,7 @@ const convertShipBlueprints = async (): Promise<void> => {
                             (requirement) => itemNames.get(requirement.Template) === "Provisions"
                         ) ?? {}
                     ).Amount ?? 0,
-                doubloons:
-                    (
-                        apiBlueprint.FullRequirements.find(
-                            (requirement) => itemNames.get(requirement.Template) === "Doubloons"
-                        ) ?? {}
-                    ).Amount ?? 0,
+                price: apiBlueprint.GoldRequirements,
                 permit:
                     (
                         apiBlueprint.FullRequirements.find((requirement) =>
@@ -631,7 +618,7 @@ const convertShipBlueprints = async (): Promise<void> => {
                 craftLevel: apiBlueprint.RequiresLevel,
                 craftXP: apiBlueprint.GivesXP,
                 labourHours: apiBlueprint.LaborPrice,
-            }
+            } as ShipBlueprint
         })
         // Sort by id
         .sort(sortBy(["id"]))
