@@ -27,6 +27,18 @@ import {
 
 let apiItems: APIItemGeneric[]
 
+// noinspection SpellCheckingInspection
+const woodsNotUsed = new Set([
+    2358, // Danzic Fir Frame
+    2363, // Moulmein Teak Frame
+    2367, // Virginia Pine Frame
+    2368, // African Oak Planking
+    2370, // Danzic Fir Planking
+    2372, // Greenheart Planking
+    2375, // Moulmein Teak Planking
+    2379, // Virginia Pine Planking
+])
+
 /**
  * Convert API module data
  */
@@ -69,13 +81,17 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour hit points"],
         ["CREW MODULE_BASE_HP", "Crew"],
         ["INTERNAL_STRUCTURE MODULE_BASE_HP", "Hull hit points"],
+        ["INTERNAL_STRUCTURE REPAIR_MODULE_TIME", "Repair time"],
+        ["MAST MAST_BOTTOM_SECTION_HP", "Mast hit points"],
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
         ["NONE SHIP_MATERIAL", "Ship material"],
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
+        ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acc rate"],
         ["NONE SHIP_TURNING_SPEED", "Turn rate"],
+        ["REPAIR_ARMOR REPAIR_PERCENT", "Repair amount"],
         ["SAIL MAST_THICKNESS", "Mast thickness"],
         ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
         ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
@@ -193,8 +209,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE WATER_PUMP_BAILING", "Water pump bailing"],
         ["POWDER POWDER_RADIUS", "Explosion power"],
         ["POWDER REPAIR_MODULE_TIME", ""],
-        ["REPAIR_ARMOR REPAIR_PERCENT", ""],
-        ["REPAIR_GENERIC REPAIR_PERCENT", "Repair amount"],
+        ["REPAIR_GENERIC REPAIR_PERCENT", ""],
         ["REPAIR_SAIL REPAIR_PERCENT", ""],
         ["RUDDER MODULE_BASE_HP", "Rudder hitpoints"],
         ["RUDDER REPAIR_MODULE_TIME", ""],
@@ -379,11 +394,13 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         return `${type}${sortingGroup}${permanentType}`
     }
 
-    const apiModules = apiItems.filter(
-        (item) =>
-            item.ItemType === "Module" &&
-            ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
-    ) as APIModule[]
+    const apiModules = apiItems
+        .filter(
+            (item) =>
+                item.ItemType === "Module" &&
+                ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
+        )
+        .filter((item) => !woodsNotUsed.has(item.Id)) as APIModule[]
     apiModules.forEach((apiModule) => {
         let dontSave = false
         const module = {
