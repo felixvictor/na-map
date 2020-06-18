@@ -267,7 +267,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 }
 
                 if (modifierName === "Splinter resistance") {
-                    amount *= 100
+                    amount = Math.round(amount * 100)
                     isPercentage = true
                 }
 
