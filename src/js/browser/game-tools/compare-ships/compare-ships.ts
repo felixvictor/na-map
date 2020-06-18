@@ -1160,9 +1160,7 @@ export class CompareShips {
 
         this._modifierAmount = new Map()
         setModifierAmounts()
-        console.log(this._modifierAmount.get("Armor thickness"))
         adjustDataByModifiers()
-        console.log(data.sides.thickness)
         adjustDataByCaps()
         if (this._modifierAmount.has("Max speed")) {
             setSpeedDegrees()
