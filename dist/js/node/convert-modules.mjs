@@ -226,7 +226,7 @@ export const convertModulesAndWoodData = async () => {
                     amount *= -1;
                 }
                 if (modifierName === "Splinter resistance") {
-                    amount *= 100;
+                    amount = Math.round(amount * 100);
                     isPercentage = true;
                 }
                 wood.properties.push({
