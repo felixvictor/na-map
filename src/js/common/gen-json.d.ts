@@ -448,7 +448,7 @@ export interface ShipBlueprint {
     wood: ShipBlueprintResource[]
     resources: ShipBlueprintResource[]
     provisions: number
-    doubloons: number
+    price: number
     permit: number
     ship: ShipBlueprintShip
     shipyardLevel: number
