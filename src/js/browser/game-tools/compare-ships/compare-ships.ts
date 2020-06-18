@@ -341,32 +341,32 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness", "bow.thickness", "stern.thickness"],
-                    cap: { amount: 0.5, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
             [
                 "Armour hit points",
                 {
                     properties: ["bow.armour", "sides.armour", "stern.armour"],
-                    cap: { amount: 0.4, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
-            ["Structure hit points", { properties: ["structure.armour"], cap: { amount: 0.4, isPercentage: true } }],
+            ["Structure hit points", { properties: ["structure.armour"], cap: { amount: 1, isPercentage: true } }],
             [
                 "Mast health",
                 {
                     properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"],
-                    cap: { amount: 0.3, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
             [
                 "Mast thickness",
                 {
                     properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
-                    cap: { amount: 0.3, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
-            ["Max speed", { properties: ["speed.max"], cap: { amount: 16, isPercentage: false } }],
+            ["Max speed", { properties: ["speed.max"], cap: { amount: 20.9, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
         ])
 
