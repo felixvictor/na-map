@@ -19,6 +19,7 @@ import htm from "htm"
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
+import { formatPP } from "../../common/common-format"
 import { formatFloatFixedHTML, initTablesort } from "../../common/common-game-tools"
 import { simpleStringSort } from "../../common/common-node"
 
@@ -145,12 +146,18 @@ export default class ListWoods {
                                 <td>${wood.name}</td>
 
                                 ${modifiers.map((modifier) => {
-                                    const amount = wood.properties
-                                        .filter((property) => property.modifier === modifier)
-                                        .map((property) => property.amount)[0]
+                                    const amount =
+                                        wood.properties.find((property) => property.modifier === modifier)?.amount ?? 0
 
-                                    return html` <td class="text-right" data-sort="${amount ?? 0}">
-                                        ${amount ? formatFloatFixedHTML(amount) : ""}
+                                    let formattedAmount
+                                    if (modifier === "Repair amount" && amount) {
+                                        formattedAmount = formatPP(amount)
+                                    } else {
+                                        formattedAmount = amount ? formatFloatFixedHTML(amount) : ""
+                                    }
+
+                                    return html`<td class="text-right" data-sort="${amount ?? 0}">
+                                        ${formattedAmount}
                                     </td>`
                                 })}
                             </tr>
