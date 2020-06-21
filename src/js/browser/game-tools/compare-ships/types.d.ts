@@ -40,12 +40,10 @@ export interface ShipDisplayData {
     maxWeight: string
     minCrew: string
     minSpeed?: string
-    pump: string
     repairTime: string
     rigRepairAmount: string
     rigRepairsNeeded: string
     rollAngle: string
-    rudder: string
     rumRepairsNeeded: string
     sailingCrew: string
     sails: string
