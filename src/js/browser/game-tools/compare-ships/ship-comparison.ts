@@ -377,6 +377,15 @@ export class ShipComparison extends Ship {
                 this._shipBaseData.ship.deceleration,
                 2
             )}`,
+            rollAngle: `${formatIntTrunc(this.shipCompareData.ship.rollAngle)}\u00A0${getDiff(
+                this._shipBaseData.ship.rollAngle,
+                this.shipCompareData.ship.rollAngle
+            )}`,
+            turnAcceleration: `${formatFloat(this.shipCompareData.ship.turnAcceleration)}\u00A0${getDiff(
+                this._shipBaseData.ship.turnAcceleration,
+                this.shipCompareData.ship.turnAcceleration,
+                2
+            )}`,
             decks: `${this.shipCompareData.guns.decks}\u00A0${getDiff(
                 this.shipCompareData.guns.decks,
                 this._shipBaseData.guns.decks
@@ -405,8 +414,8 @@ export class ShipComparison extends Ship {
             gunsBack: this.shipCompareData.guns.gunsPerDeck[5].amount,
             gunsFront: this.shipCompareData.guns.gunsPerDeck[4].amount,
             halfturnTime: `${formatFloat(this.shipCompareData.rudder.halfturnTime, 4)}\u00A0${getDiff(
-                this.shipCompareData.rudder.halfturnTime,
                 this._shipBaseData.rudder.halfturnTime,
+                this.shipCompareData.rudder.halfturnTime,
                 2
             )}`,
             holdSize: `${formatIntTrunc(this.shipCompareData.holdSize)}\u00A0${getDiff(

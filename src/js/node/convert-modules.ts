@@ -89,7 +89,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE SHIP_MATERIAL", "Ship material"],
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
-        ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acc rate"],
+        ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acceleration"],
         ["NONE SHIP_TURNING_SPEED", "Turn rate"],
         ["REPAIR_ARMOR REPAIR_PERCENT", "Repair amount"],
         ["SAIL MAST_THICKNESS", "Mast thickness"],

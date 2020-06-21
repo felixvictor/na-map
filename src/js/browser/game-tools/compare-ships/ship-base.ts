@@ -408,6 +408,7 @@ export class ShipBase extends Ship {
             rigRepairsNeeded: `${formatIntTrunc(
                 rigRepairsNeeded
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(rigRepairsNeeded * repairsSetSize)}</span>`,
+            rollAngle: formatIntTrunc(this.shipData.ship.rollAngle),
             rudder: `${formatIntTrunc(
                 this.shipData.rudder.armour
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.rudder.thickness)}</span>`,
@@ -423,6 +424,7 @@ export class ShipBase extends Ship {
             splinterResistance: formatPercent(this.shipData.resistance!.splinter, 0),
             sternRepair: `${formatIntTrunc(this.shipData.repairTime.stern)}`,
             structure: formatIntTrunc(this.shipData.structure.armour),
+            turnAcceleration: formatFloat(this.shipData.ship.turnAcceleration, 4),
             upgradeXP: formatIntTrunc(this.shipData.upgradeXP),
             waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
             cannonWeight: formatIntTrunc(this.shipData.guns.weight.cannons),
