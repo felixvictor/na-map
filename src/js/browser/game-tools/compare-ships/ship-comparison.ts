@@ -444,22 +444,22 @@ export class ShipComparison extends Ship {
             )}`,
             limitBack: this.shipCompareData.guns.gunsPerDeck[5],
             limitFront: this.shipCompareData.guns.gunsPerDeck[4],
-            mastBottomArmor: `${formatIntTrunc(this.shipCompareData.mast.bottomArmour)}</br>${getDiff(
+            mastBottomArmor: `${formatIntTrunc(this.shipCompareData.mast.bottomArmour)} ${getDiff(
                 this.shipCompareData.mast.bottomArmour,
                 this._shipBaseData.mast.bottomArmour
-            )} <span class="badge badge-white">${formatIntTrunc(
+            )}</br><span class="badge badge-white">${formatIntTrunc(
                 this.shipCompareData.mast.bottomThickness
             )}</span>${getDiff(this.shipCompareData.mast.bottomThickness, this._shipBaseData.mast.bottomThickness)}`,
-            mastMiddleArmor: `${formatIntTrunc(this.shipCompareData.mast.middleArmour)}</br>${getDiff(
+            mastMiddleArmor: `${formatIntTrunc(this.shipCompareData.mast.middleArmour)} ${getDiff(
                 this.shipCompareData.mast.middleArmour,
                 this._shipBaseData.mast.middleArmour
-            )} <span class="badge badge-white">${formatIntTrunc(
+            )}</br><span class="badge badge-white">${formatIntTrunc(
                 this.shipCompareData.mast.middleThickness
             )}</span>${getDiff(this.shipCompareData.mast.middleThickness, this._shipBaseData.mast.middleThickness)}`,
-            mastTopArmor: `${formatIntTrunc(this.shipCompareData.mast.topArmour)}</br>${getDiff(
+            mastTopArmor: `${formatIntTrunc(this.shipCompareData.mast.topArmour)} ${getDiff(
                 this.shipCompareData.mast.topArmour,
                 this._shipBaseData.mast.topArmour
-            )} <span class="badge badge-white">${formatIntTrunc(
+            )}</br><span class="badge badge-white">${formatIntTrunc(
                 this.shipCompareData.mast.topThickness
             )}</span>${getDiff(this.shipCompareData.mast.topThickness, this._shipBaseData.mast.topThickness)}`,
             maxCrew: `${formatIntTrunc(this.shipCompareData.crew.max)}\u00A0${getDiff(
