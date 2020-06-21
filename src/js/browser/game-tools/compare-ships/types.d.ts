@@ -11,12 +11,15 @@ export interface ShipDisplayData {
     battleRating: string
     bowRepair?: string
     cannonBroadside: string
+    cannonCrew: string
+    cannonWeight: string
     cannonsPerDeck: [string, string]
     carroBroadside: string
+    carroCrew: string
+    carroWeight: string
     deceleration: string
     decks: string
     fireResistance: string
-    firezoneHorizontalWidth: string
     frontArmor: string
     guns: string
     gunsBack: number | string
@@ -35,15 +38,12 @@ export interface ShipDisplayData {
     maxSpeed: string
     maxTurningSpeed: string
     maxWeight: string
-    minSpeed?: string
     minCrew: string
-    cannonCrew: string
-    carroCrew: string
-    pump: string
+    minSpeed?: string
     repairTime: string
     rigRepairAmount: string
     rigRepairsNeeded: string
-    rudder: string
+    rollAngle: string
     rumRepairsNeeded: string
     sailingCrew: string
     sails: string
@@ -52,10 +52,9 @@ export interface ShipDisplayData {
     splinterResistance: string
     sternRepair?: string
     structure: string
+    turnAcceleration: string
     upgradeXP: string
     waterlineHeight: string
-    cannonWeight: string
-    carroWeight: string
 }
 
 export interface DragData {
