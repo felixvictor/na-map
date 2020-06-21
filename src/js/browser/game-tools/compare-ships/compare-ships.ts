@@ -125,6 +125,7 @@ export class CompareShips {
     svgWidth!: number
     windProfileRotate = 0
     woodCompare!: CompareWoods
+    #doNotRound!: Set<string>
     private _maxSpeed!: number
     private _minSpeed!: number
     private _modal$: JQuery = {} as JQuery
@@ -300,15 +301,14 @@ export class CompareShips {
                 "Armor thickness",
                 { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true },
             ],
-            ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
-            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
             [
                 "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true },
             ],
+            ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
             ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
-            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
+            ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
@@ -325,16 +325,22 @@ export class CompareShips {
                     isBaseValueAbsolute: true,
                 },
             ],
+            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
+            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
+            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
+            ["Roll angle", { properties: ["ship.rollAngle"], isBaseValueAbsolute: true }],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
+            ["Rudder turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
-            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
-            ["Speed decrease", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
-            ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
+            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
+            ["Turn acceleration", { properties: ["ship.turnAcceleration"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
         ])
+
+        // Integer values that should not be rounded when modifiers are applied
+        this.#doNotRound = new Set(["Turn acceleration"])
 
         this._moduleAndWoodCaps = new Map<string, PropertyWithCap>([
             [
@@ -975,8 +981,8 @@ export class CompareShips {
         return shipDataUpdated
     }
 
-    _roundPropertyValue(baseValue: number, value: number): number {
-        if (Number.isInteger(baseValue)) {
+    _roundPropertyValue(baseValue: number, value: number, doNotRound = false): number {
+        if (Number.isInteger(baseValue) && !doNotRound) {
             return Math.round(value)
         }
 
@@ -996,7 +1002,8 @@ export class CompareShips {
             adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute)
         }
 
-        return this._roundPropertyValue(value, adjustedValue)
+        const doNotRound = !this.#doNotRound.has(key) && !isBaseValueAbsolute
+        return this._roundPropertyValue(value, adjustedValue, doNotRound)
     }
 
     _setModifier(property: ModulePropertiesEntity): void {

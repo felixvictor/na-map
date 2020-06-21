@@ -162,13 +162,14 @@ const subFileStructure: SubFileStructure[] = [
             // ["HIT_PROBABILITY", "HIT_PROBABILITY"],
             ["SHIP_PHYSICS_ACC_COEF", { group: "ship", element: "acceleration" }],
             ["SHIP_PHYSICS_DEC_COEF", { group: "ship", element: "deceleration" }],
+            ["SHIP_MAX_ROLL_ANGLE", { group: "ship", element: "rollAngle" }],
             // ["SHIP_RHEAS_DRIFT", "SHIP_RHEAS_DRIFT"],
             // ["SHIP_SPEED_DRIFT_MODIFIER", { group: "ship", element: "speedDriftModifier" }],
             // ["SHIP_SPEED_YARD_POWER_MODIFIER", "SHIP_SPEED_YARD_POWER_MODIFIER"],
             // ["SHIP_STAYSAILS_DRIFT", { group: "ship", element: "staySailsDrift" }],
-            ["SHIP_STRUCTURE_LEAKS_PER_SECOND", { group: "ship", element: "structureLeaksPerSecond" }],
-            ["SHIP_TURNING_ACCELERATION_TIME", { group: "ship", element: "turningAcceleration" }],
-            ["SHIP_TURNING_ACCELERATION_TIME_RHEAS", { group: "ship", element: "turningYardAcceleration" }],
+            ["SHIP_STRUCTURE_LEAKS_PER_SECOND", { group: "ship", element: "structureLeaks" }],
+            ["SHIP_TURNING_ACCELERATION_TIME", { group: "ship", element: "turnAcceleration" }],
+            ["SHIP_TURNING_ACCELERATION_TIME_RHEAS", { group: "ship", element: "yardTurningAcceleration" }],
             ["SHIP_WATERLINE_HEIGHT", { group: "ship", element: "waterlineHeight" }],
         ]),
     },
@@ -353,7 +354,7 @@ const convertGenericShipData = (): ShipData[] => {
 
             addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex)
             addDeck(apiShip.BackDeckClassLimit[0], backDeckIndex)
-
+/*
             const ship = {
                 id: Number(apiShip.Id),
                 name: cleanName(apiShip.Name),
@@ -384,21 +385,22 @@ const convertGenericShipData = (): ShipData[] => {
                 pump: { armour: apiShip.HealthInfo.Pump },
                 rudder: {
                     armour: apiShip.HealthInfo.Rudder,
-                    turnSpeed: 0,
                     halfturnTime: 0,
                     thickness: 0,
+                    turnSpeed: 0,
                 },
                 upgradeXP: apiShip.OverrideTotalXpForUpgradeSlots,
-                repairTime: { stern: 120, bow: 120, sides: 120, rudder: 30, sails: 120, structure: 60 },
+                repairTime: { sides: 0 },
                 ship: {
-                    waterlineHeight: 0,
-                    firezoneHorizontalWidth: 0,
-                    structureLeaksPerSecond: 0,
-                    deceleration: 0,
                     acceleration: 0,
-                    turningAcceleration: 0,
-                    turningYardAcceleration: 0,
+                    deceleration: 0,
+                    firezoneHorizontalWidth: 0,
                     maxSpeed: 0,
+                    rollAngle: 0,
+                    structureLeaks: 0,
+                    turnAcceleration: 0,
+                    waterlineHeight: 0,
+                    yardTurningAcceleration: 0,
                 },
                 mast: {
                     bottomArmour: 0,
@@ -412,6 +414,43 @@ const convertGenericShipData = (): ShipData[] => {
                 tradeShip: apiShip.ShipType === 1,
                 // hostilityScore: ship.HostilityScore
             } as ShipData
+*/
+            const ship = {
+                id: Number(apiShip.Id),
+                name: cleanName(apiShip.Name),
+                class: apiShip.Class,
+                guns,
+                shipMass: apiShip.ShipMass,
+                battleRating: apiShip.BattleRating,
+                holdSize: apiShip.HoldSize,
+                maxWeight: apiShip.MaxWeight,
+                crew: {
+                    min: apiShip.MinCrewRequired,
+                    max: apiShip.HealthInfo.Crew,
+                    cannons: totalCannonCrew,
+                    carronades: totalCarroCrew,
+                },
+                speedDegrees,
+                speed: {
+                    // eslint-disable-next-line unicorn/no-reduce
+                    min: speedDegrees.reduce((a, b) => Math.min(a, b)),
+                    max: roundToThousands(calcPortSpeed),
+                },
+                sides: { armour: apiShip.HealthInfo.LeftArmor },
+                bow: { armour: apiShip.HealthInfo.FrontArmor },
+                stern: { armour: apiShip.HealthInfo.BackArmor },
+                structure: { armour: apiShip.HealthInfo.InternalStructure },
+                sails: { armour: apiShip.HealthInfo.Sails },
+                pump: { armour: apiShip.HealthInfo.Pump },
+                rudder: {
+                    armour: apiShip.HealthInfo.Rudder,
+                },
+                upgradeXP: apiShip.OverrideTotalXpForUpgradeSlots,
+                premium: apiShip.Premium,
+                tradeShip: apiShip.ShipType === 1,
+                // hostilityScore: ship.HostilityScore
+            } as ShipData
+
 
             if (ship.id === 1535) {
                 ship.name = "Rookie Brig"
