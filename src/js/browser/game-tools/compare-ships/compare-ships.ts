@@ -346,8 +346,8 @@ export class CompareShips {
             [
                 "Armor thickness",
                 {
-                    properties: ["sides.thickness", "bow.thickness", "stern.thickness"],
-                    cap: { amount: 1, isPercentage: true },
+                    properties: ["sides.thickness"],
+                    cap: { amount: 0.49, isPercentage: true },
                 },
             ],
             [
@@ -372,7 +372,7 @@ export class CompareShips {
                     cap: { amount: 1, isPercentage: true },
                 },
             ],
-            ["Max speed", { properties: ["speed.max"], cap: { amount: 20.9, isPercentage: false } }],
+            ["Max speed", { properties: ["speed.max"], cap: { amount: 17, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
         ])
 
