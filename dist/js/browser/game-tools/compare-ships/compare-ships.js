@@ -68,6 +68,7 @@ export class CompareShips {
             this._setupListener();
         }
     }
+    #doNotRound;
     static _getModuleLevel(rate) {
         return rate <= 3 ? "L" : rate <= 5 ? "M" : "S";
     }
@@ -154,19 +155,26 @@ export class CompareShips {
                 "Armor thickness",
                 { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true },
             ],
-            ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
-            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
             [
                 "Armour hit points",
                 { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true },
             ],
+            ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
             ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
-            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
+            ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
             ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Sail hit points", { properties: ["sails.armour"], isBaseValueAbsolute: true }],
+            [
+                "Mast hit points",
+                {
+                    properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"],
+                    isBaseValueAbsolute: true,
+                },
+            ],
             ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
             [
                 "Mast health",
@@ -179,22 +187,26 @@ export class CompareShips {
                     isBaseValueAbsolute: true,
                 },
             ],
+            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
+            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
+            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
+            ["Roll angle", { properties: ["ship.rollAngle"], isBaseValueAbsolute: true }],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
+            ["Rudder turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
-            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
-            ["Speed decrease", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
-            ["Turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
+            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
+            ["Turn acceleration", { properties: ["ship.turnAcceleration"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
         ]);
+        this.#doNotRound = new Set(["Turn acceleration"]);
         this._moduleAndWoodCaps = new Map([
             [
                 "Armor thickness",
                 {
-                    properties: ["sides.thickness", "bow.thickness", "stern.thickness"],
-                    cap: { amount: 1, isPercentage: true },
+                    properties: ["sides.thickness"],
+                    cap: { amount: 0.49, isPercentage: true },
                 },
             ],
             [
@@ -219,7 +231,7 @@ export class CompareShips {
                     cap: { amount: 1, isPercentage: true },
                 },
             ],
-            ["Max speed", { properties: ["speed.max"], cap: { amount: 20.9, isPercentage: false } }],
+            ["Max speed", { properties: ["speed.max"], cap: { amount: 17, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
         ]);
         const theoreticalMinSpeed = (d3Min(this._shipData, (ship) => ship.speed.min) ?? 0) * 1.2;
@@ -636,8 +648,8 @@ export class CompareShips {
         shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId);
         return shipDataUpdated;
     }
-    _roundPropertyValue(baseValue, value) {
-        if (Number.isInteger(baseValue)) {
+    _roundPropertyValue(baseValue, value, doNotRound = false) {
+        if (Number.isInteger(baseValue) && !doNotRound) {
             return Math.round(value);
         }
         return Math.trunc(value * 100) / 100;
@@ -652,7 +664,8 @@ export class CompareShips {
             const { absolute } = this._modifierAmount.get(key);
             adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
         }
-        return this._roundPropertyValue(value, adjustedValue);
+        const doNotRound = !this.#doNotRound.has(key) && !isBaseValueAbsolute;
+        return this._roundPropertyValue(value, adjustedValue, doNotRound);
     }
     _setModifier(property) {
         let absolute = property.isPercentage ? 0 : property.amount;

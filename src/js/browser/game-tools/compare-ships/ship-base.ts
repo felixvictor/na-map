@@ -357,7 +357,7 @@ export class ShipBase extends Ship {
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatIntTrunc(
                 this.shipData.stern.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.stern.thickness)}</span>`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.stern.thickness)}</span>`,
             battleRating: String(this.shipData.battleRating),
             bowRepair: `${formatIntTrunc(this.shipData.repairTime.bow)}`,
             cannonBroadside: formatIntTrunc(this.shipData.guns.broadside.cannons),
@@ -369,7 +369,7 @@ export class ShipBase extends Ship {
             firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
             frontArmor: `${formatIntTrunc(
                 this.shipData.bow.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.bow.thickness)}</span>`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.bow.thickness)}</span>`,
             guns: String(this.shipData.guns.total),
             gunsBack: this.shipData.guns.gunsPerDeck[5].amount,
             gunsFront: this.shipData.guns.gunsPerDeck[4].amount,
@@ -386,13 +386,13 @@ export class ShipBase extends Ship {
             limitFront: this.shipData.guns.gunsPerDeck[4],
             mastBottomArmor: `${formatIntTrunc(
                 this.shipData.mast.bottomArmour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.mast.bottomThickness)}</span>`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.mast.bottomThickness)}</span>`,
             mastMiddleArmor: `${formatIntTrunc(
                 this.shipData.mast.middleArmour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.mast.middleThickness)}</span>`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.mast.middleThickness)}</span>`,
             mastTopArmor: `${formatIntTrunc(
                 this.shipData.mast.topArmour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.mast.topThickness)}</span>`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.mast.topThickness)}</span>`,
             maxCrew: formatIntTrunc(this.shipData.crew.max),
             maxSpeed: formatFloat(this.shipData.speed.max, 4),
             maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed, 4),
@@ -408,6 +408,7 @@ export class ShipBase extends Ship {
             rigRepairsNeeded: `${formatIntTrunc(
                 rigRepairsNeeded
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(rigRepairsNeeded * repairsSetSize)}</span>`,
+            rollAngle: formatIntTrunc(this.shipData.ship.rollAngle),
             rudder: `${formatIntTrunc(
                 this.shipData.rudder.armour
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.rudder.thickness)}</span>`,
@@ -419,10 +420,11 @@ export class ShipBase extends Ship {
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
             sideArmor: `${formatIntTrunc(
                 this.shipData.sides.armour
-            )}\u00A0<span class="badge badge-white">${formatIntTrunc(this.shipData.sides.thickness)}</span>`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.sides.thickness)}</span>`,
             splinterResistance: formatPercent(this.shipData.resistance!.splinter, 0),
             sternRepair: `${formatIntTrunc(this.shipData.repairTime.stern)}`,
             structure: formatIntTrunc(this.shipData.structure.armour),
+            turnAcceleration: formatFloat(this.shipData.ship.turnAcceleration, 4),
             upgradeXP: formatIntTrunc(this.shipData.upgradeXP),
             waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
             cannonWeight: formatIntTrunc(this.shipData.guns.weight.cannons),

@@ -42,6 +42,10 @@ p {
     text-align: left;
 }
 
+.nav-item > label {
+    margin-bottom: unset;
+}
+
 table,
 .page-link {
     font-variant-numeric: normal; // onum off
