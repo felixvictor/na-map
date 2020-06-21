@@ -313,6 +313,14 @@ export class CompareShips {
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
             ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
+            ["Sail hit points", { properties: ["sails.armour"], isBaseValueAbsolute: true }],
+            [
+                "Mast hit points",
+                {
+                    properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"],
+                    isBaseValueAbsolute: true,
+                },
+            ],
             ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
             [
                 "Mast health",
