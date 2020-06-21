@@ -568,14 +568,14 @@ interface ShipResistance {
     splinter: number
 }
 interface ShipShip {
-    waterlineHeight: number
-    firezoneHorizontalWidth: number
-    structureLeaksPerSecond: number
-    deceleration: number
     acceleration: number
-    turningAcceleration: number
-    turningYardAcceleration: number
+    deceleration: number
+    firezoneHorizontalWidth: number
     maxSpeed: number
+    rollAngle: number
+    turnAcceleration: number
+    waterlineHeight: number
+    yardTurningAcceleration: number
 }
 interface ShipMast {
     bottomArmour: number
