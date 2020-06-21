@@ -170,8 +170,6 @@ export class Ship {
         text += displayColumn("structure", "Hull")
         text += displayColumn("frontArmor", "Bow")
         text += displayColumn("backArmor", "Stern")
-        text += displayColumn("pump", "Pump")
-        text += displayColumn("rudder", "Rudder")
         text += "</div></div></div>"
 
         text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>')
