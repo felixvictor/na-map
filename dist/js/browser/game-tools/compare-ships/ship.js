@@ -72,7 +72,7 @@ export class Ship {
         text += displayColumn("battleRating", "Battle rating");
         text += displayColumn("guns", "Cannons");
         text += displayColumn("upgradeXP", "Knowledge XP");
-        text += displayColumn("waterlineHeight", "Water line");
+        text += displayColumn("rollAngle", "Roll angle");
         text += "</div></div></div>";
         text += displayFirstColumn(ship.decks);
         text += Ship.displaySecondBlock();
@@ -92,10 +92,10 @@ export class Ship {
         text += displayFirstColumn("Speed");
         text += Ship.displaySecondBlock();
         text += displayColumn("maxSpeed", "Maximum");
-        text += displayColumn("", "");
-        text += displayColumn("acceleration", "Acceleration");
         text += displayColumn("deceleration", "Deceleration");
-        text += displayColumn("maxTurningSpeed", "Turn speed");
+        text += displayColumn("acceleration", "Acceleration");
+        text += displayColumn("turnAcceleration", "Turn acceleration");
+        text += displayColumn("maxTurningSpeed", "Rudder turn speed");
         text += displayColumn("halfturnTime", "Rudder half time");
         text += "</div></div></div>";
         text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>');
@@ -104,8 +104,6 @@ export class Ship {
         text += displayColumn("structure", "Hull");
         text += displayColumn("frontArmor", "Bow");
         text += displayColumn("backArmor", "Stern");
-        text += displayColumn("pump", "Pump");
-        text += displayColumn("rudder", "Rudder");
         text += "</div></div></div>";
         text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>');
         text += Ship.displaySecondBlock();
