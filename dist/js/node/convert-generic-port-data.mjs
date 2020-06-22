@@ -84,6 +84,14 @@ const getSpawnPoints = (portRaidSpawnPoints) => portRaidSpawnPoints
     Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
     Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z)),
 ]);
+const getRaidCircles = (portRaidZonePositions) => portRaidZonePositions.map((raidCircle) => [
+    Math.trunc(convertCoordX(raidCircle.x, raidCircle.z)),
+    Math.trunc(convertCoordY(raidCircle.x, raidCircle.z)),
+]);
+const getRaidPoints = (portRaidSpawnPoints) => portRaidSpawnPoints.map((raidPoint) => [
+    Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
+    Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z)),
+]);
 const setAndSavePBZones = async () => {
     const ports = apiPorts
         .filter((port) => !port.NonCapturable)
@@ -97,6 +105,8 @@ const setAndSavePBZones = async () => {
             towers: getTowers(port.PortElementsSlotGroups),
             joinCircle: getJoinCircle(Number(port.Id), Number(port.Rotation)),
             spawnPoints: getSpawnPoints(port.PortRaidSpawnPoints),
+            raidCircles: getRaidCircles(port.PortRaidZonePositions),
+            raidPoints: getRaidPoints(port.PortRaidSpawnPoints),
         };
     })
         .sort(sortBy(["id"]));
