@@ -18,6 +18,7 @@ import { serverNames } from "../common/common-var";
 import { isEmpty } from "../common/common";
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
+const plankingRatio = 0.2135;
 const crewSpaceRatio = 0.025;
 const shipNames = new Map([
     ["agamemnon", { id: 694, master: [] }],
@@ -403,6 +404,7 @@ const convertShipBlueprints = async () => {
             name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
             wood: [
                 { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
+                { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
                 { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
             ],
             resources: apiBlueprint.FullRequirements.filter((requirement) => !((itemNames.get(requirement.Template)?.endsWith(" Permit") ??
