@@ -250,7 +250,14 @@ export interface PbZoneBasic {
     spawnPoints: Point[]
 }
 
-export interface PbZone extends PbZoneBasic, PbZoneDefence {
+export interface PbZoneRaid {
+    id: number
+    joinCircle: Point
+    raidCircles: Point[]
+    raidPoints: Point[]
+}
+
+export interface PbZone extends PbZoneBasic, PbZoneDefence, PbZoneRaid {
     id: number
     position: Point
 }
