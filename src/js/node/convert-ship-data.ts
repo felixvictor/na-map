@@ -43,7 +43,7 @@ const topMastThicknessRatio = 0.5
 /**
  * Logs needed for planking as a ratio of ship mass
  */
-const plankingRatio = 0.2135
+const plankingRatio = 0.2134
 
 /**
  * Hemp needed for crew space trim as a ratio of ship mass

@@ -355,7 +355,7 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness"],
-                    cap: { amount: 0.49, isPercentage: true },
+                    cap: { amount: 0.5, isPercentage: true },
                 },
             ],
             [
