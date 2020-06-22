@@ -277,7 +277,7 @@ export default class ListShipBlueprints {
             const index = defaultResources.findIndex((resource) => resource[0] === "Hemp")
             defaultResources[index][1] = (defaultResources[index][1] as number) + hempAmount
         } else {
-            trimAmount = this._currentBlueprint.wood.find((wood) => wood.name === "Frame")!.amount
+            trimAmount = this._currentBlueprint.wood.find((wood) => wood.name === "Planking")!.amount
             // Frame and trim have same wood: add trim to frame
             if (this._woodsSelected.trim === this._woodsSelected.frame) {
                 frameAmount += trimAmount

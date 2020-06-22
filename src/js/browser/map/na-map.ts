@@ -32,9 +32,7 @@ import DisplayPorts from "./display-ports"
 import SelectPorts from "./select-ports"
 import ShowF11 from "./show-f11"
 import ShowTrades from "./show-trades"
-import WindRose from "../map-tools/wind-rose"
 import MakeJourney from "./make-journey"
-import PredictWind from "../map-tools/predict-wind"
 import { mapSize } from "../../common/common-var"
 
 interface Tile {
@@ -72,8 +70,6 @@ class NAMap {
     private _portSelect!: SelectPorts
     private _showGrid!: string
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
-    private readonly _windPrediction!: PredictWind
-    private readonly _windRose!: WindRose
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
     private _zoomLevel!: string
     private readonly _doubleClickActionCookie: Cookie
@@ -239,7 +235,7 @@ class NAMap {
         this._ports = new DisplayPorts(this)
         await this._ports.init()
 
-        this._pbZone = new DisplayPbZones(this._ports)
+        this._pbZone = new DisplayPbZones(this._ports, this.serverName)
         this._grid = new DisplayGrid(this)
 
         this._journey = new MakeJourney(this.rem)
@@ -416,8 +412,6 @@ class NAMap {
     }
 
     _clearMap(): void {
-        this._windPrediction.clearMap()
-        this._windRose.clearMap()
         this.f11.clearMap()
         this._ports.clearMap()
         this._portSelect.clearMap()
