@@ -25,7 +25,7 @@ import {
 } from "../common/common-math"
 import { serverNames } from "../common/common-var"
 
-import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortSpawnPointsEntity } from "./api-port"
+import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson, PbZone, PortBasic } from "../common/gen-json"
 
 let apiPorts = [] as APIPort[]
@@ -114,13 +114,25 @@ const getJoinCircle = (id: number, rotation: number): Point => {
 }
 
 const spawnPoints = new Set([1, 2])
-const getSpawnPoints = (portRaidSpawnPoints: PortSpawnPointsEntity[]): Point[] =>
+const getSpawnPoints = (portRaidSpawnPoints: PortRaidSpawnPointsEntity[]): Point[] =>
     portRaidSpawnPoints
         .filter((raidPoint, i) => spawnPoints.has(i))
         .map((raidPoint) => [
             Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
             Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z)),
         ])
+
+const getRaidCircles = (portRaidZonePositions: PortPosition[]): Point[] =>
+    portRaidZonePositions.map((raidCircle) => [
+        Math.trunc(convertCoordX(raidCircle.x, raidCircle.z)),
+        Math.trunc(convertCoordY(raidCircle.x, raidCircle.z)),
+    ])
+
+const getRaidPoints = (portRaidSpawnPoints: PortRaidSpawnPointsEntity[]): Point[] =>
+    portRaidSpawnPoints.map((raidPoint) => [
+        Math.trunc(convertCoordX(raidPoint.Position.x, raidPoint.Position.z)),
+        Math.trunc(convertCoordY(raidPoint.Position.x, raidPoint.Position.z)),
+    ])
 
 const setAndSavePBZones = async (): Promise<void> => {
     const ports = apiPorts
@@ -135,6 +147,8 @@ const setAndSavePBZones = async (): Promise<void> => {
                 towers: getTowers(port.PortElementsSlotGroups),
                 joinCircle: getJoinCircle(Number(port.Id), Number(port.Rotation)),
                 spawnPoints: getSpawnPoints(port.PortRaidSpawnPoints),
+                raidCircles: getRaidCircles(port.PortRaidZonePositions),
+                raidPoints: getRaidPoints(port.PortRaidSpawnPoints),
             } as PbZone
         })
         .sort(sortBy(["id"]))

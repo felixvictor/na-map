@@ -17,14 +17,19 @@ import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import DisplayPorts from "./display-ports"
 
-import { PbZone, PbZoneBasic, PbZoneDefence } from "../../common/gen-json"
+import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "../../common/gen-json"
 import { Bound } from "../../common/interface"
+import { Server } from "../../common/servers"
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const servers: Server[] = require("../../common/servers")
 
 export default class DisplayPbZones {
     showPB: string
+    #serverType: string
     private readonly _ports!: DisplayPorts
     private readonly _showId: string
-    private readonly _showValues: string[]
+    private readonly _showValues: Array<{ id: string; label: string }>
     private readonly _showCookie: Cookie
     private readonly _showRadios: RadioButton
     private _isDataLoaded: boolean
@@ -33,27 +38,48 @@ export default class DisplayPbZones {
     private _upperBound!: Bound
     private _defencesFiltered!: PbZoneDefence[]
     private _pbZonesFiltered!: PbZoneBasic[]
+    private _raidZonesFiltered!: PbZoneRaid[]
     private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
 
-    constructor(ports: DisplayPorts) {
+    constructor(ports: DisplayPorts, serverId: string) {
         this._ports = ports
+        this.#serverType = servers.find((server) => server.id === serverId)!.type
 
         this._showId = "show-zones"
 
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          */
-        this._showValues = ["pb-all", "pb-single", "off"]
+        if (this.#serverType === "PVP") {
+            this._showValues = [
+                { id: "pb-all", label: "All ports" },
+                { id: "pb-single", label: "Single port" },
+                { id: "off", label: "Off" },
+            ]
+        } else {
+            this._showValues = [
+                { id: "pb-all", label: "All ports" },
+                { id: "pb-single", label: "Single port" },
+                { id: "raid-all", label: "All raid" },
+                { id: "raid-single", label: "Single raid" },
+                { id: "off", label: "Off" },
+            ]
+        }
+
+        this._setupRadios()
 
         /**
          * Show port battle zones cookie
          */
-        this._showCookie = new Cookie({ id: this._showId, values: this._showValues })
+        this._showCookie = new Cookie({ id: this._showId, values: this._showValues.map((item) => item.id) })
 
         /**
          * Show port battle zones radio buttons
          */
-        this._showRadios = new RadioButton(this._showId, this._showValues)
+        this._showRadios = new RadioButton(
+            this._showId,
+            this._showValues.map((item) => item.id)
+        )
 
         /**
          * Get showLayer setting from cookie or use default value
@@ -68,6 +94,24 @@ export default class DisplayPbZones {
 
     _setupSvg(): void {
         this._g = d3Select<SVGSVGElement, unknown>("#map").insert<SVGGElement>("g", "#ports").attr("class", "pb")
+    }
+
+    _setupRadios(): void {
+        const divMain = d3Select("#show-zones")
+        for (const radioItem of this._showValues) {
+            const div = divMain.append("div").attr("class", "custom-control custom-radio custom-control-inline")
+            div.append("input")
+                .attr("type", "radio")
+                .attr("class", "custom-control-input")
+                .attr("name", "show-zones")
+                .attr("id", `show-zones-${radioItem.id}`)
+                .attr("value", radioItem.id)
+            div.append("label")
+                .attr("type", "radio")
+                .attr("class", "custom-control-label")
+                .attr("for", `show-zones-${radioItem.id}`)
+                .text(radioItem.label)
+        }
     }
 
     async _loadData(): Promise<void> {
@@ -141,16 +185,20 @@ export default class DisplayPbZones {
                         .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
 
                     // Spawn points
-                    g.append("path")
-                        .attr("class", "raid-point")
-                        .attr("d", (d) =>
-                            d.spawnPoints.map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5)).join("")
-                        )
-                    g.append("text")
-                        .attr("class", "pb-text raid-point-text")
-                        .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
-                        .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
-                        .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
+                    if (this.#serverType === "PVP") {
+                        g.append("path")
+                            .attr("class", "raid-point")
+                            .attr("d", (d) =>
+                                d.spawnPoints
+                                    .map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5))
+                                    .join("")
+                            )
+                        g.append("text")
+                            .attr("class", "pb-text raid-point-text")
+                            .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
+                            .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
+                            .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
+                    }
 
                     return g
                 }
@@ -185,10 +233,54 @@ export default class DisplayPbZones {
                     return g
                 }
             )
+
+        this._g
+            .selectAll<SVGGElement, PbZoneRaid>("g.raid-zones")
+            .data(this._raidZonesFiltered, (d) => String(d.id))
+            .join(
+                (enter): d3Selection.Selection<SVGGElement, PbZoneRaid, SVGGElement, any> => {
+                    const g = enter.append("g").attr("class", "raid-zones")
+
+                    // Raid join circles
+                    g.append("path")
+                        .attr("class", "raid-join-circle")
+                        .attr("d", (d) => drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 35))
+
+                    // Raid circles
+                    g.append("path")
+                        .attr("class", "raid-circle")
+                        .attr("d", (d) =>
+                            d.raidCircles.map((raidCircle) => drawSvgCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
+                        )
+                    g.append("text")
+                        .attr("class", "pb-text raid-circle-text")
+                        .attr("x", (d) => d.raidCircles.map((raidCircle) => raidCircle[0]).join(","))
+                        .attr("y", (d) => d.raidCircles.map((raidCircle) => raidCircle[1]).join(","))
+                        .text((d) => d.raidCircles.map((raidCircle, i) => String.fromCharCode(65 + i)).join(""))
+
+                    // Raid points
+                    g.append("path")
+                        .attr("class", "raid-point")
+                        .attr("d", (d) =>
+                            d.raidPoints.map((raidPoint) => drawSvgCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
+                        )
+                    g.append("text")
+                        .attr("class", "pb-text raid-point-text")
+                        .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
+                        .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
+                        .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""))
+                    return g
+                }
+            )
     }
 
     _isPortIn(d: PbZone): boolean {
-        return this.showPB === "pb-all" || (this.showPB === "pb-single" && Number(d.id) === this._ports.currentPort.id)
+        return (
+            this.showPB === "pb-all" ||
+            this.showPB === "raid-all" ||
+            ((this.showPB === "pb-single" || this.showPB === "raid-single") &&
+                Number(d.id) === this._ports.currentPort.id)
+        )
     }
 
     _setData(): void {
@@ -204,6 +296,7 @@ export default class DisplayPbZones {
         } else {
             this._defencesFiltered = []
             this._pbZonesFiltered = []
+            this._raidZonesFiltered = []
         }
     }
 
@@ -227,8 +320,15 @@ export default class DisplayPbZones {
                 joinCircle: port.joinCircle,
                 spawnPoints: port.spawnPoints,
             }))
+            this._raidZonesFiltered = []
         } else {
             this._pbZonesFiltered = []
+            this._raidZonesFiltered = portsFiltered.map((port) => ({
+                id: port.id,
+                joinCircle: port.joinCircle,
+                raidCircles: port.raidCircles,
+                raidPoints: port.raidPoints,
+            }))
         }
     }
 
