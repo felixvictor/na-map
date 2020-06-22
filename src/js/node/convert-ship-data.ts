@@ -41,6 +41,11 @@ const middleMastThicknessRatio = 0.75
 const topMastThicknessRatio = 0.5
 
 /**
+ * Logs needed for planking as a ratio of ship mass
+ */
+const plankingRatio = 0.2135
+
+/**
  * Hemp needed for crew space trim as a ratio of ship mass
  */
 const crewSpaceRatio = 0.025
@@ -354,67 +359,7 @@ const convertGenericShipData = (): ShipData[] => {
 
             addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex)
             addDeck(apiShip.BackDeckClassLimit[0], backDeckIndex)
-/*
-            const ship = {
-                id: Number(apiShip.Id),
-                name: cleanName(apiShip.Name),
-                class: apiShip.Class,
-                guns,
-                shipMass: apiShip.ShipMass,
-                battleRating: apiShip.BattleRating,
-                holdSize: apiShip.HoldSize,
-                maxWeight: apiShip.MaxWeight,
-                crew: {
-                    min: apiShip.MinCrewRequired,
-                    max: apiShip.HealthInfo.Crew,
-                    sailing: 0,
-                    cannons: totalCannonCrew,
-                    carronades: totalCarroCrew,
-                },
-                speedDegrees,
-                speed: {
-                    // eslint-disable-next-line unicorn/no-reduce
-                    min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                    max: roundToThousands(calcPortSpeed),
-                },
-                sides: { armour: apiShip.HealthInfo.LeftArmor, thickness: 0 },
-                bow: { armour: apiShip.HealthInfo.FrontArmor, thickness: 0 },
-                stern: { armour: apiShip.HealthInfo.BackArmor, thickness: 0 },
-                structure: { armour: apiShip.HealthInfo.InternalStructure },
-                sails: { armour: apiShip.HealthInfo.Sails, risingSpeed: 0 },
-                pump: { armour: apiShip.HealthInfo.Pump },
-                rudder: {
-                    armour: apiShip.HealthInfo.Rudder,
-                    halfturnTime: 0,
-                    thickness: 0,
-                    turnSpeed: 0,
-                },
-                upgradeXP: apiShip.OverrideTotalXpForUpgradeSlots,
-                repairTime: { sides: 0 },
-                ship: {
-                    acceleration: 0,
-                    deceleration: 0,
-                    firezoneHorizontalWidth: 0,
-                    maxSpeed: 0,
-                    rollAngle: 0,
-                    structureLeaks: 0,
-                    turnAcceleration: 0,
-                    waterlineHeight: 0,
-                    yardTurningAcceleration: 0,
-                },
-                mast: {
-                    bottomArmour: 0,
-                    middleArmour: 0,
-                    topArmour: 0,
-                    bottomThickness: 0,
-                    middleThickness: 0,
-                    topThickness: 0,
-                },
-                premium: apiShip.Premium,
-                tradeShip: apiShip.ShipType === 1,
-                // hostilityScore: ship.HostilityScore
-            } as ShipData
-*/
+
             const ship = {
                 id: Number(apiShip.Id),
                 name: cleanName(apiShip.Name),
@@ -450,7 +395,6 @@ const convertGenericShipData = (): ShipData[] => {
                 tradeShip: apiShip.ShipType === 1,
                 // hostilityScore: ship.HostilityScore
             } as ShipData
-
 
             if (ship.id === 1535) {
                 ship.name = "Rookie Brig"
@@ -622,6 +566,7 @@ const convertShipBlueprints = async (): Promise<void> => {
                 name: cleanName(apiBlueprint.Name).replace(" Blueprint", ""),
                 wood: [
                     { name: "Frame", amount: apiBlueprint.WoodTypeDescs[0].Requirements[0].Amount },
+                    { name: "Planking", amount: Math.round(shipMass * plankingRatio + 0.5) },
                     { name: "Crew Space", amount: Math.round(shipMass * crewSpaceRatio + 0.5) },
                 ],
                 resources: apiBlueprint.FullRequirements.filter(
