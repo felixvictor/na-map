@@ -18,7 +18,7 @@ import { serverNames } from "../common/common-var";
 import { isEmpty } from "../common/common";
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
-const plankingRatio = 0.2135;
+const plankingRatio = 0.2134;
 const crewSpaceRatio = 0.025;
 const shipNames = new Map([
     ["agamemnon", { id: 694, master: [] }],

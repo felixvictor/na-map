@@ -40,7 +40,7 @@ import {
     rigRepairsPercent,
     stripShipName,
 } from "../../../common/common-game-tools"
-import { ArrayIndex, HtmlString, Index, NestedIndex } from "../../../common/interface"
+import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
@@ -95,17 +95,12 @@ interface PropertyWithCap {
 }
 
 type ModuleType = string
+type ModuleId = number
 
 const shipColumnType = ["Base", "C1", "C2"] as const
 type ShipColumnType = typeof shipColumnType[number]
-type Column<T> = {
-    [K in ShipColumnType]: T
-}
 type ColumnArray<T> = {
     [K in ShipColumnType]: T[]
-}
-type ColumnNested<T> = {
-    [K in ShipColumnType]: Index<T>
 }
 type ColumnNestedArray<T> = {
     [K in ShipColumnType]: ArrayIndex<T>
@@ -129,11 +124,11 @@ export class CompareShips {
     private _maxSpeed!: number
     private _minSpeed!: number
     private _modal$: JQuery = {} as JQuery
-    private _modifierAmount: Map<string, AbsoluteAndPercentageAmount>
-    private _moduleAndWoodCaps!: Map<string, PropertyWithCap>
-    private _moduleAndWoodChanges!: Map<string, Property>
+    private _modifierAmount: Map<ModifierName, AbsoluteAndPercentageAmount> = new Map()
+    private _moduleAndWoodCaps!: Map<ModifierName, PropertyWithCap>
+    private _moduleAndWoodChanges!: Map<ModifierName, Property>
     private _moduleDataDefault!: Module[]
-    private _moduleProperties!: Map<number, ModuleEntity>
+    private _moduleProperties!: Map<ModuleId, ModuleEntity>
     private _moduleTypes!: Set<ModuleType>
     private _selectedUpgradeIdsList: ColumnArray<number> = {} as ColumnArray<number>
     private _selectedUpgradeIdsPerType: ColumnNestedArray<number> = {} as ColumnNestedArray<number>
@@ -170,8 +165,6 @@ export class CompareShips {
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
-
-        this._modifierAmount = new Map()
 
         if (this._baseId === "ship-compare") {
             this.columnsCompare = ["C1", "C2"]
@@ -293,9 +286,7 @@ export class CompareShips {
     }
 
     _setupData(): void {
-        this._moduleAndWoodChanges = new Map<string, Property>([
-            // ["Sail damage", [  ]],
-            // ["Sail health", [  ]],
+        this._moduleAndWoodChanges = new Map<ModifierName, Property>([
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
                 "Armor thickness",
@@ -307,6 +298,8 @@ export class CompareShips {
             ],
             ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
             ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
+            ["Cannon crew", { properties: ["crew.cannons"], isBaseValueAbsolute: true }],
+            ["Carronade crew", { properties: ["crew.carronades"], isBaseValueAbsolute: true }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
             ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
@@ -350,7 +343,7 @@ export class CompareShips {
         // Integer values that should not be rounded when modifiers are applied
         this.#doNotRound = new Set(["Turn acceleration"])
 
-        this._moduleAndWoodCaps = new Map<string, PropertyWithCap>([
+        this._moduleAndWoodCaps = new Map<ModifierName, PropertyWithCap>([
             [
                 "Armor thickness",
                 {
@@ -1115,10 +1108,10 @@ export class CompareShips {
         }
 
         const adjustDataByCaps = (): void => {
-            const valueCapped = { isCapped: false, modifiers: new Set<string>() }
+            const valueCapped = { isCapped: false, modifiers: new Set<ModifierName>() }
 
             const adjustValue = (
-                modifier: string,
+                modifier: ModifierName,
                 valueUncapped: number,
                 valueBase: number,
                 { amount: capAmount, isPercentage }: Amount
