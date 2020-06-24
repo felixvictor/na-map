@@ -8,8 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as path from "path";
+import d3Array from "d3-array";
+const { group: d3Group } = d3Array;
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
-import { capitalizeFirstLetter, groupToMap, woodType } from "../common/common";
+import { capitalizeFirstLetter, woodType } from "../common/common";
 import { cleanName, sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { serverNames } from "../common/common-var";
@@ -27,6 +29,8 @@ const woodsNotUsed = new Set([
 export const convertModulesAndWoodData = async () => {
     const modules = new Map();
     const woods = {};
+    woods.trim = [];
+    woods.frame = [];
     const moduleRate = [
         {
             level: "L",
@@ -42,8 +46,6 @@ export const convertModulesAndWoodData = async () => {
         },
     ];
     const bonusRegex = /(.+\sBonus)\s(\d)/u;
-    woods.trim = [];
-    woods.frame = [];
     const levels = new Map([
         ["Universal", "U"],
         ["Regular", "R"],
@@ -194,58 +196,50 @@ export const convertModulesAndWoodData = async () => {
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hit points"],
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ]);
+    const flipAmountForModule = new Set(["Fire resistance", "Leak resistance", "Rudder speed"]);
     const setWood = (module) => {
         const wood = {};
         wood.id = module.id;
+        wood.properties = module.APImodifiers.map((modifier) => {
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const modifierName = modifiers.get(apiModifierName) ?? "";
+            let amount = modifier.Percentage;
+            let isPercentage = true;
+            if (modifier.Absolute) {
+                amount = modifier.Absolute;
+                isPercentage = false;
+            }
+            if (modifierName === "Boarding morale") {
+                isPercentage = false;
+            }
+            if (flipAmountForModule.has(modifierName)) {
+                amount *= -1;
+            }
+            if (modifierName === "Splinter resistance") {
+                amount = Math.round(amount * 100);
+                isPercentage = true;
+            }
+            return {
+                modifier: modifierName ?? "",
+                amount,
+                isPercentage,
+            };
+        });
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
-            wood.type = "Trim";
+            wood.type = "trim";
             wood.name = module.name.replace(" Planking", "");
             woods.trim.push(wood);
         }
         else {
-            wood.type = "Frame";
+            wood.type = "frame";
             wood.name = module.name.replace(" Frame", "");
             woods.frame.push(wood);
-        }
-        wood.properties = [];
-        for (const modifier of module.APImodifiers) {
-            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
-                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`);
-                let amount = modifier.Percentage;
-                let isPercentage = true;
-                if (modifier.Absolute) {
-                    amount = modifier.Absolute;
-                    isPercentage = false;
-                }
-                if (modifierName === "Boarding morale") {
-                    isPercentage = false;
-                }
-                if (modifierName === "Fire resistance" ||
-                    modifierName === "Leak resistance" ||
-                    modifierName === "Rudder speed") {
-                    amount *= -1;
-                }
-                if (modifierName === "Splinter resistance") {
-                    amount = Math.round(amount * 100);
-                    isPercentage = true;
-                }
-                wood.properties.push({
-                    modifier: modifierName ?? "",
-                    amount,
-                    isPercentage,
-                });
-            }
-        }
-        for (const type of woodType) {
-            for (const APIwood of woods[type]) {
-                APIwood.properties.sort(sortBy(["modifier", "id"]));
-            }
         }
     };
     const getModuleProperties = (APImodifiers) => {
         return APImodifiers.filter((modifier) => {
             const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
-            if (modifiers.get(apiModifierName) === undefined) {
+            if (!modifiers.has(apiModifierName)) {
                 console.log(`${apiModifierName} modifier not defined`);
                 return true;
             }
@@ -266,9 +260,7 @@ export const convertModulesAndWoodData = async () => {
                     amount = Math.round(modifier.Absolute * 10000) / 100;
                 }
             }
-            if (modifierName === "Fire resistance" ||
-                modifierName === "Leak resistance" ||
-                modifierName === "Rudder speed") {
+            if (flipAmountForModule.has(modifierName)) {
                 amount *= -1;
             }
             else if (modifierName === "Splinter resistance") {
@@ -357,12 +349,14 @@ export const convertModulesAndWoodData = async () => {
                 const properties = getModuleProperties(module.APImodifiers);
                 if (properties) {
                     module.properties = properties;
+                    const cannonCrewProperty = properties.find((property) => property.modifier === "Cannon crew");
+                    if (cannonCrewProperty) {
+                        const carronadeCrewProperty = JSON.parse(JSON.stringify(cannonCrewProperty));
+                        carronadeCrewProperty.modifier = "Carronade crew";
+                        module.properties.push(carronadeCrewProperty);
+                    }
                 }
-                delete module.APImodifiers;
                 module.type = getModuleType(module);
-                delete module.moduleType;
-                delete module.sortingGroup;
-                delete module.permanentType;
                 for (const rate of moduleRate) {
                     for (const name of rate.names) {
                         if (module.name.endsWith(name)) {
@@ -405,18 +399,20 @@ export const convertModulesAndWoodData = async () => {
                     module.type.startsWith("Not used")) {
                     dontSave = true;
                 }
-                else {
-                }
             }
-            modules.set(module.name + module.moduleLevel, dontSave ? {} : module);
+            const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module;
+            modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule);
         }
     });
-    let result = [...modules.values()];
-    result = result.filter((module) => Object.keys(module).length).sort(sortBy(["type", "id"]));
-    const modulesGrouped = [...groupToMap(result, (module) => module.type)];
-    await saveJsonAsync(commonPaths.fileModules, modulesGrouped);
-    woods.trim.sort(sortBy(["id"]));
-    woods.frame.sort(sortBy(["id"]));
+    const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]));
+    const modulesGrouped = d3Group(result, (module) => module.type);
+    await saveJsonAsync(commonPaths.fileModules, [...modulesGrouped]);
+    for (const type of woodType) {
+        for (const wood of woods[type]) {
+            wood.properties.sort(sortBy(["modifier"]));
+        }
+        woods[type].sort(sortBy(["id"]));
+    }
     await saveJsonAsync(commonPaths.fileWood, woods);
 };
 export const convertModules = () => {

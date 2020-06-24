@@ -36,6 +36,7 @@ export class CompareShips {
     constructor(id = "ship-compare") {
         this.windProfileRotate = 0;
         this._modal$ = {};
+        this._modifierAmount = new Map();
         this._selectedUpgradeIdsList = {};
         this._selectedUpgradeIdsPerType = {};
         this._selectModule$ = {};
@@ -52,7 +53,6 @@ export class CompareShips {
         this.colourScaleSpeedDiff = d3ScaleLinear()
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl);
-        this._modifierAmount = new Map();
         if (this._baseId === "ship-compare") {
             this.columnsCompare = ["C1", "C2"];
         }
@@ -161,6 +161,8 @@ export class CompareShips {
             ],
             ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
             ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
+            ["Cannon crew", { properties: ["crew.cannons"], isBaseValueAbsolute: true }],
+            ["Carronade crew", { properties: ["crew.carronades"], isBaseValueAbsolute: true }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
             ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
             ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
