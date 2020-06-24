@@ -58,3 +58,5 @@ export interface BaseModalHtml extends BaseModal {
     body: () => HtmlResult
     footer: () => HtmlResult
 }
+
+export type ModifierName = string
