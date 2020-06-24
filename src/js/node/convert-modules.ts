@@ -10,8 +10,11 @@
 
 import * as path from "path"
 
+import d3Array from "d3-array"
+const { group: d3Group } = d3Array
+
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
-import { capitalizeFirstLetter, groupToMap, woodType } from "../common/common"
+import { capitalizeFirstLetter, woodType } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverNames } from "../common/common-var"
@@ -24,6 +27,9 @@ import {
     WoodData,
     WoodTrimOrFrame,
 } from "../common/gen-json"
+import { ModifierName } from "../common/interface"
+
+type APIModifierName = string
 
 let apiItems: APIItemGeneric[]
 
@@ -46,6 +52,9 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
     const modules = new Map()
 
     const woods = {} as WoodData
+    woods.trim = []
+    woods.frame = []
+
     const moduleRate = [
         {
             level: "L",
@@ -63,9 +72,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
 
     const bonusRegex = /(.+\sBonus)\s(\d)/u
 
-    woods.trim = []
-    woods.frame = []
-
     const levels = new Map([
         ["Universal", "U"],
         ["Regular", "R"],
@@ -74,9 +80,9 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["LineShips", "L"],
     ])
 
-    // Woods
     // noinspection SpellCheckingInspection
-    const modifiers = new Map([
+    const modifiers = new Map<APIModifierName, ModifierName>([
+        // Woods
         ["ARMOR_ALL_SIDES ARMOR_THICKNESS", "Armor thickness"],
         ["ARMOR_ALL_SIDES MODULE_BASE_HP", "Armour hit points"],
         ["CREW MODULE_BASE_HP", "Crew"],
@@ -222,6 +228,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ])
 
+    const flipAmountForModule = new Set<ModifierName>(["Fire resistance", "Leak resistance", "Rudder speed"])
+
     /**
      * Set wood properties
      * @param module - Module data
@@ -230,60 +238,47 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         const wood = {} as WoodTrimOrFrame
         wood.id = module.id
 
+        wood.properties = module.APImodifiers.map((modifier) => {
+            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+            // Add modifier if in modifier map
+            const modifierName = modifiers.get(apiModifierName) ?? ""
+            let amount = modifier.Percentage
+            let isPercentage = true
+
+            if (modifier.Absolute) {
+                amount = modifier.Absolute
+                isPercentage = false
+            }
+
+            // Some modifiers are wrongly indicated as a percentage
+            if (modifierName === "Boarding morale") {
+                isPercentage = false
+            }
+
+            if (flipAmountForModule.has(modifierName)) {
+                amount *= -1
+            }
+
+            if (modifierName === "Splinter resistance") {
+                amount = Math.round(amount * 100)
+                isPercentage = true
+            }
+
+            return {
+                modifier: modifierName ?? "",
+                amount,
+                isPercentage,
+            }
+        })
+
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
-            wood.type = "Trim"
+            wood.type = "trim"
             wood.name = module.name.replace(" Planking", "")
             woods.trim.push(wood)
         } else {
-            wood.type = "Frame"
+            wood.type = "frame"
             wood.name = module.name.replace(" Frame", "")
             woods.frame.push(wood)
-        }
-
-        wood.properties = []
-        for (const modifier of module.APImodifiers) {
-            // Add modifier if in modifier map
-            if (modifiers.has(`${modifier.Slot} ${modifier.MappingIds.join()}`)) {
-                const modifierName = modifiers.get(`${modifier.Slot} ${modifier.MappingIds.join()}`)
-                let amount = modifier.Percentage
-                let isPercentage = true
-
-                if (modifier.Absolute) {
-                    amount = modifier.Absolute
-                    isPercentage = false
-                }
-
-                // Some modifiers are wrongly indicated as a percentage
-                if (modifierName === "Boarding morale") {
-                    isPercentage = false
-                }
-
-                if (
-                    modifierName === "Fire resistance" ||
-                    modifierName === "Leak resistance" ||
-                    modifierName === "Rudder speed"
-                ) {
-                    amount *= -1
-                }
-
-                if (modifierName === "Splinter resistance") {
-                    amount = Math.round(amount * 100)
-                    isPercentage = true
-                }
-
-                wood.properties.push({
-                    modifier: modifierName ?? "",
-                    amount,
-                    isPercentage,
-                })
-            }
-        }
-
-        // Sort by modifier
-        for (const type of woodType) {
-            for (const APIwood of woods[type]) {
-                APIwood.properties.sort(sortBy(["modifier", "id"]))
-            }
         }
     }
 
@@ -294,15 +289,15 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
         return APImodifiers.filter((modifier) => {
-            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
-            if (modifiers.get(apiModifierName) === undefined) {
+            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+            if (!modifiers.has(apiModifierName)) {
                 console.log(`${apiModifierName} modifier not defined`)
                 return true
             }
 
             return modifiers.get(apiModifierName) !== ""
         }).map((modifier) => {
-            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
             const modifierName = modifiers.get(apiModifierName) ?? ""
 
             let amount = modifier.Percentage
@@ -321,11 +316,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 }
             }
 
-            if (
-                modifierName === "Fire resistance" ||
-                modifierName === "Leak resistance" ||
-                modifierName === "Rudder speed"
-            ) {
+            if (flipAmountForModule.has(modifierName)) {
                 amount *= -1
             } else if (modifierName === "Splinter resistance") {
                 amount = Math.round(modifier.Absolute * 10000) / 100
@@ -439,15 +430,17 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 const properties = getModuleProperties(module.APImodifiers)
                 if (properties) {
                     module.properties = properties
+
+                    // Copy cannon crew entry for carronade crew
+                    const cannonCrewProperty = properties.find((property) => property.modifier === "Cannon crew")
+                    if (cannonCrewProperty) {
+                        const carronadeCrewProperty = JSON.parse(JSON.stringify(cannonCrewProperty))
+                        carronadeCrewProperty.modifier = "Carronade crew"
+                        module.properties.push(carronadeCrewProperty)
+                    }
                 }
 
-                delete module.APImodifiers
-
                 module.type = getModuleType(module)
-
-                delete module.moduleType
-                delete module.sortingGroup
-                delete module.permanentType
 
                 for (const rate of moduleRate) {
                     for (const name of rate.names) {
@@ -496,22 +489,28 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                     module.type.startsWith("Not used")
                 ) {
                     dontSave = true
-                } else {
-                    // console.log(module.id, module.name);
                 }
             }
 
-            modules.set(module.name + module.moduleLevel, dontSave ? {} : module)
+            const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
+            modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule)
         }
     })
+    // Get the not empty modules and sort
+    const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]))
+    // Group by type
+    const modulesGrouped = d3Group(result, (module: ModuleEntity): string => module.type)
+    await saveJsonAsync(commonPaths.fileModules, [...modulesGrouped])
 
-    let result = [...modules.values()]
-    result = result.filter((module) => Object.keys(module).length).sort(sortBy(["type", "id"]))
-    const modulesGrouped = [...groupToMap(result, (module: ModuleEntity): string => module.type)]
+    // Sort by modifier
+    for (const type of woodType) {
+        for (const wood of woods[type]) {
+            wood.properties.sort(sortBy(["modifier"]))
+        }
 
-    await saveJsonAsync(commonPaths.fileModules, modulesGrouped)
-    woods.trim.sort(sortBy(["id"]))
-    woods.frame.sort(sortBy(["id"]))
+        woods[type].sort(sortBy(["id"]))
+    }
+
     await saveJsonAsync(commonPaths.fileWood, woods)
 }
 
