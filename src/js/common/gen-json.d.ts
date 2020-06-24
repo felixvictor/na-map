@@ -14,8 +14,8 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { CannonType, NationFullName, NationShortName, NationShortNameAlternative } from "./common"
-import { ArrayIndex } from "./interface"
+import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodType } from "./common";
+import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType } from "./types"
 
 /****************************
@@ -163,7 +163,7 @@ interface LootAmount {
  * modules.json
  */
 
-export type Module = [string, ModuleEntity[]]
+export type Module = [ModifierName, ModuleEntity[]]
 export interface ModuleEntity {
     id: number
     name: string
@@ -180,7 +180,7 @@ export interface ModuleConvertEntity extends ModuleEntity {
     moduleType: string
 }
 export interface ModulePropertiesEntity {
-    modifier: string
+    modifier: ModifierName
     amount: number
     isPercentage: boolean
 }
@@ -596,16 +596,13 @@ interface ShipMast {
 /****************************
  * woods.json
  */
-
-export interface WoodData {
-    [index: string]: ValuesType<WoodData>
-    trim: WoodTrimOrFrame[]
-    frame: WoodTrimOrFrame[]
+export type WoodData = {
+    [K in WoodType]: WoodTrimOrFrame[]
 }
 interface WoodTrimOrFrame {
     id: number
     properties: WoodProperty[]
-    type: string
+    type: WoodType
     name: string
 }
 interface WoodProperty extends ObjectIndexer<boolean | number | string> {
