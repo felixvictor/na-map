@@ -353,6 +353,15 @@ export class ShipBase extends Ship {
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
 
         const ship = {
+            morale: formatIntTrunc(this.shipData.boarding.morale),
+            musketsAccuracy: formatPercent(this.shipData.boarding.musketsAccuracy),
+            prepBonus: formatIntTrunc(this.shipData.boarding.prepBonus),
+            attack: formatIntTrunc(this.shipData.boarding.attack),
+            defense: formatIntTrunc(this.shipData.boarding.defense),
+            disengageTime: formatIntTrunc(this.shipData.boarding.disengageTime),
+            musketsCrew: formatIntTrunc(this.shipData.boarding.musketsCrew),
+            cannonsAccuracy: formatPercent(this.shipData.boarding.cannonsAccuracy),
+
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatIntTrunc(
