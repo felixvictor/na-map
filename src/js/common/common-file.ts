@@ -27,13 +27,13 @@ export const makeDirAsync = async (dir: string): Promise<void> => {
     await pfs.mkdir(dir, { recursive: true })
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const saveJsonAsync = async (fileName: string, data: object): Promise<void> => {
     await makeDirAsync(path.dirname(fileName))
     await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const saveTextFile = (fileName: string, data: any): void =>
+export const saveTextFile = (fileName: string, data: string): void =>
     fs.writeFileSync(fileName, data, { encoding: "utf8" })
 
 export const readTextFile = (fileName: string): string => {
@@ -98,7 +98,7 @@ export const uncompressApiData = (): void => {
 /**
  * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
  */
-export const checkFetchStatus = (response: Response): Promise<object> => {
+export const checkFetchStatus = async (response: Response): Promise<Record<string, unknown> | Response> => {
     // noinspection MagicNumberJS
     if (response.status >= 200 && response.status < 300) {
         return Promise.resolve(response)
@@ -111,12 +111,12 @@ export const checkFetchStatus = (response: Response): Promise<object> => {
  * Get json from fetch response
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getJsonFromFetch = (response: Response): Promise<any> => response.json()
+export const getJsonFromFetch = async (response: Response): Promise<any> => response.json()
 
 /**
  * Get text from fetch response
  */
-export const getTextFromFetch = (response: Response): Promise<string> => response.text()
+export const getTextFromFetch = async (response: Response): Promise<string> => response.text()
 
 /**
  * Write error to console

@@ -316,9 +316,11 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
         if (frontlineAttackingNationGroupedByFromPort[attackingNation]) {
             for (const fromPort of frontlineAttackingNationGroupedByFromPort[attackingNation]) {
                 if (fromPort.value) {
+                    // eslint-disable-next-line max-depth
                     for (const toPort of fromPort.value) {
                         const key = String(toPort.nation) + String(toPort.id)
                         let fromPorts = frontlineDefendingNationMap.get(key)
+                        // eslint-disable-next-line max-depth
                         if (fromPorts) {
                             fromPorts.add(fromPort.key)
                         } else {

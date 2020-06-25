@@ -78,7 +78,12 @@ const vectorCross = (a: Vector, b: Vector): Vector => ({
  * @param returnMiddle - If two solutions found then return the center of them
  * @returns Solution
  */
-export const trilaterate = (p1: Circle, p2: Circle, p3: Circle, returnMiddle = false): Vector | Vector[] | undefined => {
+export const trilaterate = (
+    p1: Circle,
+    p2: Circle,
+    p3: Circle,
+    returnMiddle = false
+): Vector | Vector[] | undefined => {
     // based on: https://en.wikipedia.org/wiki/Trilateration
 
     const ex = vectorDivide(vectorSubtract(p2, p1), norm(vectorSubtract(p2, p1)))
