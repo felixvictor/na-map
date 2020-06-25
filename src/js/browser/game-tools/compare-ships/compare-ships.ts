@@ -287,6 +287,16 @@ export class CompareShips {
 
     _setupData(): void {
         this._moduleAndWoodChanges = new Map<ModifierName, Property>([
+            ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
+            ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: true }],
+            ["Preparation bonus", { properties: ["boarding.prepBonus"], isBaseValueAbsolute: true }],
+            ["Melee attack", { properties: ["boarding.attack"], isBaseValueAbsolute: true }],
+            ["Melee defense", { properties: ["boarding.defense"], isBaseValueAbsolute: true }],
+            ["Disengage time", { properties: ["boarding.disengageTime"], isBaseValueAbsolute: true }],
+            ["Crew with muskets", { properties: ["boarding.musketsCrew"], isBaseValueAbsolute: false }],
+            ["Boarding cannon accuracy", { properties: ["boarding.cannonsAccuracy"], isBaseValueAbsolute: true }],
+
+
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
                 "Armor thickness",
@@ -962,8 +972,32 @@ export class CompareShips {
      */
     _getShipData(columnId: ShipColumnType): ShipData {
         const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId])!
-        let shipDataUpdated = shipDataDefault
+        shipDataDefault.crew.carronades = shipDataDefault.crew.cannons
+        shipDataDefault.boarding = {
+            attack: 100,
+            cannonsAccuracy: 100,
+            defense: 100,
+            disengageTime: 4,
+            morale: 100,
+            musketsAccuracy: 100,
+            musketsCrew: 40,
+            prepBonus: 4,
+        }
+        /*
+        { "modifier": "Morale", "amount": 6, "isPercentage": false },
+        { "modifier": "Muskets accuracy penalty", "amount": -15, "isPercentage": true }
 
+        { "modifier": "Preparation bonus", "amount": 6, "isPercentage": false },
+        { "modifier": "Melee attack", "amount": 5, "isPercentage": true },
+        { "modifier": "Melee defense", "amount": 4, "isPercentage": true }
+
+        { "modifier": "Muskets accuracy", "amount": 10, "isPercentage": true },
+        { "modifier": "Additional crew with muskets", "amount": 10, "isPercentage": true }
+        { "modifier": "Disengage time", "amount": -2, "isPercentage": false }
+
+        { "modifier": "Boarding cannon accuracy", "amount": 7, "isPercentage": true }
+        */
+        let shipDataUpdated = shipDataDefault
         shipDataUpdated.repairAmount = {
             armour: hullRepairsPercent,
             armourPerk: 0,
