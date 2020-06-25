@@ -2,6 +2,7 @@ declare module "tablesort" {
     interface Options {
         descending: string
     }
+    // eslint-disable-next-line @typescript-eslint/no-extraneous-class
     export class Tablesort {
         constructor(el: HTMLElement, options?: Options)
     }

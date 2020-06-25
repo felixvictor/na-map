@@ -318,7 +318,7 @@ export class ShipComparison extends Ship {
             }
 
             let diff: number
-            let formattedDiff = ""
+            let formattedDiff: string
             let badge = "badge-danger"
 
             if (isPercentage) {
@@ -361,10 +361,9 @@ export class ShipComparison extends Ship {
             backArmor: `${formatIntTrunc(this.shipCompareData.stern.armour)}\u00A0${getDiff(
                 this.shipCompareData.stern.armour,
                 this._shipBaseData.stern.armour
-            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipCompareData.stern.thickness)}</span>${getDiff(
-                this.shipCompareData.stern.thickness,
-                this._shipBaseData.stern.thickness
-            )}`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(
+                this.shipCompareData.stern.thickness
+            )}</span>${getDiff(this.shipCompareData.stern.thickness, this._shipBaseData.stern.thickness)}`,
             battleRating: `${this.shipCompareData.battleRating}\u00A0${getDiff(
                 this.shipCompareData.battleRating,
                 this._shipBaseData.battleRating
@@ -406,10 +405,9 @@ export class ShipComparison extends Ship {
             frontArmor: `${formatIntTrunc(this.shipCompareData.bow.armour)}\u00A0${getDiff(
                 this.shipCompareData.bow.armour,
                 this._shipBaseData.bow.armour
-            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipCompareData.bow.thickness)}</span>${getDiff(
-                this.shipCompareData.bow.thickness,
-                this._shipBaseData.bow.thickness
-            )}`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(
+                this.shipCompareData.bow.thickness
+            )}</span>${getDiff(this.shipCompareData.bow.thickness, this._shipBaseData.bow.thickness)}`,
             guns: `${this.shipCompareData.guns.total}\u00A0${getDiff(
                 this.shipCompareData.guns.total,
                 this._shipBaseData.guns.total
@@ -521,10 +519,9 @@ export class ShipComparison extends Ship {
             sideArmor: `${formatIntTrunc(this.shipCompareData.sides.armour)}\u00A0${getDiff(
                 this.shipCompareData.sides.armour,
                 this._shipBaseData.sides.armour
-            )}</br><span class="badge badge-white">${formatIntTrunc(this.shipCompareData.sides.thickness)}</span>${getDiff(
-                this.shipCompareData.sides.thickness,
-                this._shipBaseData.sides.thickness
-            )}`,
+            )}</br><span class="badge badge-white">${formatIntTrunc(
+                this.shipCompareData.sides.thickness
+            )}</span>${getDiff(this.shipCompareData.sides.thickness, this._shipBaseData.sides.thickness)}`,
             splinterResistance: `${formatPercent(this.shipCompareData.resistance!.splinter, 0)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.splinter,
                 this._shipBaseData.resistance!.splinter,

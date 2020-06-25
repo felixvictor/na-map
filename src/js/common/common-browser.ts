@@ -91,7 +91,7 @@ export const colourList = [
 
 /**
  * Enable nested dropdowns in navbar
- * @link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar
+ * {@link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar}
  * @param id - nav-item id
  */
 export const initMultiDropdownNavbar = (id: string): void => {

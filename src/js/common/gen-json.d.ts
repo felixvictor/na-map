@@ -14,7 +14,7 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodType } from "./common";
+import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodType } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType } from "./types"
 

@@ -194,6 +194,7 @@ export const validNationShortName = (nationShortName: string): boolean =>
  * @param   object - Object
  * @returns True if object is empty
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 export const isEmpty = (object: object): boolean =>
     Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object
 
@@ -203,27 +204,6 @@ export const isEmpty = (object: object): boolean =>
  * @returns Uppercased string
  */
 export const capitalizeFirstLetter = (string: string): string => string.charAt(0).toUpperCase() + string.slice(1)
-
-/**
- * Group by
- * {@link https://stackoverflow.com/a/38327540
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const groupToMap = (list: any, keyGetter: any): Map<any, any> => {
-    const map = new Map()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    list.forEach((item: any) => {
-        const key = keyGetter(item)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const collection: any = map.get(key)
-        if (collection) {
-            collection.push(item)
-        } else {
-            map.set(key, [item])
-        }
-    })
-    return map
-}
 
 /**
  * Create array with numbers ranging from start to end
