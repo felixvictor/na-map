@@ -392,6 +392,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
         )
         .filter((item) => !woodsNotUsed.has(item.Id)) as APIModule[]
+
+    // eslint-disable-next-line complexity
     apiModules.forEach((apiModule) => {
         let dontSave = false
         const module = {

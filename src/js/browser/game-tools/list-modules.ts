@@ -53,7 +53,7 @@ export default class ListModules {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async (event) => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -133,7 +133,7 @@ export default class ListModules {
          * @param moduleLevel - Module level
          * @returns Ship rate
          */
-        const getRate = (moduleLevel: string): string => (moduleLevel === "U" ? "" : `${rates.get(moduleLevel)}`)
+        const getRate = (moduleLevel: string): string => (moduleLevel === "U" ? "" : `${rates.get(moduleLevel) ?? ""}`)
 
         let rate = ""
         const rows = [] as HtmlString[]

@@ -238,7 +238,7 @@ export default class DisplayPbZones {
             .selectAll<SVGGElement, PbZoneRaid>("g.raid-zones")
             .data(this._raidZonesFiltered, (d) => String(d.id))
             .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneRaid, SVGGElement, any> => {
+                (enter): d3Selection.Selection<SVGGElement, PbZoneRaid, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "raid-zones")
 
                     // Raid join circles

@@ -8,10 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs"
 import * as path from "path"
 import { default as Immutable } from "immutable"
-import { default as PNG } from "pngjs"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
@@ -385,4 +383,4 @@ class PixelMap {
     }
 }
 
-const map = new PixelMap()
+void new PixelMap()
