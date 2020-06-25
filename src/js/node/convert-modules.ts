@@ -139,7 +139,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Cannon side traverse"],
         ["NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow"],
         ["NONE GRENADES_BONUS", "Grenades"],
-        ["NONE GROG_ACCURACY_PENALTY", "Muskets accuracy penalty"],
+        ["NONE GROG_ACCURACY_PENALTY", "Muskets accuracy"],
         ["NONE GROG_ATTACK_BONUS", "Melee attack"],
         ["NONE HANDBOOK_ATTACK_BONUS", "Melee attack"],
         ["NONE HANDBOOK_DEFENSE_BONUS", "Melee defense"],
@@ -155,7 +155,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE MAST_PHYSICS_MAIN_SAIL_TORQUE_BONUS", "Square sails torque"],
         ["NONE MAST_PHYSICS_SPANKER_SAIL_FORCE_BONUS", "Spanker power"],
         ["NONE MUSKETS_ACCURACY_BONUS", "Muskets accuracy"],
-        ["NONE MUSKETS_PERCENTAGE_OF_CREW", "Additional crew with muskets"],
+        ["NONE MUSKETS_PERCENTAGE_OF_CREW", "Crew with muskets"],
         ["NONE PERK_BOARDING_ATTACK_COST_MODIFIER", "Boarding attack cost"],
         ["NONE PERK_BOARDING_DEFEND_COST_MODIFIER", "Boarding defend cost"],
         ["NONE PERK_BOARDING_ENEMY_EXTRA_CREW_REQUIREMENT", "Enemy boarding crew needed"],
@@ -175,7 +175,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE PERK_ENABLE_DOUBLE_SHOT", "Double shot"],
         ["NONE PERK_FISHING_DROP_CHANCE_MODIFIER", "Fishing efficiency"],
         ["NONE PERK_HEEL_DEGREES_MODIFIER", "Heel correction"],
-        ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold capacity"],
+        ["NONE PERK_HOLD_MAX_WEIGHT_MODIFIER", "Hold weight"],
         ["NONE PERK_HULL_REPAIR_PERCENT_MODIFIER", "Armour repair amount (perk)"],
         ["NONE PERK_LABOR_HOURS_GENERATION_MODIFIER", "Labour hour generation"],
         ["NONE PERK_LABOR_HOURS_WALLET_MODIFIER", "Labour hour reserve"],
@@ -200,10 +200,10 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE PERK_SHIP_MASTER_SPEED_ADD_MODIFIER", "Ship master speed add modifier"],
         ["NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Ship purchase price"],
         ["NONE PERK_START_ALL_GUNS_LOADED", "Guns loaded at start"],
-        ["NONE PREPARATION_BONUS_PER_ROUND", "Preparation bonus per round"],
+        ["NONE PREPARATION_BONUS_PER_ROUND", "Preparation"],
         ["NONE RHEA_TURN_SPEED", "Yard turn speed"],
         ["NONE SAIL_RISING_SPEED", "Sail rising speed"],
-        ["NONE SHIP_BOARDING_PREPARATION_BONUS", "Boarding preparation bonus"],
+        ["NONE SHIP_BOARDING_PREPARATION_BONUS", "Preparation"],
         ["NONE SHIP_EXTRA_CHAIN_UNITS", "Additional chains"],
         ["NONE SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"], // typo
         ["NONE SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges"],
@@ -393,7 +393,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         )
         .filter((item) => !woodsNotUsed.has(item.Id)) as APIModule[]
 
-    // eslint-disable-next-line complexity
     apiModules.forEach((apiModule) => {
         let dontSave = false
         const module = {
@@ -432,14 +431,6 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 const properties = getModuleProperties(module.APImodifiers)
                 if (properties) {
                     module.properties = properties
-
-                    // Copy cannon crew entry for carronade crew
-                    const cannonCrewProperty = properties.find((property) => property.modifier === "Cannon crew")
-                    if (cannonCrewProperty) {
-                        const carronadeCrewProperty = JSON.parse(JSON.stringify(cannonCrewProperty))
-                        carronadeCrewProperty.modifier = "Carronade crew"
-                        module.properties.push(carronadeCrewProperty)
-                    }
                 }
 
                 module.type = getModuleType(module)
