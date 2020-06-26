@@ -16,7 +16,7 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
-import { formatFloat, formatIntTrunc, formatPercent } from "../../../common/common-format"
+import { formatFloat, formatIntTrunc, formatPercent, formatSignInt } from "../../../common/common-format"
 import { degreesToCompass, getOrdinal } from "../../../common/common-math"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { event as d3Event } from "d3-selection"
@@ -353,14 +353,14 @@ export class ShipBase extends Ship {
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
 
         const ship = {
-            morale: formatIntTrunc(this.shipData.boarding.morale),
-            musketsAccuracy: formatPercent(this.shipData.boarding.musketsAccuracy),
-            prepBonus: formatIntTrunc(this.shipData.boarding.prepBonus),
-            attack: formatIntTrunc(this.shipData.boarding.attack),
-            defense: formatIntTrunc(this.shipData.boarding.defense),
+            attack: formatSignInt(this.shipData.boarding.attack * 100),
+            cannonsAccuracy: formatSignInt(this.shipData.boarding.cannonsAccuracy * 100),
+            defense: formatSignInt(this.shipData.boarding.defense * 100),
             disengageTime: formatIntTrunc(this.shipData.boarding.disengageTime),
-            musketsCrew: formatIntTrunc(this.shipData.boarding.musketsCrew),
-            cannonsAccuracy: formatPercent(this.shipData.boarding.cannonsAccuracy),
+            morale: formatIntTrunc(this.shipData.boarding.morale),
+            musketsAccuracy: formatSignInt(this.shipData.boarding.musketsAccuracy * 100),
+            musketsCrew: formatSignInt(this.shipData.boarding.musketsCrew * 100),
+            prepBonus: formatIntTrunc(this.shipData.boarding.prepBonus),
 
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,

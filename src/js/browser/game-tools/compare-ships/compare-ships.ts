@@ -288,14 +288,13 @@ export class CompareShips {
     _setupData(): void {
         this._moduleAndWoodChanges = new Map<ModifierName, Property>([
             ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
-            ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: true }],
-            ["Preparation bonus", { properties: ["boarding.prepBonus"], isBaseValueAbsolute: true }],
-            ["Melee attack", { properties: ["boarding.attack"], isBaseValueAbsolute: true }],
-            ["Melee defense", { properties: ["boarding.defense"], isBaseValueAbsolute: true }],
+            ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
+            ["Preparation", { properties: ["boarding.prepBonus"], isBaseValueAbsolute: true }],
+            ["Melee attack", { properties: ["boarding.attack"], isBaseValueAbsolute: false }],
+            ["Melee defense", { properties: ["boarding.defense"], isBaseValueAbsolute: false }],
             ["Disengage time", { properties: ["boarding.disengageTime"], isBaseValueAbsolute: true }],
             ["Crew with muskets", { properties: ["boarding.musketsCrew"], isBaseValueAbsolute: false }],
-            ["Boarding cannon accuracy", { properties: ["boarding.cannonsAccuracy"], isBaseValueAbsolute: true }],
-
+            ["Boarding cannons accuracy", { properties: ["boarding.cannonsAccuracy"], isBaseValueAbsolute: false }],
 
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
@@ -727,7 +726,7 @@ export class CompareShips {
 
             div.append("div")
                 .attr("id", `${this._baseId}-${columnId}`)
-                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`)
+                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"} compress`)
         }
 
         const footer = d3Select(`#${this._modalId} .modal-footer`)
@@ -974,29 +973,16 @@ export class CompareShips {
         const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId])!
         shipDataDefault.crew.carronades = shipDataDefault.crew.cannons
         shipDataDefault.boarding = {
-            attack: 100,
-            cannonsAccuracy: 100,
-            defense: 100,
+            attack: 0,
+            cannonsAccuracy: 0,
+            defense: 0,
             disengageTime: 4,
             morale: 100,
-            musketsAccuracy: 100,
-            musketsCrew: 40,
-            prepBonus: 4,
+            musketsAccuracy: 0,
+            musketsCrew: 0,
+            prepBonus: 13,
         }
-        /*
-        { "modifier": "Morale", "amount": 6, "isPercentage": false },
-        { "modifier": "Muskets accuracy penalty", "amount": -15, "isPercentage": true }
 
-        { "modifier": "Preparation bonus", "amount": 6, "isPercentage": false },
-        { "modifier": "Melee attack", "amount": 5, "isPercentage": true },
-        { "modifier": "Melee defense", "amount": 4, "isPercentage": true }
-
-        { "modifier": "Muskets accuracy", "amount": 10, "isPercentage": true },
-        { "modifier": "Additional crew with muskets", "amount": 10, "isPercentage": true }
-        { "modifier": "Disengage time", "amount": -2, "isPercentage": false }
-
-        { "modifier": "Boarding cannon accuracy", "amount": 7, "isPercentage": true }
-        */
         let shipDataUpdated = shipDataDefault
         shipDataUpdated.repairAmount = {
             armour: hullRepairsPercent,
