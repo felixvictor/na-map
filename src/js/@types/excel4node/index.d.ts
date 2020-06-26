@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any,tsdoc/syntax */
 /**
  * https://github.com/Dominic-Preap/excel4node/blob/master/typings/excel4node.d.ts
  */
@@ -576,29 +576,34 @@ declare module "excel4node" {
         /**
          * Set rows and/or columns to create a frozen pane with an optionall scrollTo
          */
-        freeze(number?: number): RowColumnBase // Freezes the first two columns and scrolls the right view to column
+        freeze: (number?: number) => RowColumnBase // Freezes the first two columns and scrolls the right view to column
         /**
          * Add Filters to a row If not options are given to the filter function, a filter will be added to all columns that contain data. Optionally, if you wish to restrict your filter to a specific range, you can specify start and end rows and columns for that range. The filter row should be included in this range.
          */
-        filter(opt?: { firstRow?: number; firstColumn?: number; lastRow?: number; lastColumn?: number }): RowColumnBase
+        filter: (opt?: {
+            firstRow?: number
+            firstColumn?: number
+            lastRow?: number
+            lastColumn?: number
+        }) => RowColumnBase
 
         /**
          * Hide a row or column
          */
-        hide(): RowColumnBase
+        hide: () => RowColumnBase
 
         /**
          * Create groupings of rows or columns and optionally state to collapse the grouping
          */
-        group(number: number, collapse?: boolean): RowColumnBase
+        group: (number: number, collapse?: boolean) => RowColumnBase
     }
 
     interface Column extends RowColumnBase {
-        setWidth(number: number): RowColumnBase
+        setWidth: (number: number) => RowColumnBase
     }
 
     interface Row extends RowColumnBase {
-        setHeight(number: number): RowColumnBase
+        setHeight: (number: number) => RowColumnBase
     }
     // #endregion
 
@@ -610,31 +615,31 @@ declare module "excel4node" {
         /**
          * accepts a String or Array. Sending array allows for multiple font formattings within the same cell.
          */
-        string(arg: string | any[]): Cell
+        string: (arg: string | any[]) => Cell
         /**
          * accepts a number
          */
-        number(arg: number): Cell
+        number: (arg: number) => Cell
         /**
          * accepts an Excel formula
          */
-        formula(arg: string): Cell
+        formula: (arg: string) => Cell
         /**
          * accepts either a date or a date string
          */
-        date(arg: string | Date): Cell
+        date: (arg: string | Date) => Cell
         /**
          * accepts a URL and optionally a displayStr and hover tooltip
          */
-        link(arg: string, displayStr?: string, tooltip?: string): Cell
+        link: (arg: string, displayStr?: string, tooltip?: string) => Cell
         /**
          * accepts a boolean (true or false)
          */
-        bool(arg: boolean): Cell
+        bool: (arg: boolean) => Cell
         /**
          * accepts the same object as when creating a new style. When applied to a cell that already has style formatting, the original formatting will be kept and updated with the changes sent to the style function.
          */
-        style(arg: Style): Cell
+        style: (arg: Style) => Cell
     }
     // #endregion
 

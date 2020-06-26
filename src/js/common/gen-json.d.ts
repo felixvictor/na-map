@@ -14,7 +14,7 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodType } from "./common";
+import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodType } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType } from "./types"
 
@@ -480,6 +480,7 @@ interface ShipBlueprintShip {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ShipData extends ObjectIndexer<any> {
     battleRating: number
+    boarding: ShipBoarding
     bow: ShipHealth
     class: number
     crew: ShipCrew
@@ -505,6 +506,17 @@ export interface ShipData extends ObjectIndexer<any> {
     structure: ShipStructureOrPump
     tradeShip: boolean
     upgradeXP: number
+}
+interface ShipBoarding {
+    prepInitial: number
+    prepPerRound: number
+    attack?: number
+    cannonsAccuracy?: number
+    defense?: number
+    disengageTime?: number
+    morale?: number
+    musketsAccuracy?: number
+    musketsCrew?: number
 }
 interface ShipGuns {
     total: number

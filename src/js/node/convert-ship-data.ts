@@ -142,6 +142,14 @@ const subFileStructure: SubFileStructure[] = [
         ]),
     },
     {
+        ext: "crew",
+        elements: new Map([
+            ["SHIP_BOARDING_PREPARATION_BONUS", { group: "boarding", element: "prepInitial" }],
+            ["PREPARATION_BONUS_PER_ROUND", { group: "boarding", element: "prepPerRound" }],
+            ["HANDBOOK_MORALE_BONUS", { group: "boarding", element: "morale" }],
+        ]),
+    },
+    {
         ext: "f armor",
         elements: new Map([
             // ["ARMOR_FRONT_HP", { group: "bow", element: "armour" }], // removed patch 30
@@ -461,6 +469,16 @@ const getAdditionalData = (elements: ElementMap, fileData: XmlGeneric): ShipData
             if (key === "MAST_THICKNESS") {
                 addData[group].middleThickness = value * middleMastThicknessRatio
                 addData[group].topThickness = value * topMastThicknessRatio
+            }
+
+            // Set default value for preparation per round
+            if (key === "PREPARATION_BONUS_PER_ROUND") {
+                addData[group][element] += 18
+            }
+
+            // Set default value for morale
+            if (key === "HANDBOOK_MORALE_BONUS") {
+                addData[group][element] += 100
             }
         }
     }
