@@ -66,5 +66,5 @@ const loadData = async (baseAPIFilename) => {
     await Promise.all(getPromise);
     return true;
 };
-loadData(baseAPIFilename);
+void loadData(baseAPIFilename);
 //# sourceMappingURL=load-api-data.js.map
