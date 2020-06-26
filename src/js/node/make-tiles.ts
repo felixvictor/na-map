@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-// eslint-disable-next-line @typescript-eslint/camelcase
 import child_process from "child_process"
 import sharp from "sharp"
 
@@ -26,7 +25,6 @@ const convert = async (): Promise<void> => {
             .tile({ size: tileSize, layout: "google" })
             .toFile(mapPath)
 
-        // eslint-disable-next-line @typescript-eslint/camelcase
         child_process.exec(
             `convert ${inFilename} -fuzz 4% -fill 'rgb(195, 189, 180)' -opaque 'rgb(142, 132, 115)' -resize 1024 ${logoMainFile}`,
             (err, stdout, stderr) => {
@@ -48,4 +46,4 @@ const convert = async (): Promise<void> => {
     }
 }
 
-convert()
+void convert()

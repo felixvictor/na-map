@@ -19,7 +19,7 @@ interface FormatLocaleDefinition {
      */
     decimal: string
     /**
-     * The group separator (e.g., ","). Note that the thousands property is a misnomer, as\
+     * The group separator (e.g., ","). Note that the thousands property is a misnomer, as
      * the grouping definition allows groups other than thousands.
      */
     thousands: string
@@ -116,7 +116,7 @@ export const formatInt = (x: number): string => formatLocale.format(",d")(x)
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x - 0.5)
+export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x === 0 ? 0 : x - 0.5)
 
 /**
  * Format integer with +/- sign
@@ -141,7 +141,7 @@ export const formatSiInt = (x: number): string =>
     formatLocale
         .format(",.2s")(x)
         .replace(".0", "")
-        .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("M", "\u2009\u1D0D") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
         .replace("m", "\u2009m")
 
@@ -154,7 +154,7 @@ export const formatSiCurrency = (x: number): string =>
     formatLocale
         .format("$,.2s")(x)
         .replace(".0", "")
-        .replace("M", "\u2009\u1d0d") // LATIN LETTER SMALL CAPITAL M
+        .replace("M", "\u2009\u1D0D") // LATIN LETTER SMALL CAPITAL M
         .replace("k", "\u2009k")
 
 /**

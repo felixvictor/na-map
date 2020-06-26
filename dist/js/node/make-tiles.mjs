@@ -37,5 +37,5 @@ const convert = async () => {
         throw new Error(error);
     }
 };
-convert();
+void convert();
 //# sourceMappingURL=make-tiles.js.map

@@ -237,5 +237,5 @@ const updateTwitter = async () => {
         process.exitCode = Number(!isPortDataChanged);
     }
 };
-updateTwitter();
+void updateTwitter();
 //# sourceMappingURL=update-twitter.js.map

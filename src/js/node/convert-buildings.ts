@@ -162,9 +162,7 @@ const getPrices = (buildings: Building[]): Price => {
     const getStandardPrices = (name: string): number | undefined =>
         prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.real
 
-    prices.standard = (buildings.filter(
-        (building: Building) => building.result && building.result[0] && building.result[0].price
-    ) as BuildingWithResult[])
+    prices.standard = (buildings.filter((building: Building) => building.result?.[0].price) as BuildingWithResult[])
         .map(
             (building: BuildingWithResult): PriceStandardWood => {
                 const result = building.result[0]
