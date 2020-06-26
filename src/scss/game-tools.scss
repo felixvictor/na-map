@@ -113,10 +113,6 @@ table tr {
     height: 83px;
 }
 
-.badge {
-    padding-top: 0.15rem;
-}
-
 .mm {
     color: $red;
 }
@@ -203,17 +199,24 @@ table tr {
     }
 }
 
+$padding-small: $padding-third / 1.618;
+$padding-large: $padding-third;
+
+.badge {
+    padding-top: $padding-small;
+}
+
 .row-small {
-    padding-bottom: $padding-third;
+    padding-bottom: $padding-small;
 }
 
 .compress {
-    line-height: 0.8;
+    line-height: 0.9;
 }
 
 .col-compress {
-    padding: $padding-third $padding-third 0;
+    padding: $padding-large $padding-large 0;
     .des {
-        top: -0.2rem;
+        top: -$padding-small / 2;
     }
 }

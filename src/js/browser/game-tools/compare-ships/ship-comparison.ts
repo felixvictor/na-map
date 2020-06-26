@@ -330,6 +330,9 @@ export class ShipComparison extends Ship {
             if (isPercentage) {
                 diff = Number.parseFloat((b - a).toFixed(decimals)) * 100
                 formattedDiff = formatFloat(Math.abs(diff))
+            } else if (a === 0 || b === 0) {
+                diff = b - a
+                formattedDiff = formatFloat(Math.abs(diff))
             } else {
                 diff = 1 - a / b
                 formattedDiff = formatPercent(Math.abs(diff), 0)
@@ -358,49 +361,47 @@ export class ShipComparison extends Ship {
         const rumRepairsNeededCompare = Math.round(this.shipCompareData.crew.max * rumRepairsFactor)
 
         const ship = {
-            morale: `${formatIntTrunc(this.shipCompareData.boarding.morale)}\u00A0${getDiff(
-                this.shipCompareData.boarding.morale,
-                this._shipBaseData.boarding.morale
+            morale: `${formatIntTrunc(this.shipCompareData.boarding.morale!)}\u00A0${getDiff(
+                this.shipCompareData.boarding.morale!,
+                this._shipBaseData.boarding.morale!
             )}`,
-            musketsAccuracy: `${formatSignInt(this.shipCompareData.boarding.musketsAccuracy)}\u00A0${getDiff(
-                this.shipCompareData.boarding.musketsAccuracy,
-                this._shipBaseData.boarding.musketsAccuracy,
-                2,
+            musketsAccuracy: `${formatSignInt(this.shipCompareData.boarding.musketsAccuracy! * 100)}\u00A0${getDiff(
+                this.shipCompareData.boarding.musketsAccuracy! * 100,
+                this._shipBaseData.boarding.musketsAccuracy! * 100
+            )}`,
+            prepPerRound: `${formatIntTrunc(this.shipCompareData.boarding.prepPerRound)}\u00A0${getDiff(
+                this.shipCompareData.boarding.prepPerRound,
+                this._shipBaseData.boarding.prepPerRound
+            )}`,
+            attack: `${formatSignFloat(this.shipCompareData.boarding.attack!, 2)}\u00A0${getDiff(
+                this.shipCompareData.boarding.attack! / 100,
+                this._shipBaseData.boarding.attack! / 100,
+                3,
                 true
             )}`,
-            prepBonus: `${formatIntTrunc(this.shipCompareData.boarding.prepBonus)}\u00A0${getDiff(
-                this.shipCompareData.boarding.prepBonus,
-                this._shipBaseData.boarding.prepBonus,
-                2
-            )}`,
-            attack: `${formatSignInt(this.shipCompareData.boarding.attack)}\u00A0${getDiff(
-                this.shipCompareData.boarding.attack,
-                this._shipBaseData.boarding.attack,
-                2,
+            defense: `${formatSignFloat(this.shipCompareData.boarding.defense!, 2)}\u00A0${getDiff(
+                this.shipCompareData.boarding.defense! / 100,
+                this._shipBaseData.boarding.defense! / 100,
+                3,
                 true
             )}`,
-            defense: `${formatSignInt(this.shipCompareData.boarding.defense)}\u00A0${getDiff(
-                this.shipCompareData.boarding.defense,
-                this._shipBaseData.boarding.defense,
-                2,
-                true
+            disengageTime: `${formatIntTrunc(this.shipCompareData.boarding.disengageTime!)}\u00A0${getDiff(
+                this._shipBaseData.boarding.disengageTime!,
+                this.shipCompareData.boarding.disengageTime!
             )}`,
-            disengageTime: `${formatIntTrunc(this.shipCompareData.boarding.disengageTime)}\u00A0${getDiff(
-                this._shipBaseData.boarding.disengageTime,
-                this.shipCompareData.boarding.disengageTime,
-                2
+            musketsCrew: `${formatIntTrunc(
+                (this.shipCompareData.boarding.musketsCrew! / 100) * this.shipCompareData.crew.max
+            )}\u00A0${getDiff(
+                (this.shipCompareData.boarding.musketsCrew! / 100) * this.shipCompareData.crew.max,
+                (this._shipBaseData.boarding.musketsCrew! / 100) * this._shipBaseData.crew.max
             )}`,
-            musketsCrew: `${formatSignInt(this.shipCompareData.boarding.musketsCrew)}\u00A0${getDiff(
-                this.shipCompareData.boarding.musketsCrew,
-                this._shipBaseData.boarding.musketsCrew,
-                2,
-                true
+            prepInitial: `${formatIntTrunc(this.shipCompareData.boarding.prepInitial)}\u00A0${getDiff(
+                this.shipCompareData.boarding.prepInitial,
+                this._shipBaseData.boarding.prepInitial
             )}`,
-            cannonsAccuracy: `${formatSignInt(this.shipCompareData.boarding.cannonsAccuracy)}\u00A0${getDiff(
-                this.shipCompareData.boarding.cannonsAccuracy,
-                this._shipBaseData.boarding.cannonsAccuracy,
-                2,
-                true
+            cannonsAccuracy: `${formatSignInt(this.shipCompareData.boarding.cannonsAccuracy! * 100)}\u00A0${getDiff(
+                this.shipCompareData.boarding.cannonsAccuracy! * 100,
+                this._shipBaseData.boarding.cannonsAccuracy! * 100
             )}`,
 
             acceleration: `${formatFloat(this.shipCompareData.ship.acceleration)}\u00A0${getDiff(

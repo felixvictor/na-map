@@ -16,7 +16,13 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
-import { formatFloat, formatIntTrunc, formatPercent, formatSignInt } from "../../../common/common-format"
+import {
+    formatFloat,
+    formatIntTrunc,
+    formatPercent,
+    formatSignFloat,
+    formatSignInt,
+} from "../../../common/common-format"
 import { degreesToCompass, getOrdinal } from "../../../common/common-math"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { event as d3Event } from "d3-selection"
@@ -353,14 +359,15 @@ export class ShipBase extends Ship {
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
 
         const ship = {
-            attack: formatSignInt(this.shipData.boarding.attack * 100),
-            cannonsAccuracy: formatSignInt(this.shipData.boarding.cannonsAccuracy * 100),
-            defense: formatSignInt(this.shipData.boarding.defense * 100),
-            disengageTime: formatIntTrunc(this.shipData.boarding.disengageTime),
-            morale: formatIntTrunc(this.shipData.boarding.morale),
-            musketsAccuracy: formatSignInt(this.shipData.boarding.musketsAccuracy * 100),
-            musketsCrew: formatSignInt(this.shipData.boarding.musketsCrew * 100),
-            prepBonus: formatIntTrunc(this.shipData.boarding.prepBonus),
+            attack: formatSignFloat(this.shipData.boarding.attack!, 2),
+            cannonsAccuracy: formatSignInt(this.shipData.boarding.cannonsAccuracy! * 100),
+            defense: formatSignFloat(this.shipData.boarding.defense!, 2),
+            disengageTime: formatIntTrunc(this.shipData.boarding.disengageTime!),
+            morale: formatIntTrunc(this.shipData.boarding.morale!),
+            musketsAccuracy: formatSignInt(this.shipData.boarding.musketsAccuracy! * 100),
+            musketsCrew: formatIntTrunc((this.shipData.boarding.musketsCrew! / 100) * this.shipData.crew.max),
+            prepPerRound: formatIntTrunc(this.shipData.boarding.prepPerRound),
+            prepInitial: formatIntTrunc(this.shipData.boarding.prepInitial),
 
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
