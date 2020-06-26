@@ -124,6 +124,5 @@ const convertLoot = async (): Promise<void> => {
 export const convertLootData = (): void => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
 
-    // eslint-disable-next-line no-void
     void convertLoot()
 }

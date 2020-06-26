@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
-import { formatFloat, formatIntTrunc, formatPercent } from "../../../common/common-format";
+import { formatFloat, formatIntTrunc, formatPercent, formatSignFloat, formatSignInt, } from "../../../common/common-format";
 import { degreesToCompass, getOrdinal } from "../../../common/common-math";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event } from "d3-selection";
@@ -239,6 +239,15 @@ export class ShipBase extends Ship {
         const rigRepairsNeeded = Math.round((this.shipData.sails.armour * this.shipData.repairAmount.sails) / rigRepairsVolume);
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor);
         const ship = {
+            attack: formatSignFloat(this.shipData.boarding.attack, 2),
+            cannonsAccuracy: formatSignInt(this.shipData.boarding.cannonsAccuracy * 100),
+            defense: formatSignFloat(this.shipData.boarding.defense, 2),
+            disengageTime: formatIntTrunc(this.shipData.boarding.disengageTime),
+            morale: formatIntTrunc(this.shipData.boarding.morale),
+            musketsAccuracy: formatSignInt(this.shipData.boarding.musketsAccuracy * 100),
+            musketsCrew: formatIntTrunc((this.shipData.boarding.musketsCrew / 100) * this.shipData.crew.max),
+            prepPerRound: formatIntTrunc(this.shipData.boarding.prepPerRound),
+            prepInitial: formatIntTrunc(this.shipData.boarding.prepInitial),
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatIntTrunc(this.shipData.stern.armour)}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.stern.thickness)}</span>`,

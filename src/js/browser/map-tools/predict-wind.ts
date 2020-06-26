@@ -45,7 +45,7 @@ export default class PredictWind {
     private readonly _sliderId: HtmlString
     private readonly _timeGroupId: HtmlString
     private readonly _timeInputId: HtmlString
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, any>
+    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     constructor() {
         this._height = 300
         this._width = 260

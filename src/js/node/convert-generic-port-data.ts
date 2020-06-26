@@ -283,7 +283,6 @@ export const convertGenericPortData = (): void => {
         ])
     )
 
-    /* eslint-disable no-void */
     void setAndSavePortData()
     void setAndSavePBZones()
     void setAndSaveCountyRegionData()

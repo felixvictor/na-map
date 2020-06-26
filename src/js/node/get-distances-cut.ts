@@ -315,4 +315,4 @@ class Map {
     }
 }
 
-const map = new Map()
+void new Map()
