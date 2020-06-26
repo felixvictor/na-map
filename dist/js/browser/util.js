@@ -91,7 +91,7 @@ export const printCompassRose = ({ element, radius, }) => {
     const degreesPerStep = degreesFullCircle / steps;
     const innerRadius = Math.round(radius * 0.8);
     const strokeWidth = 3;
-    const data = new Array(steps).fill(null).map((_e, i) => degreesToCompass(i * degreesPerStep));
+    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep));
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -113,7 +113,7 @@ export const printCompassRose = ({ element, radius, }) => {
         .append("text")
         .attr("transform", (d) => {
         let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2);
-        let translate = "";
+        let translate;
         dummy.text(d);
         const textHeight = dummy.node()?.getBBox().height ?? 0;
         const textWidth = dummy.node()?.getBBox().width ?? 0;
@@ -143,7 +143,7 @@ export const printSmallCompassRose = ({ element, radius, }) => {
     const degreesPerStep = degreesFullCircle / steps;
     const innerRadius = Math.round(radius * 0.8);
     const strokeWidth = 1.5;
-    const data = new Array(steps).fill(null).map((_e, i) => degreesToCompass(i * degreesPerStep));
+    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep));
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -167,7 +167,7 @@ export const printSmallCompassRose = ({ element, radius, }) => {
 };
 export const displayClan = (clan) => `<span class="caps">${clan}</span>`;
 const copyToClipboardFallback = (text, modal$) => {
-    if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+    if (document.queryCommandSupported?.("copy")) {
         const input = document.createElement("input");
         input.type = "text";
         input.value = text;
@@ -192,7 +192,7 @@ const copyToClipboardFallback = (text, modal$) => {
         return false;
     }
 };
-const writeClipboard = (text) => {
+const writeClipboard = async (text) => {
     return navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -207,7 +207,7 @@ export const copyToClipboard = (text, modal$) => {
     if (!navigator.clipboard) {
         copyToClipboardFallback(text, modal$);
     }
-    writeClipboard(text);
+    void writeClipboard(text);
 };
 export const copyF11ToClipboard = (x, z, modal$) => {
     if (Number.isFinite(x) && Number.isFinite(z)) {

@@ -8,10 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as path from "path";
-import d3Collection from "d3-collection";
 import d3Array from "d3-array";
-const { nest: d3Nest } = d3Collection;
-const { ascending: d3Ascending, group: d3Group } = d3Array;
+const { group: d3Group } = d3Array;
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
@@ -112,6 +110,6 @@ const convertRecipes = async () => {
 };
 export const convertRecipeData = () => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
-    convertRecipes();
+    void convertRecipes();
 };
 //# sourceMappingURL=convert-recipes.js.map
