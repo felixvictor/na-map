@@ -191,10 +191,6 @@ table tr {
     font-variant-numeric: normal; // onum off
 }
 
-.row-small {
-    padding: $padding-third 0;
-}
-
 .ship-base {
     .row-light {
         background-color: $primary-100;
@@ -204,5 +200,20 @@ table tr {
 .ship-compare {
     .row-light {
         background-color: $secondary-100;
+    }
+}
+
+.row-small {
+    padding-bottom: $padding-third;
+}
+
+.compress {
+    line-height: 0.8;
+}
+
+.col-compress {
+    padding: $padding-third $padding-third 0;
+    .des {
+        top: -0.2rem;
     }
 }
