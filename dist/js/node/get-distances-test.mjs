@@ -272,5 +272,5 @@ class PixelMap {
         return !(spot & this.#VISITED) && !(spot & this.#LAND);
     }
 }
-const map = new PixelMap();
+void new PixelMap();
 //# sourceMappingURL=get-distances-test.js.map

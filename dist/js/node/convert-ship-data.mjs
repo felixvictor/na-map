@@ -100,6 +100,14 @@ const subFileStructure = [
         ]),
     },
     {
+        ext: "crew",
+        elements: new Map([
+            ["SHIP_BOARDING_PREPARATION_BONUS", { group: "boarding", element: "prepInitial" }],
+            ["PREPARATION_BONUS_PER_ROUND", { group: "boarding", element: "prepPerRound" }],
+            ["HANDBOOK_MORALE_BONUS", { group: "boarding", element: "morale" }],
+        ]),
+    },
+    {
         ext: "f armor",
         elements: new Map([
             ["ARMOR_THICKNESS", { group: "bow", element: "thickness" }],
@@ -325,6 +333,12 @@ const getAdditionalData = (elements, fileData) => {
             if (key === "MAST_THICKNESS") {
                 addData[group].middleThickness = value * middleMastThicknessRatio;
                 addData[group].topThickness = value * topMastThicknessRatio;
+            }
+            if (key === "PREPARATION_BONUS_PER_ROUND") {
+                addData[group][element] += 18;
+            }
+            if (key === "HANDBOOK_MORALE_BONUS") {
+                addData[group][element] += 100;
             }
         }
     }
