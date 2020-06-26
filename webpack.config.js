@@ -31,10 +31,9 @@ const path = require("path")
 const glob = require("glob")
 const webpack = require("webpack")
 
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
+// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const CopyPlugin = require("copy-webpack-plugin")
 const FaviconsPlugin = require("favicons-webpack-plugin")
-const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const HtmlPlugin = require("html-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const parseCss = require("css")
@@ -339,7 +338,6 @@ const config = {
     },
 
     plugins: [
-        new ForkTsCheckerWebpackPlugin(),
         new CleanWebpackPlugin({
             verbose: false,
         }),
@@ -566,6 +564,7 @@ if (isQuiet) {
     config.stats = "errors-only"
 }
 
+/*
 if (isProduction && !isQuiet) {
     config.plugins.push(
         new BundleAnalyzerPlugin({
@@ -578,6 +577,7 @@ if (isProduction && !isQuiet) {
         })
     )
 }
+*/
 
 if (isProduction) {
     config.optimization = {

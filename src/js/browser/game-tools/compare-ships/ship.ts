@@ -84,7 +84,7 @@ export class Ship {
      * @returns HTML formatted block head
      */
     static displaySecondBlock(): HtmlString {
-        return '<div class="col-9"><div class="row no-gutters">'
+        return '<div class="col-9"><div class="row">'
     }
 
     // noinspection FunctionTooLongJS
@@ -102,7 +102,9 @@ export class Ship {
          */
         function displayFirstColumn(element: string): HtmlString {
             row += 1
-            return `<div class="row row-small ${row % 2 ? "row-light" : ""}"><div class="col-3">${element}</div>`
+            return `<div class="row row-small ${
+                row % 2 ? "row-light" : ""
+            }"><div class="col-compress col-3">${element}</div>`
         }
 
         /**
@@ -123,7 +125,7 @@ export class Ship {
                 elementText = element === "" ? "" : String(ship[element])
             }
 
-            return `<div class="col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`
+            return `<div class="col-compress col-${col}">${elementText}<br><span class="des">${description}</span>${br}</div>`
         }
 
         let text = ""
@@ -187,6 +189,19 @@ export class Ship {
         text += displayColumn("maxCrew", "Maximum", 4)
         text += displayColumn("cannonCrew", "Cannon", 4)
         text += displayColumn("carroCrew", "Carronades", 4)
+        text += "</div></div></div>"
+
+        text += displayFirstColumn("Boarding")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("morale", "Morale", 4)
+        text += displayColumn("attack", "Attack", 4)
+        text += displayColumn("defense", "Defense", 4)
+        text += displayColumn("musketsCrew", "Crew with muskets", 4)
+        text += displayColumn("musketsAccuracy", "Musket accuracy %", 4)
+        text += displayColumn("cannonsAccuracy", "Cannon accuracy %", 4)
+        text += displayColumn("prepPerRound", "Preparation per round", 4)
+        text += displayColumn("prepInitial", "Initial preparation", 4)
+        text += displayColumn("disengageTime", "Rounds to disengage", 4)
         text += "</div></div></div>"
 
         text += displayFirstColumn("Resistance")

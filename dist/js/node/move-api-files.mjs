@@ -14,7 +14,7 @@ import { makeDirAsync } from "../common/common-file";
 const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/;
 const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/;
 const moveFileAsync = async (oldFileName, newFileName) => {
-    fs.rename(oldFileName, newFileName, err => {
+    fs.rename(oldFileName, newFileName, (err) => {
         if (err) {
             throw err;
         }
@@ -33,6 +33,6 @@ const moveAPIFile = async (fileName) => {
 };
 for (const fileName of fs.readdirSync(commonPaths.dirAPI)) {
     console.log("loop", fileName);
-    moveAPIFile(fileName);
+    void moveAPIFile(fileName);
 }
 //# sourceMappingURL=move-api-files.js.map

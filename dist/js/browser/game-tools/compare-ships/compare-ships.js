@@ -21,7 +21,7 @@ import html2canvas from "html2canvas";
 import { registerEvent } from "../../analytics";
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, insertBaseModal, } from "../../../common/common-browser";
 import { isEmpty, putImportError, woodType } from "../../../common/common";
-import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format";
+import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format";
 import { hashids, hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShipName, } from "../../../common/common-game-tools";
 import { getOrdinal } from "../../../common/common-math";
 import { sortBy } from "../../../common/common-node";
@@ -92,7 +92,7 @@ export class CompareShips {
                 amount =
                     property.amount < 1 && property.amount > 0
                         ? formatPP(property.amount)
-                        : formatSignInt(property.amount);
+                        : formatSignFloat(property.amount, 2);
             }
             return `${property.modifier} ${amount}`;
         })
@@ -150,6 +150,15 @@ export class CompareShips {
     }
     _setupData() {
         this._moduleAndWoodChanges = new Map([
+            ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
+            ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
+            ["Preparation", { properties: ["boarding.prepPerRound"], isBaseValueAbsolute: true }],
+            ["Initial preparation", { properties: ["boarding.prepInitial"], isBaseValueAbsolute: true }],
+            ["Melee attack", { properties: ["boarding.attack"], isBaseValueAbsolute: false }],
+            ["Melee defense", { properties: ["boarding.defense"], isBaseValueAbsolute: false }],
+            ["Disengage time", { properties: ["boarding.disengageTime"], isBaseValueAbsolute: true }],
+            ["Crew with muskets", { properties: ["boarding.musketsCrew"], isBaseValueAbsolute: true }],
+            ["Boarding cannons accuracy", { properties: ["boarding.cannonsAccuracy"], isBaseValueAbsolute: false }],
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
                 "Armor thickness",
@@ -482,7 +491,7 @@ export class CompareShips {
             }
             div.append("div")
                 .attr("id", `${this._baseId}-${columnId}`)
-                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`);
+                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"} compress`);
         }
         const footer = d3Select(`#${this._modalId} .modal-footer`);
         footer
@@ -634,6 +643,18 @@ export class CompareShips {
     }
     _getShipData(columnId) {
         const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId]);
+        shipDataDefault.crew.carronades = shipDataDefault.crew.cannons;
+        shipDataDefault.boarding = {
+            attack: 0,
+            cannonsAccuracy: 0,
+            defense: 0,
+            disengageTime: 4,
+            morale: shipDataDefault.boarding.morale,
+            musketsAccuracy: 0,
+            musketsCrew: 30,
+            prepInitial: shipDataDefault.boarding.prepInitial,
+            prepPerRound: shipDataDefault.boarding.prepPerRound,
+        };
         let shipDataUpdated = shipDataDefault;
         shipDataUpdated.repairAmount = {
             armour: hullRepairsPercent,

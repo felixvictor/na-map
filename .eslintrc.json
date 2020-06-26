@@ -52,6 +52,7 @@
                 "semi": ["error", "never"],
                 "unicorn/prevent-abbreviations": "off",
                 "unicorn/no-nested-ternary": "off",
+                "unicorn/no-useless-undefined": "off",
                 "tsdoc/syntax": "warn",
                 "@typescript-eslint/ban-ts-comment": "off",
                 "@typescript-eslint/consistent-type-assertions": ["error", { "assertionStyle": "as" }],

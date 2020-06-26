@@ -107,7 +107,7 @@ const getAPISeasonedItem = (name) => apiItems.find((item) => item.ItemType === "
 const getPrices = (buildings) => {
     const prices = { standard: [], seasoned: [] };
     const getStandardPrices = (name) => prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.real;
-    prices.standard = buildings.filter((building) => building.result && building.result[0] && building.result[0].price)
+    prices.standard = buildings.filter((building) => building.result?.[0].price)
         .map((building) => {
         const result = building.result[0];
         return {

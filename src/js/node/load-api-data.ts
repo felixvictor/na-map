@@ -104,5 +104,4 @@ const loadData = async (baseAPIFilename: string): Promise<boolean> => {
     return true
 }
 
-// noinspection JSIgnoredPromiseFromCall
-loadData(baseAPIFilename)
+void loadData(baseAPIFilename)

@@ -391,4 +391,4 @@ const updateTwitter = async (): Promise<void> => {
     }
 }
 
-updateTwitter()
+void updateTwitter()
