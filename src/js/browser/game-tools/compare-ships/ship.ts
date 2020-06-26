@@ -196,11 +196,12 @@ export class Ship {
         text += displayColumn("morale", "Morale", 4)
         text += displayColumn("attack", "Attack", 4)
         text += displayColumn("defense", "Defense", 4)
-        text += displayColumn("musketsCrew", "Musket crew %", 4)
+        text += displayColumn("musketsCrew", "Crew with muskets", 4)
         text += displayColumn("musketsAccuracy", "Musket accuracy %", 4)
         text += displayColumn("cannonsAccuracy", "Cannon accuracy %", 4)
-        text += displayColumn("prepBonus", "Preparation per round")
-        text += displayColumn("disengageTime", "Rounds to disengage")
+        text += displayColumn("prepPerRound", "Preparation per round", 4)
+        text += displayColumn("prepInitial", "Initial preparation", 4)
+        text += displayColumn("disengageTime", "Rounds to disengage", 4)
         text += "</div></div></div>"
 
         text += displayFirstColumn("Resistance")

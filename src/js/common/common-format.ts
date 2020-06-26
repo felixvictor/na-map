@@ -116,7 +116,7 @@ export const formatInt = (x: number): string => formatLocale.format(",d")(x)
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x - 0.5)
+export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x === 0 ? 0 : x - 0.5)
 
 /**
  * Format integer with +/- sign

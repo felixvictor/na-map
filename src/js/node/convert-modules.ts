@@ -229,6 +229,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
     ])
 
     const flipAmountForModule = new Set<ModifierName>(["Fire resistance", "Leak resistance", "Rudder speed"])
+    const notPercentage = new Set<ModifierName>(["Crew with muskets", "Melee attack", "Melee defense", "Morale"])
 
     /**
      * Set wood properties
@@ -251,7 +252,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
 
             // Some modifiers are wrongly indicated as a percentage
-            if (modifierName === "Boarding morale") {
+            if (notPercentage.has(modifierName)) {
                 isPercentage = false
             }
 
@@ -321,6 +322,11 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             } else if (modifierName === "Splinter resistance") {
                 amount = Math.round(modifier.Absolute * 10000) / 100
                 isPercentage = true
+            }
+
+            // Some modifiers are wrongly indicated as a percentage
+            if (notPercentage.has(modifierName)) {
+                isPercentage = false
             }
 
             return {
