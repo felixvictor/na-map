@@ -8,5 +8,5 @@ interface RoundSliderPos {
 }
 
 interface JQuery {
-    roundSlider(options?: object | string): any
+    roundSlider: (options?: Record<string, unknown> | string) => any
 }

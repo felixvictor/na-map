@@ -31,7 +31,7 @@ import {
     insertBaseModal,
 } from "../../../common/common-browser"
 import { isEmpty, putImportError, woodType } from "../../../common/common"
-import { formatPP, formatSignInt, formatSignPercent } from "../../../common/common-format"
+import { formatPP, formatSignFloat, formatSignInt, formatSignPercent } from "../../../common/common-format";
 import {
     hashids,
     hullRepairsPercent,
@@ -211,7 +211,7 @@ export class CompareShips {
                     amount =
                         property.amount < 1 && property.amount > 0
                             ? formatPP(property.amount)
-                            : formatSignInt(property.amount)
+                            : formatSignFloat(property.amount, 2)
                 }
 
                 return `${property.modifier} ${amount}`
@@ -287,6 +287,16 @@ export class CompareShips {
 
     _setupData(): void {
         this._moduleAndWoodChanges = new Map<ModifierName, Property>([
+            ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
+            ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
+            ["Preparation", { properties: ["boarding.prepPerRound"], isBaseValueAbsolute: true }],
+            ["Initial preparation", { properties: ["boarding.prepInitial"], isBaseValueAbsolute: true }],
+            ["Melee attack", { properties: ["boarding.attack"], isBaseValueAbsolute: false }],
+            ["Melee defense", { properties: ["boarding.defense"], isBaseValueAbsolute: false }],
+            ["Disengage time", { properties: ["boarding.disengageTime"], isBaseValueAbsolute: true }],
+            ["Crew with muskets", { properties: ["boarding.musketsCrew"], isBaseValueAbsolute: true }],
+            ["Boarding cannons accuracy", { properties: ["boarding.cannonsAccuracy"], isBaseValueAbsolute: false }],
+
             ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
             [
                 "Armor thickness",
@@ -717,7 +727,7 @@ export class CompareShips {
 
             div.append("div")
                 .attr("id", `${this._baseId}-${columnId}`)
-                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"}`)
+                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"} compress`)
         }
 
         const footer = d3Select(`#${this._modalId} .modal-footer`)
@@ -962,8 +972,20 @@ export class CompareShips {
      */
     _getShipData(columnId: ShipColumnType): ShipData {
         const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId])!
-        let shipDataUpdated = shipDataDefault
+        shipDataDefault.crew.carronades = shipDataDefault.crew.cannons
+        shipDataDefault.boarding = {
+            attack: 0,
+            cannonsAccuracy: 0,
+            defense: 0,
+            disengageTime: 4,
+            morale: shipDataDefault.boarding.morale,
+            musketsAccuracy: 0,
+            musketsCrew: 30,
+            prepInitial: shipDataDefault.boarding.prepInitial,
+            prepPerRound: shipDataDefault.boarding.prepPerRound,
+        }
 
+        let shipDataUpdated = shipDataDefault
         shipDataUpdated.repairAmount = {
             armour: hullRepairsPercent,
             armourPerk: 0,

@@ -29,7 +29,7 @@ import { serverNames } from "../common/common-var"
 import { cleanName } from "../common/common-node"
 
 import { APIPort } from "./api-port"
-import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json";
+import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json"
 
 const fileExtension = ".json.xz"
 
@@ -226,7 +226,7 @@ const convertOwnership = (): void => {
      * @param fileNames - File names
      * @returns Resolved promise
      */
-    const processFiles = async (fileNames: string[]): Promise<any> => {
+    const processFiles = async (fileNames: string[]): Promise<unknown> => {
         // eslint-disable-next-line unicorn/no-reduce
         return fileNames.reduce(
             async (sequence, fileName) =>

@@ -204,5 +204,5 @@ class Map {
         return !(spot & this.#VISITED) && !(spot & this.#LAND);
     }
 }
-const map = new Map();
+void new Map();
 //# sourceMappingURL=get-distances.js.map

@@ -21,7 +21,7 @@ const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/
  * Move file (async)
  */
 const moveFileAsync = async (oldFileName: string, newFileName: string): Promise<void> => {
-    fs.rename(oldFileName, newFileName, err => {
+    fs.rename(oldFileName, newFileName, (err) => {
         if (err) {
             throw err
         }
@@ -48,5 +48,5 @@ const moveAPIFile = async (fileName: string): Promise<void> => {
 for (const fileName of fs.readdirSync(commonPaths.dirAPI)) {
     console.log("loop", fileName)
     // noinspection JSIgnoredPromiseFromCall
-    moveAPIFile(fileName)
+    void moveAPIFile(fileName)
 }

@@ -152,7 +152,7 @@ export const printCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, any, HTMLElement, any>
+    element: Selection<BaseType, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
@@ -160,7 +160,7 @@ export const printCompassRose = ({
     // noinspection MagicNumberJS
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 3
-    const data = new Array(steps).fill(null).map((_e, i) => degreesToCompass(i * degreesPerStep))
+    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -196,7 +196,7 @@ export const printCompassRose = ({
         .append("text")
         .attr("transform", (d) => {
             let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)
-            let translate = ""
+            let translate: string
 
             dummy.text(d)
             const textHeight = dummy.node()?.getBBox().height ?? 0
@@ -232,14 +232,14 @@ export const printSmallCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, unknown, HTMLElement, any>
+    element: Selection<BaseType, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
     const degreesPerStep = degreesFullCircle / steps
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 1.5
-    const data = new Array(steps).fill(null).map((_e, i) => degreesToCompass(i * degreesPerStep))
+    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -286,7 +286,7 @@ export const displayClan = (clan: string): string => `<span class="caps">${clan}
  */
 const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
     // console.log("copyToClipboardFallback");
-    if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+    if (document.queryCommandSupported?.("copy")) {
         const input = document.createElement("input")
 
         input.type = "text"
@@ -316,7 +316,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
  * @param   text - String
  * @returns Clipboard promise
  */
-const writeClipboard = (text: string): Promise<boolean> => {
+const writeClipboard = async (text: string): Promise<boolean> => {
     return navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -339,8 +339,7 @@ export const copyToClipboard = (text: string, modal$: JQuery): void => {
         copyToClipboardFallback(text, modal$)
     }
 
-    // noinspection JSIgnoredPromiseFromCall
-    writeClipboard(text)
+    void writeClipboard(text)
 }
 
 /**
@@ -368,14 +367,13 @@ export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void =
  * @param steps - Number of steps (default 512)
  */
 export const colourRamp = (
-    element: Selection<SVGElement | HTMLElement, unknown, HTMLElement, any>,
+    element: Selection<SVGElement | HTMLElement, unknown, HTMLElement, unknown>,
     colourScale: ScaleLinear<string | CanvasGradient | CanvasPattern, string | CanvasGradient | CanvasPattern>,
     steps = 512
 ): void => {
     const height = 200
     const width = 1000
     const canvas = element.insert("canvas").attr("width", width).attr("height", height)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const context = canvas.node()?.getContext("2d")
     // @ts-expect-error
     canvas.style.imageRendering = "pixelated"

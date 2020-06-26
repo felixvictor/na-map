@@ -113,10 +113,6 @@ table tr {
     height: 83px;
 }
 
-.badge {
-    padding-top: 0.15rem;
-}
-
 .mm {
     color: $red;
 }
@@ -191,10 +187,6 @@ table tr {
     font-variant-numeric: normal; // onum off
 }
 
-.row-small {
-    padding: $padding-third 0;
-}
-
 .ship-base {
     .row-light {
         background-color: $primary-100;
@@ -204,5 +196,27 @@ table tr {
 .ship-compare {
     .row-light {
         background-color: $secondary-100;
+    }
+}
+
+$padding-small: $padding-third / 1.618;
+$padding-large: $padding-third;
+
+.badge {
+    padding-top: $padding-small;
+}
+
+.row-small {
+    padding-bottom: $padding-small;
+}
+
+.compress {
+    line-height: 0.9;
+}
+
+.col-compress {
+    padding: $padding-large $padding-large 0;
+    .des {
+        top: -$padding-small / 2;
     }
 }
