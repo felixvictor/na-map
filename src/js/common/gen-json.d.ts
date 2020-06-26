@@ -480,6 +480,7 @@ interface ShipBlueprintShip {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ShipData extends ObjectIndexer<any> {
     battleRating: number
+    boarding: ShipBoarding
     bow: ShipHealth
     class: number
     crew: ShipCrew
@@ -505,6 +506,17 @@ export interface ShipData extends ObjectIndexer<any> {
     structure: ShipStructureOrPump
     tradeShip: boolean
     upgradeXP: number
+}
+interface ShipBoarding {
+    prepInitial: number
+    prepPerRound: number
+    attack?: number
+    cannonsAccuracy?: number
+    defense?: number
+    disengageTime?: number
+    morale?: number
+    musketsAccuracy?: number
+    musketsCrew?: number
 }
 interface ShipGuns {
     total: number
