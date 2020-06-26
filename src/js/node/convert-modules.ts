@@ -133,7 +133,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE BOARDING_ATTACK_BONUS", "Melee attack"],
         ["NONE BOARDING_DEFENSE_BONUS", "Melee defense"],
         ["NONE CREW_TRANSFER_SPEED", "Crew transfer speed"],
-        ["NONE DECK_GUNS_ACCURACY_BONUS", "Boarding cannon accuracy"],
+        ["NONE DECK_GUNS_ACCURACY_BONUS", "Boarding cannons accuracy"],
         ["NONE FIRE_DECREASE_RATE", "Fire resistance"],
         ["NONE FIRE_INCREASE_RATE", "Fire resistance"],
         ["NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Cannon side traverse"],
