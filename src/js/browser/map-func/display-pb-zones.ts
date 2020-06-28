@@ -15,7 +15,7 @@ import { putImportError } from "../../common/common"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
-import DisplayPorts from "./display-ports"
+import DisplayPorts from "../map-init/display-ports"
 
 import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "../../common/gen-json"
 import { Bound } from "../../common/interface"
