@@ -44,8 +44,8 @@ import {
 } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
 
-import { NAMap } from "./na-map"
-import DisplayPorts from "./display-ports"
+import { NAMap } from "../map-init/na-map"
+import DisplayPorts from "../map-init/display-ports"
 import DisplayPbZones from "./display-pb-zones"
 
 type goodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>

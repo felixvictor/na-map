@@ -26,13 +26,7 @@ import { Bound, MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interfa
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 
-import DisplayGrid from "./display-grid"
-import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
-import SelectPorts from "./select-ports"
-import ShowF11 from "./show-f11"
-import ShowTrades from "./show-trades"
-import MakeJourney from "./make-journey"
 import { mapSize } from "../../common/common-var"
 
 interface Tile {
@@ -47,14 +41,12 @@ interface Tile {
  */
 class NAMap {
     coord: MinMaxCoord
-    f11!: ShowF11
     readonly gridOverlay: HTMLElement
     height = 0
     minScale = 0
     rem: number
     serverName: string
     showGrid: string
-    showTrades!: ShowTrades
     width = 0
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
@@ -63,11 +55,6 @@ class NAMap {
     private _doubleClickAction: string
     private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     private _mainG!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    private _grid!: DisplayGrid
-    private _journey!: MakeJourney
-    private _pbZone!: DisplayPbZones
-    private _ports!: DisplayPorts
-    private _portSelect!: SelectPorts
     private _showGrid!: string
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
