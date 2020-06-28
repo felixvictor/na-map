@@ -26,7 +26,7 @@ import Toast from "../util/toast"
 
 import { HtmlString } from "../../common/interface"
 
-import DisplayPorts from "../map-init/display-ports"
+import DisplayPorts from "../map/display-ports"
 
 /**
  * Get position
