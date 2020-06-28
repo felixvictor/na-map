@@ -107,7 +107,7 @@ const setupListener = (): void => {
  */
 const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const Map = await import(/*  webpackPreload: true, webpackChunkName: "map" */ "./map/na-map")
+        const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
         const map = new Map.NAMap(serverId, searchParams)
         await map.MapInit()
 
