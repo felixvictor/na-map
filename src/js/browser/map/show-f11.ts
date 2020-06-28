@@ -21,7 +21,7 @@ import { copyF11ToClipboard } from "../util"
 
 import { BaseModalPure, HtmlString, MinMaxCoord } from "../../common/interface"
 
-import { NAMap } from "../map-init/na-map"
+import { NAMap } from "./na-map"
 import * as d3Selection from "d3-selection"
 
 import dayjs from "dayjs"
