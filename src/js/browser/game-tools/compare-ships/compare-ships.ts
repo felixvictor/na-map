@@ -30,7 +30,7 @@ import {
     insertBaseModal,
 } from "../../../common/common-browser"
 import { isEmpty, putImportError, woodType } from "../../../common/common"
-import { formatPP, formatSignFloat, formatSignInt, formatSignPercent } from "../../../common/common-format"
+import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format"
 import {
     hashids,
     hullRepairsPercent,
