@@ -17,7 +17,6 @@ import { select as d3Select } from "d3-selection";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
-import html2canvas from "html2canvas";
 import { registerEvent } from "../../analytics";
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, insertBaseModal, } from "../../../common/common-browser";
 import { isEmpty, putImportError, woodType } from "../../../common/common";
@@ -359,9 +358,10 @@ export class CompareShips {
     async _makeImage(event) {
         registerEvent("Menu", "Ship compare image");
         event.preventDefault();
+        const html2canvas = await import("html2canvas");
         const element = document.querySelector(`#${this._modalId} .modal-dialog .modal-content .modal-body`);
         if (element) {
-            const canvas = await html2canvas(element, {
+            const canvas = await html2canvas.default(element, {
                 allowTaint: true,
                 foreignObjectRendering: true,
                 ignoreElements: (element) => element.classList.contains("central") ||
