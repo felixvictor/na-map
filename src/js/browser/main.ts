@@ -101,19 +101,35 @@ const setupListener = (): void => {
 }
 
 /**
+ * Load base map
+ * @param serverId - Server id
+ */
+const loadBaseMap = async (serverId: string): Promise<void> => {
+    try {
+        const initMap = await import(/* webpackChunkName: "map-init" */ "./map-init")
+        const baseMap = new initMap.BaseMap(serverId)
+        await baseMap.init()
+    } catch (error) {
+        putImportError(error)
+    }
+}
+
+/**
  * Load map and set resize event
  * @param serverId - Server id
  * @param searchParams - Query arguments
  */
 const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
-        const map = new Map.NAMap(serverId, searchParams)
-        await map.MapInit()
+ //       const Map = await import(/* webpackChunkName: "map-func" */ "./map")
+//        const map = new Map.NAMap(serverId, searchParams)
+//        await map.MapInit()
 
+        /*
         window.addEventListener("resize", () => {
             map.resize()
         })
+         */
     } catch (error) {
         putImportError(error)
     }
@@ -149,11 +165,13 @@ const load = async (): Promise<void> => {
     const serverId = getServerName()
     const searchParams = getSearchParams()
 
+    await loadBaseMap(serverId)
+
     // Remove search string from URL
     // {@link https://stackoverflow.com/a/5298684}
     history.replaceState("", document.title, window.location.origin + window.location.pathname)
 
-    await loadMap(serverId, searchParams)
+    // await loadMap(serverId, searchParams)
 
     if (searchParams.get("v")) {
         void loadGameTools(serverId, searchParams)
