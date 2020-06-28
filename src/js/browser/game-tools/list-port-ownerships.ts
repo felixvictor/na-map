@@ -31,7 +31,6 @@ import {
     stack as d3Stack,
     stackOffsetNone as d3StackOffsetNone,
 } from "d3-shape"
-import TimelinesChart from "timelines-chart"
 
 import { registerEvent } from "../analytics"
 import { NationFullName, nations, NationShortName, putImportError } from "../../common/common"
@@ -301,8 +300,10 @@ export default class ListPortOwnerships {
      * Inject chart
      * @param data - Data
      */
-    _injectChart(data: Group[]): void {
-        TimelinesChart()
+    async _injectChart(data: Group[]): Promise<void> {
+        const TimelinesChart = await import(/* webpackChunkName: "timelines-chart" */ "timelines-chart")
+
+        TimelinesChart.default()
             // @ts-expect-error
             .data(data)
             .enableAnimations(false)
@@ -325,6 +326,6 @@ export default class ListPortOwnerships {
         const regionData = this._ownershipData
             .filter((region) => region.region === regionSelected)
             .map((region) => region.data)[0]
-        this._injectChart(regionData)
+        void this._injectChart(regionData)
     }
 }
