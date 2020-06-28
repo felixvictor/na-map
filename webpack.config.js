@@ -123,9 +123,10 @@ const colourWhite = colours.get("white")
 const babelOpt = {
     cacheDirectory: true,
     plugins: [
-        "@babel/plugin-proposal-nullish-coalescing-operator",
-        "@babel/plugin-transform-spread",
         "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-proposal-nullish-coalescing-operator",
+        "@babel/plugin-syntax-dynamic-import",
+        "@babel/plugin-transform-spread",
     ],
     presets: [
         [
@@ -311,7 +312,7 @@ const config = {
 
     devtool: false,
 
-    entry: [path.resolve(dirJsSrc, "browser/main.ts"), path.resolve(dirJsSrc, "browser/map-tools")],
+    entry: [path.resolve(dirJsSrc, "browser/main.ts")],
 
     externals: {
         jquery: "jQuery",
@@ -322,6 +323,7 @@ const config = {
         extensions: [".ts", ".js", ".json"],
     },
 
+    // https://blog.logrocket.com/guide-performance-optimization-webpack/
     optimization: {
         moduleIds: "hashed",
         runtimeChunk: "single",
@@ -580,26 +582,24 @@ if (isProduction && !isQuiet) {
 */
 
 if (isProduction) {
-    config.optimization = {
-        minimize: true,
-        minimizer: [
-            new TerserPlugin({
-                cache: true, // does not work with webpack 5
-                parallel: true,
-                terserOptions: {
-                    ecma: 2020,
-                    module: true,
-                    mangle: {
-                        properties: false,
-                    },
-                    output: {
-                        beautify: false,
-                    },
-                    toplevel: false,
+    config.optimization.minimize = true
+    config.optimization.minimizer = [
+        new TerserPlugin({
+            cache: true, // does not work with webpack 5
+            parallel: true,
+            terserOptions: {
+                ecma: 2020,
+                module: true,
+                mangle: {
+                    properties: false,
                 },
-            }),
-        ],
-    }
+                output: {
+                    beautify: false,
+                },
+                toplevel: false,
+            },
+        }),
+    ]
 } else {
     config.devtool = "eval-source-map"
     config.plugins.push(new webpack.HotModuleReplacementPlugin())
