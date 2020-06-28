@@ -20,7 +20,6 @@ import { select as d3Select } from "d3-selection"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
-import html2canvas from "html2canvas"
 
 import { registerEvent } from "../../analytics"
 import {
@@ -31,7 +30,7 @@ import {
     insertBaseModal,
 } from "../../../common/common-browser"
 import { isEmpty, putImportError, woodType } from "../../../common/common"
-import { formatPP, formatSignFloat, formatSignInt, formatSignPercent } from "../../../common/common-format";
+import { formatPP, formatSignFloat, formatSignInt, formatSignPercent } from "../../../common/common-format"
 import {
     hashids,
     hullRepairsPercent,
@@ -532,11 +531,12 @@ export class CompareShips {
         registerEvent("Menu", "Ship compare image")
         event.preventDefault()
 
+        const html2canvas = await import(/* webpackChunkName: "html2canvas" */ "html2canvas")
         const element = document.querySelector(
             `#${this._modalId} .modal-dialog .modal-content .modal-body`
         ) as HTMLElement
         if (element) {
-            const canvas = await html2canvas(element, {
+            const canvas = await html2canvas.default(element, {
                 allowTaint: true,
                 foreignObjectRendering: true,
                 ignoreElements: (element) =>
