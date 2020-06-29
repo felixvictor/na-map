@@ -238,8 +238,6 @@ class NAMap {
         this._pbZone = new DisplayPbZones(this._ports, this.serverName)
         this._grid = new DisplayGrid(this)
 
-        this._journey = new MakeJourney(this.rem)
-
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
         this.showTrades = new ShowTrades(
             this.serverName,
@@ -249,7 +247,9 @@ class NAMap {
             [this.width, this.height]
         )
         await this.showTrades.showOrHide()
+
         this._init()
+        this._journey = new MakeJourney(this.rem)
 
         /*
         Marks.forEach(mark => {

@@ -22,6 +22,7 @@ import * as d3Selection from "d3-selection"
  */
 export default class DisplayGrid {
     #isShown: boolean
+    #isInitialised = false
     readonly #map: NAMap
     readonly #minCoord: number
     readonly #maxCoord: number
@@ -75,8 +76,6 @@ export default class DisplayGrid {
 
         this.#xBackgroundHeight = this.#map.xGridBackgroundHeight
         this.#yBackgroundWidth = this.#map.yGridBackgroundWidth
-
-        this._setupSvg()
     }
 
     /**
@@ -265,8 +264,9 @@ export default class DisplayGrid {
      * Update grid (shown or not shown)
      */
     update(): void {
-        let show = false
+        this.testForInitialisation()
 
+        let show = false
         if (this.#isShown && this.zoomLevel !== "initial") {
             show = true
         }
@@ -283,6 +283,16 @@ export default class DisplayGrid {
      * Set axis transform
      */
     transform(): void {
-        this._displayAxis()
+        if (this.#isShown) {
+            this.testForInitialisation()
+            this._displayAxis()
+        }
+    }
+
+    private testForInitialisation() {
+        if (!this.#isInitialised) {
+            this._setupSvg()
+            this.#isInitialised = true
+        }
     }
 }
