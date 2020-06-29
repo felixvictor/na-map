@@ -124,8 +124,6 @@ export default class SelectPorts {
     }
 
     _setupSelects(): void {
-        this._setupPortSelect()
-        this._setupGoodSelect()
         this._setupFrontlinesNationSelect()
         this._setupNationSelect()
         this._setupClanSelect()
@@ -271,19 +269,15 @@ export default class SelectPorts {
             .join("")}`
 
         this._portNamesSelector.insertAdjacentHTML("beforeend", options)
-        $(this._portNamesSelector).selectpicker("refresh")
-    }
-
-    _setupPortSelect(): void {
-        this._portNamesSelector.classList.add("selectpicker")
-        $(this._portNamesSelector).selectpicker({
-            dropupAuto: false,
-            liveSearch: true,
-            liveSearchNormalize: true,
-            liveSearchPlaceholder: "Search ...",
-            title: "Show trade relations",
-            virtualScroll: true,
-        } as BootstrapSelectOptions)
+        $(this._portNamesSelector)
+            .selectpicker({
+                dropupAuto: false,
+                liveSearch: true,
+                liveSearchNormalize: true,
+                liveSearchPlaceholder: "Search ...",
+                virtualScroll: true,
+            } as BootstrapSelectOptions)
+            .selectpicker("refresh")
     }
 
     _injectGoodsSelect(): void {
@@ -305,19 +299,15 @@ export default class SelectPorts {
         const sortedGoods = [...selectGoods].sort((a, b) => a[1].localeCompare(b[1]))
         const options = `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options)
-        $(this._buyGoodsSelector).selectpicker("refresh")
-    }
-
-    _setupGoodSelect(): void {
-        this._buyGoodsSelector.classList.add("selectpicker")
-        $(this._buyGoodsSelector).selectpicker({
-            dropupAuto: false,
-            liveSearch: true,
-            liveSearchNormalize: true,
-            liveSearchPlaceholder: "Search ...",
-            title: "Show goods’ relations",
-            virtualScroll: true,
-        } as BootstrapSelectOptions)
+        $(this._buyGoodsSelector)
+            .selectpicker({
+                dropupAuto: false,
+                liveSearch: true,
+                liveSearchNormalize: true,
+                liveSearchPlaceholder: "Search ...",
+                virtualScroll: true,
+            } as BootstrapSelectOptions)
+            .selectpicker("refresh")
     }
 
     setupInventorySelect(show: boolean): void {
