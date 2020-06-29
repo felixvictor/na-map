@@ -37,7 +37,14 @@ import {
     NationShortNameAlternative,
     putImportError,
 } from "../../common/common"
-import { colourGreenDark, colourList, colourOrange, colourRedDark, colourWhite } from "../../common/common-browser"
+import {
+    colourGreenDark,
+    colourList,
+    colourOrange,
+    colourRedDark,
+    colourWhite,
+    primary300
+} from "../../common/common-browser";
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import {
     Coordinate,
@@ -630,81 +637,72 @@ export default class DisplayPorts {
         this._nationIcons = DisplayPorts._importAll(
             (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
         )
-        const svgDef = d3Select("#na-svg defs")
+
+        const getPattern = (id: string): SVGPatternElement => {
+            const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern")
+            pattern.id = id
+            pattern.setAttribute("width", "133%")
+            pattern.setAttribute("height", "100%")
+            pattern.setAttribute("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
+
+            return pattern
+        }
+
+        const getImage = (nation: NationShortName): SVGImageElement => {
+            const image = document.createElementNS("http://www.w3.org/2000/svg", "image")
+            image.setAttribute("width", String(this._iconSize))
+            image.setAttribute("height", String(this._iconSize))
+            image.setAttribute("href", this._nationIcons[nation].replace('"', "").replace('"', ""))
+
+            return image
+        }
+
+        const getCircleCapital = (): SVGCircleElement => {
+            const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+            circleCapital.setAttribute("cx", String(this._iconSize / 2))
+            circleCapital.setAttribute("cy", String(this._iconSize / 2))
+            circleCapital.setAttribute("r", "16")
+
+            return circleCapital
+        }
+
+        const getRectAvail = (): SVGRectElement => {
+            const rectAvail = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+            rectAvail.setAttribute("height", "480")
+            rectAvail.setAttribute("width", "640")
+            rectAvail.setAttribute("fill", primary300)
+            rectAvail.setAttribute("fill-opacity", "0.7")
+
+            return rectAvail
+        }
+
+        const svgDefNode = document.querySelector("#na-svg defs")!
 
         nations
             .map((d) => d.short)
             .forEach((nation) => {
-                const pattern = svgDef
-                    .append("pattern")
-                    .attr("id", nation)
-                    .attr("width", "133%")
-                    .attr("height", "100%")
-                    .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
-                pattern
-                    .append("image")
-                    .attr("height", this._iconSize)
-                    .attr("width", this._iconSize)
-                    .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""))
+                const patternElement = getPattern(nation)
+                patternElement.append(getImage(nation))
+                // eslint-disable-next-line unicorn/prefer-node-append
+                const patternNode = svgDefNode.appendChild(patternElement)
 
                 if (nation !== "FT") {
-                    const patternCapital = svgDef
-                        .append("pattern")
-                        .attr("id", `${nation}c`)
-                        .attr("width", "133%")
-                        .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
-                    patternCapital
-                        .append("image")
-                        .attr("height", this._iconSize)
-                        .attr("width", this._iconSize)
-                        .attr("href", this._nationIcons[nation].replace('"', "").replace('"', ""))
-                    patternCapital
-                        .append("circle")
-                        .attr("cx", this._iconSize / 2)
-                        .attr("cy", this._iconSize / 2)
-                        .attr("r", 16)
+                    const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
+                    patternCapital.id = `${nation}c`
+                    patternCapital.append(getCircleCapital())
+                    svgDefNode.append(patternCapital)
                 }
 
                 if (nation !== "NT" && nation !== "FT") {
-                    const patternAvail = svgDef
-                        .append("pattern")
-                        .attr("id", `${nation}a`)
-                        .attr("width", "133%")
-                        .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
-                    patternAvail
-                        .append("image")
-                        .attr("height", this._iconSize)
-                        .attr("width", this._iconSize)
-                        .attr(
-                            "href",
-                            this._nationIcons[`${nation}a` as NationShortNameAlternative]
-                                .replace('"', "")
-                                .replace('"', "")
-                        )
+                    const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
+                    patternAvail.id = `${nation}a`
+                    patternAvail.append(getRectAvail())
+                    svgDefNode.append(patternAvail)
 
-                    const patternCapitalAvail = svgDef
-                        .append("pattern")
-                        .attr("id", `${nation}ca`)
-                        .attr("width", "133%")
-                        .attr("height", "100%")
-                        .attr("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
-                    patternCapitalAvail
-                        .append("image")
-                        .attr("height", this._iconSize)
-                        .attr("width", this._iconSize)
-                        .attr(
-                            "href",
-                            this._nationIcons[`${nation}a` as NationShortNameAlternative]
-                                .replace('"', "")
-                                .replace('"', "")
-                        )
-                    patternCapitalAvail
-                        .append("circle")
-                        .attr("cx", this._iconSize / 2)
-                        .attr("cy", this._iconSize / 2)
-                        .attr("r", 16)
+                    const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
+                    patternCapitalAvail.id = `${nation}ca`
+                    patternCapitalAvail.append(getCircleCapital())
+                    svgDefNode.append(patternCapitalAvail)
                 }
             })
     }
