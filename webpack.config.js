@@ -231,6 +231,7 @@ const svgoOpt = {
     ],
 }
 
+// noinspection JSIncompatibleTypesComparison
 const htmlOpt = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
     iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
@@ -520,13 +521,6 @@ const config = {
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
                             replace: `fill="${primary200}" fill-opacity="1"/>`,
-                        },
-                    },
-                    {
-                        loader: require.resolve("string-replace-loader"),
-                        options: {
-                            search: 'fill="#fff" fill-opacity=".7"/>',
-                            replace: `fill="${primary300}" fill-opacity=".7"/>`,
                         },
                     },
                 ],
