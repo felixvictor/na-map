@@ -68,6 +68,7 @@ export class CompareShips {
         }
     }
     #doNotRound;
+    #buttonMakeImage;
     static _getModuleLevel(rate) {
         return rate <= 3 ? "L" : rate <= 5 ? "M" : "S";
     }
@@ -355,9 +356,24 @@ export class CompareShips {
             this._printSelectedData(clonedDocument, selectedData, columnId);
         }
     }
+    _setMakeImageSpinner() {
+        this.#buttonMakeImage.select("i").remove();
+        this.#buttonMakeImage.attr("class", "btn btn-primary").property("disabled", true);
+        this.#buttonMakeImage
+            .append("span")
+            .attr("class", "spinner-border spinner-border-sm")
+            .attr("role", "status")
+            .attr("aria-hidden", "true");
+        this.#buttonMakeImage.append("span").attr("class", "sr-only").text("Loading...");
+    }
+    _unsetMakeImageSpinner() {
+        this.#buttonMakeImage.selectAll("span").remove();
+        this.#buttonMakeImage.attr("class", "btn btn-outline-secondary icon-outline-button").property("disabled", false);
+        this.#buttonMakeImage.append("i").attr("class", "icon icon-image");
+    }
     async _makeImage(event) {
-        registerEvent("Menu", "Ship compare image");
         event.preventDefault();
+        this._setMakeImageSpinner();
         const html2canvas = await import("html2canvas");
         const element = document.querySelector(`#${this._modalId} .modal-dialog .modal-content .modal-body`);
         if (element) {
@@ -376,6 +392,7 @@ export class CompareShips {
             });
             CompareShips._saveCanvasAsImage(canvas.toDataURL());
         }
+        this._unsetMakeImageSpinner();
     }
     _shipCompareSelected() {
         if (isEmpty(this._modal$)) {
@@ -390,6 +407,7 @@ export class CompareShips {
                 this._copyDataClicked(event);
             });
             document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", async (event) => {
+                registerEvent("Menu", "Ship compare image");
                 await this._makeImage(event);
             });
         }
@@ -502,14 +520,13 @@ export class CompareShips {
             .attr("type", "button")
             .append("i")
             .classed("icon icon-copy", true);
-        footer
+        this.#buttonMakeImage = footer
             .insert("button", "button")
             .classed("btn btn-outline-secondary icon-outline-button", true)
             .attr("id", this._imageButtonId)
             .attr("title", "Make image")
-            .attr("type", "button")
-            .append("i")
-            .classed("icon icon-image", true);
+            .attr("type", "button");
+        this.#buttonMakeImage.append("i").classed("icon icon-image", true);
     }
     _initData() {
         this._setupShipData();
