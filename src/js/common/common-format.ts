@@ -9,6 +9,7 @@
  */
 
 import { formatLocale as d3FormatLocale } from "d3-format"
+import { HtmlString } from "./interface"
 
 /**
  * Specification of locale to use when creating a new FormatLocaleObject
@@ -56,7 +57,7 @@ export const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u2009",
     grouping: [3],
-    currency: ["", "\u00A0reals"],
+    currency: ["", "\u00A0reales"],
     percent: "\u202F%",
     minus: "\u2212\u2009",
 } as FormatLocaleDefinition)
@@ -82,7 +83,7 @@ export const formatFloat = (x: number, s = 2): string => formatLocale.format(`,.
  * @returns Formatted signed float
  */
 export const formatSignFloat = (x: number, s = 2): string =>
-    formatLocale.format(`+,.${s}~r`)(x).replace("+", "\uFF0B\u200A")
+    formatLocale.format(`+,.${s}~r`)(x).replace("+", "\u002B\u200A")
 
 /**
  * Format float
@@ -123,7 +124,7 @@ export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x).replace("+", "\uFF0B\u200A")
+export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x).replace("+", "\u002B\u200A")
 
 /**
  * Format percentage point
@@ -137,11 +138,11 @@ export const formatPP = (x: number): string => formatLocale.format(",.0%")(x).re
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatSiInt = (x: number): string =>
+export const formatSiInt = (x: number): HtmlString =>
     formatLocale
         .format(",.2s")(x)
         .replace(".0", "")
-        .replace("M", "\u2009\u1D0D") // LATIN LETTER SMALL CAPITAL M
+        .replace("M", '\u2009<span class="caps">m</span>')
         .replace("k", "\u2009k")
         .replace("m", "\u2009m")
 
@@ -150,11 +151,11 @@ export const formatSiInt = (x: number): string =>
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatSiCurrency = (x: number): string =>
+export const formatSiCurrency = (x: number): HtmlString =>
     formatLocale
         .format("$,.2s")(x)
         .replace(".0", "")
-        .replace("M", "\u2009\u1D0D") // LATIN LETTER SMALL CAPITAL M
+        .replace("M", '\u2009<span class="caps">m</span>')
         .replace("k", "\u2009k")
 
 /**

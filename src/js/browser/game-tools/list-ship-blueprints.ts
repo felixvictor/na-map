@@ -321,7 +321,7 @@ export default class ListShipBlueprints {
         let extraResources = [] as ItemNeeded[]
 
         if (this._currentBlueprint.price) {
-            extraResources.push(["Reals", this._currentBlueprint.price])
+            extraResources.push(["Reales", this._currentBlueprint.price])
         }
 
         extraResources.push(["Provisions", this._currentBlueprint.provisions])
@@ -384,7 +384,7 @@ export default class ListShipBlueprints {
         addExtractionCosts(extraResources)
 
         if (extractionPrice) {
-            materials.push(["Reals", formatInt(extractionPrice)], ["Labour hours", formatInt(extractionLabour)])
+            materials.push(["Reales", formatInt(extractionPrice)], ["Labour hours", formatInt(extractionLabour)])
         }
 
         /**
@@ -425,7 +425,7 @@ export default class ListShipBlueprints {
 
         if (sLogPrice) {
             materials.push(
-                ["(S) reals", formatInt(sLogPrice)],
+                ["(S) reales", formatInt(sLogPrice)],
                 ["(S) labour hours", formatInt(sLogLabour)],
                 ["(S) doubloons", formatInt(sLogDoubloons)],
                 ["(S) tools", formatInt(sLogTools)]
