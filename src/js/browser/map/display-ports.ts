@@ -1147,8 +1147,8 @@ export default class DisplayPorts {
         }
 
         this._portSummaryTextNumPorts.text(`${numberPorts}`)
-        this._portSummaryTextTaxIncome.text(`${formatSiInt(taxTotal)}`)
-        this._portSummaryTextNetIncome.text(`${formatSiInt(netTotal)}`)
+        this._portSummaryTextTaxIncome.html(`${formatSiInt(taxTotal)}`)
+        this._portSummaryTextNetIncome.html(`${formatSiInt(netTotal)}`)
     }
 
     _updateCounties(): void {
