@@ -156,7 +156,7 @@ export default class ListBuildings {
         text += '<table class="table table-sm card-table"><thead>'
 
         if (currentBuilding.levels[0].materials.length > 0) {
-            text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reals)</th></tr>"
+            text += "<tr><th>Level</th><th>Level build materials</th><th>Build price (reales)</th></tr>"
             text += "</thead><tbody>"
             for (const level of currentBuilding.levels) {
                 const i = currentBuilding.levels.indexOf(level)
@@ -168,7 +168,7 @@ export default class ListBuildings {
             }
         } else {
             text +=
-                "<tr><th>Level</th><th>Production</th><th>Labour cost (%)</th><th>Storage</th><th>Build price (reals)</th></tr>"
+                "<tr><th>Level</th><th>Production</th><th>Labour cost (%)</th><th>Storage</th><th>Build price (reales)</th></tr>"
             text += "</thead><tbody>"
             for (const level of currentBuilding.levels) {
                 const i = currentBuilding.levels.indexOf(level)

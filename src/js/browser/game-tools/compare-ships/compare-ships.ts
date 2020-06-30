@@ -16,7 +16,7 @@ import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
 import { nest as d3Nest } from "d3-collection"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
@@ -120,6 +120,7 @@ export class CompareShips {
     windProfileRotate = 0
     woodCompare!: CompareWoods
     #doNotRound!: Set<string>
+    #buttonMakeImage!: Selection<HTMLButtonElement, unknown, HTMLElement, unknown>
     private _maxSpeed!: number
     private _minSpeed!: number
     private _modal$: JQuery = {} as JQuery
@@ -527,9 +528,27 @@ export class CompareShips {
         }
     }
 
+    _setMakeImageSpinner(): void {
+        this.#buttonMakeImage.select("i").remove()
+        this.#buttonMakeImage.attr("class", "btn btn-primary").property("disabled", true)
+        this.#buttonMakeImage
+            .append("span")
+            .attr("class", "spinner-border spinner-border-sm")
+            .attr("role", "status")
+            .attr("aria-hidden", "true")
+        this.#buttonMakeImage.append("span").attr("class", "sr-only").text("Loading...")
+    }
+
+    _unsetMakeImageSpinner(): void {
+        this.#buttonMakeImage.selectAll("span").remove()
+        this.#buttonMakeImage.attr("class", "btn btn-outline-secondary icon-outline-button").property("disabled", false)
+        this.#buttonMakeImage.append("i").attr("class", "icon icon-image")
+    }
+
     async _makeImage(event: Event): Promise<void> {
-        registerEvent("Menu", "Ship compare image")
         event.preventDefault()
+
+        this._setMakeImageSpinner()
 
         const html2canvas = await import(/* webpackChunkName: "html2canvas" */ "html2canvas")
         const element = document.querySelector(
@@ -553,6 +572,8 @@ export class CompareShips {
 
             CompareShips._saveCanvasAsImage(canvas.toDataURL())
         }
+
+        this._unsetMakeImageSpinner()
     }
 
     /**
@@ -576,6 +597,7 @@ export class CompareShips {
             })
             // Make image
             document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", async (event) => {
+                registerEvent("Menu", "Ship compare image")
                 await this._makeImage(event)
             })
         }
@@ -739,14 +761,13 @@ export class CompareShips {
             .attr("type", "button")
             .append("i")
             .classed("icon icon-copy", true)
-        footer
+        this.#buttonMakeImage = footer
             .insert("button", "button")
             .classed("btn btn-outline-secondary icon-outline-button", true)
             .attr("id", this._imageButtonId)
             .attr("title", "Make image")
             .attr("type", "button")
-            .append("i")
-            .classed("icon icon-image", true)
+        this.#buttonMakeImage.append("i").classed("icon icon-image", true)
     }
 
     _initData(): void {
