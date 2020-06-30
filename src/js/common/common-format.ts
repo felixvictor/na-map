@@ -56,7 +56,7 @@ export const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u2009",
     grouping: [3],
-    currency: ["", "\u00A0reals"],
+    currency: ["", "\u00A0reales"],
     percent: "\u202F%",
     minus: "\u2212\u2009",
 } as FormatLocaleDefinition)
