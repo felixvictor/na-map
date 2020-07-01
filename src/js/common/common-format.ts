@@ -9,7 +9,11 @@
  */
 
 import { formatLocale as d3FormatLocale } from "d3-format"
-import { HtmlString } from "./interface"
+import htm from "htm"
+import { h } from "preact"
+import { HtmlResult, HtmlString } from "./interface"
+
+const html = htm.bind(h)
 
 /**
  * Specification of locale to use when creating a new FormatLocaleObject
@@ -133,6 +137,8 @@ export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x
  */
 export const formatPP = (x: number): string => formatLocale.format(",.0%")(x).replace("%", "pp")
 
+const mSpan = '<span class="caps">m</span>'
+
 /**
  * Format integer with SI suffix
  * @param   x - Integer
@@ -142,9 +148,24 @@ export const formatSiInt = (x: number): HtmlString =>
     formatLocale
         .format(",.2s")(x)
         .replace(".0", "")
-        .replace("M", '\u2009<span class="caps">m</span>')
         .replace("k", "\u2009k")
         .replace("m", "\u2009m")
+        .replace("M", `\u2009${mSpan}`)
+
+/**
+ * Format integer with SI suffix
+ * @param   x - Integer
+ * @returns htm formatted integer
+ */
+export const formatSiIntHtml = (x: number): HtmlResult => {
+    const string = formatSiInt(x)
+
+    if (string.endsWith(mSpan)) {
+        return html`${string.replace(mSpan, "")}<span class="caps">m</span>`
+    }
+
+    return html`${string}`
+}
 
 /**
  * Format currency with SI suffix
