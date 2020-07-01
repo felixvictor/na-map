@@ -30,13 +30,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
-import {
-    capitalizeFirstLetter,
-    nations,
-    NationShortName,
-    NationShortNameAlternative,
-    putImportError,
-} from "../../common/common"
+import { capitalizeFirstLetter, nations, NationShortName, putImportError } from "../../common/common"
 import {
     colourGreenDark,
     colourList,
@@ -45,7 +39,7 @@ import {
     colourWhite,
     primary300,
 } from "../../common/common-browser"
-import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
+import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "../../common/common-format"
 import {
     Coordinate,
     defaultCircleSize,
@@ -111,9 +105,9 @@ interface PortForDisplay {
     pbTimeRange: HtmlResult
     brLimit: string
     portPoints: string
-    taxIncome: string
+    taxIncome: HtmlResult
     portTax: string
-    netIncome: string
+    netIncome: HtmlResult
     tradingCompany: number
     laborHoursDiscount: number
     dropsTrading: string
@@ -770,9 +764,9 @@ export default class DisplayPorts {
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
-            taxIncome: formatSiInt(portProperties.taxIncome),
+            taxIncome: formatSiIntHtml(portProperties.taxIncome),
             portTax: formatPercent(portProperties.portTax),
-            netIncome: formatSiInt(portProperties.netIncome),
+            netIncome: formatSiIntHtml(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany,
             laborHoursDiscount: portProperties.laborHoursDiscount,
             dropsTrading:
