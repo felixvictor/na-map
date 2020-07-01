@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
-import { formatFloat, formatIntTrunc, formatPercent, formatSignFloat, formatSignInt, } from "../../../common/common-format";
+import { formatFloat, formatIntTrunc, formatSignFloat, formatSignInt, } from "../../../common/common-format";
 import { degreesToCompass, getOrdinal } from "../../../common/common-math";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event } from "d3-selection";
@@ -258,7 +258,7 @@ export class ShipBase extends Ship {
             carroBroadside: formatIntTrunc(this.shipData.guns.broadside.carronades),
             deceleration: formatFloat(this.shipData.ship.deceleration),
             decks: pluralise(this.shipData.guns.decks, "deck"),
-            fireResistance: formatPercent(this.shipData.resistance.fire, 0),
+            fireResistance: formatSignInt(this.shipData.resistance.fire * 100),
             firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
             frontArmor: `${formatIntTrunc(this.shipData.bow.armour)}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.bow.thickness)}</span>`,
             guns: String(this.shipData.guns.total),
@@ -268,7 +268,7 @@ export class ShipBase extends Ship {
             holdSize: formatIntTrunc(this.shipData.holdSize),
             hullRepairAmount: `${formatIntTrunc((this.shipData.repairAmount.armour + this.shipData.repairAmount.armourPerk) * 100)}`,
             hullRepairsNeeded: `${formatIntTrunc(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatIntTrunc(hullRepairsNeeded * repairsSetSize)}</span>`,
-            leakResistance: formatPercent(this.shipData.resistance.leaks, 0),
+            leakResistance: formatSignInt(this.shipData.resistance.leaks * 100),
             limitBack: this.shipData.guns.gunsPerDeck[5],
             limitFront: this.shipData.guns.gunsPerDeck[4],
             mastBottomArmor: `${formatIntTrunc(this.shipData.mast.bottomArmour)}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.mast.bottomThickness)}</span>`,
@@ -292,7 +292,7 @@ export class ShipBase extends Ship {
             sails: formatIntTrunc(this.shipData.sails.armour),
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
             sideArmor: `${formatIntTrunc(this.shipData.sides.armour)}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.sides.thickness)}</span>`,
-            splinterResistance: formatPercent(this.shipData.resistance.splinter, 0),
+            splinterResistance: formatSignInt(this.shipData.resistance.splinter * 100),
             sternRepair: `${formatIntTrunc(this.shipData.repairTime.stern)}`,
             structure: formatIntTrunc(this.shipData.structure.armour),
             turnAcceleration: formatFloat(this.shipData.ship.turnAcceleration, 4),
