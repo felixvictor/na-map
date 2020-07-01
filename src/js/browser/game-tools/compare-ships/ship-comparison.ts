@@ -444,7 +444,7 @@ export class ShipComparison extends Ship {
                 2
             )}`,
             decks: pluralise(this.shipCompareData.guns.decks, "deck"),
-            fireResistance: `${formatPercent(this.shipCompareData.resistance!.fire, 0)}\u00A0${getDiff(
+            fireResistance: `${formatSignInt(this.shipCompareData.resistance!.fire * 100)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.fire,
                 this._shipBaseData.resistance!.fire,
                 2,
@@ -486,7 +486,7 @@ export class ShipComparison extends Ship {
             hullRepairsNeeded: `${formatIntTrunc(
                 hullRepairsNeededCompare
             )} <span class="badge badge-white">${formatIntTrunc(hullRepairsNeededCompare * repairsSetSize)}</span>`,
-            leakResistance: `${formatPercent(this.shipCompareData.resistance!.leaks, 0)}\u00A0${getDiff(
+            leakResistance: `${formatSignInt(this.shipCompareData.resistance!.leaks * 100)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.leaks,
                 this._shipBaseData.resistance!.leaks,
                 2,
@@ -574,7 +574,7 @@ export class ShipComparison extends Ship {
             )}</br><span class="badge badge-white">${formatIntTrunc(
                 this.shipCompareData.sides.thickness
             )}</span>${getDiff(this.shipCompareData.sides.thickness, this._shipBaseData.sides.thickness)}`,
-            splinterResistance: `${formatPercent(this.shipCompareData.resistance!.splinter, 0)}\u00A0${getDiff(
+            splinterResistance: `${formatSignInt(this.shipCompareData.resistance!.splinter * 100)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.splinter,
                 this._shipBaseData.resistance!.splinter,
                 2,
