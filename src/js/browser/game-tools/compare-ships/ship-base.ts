@@ -381,7 +381,7 @@ export class ShipBase extends Ship {
             carroBroadside: formatIntTrunc(this.shipData.guns.broadside.carronades),
             deceleration: formatFloat(this.shipData.ship.deceleration),
             decks: pluralise(this.shipData.guns.decks, "deck"),
-            fireResistance: formatPercent(this.shipData.resistance!.fire, 0),
+            fireResistance: formatSignInt(this.shipData.resistance!.fire * 100),
             firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
             frontArmor: `${formatIntTrunc(
                 this.shipData.bow.armour
@@ -397,7 +397,7 @@ export class ShipBase extends Ship {
             hullRepairsNeeded: `${formatIntTrunc(
                 hullRepairsNeeded
             )}\u00A0<span class="badge badge-white">${formatIntTrunc(hullRepairsNeeded * repairsSetSize)}</span>`,
-            leakResistance: formatPercent(this.shipData.resistance!.leaks, 0),
+            leakResistance: formatSignInt(this.shipData.resistance!.leaks * 100),
             limitBack: this.shipData.guns.gunsPerDeck[5],
             limitFront: this.shipData.guns.gunsPerDeck[4],
             mastBottomArmor: `${formatIntTrunc(
@@ -437,7 +437,7 @@ export class ShipBase extends Ship {
             sideArmor: `${formatIntTrunc(
                 this.shipData.sides.armour
             )}</br><span class="badge badge-white">${formatIntTrunc(this.shipData.sides.thickness)}</span>`,
-            splinterResistance: formatPercent(this.shipData.resistance!.splinter, 0),
+            splinterResistance: formatSignInt(this.shipData.resistance!.splinter * 100),
             sternRepair: `${formatIntTrunc(this.shipData.repairTime.stern)}`,
             structure: formatIntTrunc(this.shipData.structure.armour),
             turnAcceleration: formatFloat(this.shipData.ship.turnAcceleration, 4),
