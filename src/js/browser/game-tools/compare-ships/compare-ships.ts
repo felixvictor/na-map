@@ -993,7 +993,6 @@ export class CompareShips {
      */
     _getShipData(columnId: ShipColumnType): ShipData {
         const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId])!
-        shipDataDefault.crew.carronades = shipDataDefault.crew.cannons
         shipDataDefault.boarding = {
             attack: 0,
             cannonsAccuracy: 0,
