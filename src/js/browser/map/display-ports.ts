@@ -43,8 +43,8 @@ import {
     colourOrange,
     colourRedDark,
     colourWhite,
-    primary300
-} from "../../common/common-browser";
+    primary300,
+} from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import {
     Coordinate,
@@ -746,8 +746,9 @@ export default class DisplayPorts {
             ? formatTime((portProperties.portBattleStartTime + 10) % 24, (portProperties.portBattleStartTime + 13) % 24)
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
-        const attackHostility = html`${displayClanLitHtml(portProperties.attackerClan)}
-        (${portProperties.attackerNation})
+        const attackHostility = html`${displayClanLitHtml(
+            portProperties.attackerClan
+        )} (${portProperties.attackerNation})
         attack${portProperties.portBattle.length > 0
             ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
             : html`s: ${formatPercent(portProperties.attackHostility)} hostility`}`
@@ -888,35 +889,29 @@ export default class DisplayPorts {
 
             ${port.producesNonTrading.length > 0
                 ? html`<p class="mb-2">
-                      <span class="caps">Produces</span>
-                      ―
-                      <span class="non-trading">${port.producesNonTrading}</span>
+                      <span class="caps">Produces―</span><span class="non-trading">${port.producesNonTrading}</span>
                   </p>`
                 : html``}
             ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
                 ? html`<p class="mb-2">
-                      <span class="caps">Drops</span>
-                      ―
+                      <span class="caps">Drops―</span>
                       ${port.dropsNonTrading ? html`<span class="non-trading">${port.dropsNonTrading}</span>` : html``}
                       ${port.dropsTrading}
                   </p> `
                 : html``}
             ${port.consumesTrading.length > 0
-                ? html`<p class="mb-2">
-                      <span class="caps">Consumes</span>
-                      ― ${port.consumesTrading}
-                  </p>`
+                ? html`<p class="mb-2"><span class="caps">Consumes―</span>${port.consumesTrading}</p>`
                 : html``}
             ${this.showRadius === "tradePorts"
                 ? html`${port.goodsToSellInTradePort.length > 0
                       ? html`<p class="mb-2">
-                            <span class="caps">Sell in ${port.tradePort}</span> (net profit) ―
+                            <span class="caps">Sell in ${port.tradePort}</span> (net profit)―
                             ${port.goodsToSellInTradePort}
                         </p>`
                       : html``}
                   ${port.goodsToBuyInTradePort.length > 0
                       ? html`<p class="mb-2">
-                            <span class="caps">Buy in ${port.tradePort}</span> (net profit) ―
+                            <span class="caps">Buy in ${port.tradePort}</span> (net profit)―
                             ${port.goodsToBuyInTradePort}
                         </p>`
                       : html``}`
