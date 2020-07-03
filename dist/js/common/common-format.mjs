@@ -8,6 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { formatLocale as d3FormatLocale } from "d3-format";
+import htm from "htm";
+import { h } from "preact";
+const html = htm.bind(h);
 export const formatLocale = d3FormatLocale({
     decimal: ".",
     thousands: "\u2009",
@@ -28,12 +31,20 @@ export const formatInt = (x) => formatLocale.format(",d")(x);
 export const formatIntTrunc = (x) => formatLocale.format(",d")(x === 0 ? 0 : x - 0.5);
 export const formatSignInt = (x) => formatLocale.format("+,d")(x).replace("+", "\u002B\u200A");
 export const formatPP = (x) => formatLocale.format(",.0%")(x).replace("%", "pp");
+const mSpan = '<span class="caps">m</span>';
 export const formatSiInt = (x) => formatLocale
     .format(",.2s")(x)
     .replace(".0", "")
-    .replace("M", '\u2009<span class="caps">m</span>')
     .replace("k", "\u2009k")
-    .replace("m", "\u2009m");
+    .replace("m", "\u2009m")
+    .replace("M", `\u2009${mSpan}`);
+export const formatSiIntHtml = (x) => {
+    const string = formatSiInt(x);
+    if (string.endsWith(mSpan)) {
+        return html `${string.replace(mSpan, "")}<span class="caps">m</span>`;
+    }
+    return html `${string}`;
+};
 export const formatSiCurrency = (x) => formatLocale
     .format("$,.2s")(x)
     .replace(".0", "")

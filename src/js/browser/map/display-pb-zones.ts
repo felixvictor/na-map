@@ -8,8 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { putImportError } from "../../common/common"
 import { drawSvgCircle, drawSvgRect } from "../util"
@@ -39,7 +38,7 @@ export default class DisplayPbZones {
     private _defencesFiltered!: PbZoneDefence[]
     private _pbZonesFiltered!: PbZoneBasic[]
     private _raidZonesFiltered!: PbZoneRaid[]
-    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _g!: Selection<SVGGElement, unknown, HTMLElement, unknown>
 
     constructor(ports: DisplayPorts, serverId: string) {
         this._ports = ports
@@ -50,21 +49,13 @@ export default class DisplayPbZones {
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          */
-        if (this.#serverType === "PVP") {
-            this._showValues = [
-                { id: "pb-all", label: "All ports" },
-                { id: "pb-single", label: "Single port" },
-                { id: "off", label: "Off" },
-            ]
-        } else {
-            this._showValues = [
-                { id: "pb-all", label: "All ports" },
-                { id: "pb-single", label: "Single port" },
-                { id: "raid-all", label: "All raid" },
-                { id: "raid-single", label: "Single raid" },
-                { id: "off", label: "Off" },
-            ]
-        }
+        this._showValues = [
+            { id: "pb-all", label: "All ports" },
+            { id: "pb-single", label: "Single port" },
+            { id: "raid-all", label: "All raid" },
+            { id: "raid-single", label: "Single raid" },
+            { id: "off", label: "Off" },
+        ]
 
         this._setupRadios()
 
@@ -160,7 +151,7 @@ export default class DisplayPbZones {
             .selectAll<SVGGElement, PbZoneBasic>("g.pb-zones")
             .data(this._pbZonesFiltered, (d) => String(d.id))
             .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneBasic, SVGGElement, unknown> => {
+                (enter): Selection<SVGGElement, PbZoneBasic, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "pb-zones")
 
                     // Port battle join circles
@@ -208,7 +199,7 @@ export default class DisplayPbZones {
             .selectAll<SVGGElement, PbZoneDefence>("g.defence")
             .data(this._defencesFiltered, (d) => String(d.id))
             .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
+                (enter): Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "defence")
 
                     // Forts
@@ -238,7 +229,7 @@ export default class DisplayPbZones {
             .selectAll<SVGGElement, PbZoneRaid>("g.raid-zones")
             .data(this._raidZonesFiltered, (d) => String(d.id))
             .join(
-                (enter): d3Selection.Selection<SVGGElement, PbZoneRaid, SVGGElement, unknown> => {
+                (enter): Selection<SVGGElement, PbZoneRaid, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "raid-zones")
 
                     // Raid join circles
