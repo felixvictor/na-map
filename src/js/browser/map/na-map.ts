@@ -540,6 +540,7 @@ class NAMap {
         this.initialZoomAndPan()
         this._checkF11Coord()
         this._setFlexOverlayHeight()
+        ;(document.querySelector("#navbar-left") as HTMLElement).classList.remove("d-none")
     }
 
     get zoomLevel(): string {
