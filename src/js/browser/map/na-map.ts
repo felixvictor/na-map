@@ -339,10 +339,6 @@ class NAMap {
 
         this._showGridCookie.set(this._showGrid)
 
-        this._refreshLayer()
-    }
-
-    _refreshLayer(): void {
         this._grid.update()
     }
 
