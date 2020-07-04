@@ -264,19 +264,19 @@ export default class DisplayGrid {
      * Update grid (shown or not shown)
      */
     update(): void {
-        this.testForInitialisation()
-
         let show = false
+
         if (this.#isShown && this.zoomLevel !== "initial") {
             show = true
         }
 
-        this.#map.gridOverlay.classList.toggle("overlay-grid", show)
-        this.#map.gridOverlay.classList.toggle("overlay-no-grid", !show)
+        if (show) {
+            this.testForInitialisation()
+        }
 
-        // Show or hide axis
-        this.#gMainXAxis.classed("d-none", !show)
-        this.#gMainYAxis.classed("d-none", !show)
+        if (this.#isInitialised) {
+            this.gridToggle(show)
+        }
     }
 
     /**
@@ -287,6 +287,15 @@ export default class DisplayGrid {
             this.testForInitialisation()
             this._displayAxis()
         }
+    }
+
+    private gridToggle(show: boolean): void {
+        this.#map.gridOverlay.classList.toggle("overlay-grid", show)
+        this.#map.gridOverlay.classList.toggle("overlay-no-grid", !show)
+
+        // Show or hide axis
+        this.#gMainXAxis.classed("d-none", !show)
+        this.#gMainYAxis.classed("d-none", !show)
     }
 
     private testForInitialisation() {
