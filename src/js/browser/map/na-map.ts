@@ -339,10 +339,6 @@ class NAMap {
 
         this._showGridCookie.set(this._showGrid)
 
-        this._refreshLayer()
-    }
-
-    _refreshLayer(): void {
         this._grid.update()
     }
 
@@ -540,6 +536,7 @@ class NAMap {
         this.initialZoomAndPan()
         this._checkF11Coord()
         this._setFlexOverlayHeight()
+        ;(document.querySelector("#navbar-left") as HTMLElement).classList.remove("d-none")
     }
 
     get zoomLevel(): string {
