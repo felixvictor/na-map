@@ -25,14 +25,13 @@ import { createPortBattleSheet } from "./create-pb-sheets"
 const runType = process.argv[2] || "client"
 
 const convertApiData = async (): Promise<void> => {
-    /* eslint-disable @typescript-eslint/no-floating-promises */
-    convertBuildingData()
-    convertCannons()
+    await convertBuildingData()
+    await convertCannons()
     convertGenericPortData()
     convertLootData()
     convertModules()
     convertRecipeData()
-    convertRepairData()
+    await convertRepairData()
     convertServerPortData()
     if (runType.endsWith("server")) {
         convertOwnershipData()
@@ -43,11 +42,9 @@ const convertApiData = async (): Promise<void> => {
 
 const convert = async (): Promise<void> => {
     uncompressApiData()
-    // noinspection JSIgnoredPromiseFromCall
     await convertApiData()
-    createPortBattleSheet()
+    await createPortBattleSheet()
     compressApiData()
 }
 
-// noinspection JSIgnoredPromiseFromCall
-convert()
+void convert()
