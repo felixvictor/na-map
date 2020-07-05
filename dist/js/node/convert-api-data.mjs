@@ -21,13 +21,13 @@ import { convertShipData } from "./convert-ship-data";
 import { createPortBattleSheet } from "./create-pb-sheets";
 const runType = process.argv[2] || "client";
 const convertApiData = async () => {
-    convertBuildingData();
-    convertCannons();
+    await convertBuildingData();
+    await convertCannons();
     convertGenericPortData();
     convertLootData();
     convertModules();
     convertRecipeData();
-    convertRepairData();
+    await convertRepairData();
     convertServerPortData();
     if (runType.endsWith("server")) {
         convertOwnershipData();
@@ -37,8 +37,8 @@ const convertApiData = async () => {
 const convert = async () => {
     uncompressApiData();
     await convertApiData();
-    createPortBattleSheet();
+    await createPortBattleSheet();
     compressApiData();
 };
-convert();
+void convert();
 //# sourceMappingURL=convert-api-data.js.map
