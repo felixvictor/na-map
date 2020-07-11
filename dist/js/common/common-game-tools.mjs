@@ -88,4 +88,5 @@ export const getContrastColour = (colour) => {
     const yiq = (r * 299 + g * 587 + b * 114) / 1000;
     return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite;
 };
+export const displayClanLitHtml = (clan) => html `<span class="caps">${clan}</span>`;
 //# sourceMappingURL=common-game-tools.js.map

@@ -31,7 +31,7 @@ $icon-dir: "~Icons";
 }
 
 $icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock close copy deep gift
-    image info labour map open options shallow trading;
+    image info labour map pb-list open options shallow trading;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {
