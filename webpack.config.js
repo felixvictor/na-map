@@ -286,13 +286,11 @@ const MiniCssExtractPluginOpt = {
 
 const whitelistPatternsChildren = [
     /active/,
-    /bootstrap-datetimepicker-widget/,
     /bootstrap-select/,
     /bs-/,
     /btn/,
     /collaps/,
     /col-4/,
-    /datetimepicker-/,
     /disabled/,
     /dropdown-backdrop/,
     /fade/,
