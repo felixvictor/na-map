@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as d3Selection from "d3-selection"
 import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
@@ -19,7 +18,7 @@ import {
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format"
 import { degreesToCompass, getOrdinal } from "../../../common/common-math"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { event as d3Event } from "d3-selection"
+import { event as d3Event, Selection as D3Selection } from "d3-selection"
 import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util"
 import * as d3Drag from "d3-drag"
 import { isEmpty } from "../../../common/common"
@@ -47,8 +46,8 @@ export class ShipBase extends Ship {
     readonly shipData: ShipData
     private _speedScale!: ScaleLinear<number, number>
     private _shipRotate!: number
-    private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, unknown>
-    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, unknown>
+    private _speedText!: D3Selection<SVGTextElement, DragData, HTMLElement, unknown>
+    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | d3Drag.SubjectPosition>
 
     /**
      * @param id - Ship id
@@ -231,7 +230,8 @@ export class ShipBase extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, unknown>)
+            // @ts-expect-error
+            .call(this._drag)
 
         const compassText = gShip
             .append("text")
@@ -295,7 +295,8 @@ export class ShipBase extends Ship {
 
             .attr("class", "wind-profile-arrow")
             .attr("marker-end", "url(#wind-profile-arrow-head)")
-            .call(this._drag as d3Drag.DragBehavior<SVGPathElement, DragData, unknown>)
+            // @ts-expect-error
+            .call(this._drag)
 
         gWindProfile
             .append("circle")
