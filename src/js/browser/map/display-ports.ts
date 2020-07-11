@@ -62,12 +62,13 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "../../common/gen-json"
-import { Bound, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
+import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
 
 import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 import { simpleStringSort } from "../../common/common-node"
+import { displayClanLitHtml } from "../../common/common-game-tools"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -83,11 +84,6 @@ interface Area {
     name: string
     centroid: Point
     angle: number
-}
-
-interface DataSource {
-    fileName: string
-    name: string
 }
 
 interface PortForDisplay {
@@ -362,7 +358,7 @@ export default class DisplayPorts {
             readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
             const tradeItems = (await (
-                await fetch(`${dataDirectory}/${this.map.serverName}-items.json`)
+                await fetch(`${dataDirectory}/${this._serverName}-items.json`)
             ).json()) as TradeItem[]
             this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
             await loadEntries(dataSources)
@@ -718,8 +714,6 @@ export default class DisplayPorts {
             return getDistance(fromPortCoord, toPortCoord)
         }
         */
-
-        const displayClanLitHtml = (clan: string): HtmlResult => html`<span class="caps">${clan}</span>`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const formatFromToTime = (from: number, to: number): HtmlString =>
