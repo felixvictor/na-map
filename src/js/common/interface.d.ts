@@ -60,3 +60,8 @@ export interface BaseModalHtml extends BaseModal {
 }
 
 export type ModifierName = string
+
+export interface DataSource {
+    fileName: string
+    name: string
+}
