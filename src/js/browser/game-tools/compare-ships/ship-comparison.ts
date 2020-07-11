@@ -11,8 +11,7 @@
 import { max as d3Max, min as d3Min } from "d3-array"
 import * as d3Drag from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { event as d3Event } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { event as d3Event, Selection } from "d3-selection"
 import {
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
     pie as d3Pie,
@@ -50,10 +49,10 @@ export class ShipComparison extends Ship {
     private _minSpeedDiff!: number
     private _maxSpeedDiff!: number
     private _shipRotate!: number
-    private _speedText!: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, unknown>
-    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, unknown>
+    private _speedText!: Selection<SVGTextElement, DragData, HTMLElement, unknown>
+    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | d3Drag.SubjectPosition>
     private _windProfile!: DragData
-    private _gWindProfile!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _gWindProfile!: Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _arcsComp!: Array<PieArcDatum<number | { valueOf: () => number }>>
 
     constructor(compareId: string, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
@@ -189,7 +188,8 @@ export class ShipComparison extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            .call(this._drag as d3Drag.DragBehavior<SVGCircleElement, DragData, unknown>)
+            // @ts-expect-error
+            .call(this._drag)
 
         const compassText = gShip
             .append("text")
