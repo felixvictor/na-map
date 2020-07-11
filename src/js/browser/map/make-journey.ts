@@ -16,8 +16,7 @@ import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-
 import { range as d3Range } from "d3-array"
 import * as d3Drag from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { event as d3Event, select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { event as d3Event, select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
 
@@ -83,18 +82,18 @@ export default class MakeJourney {
     private readonly _modalId: HtmlString
     private readonly _sliderId: HtmlString
     private readonly _shipId: string
-    private _g!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
+    private _g!: Selection<SVGGElement, Segment, HTMLElement, unknown>
     private _journey!: Journey
     private _shipCompare!: CompareShips
-    private _compass!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _compassG!: d3Selection.Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _divJourneySummary!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryTextShip!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryTextWind!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _gJourneyPath!: d3Selection.Selection<SVGPathElement, Segment, HTMLElement, unknown>
-    private _drag!: d3Drag.DragBehavior<SVGSVGElement | SVGGElement, Segment, unknown>
+    private _compass!: Selection<SVGGElement, Segment, HTMLElement, unknown>
+    private _compassG!: Selection<SVGGElement, Segment, HTMLElement, unknown>
+    private _divJourneySummary!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryShip!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryTextShip!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _journeySummaryTextWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _gJourneyPath!: Selection<SVGPathElement, Segment, HTMLElement, unknown>
+    private _drag!: d3Drag.DragBehavior<SVGSVGElement | SVGGElement, Segment, Segment | d3Drag.SubjectPosition>
 
     constructor(fontSize: number) {
         this._fontSize = fontSize
@@ -154,7 +153,7 @@ export default class MakeJourney {
         const dragStart = (
             _d: unknown,
             i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | d3Selection.ArrayLike<SVGSVGElement | SVGGElement>
+            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
         ): void => {
             const event = d3Event as d3Drag.D3DragEvent<
                 SVGSVGElement | SVGGElement,
@@ -169,7 +168,7 @@ export default class MakeJourney {
         const dragged = (
             d: Segment,
             i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | d3Selection.ArrayLike<SVGSVGElement | SVGGElement>
+            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
         ): void => {
             const event = d3Event as d3Drag.D3DragEvent<
                 SVGSVGElement | SVGGElement,
@@ -191,7 +190,7 @@ export default class MakeJourney {
         const dragEnd = (
             _d: Segment,
             i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | d3Selection.ArrayLike<SVGSVGElement | SVGGElement>
+            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
         ): void => {
             d3Select(nodes[i]).classed("drag-active", false)
             //  this._journey.segments[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
@@ -478,7 +477,7 @@ export default class MakeJourney {
         const correctTextBox = (
             d: Segment,
             i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | d3Selection.ArrayLike<SVGSVGElement | SVGGElement>
+            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
         ): void => {
             // Split text into lines
             const node = d3Select(nodes[i])
@@ -553,7 +552,7 @@ export default class MakeJourney {
                 (
                     d: Segment,
                     i: number,
-                    nodes: Array<SVGSVGElement | SVGGElement> | d3Selection.ArrayLike<SVGSVGElement | SVGGElement>
+                    nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
                 ): Point => {
                     // measure the label and add the required padding
                     const numberLines = d.label.split("|").length
@@ -685,6 +684,7 @@ export default class MakeJourney {
         this._setSegmentLabel()
         this._printLabels()
         this._correctJourney()
+        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
@@ -699,6 +699,7 @@ export default class MakeJourney {
 
         this._printLabels()
         this._correctJourney()
+        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
