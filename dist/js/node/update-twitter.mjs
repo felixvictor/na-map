@@ -178,7 +178,7 @@ const npcPortBattleScheduled = (result) => {
     const port = ports[i];
     console.log("      --- npcPortBattleScheduled", i);
     port.attackerNation = "Neutral";
-    port.attackerClan = "NPC";
+    port.attackerClan = "RAIDER";
     port.attackHostility = 1;
     port.portBattle = dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
