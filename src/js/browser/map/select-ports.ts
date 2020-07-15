@@ -269,15 +269,7 @@ export default class SelectPorts {
             .join("")}`
 
         this._portNamesSelector.insertAdjacentHTML("beforeend", options)
-        $(this._portNamesSelector)
-            .selectpicker({
-                dropupAuto: false,
-                liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
-                virtualScroll: true,
-            } as BootstrapSelectOptions)
-            .selectpicker("refresh")
+        $(this._portNamesSelector).selectpicker("refresh")
     }
 
     _injectGoodsSelect(): void {
@@ -299,15 +291,7 @@ export default class SelectPorts {
         const sortedGoods = [...selectGoods].sort((a, b) => a[1].localeCompare(b[1]))
         const options = `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
         this._buyGoodsSelector.insertAdjacentHTML("beforeend", options)
-        $(this._buyGoodsSelector)
-            .selectpicker({
-                dropupAuto: false,
-                liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
-                virtualScroll: true,
-            } as BootstrapSelectOptions)
-            .selectpicker("refresh")
+        $(this._buyGoodsSelector).selectpicker("refresh")
     }
 
     setupInventorySelect(show: boolean): void {
