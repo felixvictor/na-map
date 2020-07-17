@@ -914,16 +914,19 @@ export default class DisplayPorts {
         i: number,
         nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
     ): void {
-        const node$ = $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip({
-            html: true,
-            placement: "auto",
-            trigger: "manual",
-            title: "Wait...",
-            sanitize: false,
-        })
+        const node$ = $(d3Select(nodes[i]).node() as JQuery.PlainObject)
+            .tooltip("dispose")
+            .tooltip({
+                html: true,
+                placement: "auto",
+                trigger: "manual",
+                title: "Wait...",
+                sanitize: false,
+            })
         // Inject tooltip text
         node$.on("inserted.bs.tooltip", () => {
             const tooltipInner = $(document.body).find(".tooltip").find(".tooltip-inner")[0]
+            tooltipInner.textContent = ""
             render(this._tooltipData(this._getText(d)), tooltipInner)
             node$.tooltip("update")
         })
