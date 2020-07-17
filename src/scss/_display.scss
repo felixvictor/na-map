@@ -62,6 +62,7 @@ table,
 
 @mixin caps {
     font-variant-caps: all-small-caps;
+    font-variant-numeric: oldstyle-nums;
     letter-spacing: 0.08em;
 }
 
