@@ -128,6 +128,10 @@ export default class ListPortBattles {
                     const portBattleLT = dayjs.utc(port.portBattle).local()
                     const portBattleST = dayjs.utc(port.portBattle)
                     const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
+                    const defenderNation = findNationByNationShortName(port.nation)?.name
+                    const defender = port.capturer
+                        ? html`${defenderNation} (${displayClanLitHtml(port.capturer)})`
+                        : defenderNation
                     return html`
                         <tr>
                             <td data-sort="${port.portBattle}">
@@ -136,9 +140,7 @@ export default class ListPortBattles {
                             </td>
                             <td>${port.name}</td>
                             <td>${port.attackerNation} (${displayClanLitHtml(port.attackerClan)})</td>
-                            <td>
-                                ${findNationByNationShortName(port.nation)?.name} (${displayClanLitHtml(port.capturer)})
-                            </td>
+                            <td>${defender}</td>
                         </tr>
                     `
                 })}
