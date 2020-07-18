@@ -296,26 +296,15 @@ export default class DisplayPorts {
     }
 
     _setupData(data: ReadData): void {
-        const tradingType = ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"] as const
-
         // Combine port data with port battle data
-        const portData = data.ports.map((port: PortBasic) => {
+        this.portDataDefault = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) as PortPerServer
             const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) as PortBattlePerServer
             const combinedData = { ...port, ...serverData, ...pbData } as PortWithTrades
 
-            // Delete empty entries
-            for (const type of tradingType) {
-                if (!combinedData[type]) {
-                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                    delete combinedData[type]
-                }
-            }
-
             return combinedData
         })
-        this.portDataDefault = portData
-        this.portData = portData
+        this.portData = this.portDataDefault
 
         this._setupScales()
         this._setupListener()
