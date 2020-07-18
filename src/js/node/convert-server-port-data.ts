@@ -176,9 +176,6 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
 }
 
 const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
-    const itemTypes = new Set(["BattleJournalItem", "Material", "Module", "PVEInvasionItem", "ShipUpgradeBookItem"])
-    const sortingGroups = new Set(["Resource.Food", "Resource.Resources", "Resource.Trading"])
-    const names = new Set(["American Cotton", "Tobacco"])
     const allowedItems = new Set([
         600, // Labor Contracts
         988, // Combat Medal
@@ -187,10 +184,7 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
     ])
 
     const items = apiItems
-        .filter(
-            (item) => !item.NotUsed && (item.CanBeSoldToShop || allowedItems.has(item.Id)) && item.BasePrice > 0
-            // (itemTypes.has(item.ItemType) || sortingGroups.has(item.SortingGroup) || names.has(item.Name)
-        )
+        .filter((item) => !item.NotUsed && (item.CanBeSoldToShop || allowedItems.has(item.Id)) && item.BasePrice > 0)
         .map((item) => {
             const tradeItem = {
                 id: item.Id,
