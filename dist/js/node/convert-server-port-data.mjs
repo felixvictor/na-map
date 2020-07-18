@@ -119,9 +119,6 @@ const setAndSaveTradeData = async (serverName) => {
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
 };
 const setAndSaveDroppedItems = async (serverName) => {
-    const itemTypes = new Set(["BattleJournalItem", "Material", "Module", "PVEInvasionItem", "ShipUpgradeBookItem"]);
-    const sortingGroups = new Set(["Resource.Food", "Resource.Resources", "Resource.Trading"]);
-    const names = new Set(["American Cotton", "Tobacco"]);
     const allowedItems = new Set([
         600,
         988,
