@@ -343,7 +343,7 @@ export interface PortPerServer {
     inventory: InventoryEntity[]
 }
 export interface InventoryEntity {
-    name: string
+    id: number
     buyQuantity: number
     buyPrice: number
     sellPrice: number
@@ -431,7 +431,7 @@ interface RecipeIngredientEntity {
  */
 
 export interface Trade {
-    good: string
+    good: number
     source: TradePrice
     target: TradePrice
     distance: number

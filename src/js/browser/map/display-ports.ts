@@ -249,40 +249,6 @@ export default class DisplayPorts {
         return images
     }
 
-    static _getInventory(port: PortWithTrades): HtmlString {
-        let h: HtmlString = ""
-
-        const buy = port.inventory
-            .filter((good) => good.buyQuantity > 0)
-            .map((good) => {
-                return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`
-            })
-            .join("<br>")
-        const sell = port.inventory
-            .filter((good) => good.sellQuantity > 0)
-            .map((good) => {
-                return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`
-            })
-            .join("<br>")
-
-        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
-        if (buy.length > 0) {
-            h += "<h6>Buy</h6>"
-            h += buy
-        }
-
-        if (buy.length > 0 && sell.length > 0) {
-            h += "<p></p>"
-        }
-
-        if (sell.length > 0) {
-            h += "<h6>Sell</h6>"
-            h += sell
-        }
-
-        return h
-    }
-
     static _hideDetails(
         _d: PortWithTrades,
         i: number,
@@ -898,6 +864,43 @@ export default class DisplayPorts {
         return h
     }
 
+    _getInventory(port: PortWithTrades): HtmlString {
+        const getItemName = (id: number): string => this.tradeItem.get(id)?.name ?? ""
+
+        let h: HtmlString = ""
+        const buy = port.inventory
+            .filter((good) => good.buyQuantity > 0 && good.buyPrice > 0)
+            .sort((a, b) => getItemName(a.id).localeCompare(getItemName(b.id)))
+            .map((good) => {
+                return `${formatInt(good.buyQuantity)} ${getItemName(good.id)} @ ${formatSiCurrency(good.buyPrice)}`
+            })
+            .join("<br>")
+        const sell = port.inventory
+            .filter((good) => good.sellQuantity > 0 && good.sellPrice > 0)
+            .sort((a, b) => getItemName(a.id).localeCompare(getItemName(b.id)))
+            .map((good) => {
+                return `${formatInt(good.sellQuantity)} ${getItemName(good.id)} @ ${formatSiCurrency(good.sellPrice)}`
+            })
+            .join("<br>")
+
+        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
+        if (buy.length > 0) {
+            h += "<h6>Buy</h6>"
+            h += buy
+        }
+
+        if (buy.length > 0 && sell.length > 0) {
+            h += "<p></p>"
+        }
+
+        if (sell.length > 0) {
+            h += "<h6>Sell</h6>"
+            h += sell
+        }
+
+        return h
+    }
+
     _showDetails(
         d: PortWithTrades,
         i: number,
@@ -926,7 +929,7 @@ export default class DisplayPorts {
                 this.map.showTrades.listType = "inventory"
             }
 
-            this.map.showTrades.update(DisplayPorts._getInventory(d))
+            this.map.showTrades.update(this._getInventory(d))
         }
     }
 
