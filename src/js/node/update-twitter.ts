@@ -171,90 +171,16 @@ const getTweets = async (): Promise<void> => {
 }
 
 /**
- * Find index by port name
+ *  Get port data by port name
  * @param portName - Port name
- * @returns Index
  */
-const findPortIndex = (portName: string): number => ports.findIndex((port) => port.name === portName)
+const getPort = (portName: string): PortBattlePerServer => {
+    const port = ports.find((port) => port.name === portName)
+    if (!port) {
+        throw new Error(`${portName} not found`)
+    }
 
-/**
- * Port captured
- * @param result - Result from tweet regex
- */
-const captured = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-
-    const port = ports[i]
-
-    console.log("      --- captured", i)
-    port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
-    port.capturer = result[3].trim()
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Port captured by NPC raiders
- * @param result - Result from tweet regex
- */
-const npcCaptured = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
-
-    console.log("      --- captured by NPC", i)
-    port.nation = "NT"
-    port.capturer = "RAIDER"
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Port defended
- * @param result - Result from tweet regex
- */
-const defended = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
-
-    console.log("      --- defended", i)
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Hostility increased
- * @param result - Result from tweet regex
- */
-const hostilityLevelUp = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[4])
-    const port = ports[i]
-
-    console.log("      --- hostilityLevelUp", i)
-    port.attackerNation = result[3] as AttackerNationName
-    port.attackerClan = result[2].trim()
-    port.attackHostility = Number(result[6]) / 100
-}
-
-/**
- * Hostility decreased
- * @param result - Result from tweet regex
- */
-const hostilityLevelDown = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[4])
-    const port = ports[i]
-
-    console.log("      --- hostilityLevelDown", i)
-    port.attackerNation = result[3] as AttackerNationName
-    port.attackerClan = result[2].trim()
-    port.attackHostility = Number(result[6]) / 100
+    return port
 }
 
 /**
@@ -271,9 +197,82 @@ const findPortByClanName = (clanName: string): PortBattlePerServer | undefined =
  */
 const guessNationFromClanName = (clanName: string): AttackerNationName => {
     const port = findPortByClanName(clanName)
-    // noinspection UnnecessaryLocalVariableJS
-    const nation = port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a"
-    return nation
+
+    return port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a"
+}
+
+/**
+ * Port captured
+ * @param result - Result from tweet regex
+ */
+const captured = (result: RegExpExecArray): void => {
+    const port = getPort(result[2])
+    console.log("      --- captured", port.name)
+
+    port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
+    port.capturer = result[3].trim()
+    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
+    port.attackerNation = ""
+    port.attackerClan = ""
+    port.attackHostility = 0
+    port.portBattle = ""
+}
+
+/**
+ * Port captured by NPC raiders
+ * @param result - Result from tweet regex
+ */
+const npcCaptured = (result: RegExpExecArray): void => {
+    const port = getPort(result[2])
+    console.log("      --- captured by NPC", port.name)
+
+    port.nation = "NT"
+    port.capturer = "RAIDER"
+    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
+    port.attackerNation = ""
+    port.attackerClan = ""
+    port.attackHostility = 0
+    port.portBattle = ""
+}
+
+/**
+ * Port defended
+ * @param result - Result from tweet regex
+ */
+const defended = (result: RegExpExecArray): void => {
+    const port = getPort(result[2])
+    console.log("      --- defended", port.name)
+
+    port.attackerNation = ""
+    port.attackerClan = ""
+    port.attackHostility = 0
+    port.portBattle = ""
+}
+
+/**
+ * Hostility increased
+ * @param result - Result from tweet regex
+ */
+const hostilityLevelUp = (result: RegExpExecArray): void => {
+    const port = getPort(result[4])
+    console.log("      --- hostilityLevelUp", port.name)
+
+    port.attackerNation = result[3] as AttackerNationName
+    port.attackerClan = result[2].trim()
+    port.attackHostility = Number(result[6]) / 100
+}
+
+/**
+ * Hostility decreased
+ * @param result - Result from tweet regex
+ */
+const hostilityLevelDown = (result: RegExpExecArray): void => {
+    const port = getPort(result[4])
+    console.log("      --- hostilityLevelDown", port.name)
+
+    port.attackerNation = result[3] as AttackerNationName
+    port.attackerClan = result[2].trim()
+    port.attackHostility = Number(result[6]) / 100
 }
 
 /**
@@ -281,11 +280,10 @@ const guessNationFromClanName = (clanName: string): AttackerNationName => {
  * @param result - Result from tweet regex
  */
 const portBattleScheduled = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
+    const port = getPort(result[2])
     const clanName = result[6].trim()
+    console.log("      --- portBattleScheduled", port.name)
 
-    console.log("      --- portBattleScheduled", i)
     if (result[7]) {
         port.attackerNation = result[7] as AttackerNationName
     } else {
@@ -302,10 +300,9 @@ const portBattleScheduled = (result: RegExpExecArray): void => {
  * @param result - Result from tweet regex
  */
 const npcPortBattleScheduled = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
+    const port = getPort(result[2])
+    console.log("      --- npcPortBattleScheduled", port.name)
 
-    console.log("      --- npcPortBattleScheduled", i)
     port.attackerNation = "Neutral"
     port.attackerClan = "RAIDER"
     port.attackHostility = 1

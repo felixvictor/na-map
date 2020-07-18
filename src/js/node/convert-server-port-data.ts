@@ -212,7 +212,6 @@ const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
                 ({
                     id: Number(port.Id),
                     name: cleanName(port.Name),
-
                     nation: nations[port.Nation].short,
                     capturer: port.Capturer,
                     lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
