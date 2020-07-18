@@ -102,11 +102,21 @@ const getTweets = async () => {
     }
     saveRefreshId(refresh);
 };
-const findPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
+const getPort = (portName) => {
+    const port = ports.find((port) => port.name === portName);
+    if (!port) {
+        throw new Error(`${portName} not found`);
+    }
+    return port;
+};
+const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
+const guessNationFromClanName = (clanName) => {
+    const port = findPortByClanName(clanName);
+    return port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a";
+};
 const captured = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
-    console.log("      --- captured", i);
+    const port = getPort(result[2]);
+    console.log("      --- captured", port.name);
     port.nation = findNationByName(result[4])?.short ?? "";
     port.capturer = result[3].trim();
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
@@ -116,9 +126,8 @@ const captured = (result) => {
     port.portBattle = "";
 };
 const npcCaptured = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
-    console.log("      --- captured by NPC", i);
+    const port = getPort(result[2]);
+    console.log("      --- captured by NPC", port.name);
     port.nation = "NT";
     port.capturer = "RAIDER";
     port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm");
@@ -128,41 +137,31 @@ const npcCaptured = (result) => {
     port.portBattle = "";
 };
 const defended = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
-    console.log("      --- defended", i);
+    const port = getPort(result[2]);
+    console.log("      --- defended", port.name);
     port.attackerNation = "";
     port.attackerClan = "";
     port.attackHostility = 0;
     port.portBattle = "";
 };
 const hostilityLevelUp = (result) => {
-    const i = findPortIndex(result[4]);
-    const port = ports[i];
-    console.log("      --- hostilityLevelUp", i);
+    const port = getPort(result[4]);
+    console.log("      --- hostilityLevelUp", port.name);
     port.attackerNation = result[3];
     port.attackerClan = result[2].trim();
     port.attackHostility = Number(result[6]) / 100;
 };
 const hostilityLevelDown = (result) => {
-    const i = findPortIndex(result[4]);
-    const port = ports[i];
-    console.log("      --- hostilityLevelDown", i);
+    const port = getPort(result[4]);
+    console.log("      --- hostilityLevelDown", port.name);
     port.attackerNation = result[3];
     port.attackerClan = result[2].trim();
     port.attackHostility = Number(result[6]) / 100;
 };
-const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
-const guessNationFromClanName = (clanName) => {
-    const port = findPortByClanName(clanName);
-    const nation = port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a";
-    return nation;
-};
 const portBattleScheduled = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
+    const port = getPort(result[2]);
     const clanName = result[6].trim();
-    console.log("      --- portBattleScheduled", i);
+    console.log("      --- portBattleScheduled", port.name);
     if (result[7]) {
         port.attackerNation = result[7];
     }
@@ -174,9 +173,8 @@ const portBattleScheduled = (result) => {
     port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm");
 };
 const npcPortBattleScheduled = (result) => {
-    const i = findPortIndex(result[2]);
-    const port = ports[i];
-    console.log("      --- npcPortBattleScheduled", i);
+    const port = getPort(result[2]);
+    console.log("      --- npcPortBattleScheduled", port.name);
     port.attackerNation = "Neutral";
     port.attackerClan = "RAIDER";
     port.attackHostility = 1;
