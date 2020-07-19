@@ -96,7 +96,7 @@ interface PortForDisplay {
     capital: boolean
     capturer: HtmlResult
     captureTime: string
-    lastPortBattle: string
+    cooldownTime: HtmlResult
     attack: HtmlResult
     pbTimeRange: HtmlResult
     brLimit: string
@@ -682,15 +682,19 @@ export default class DisplayPorts {
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
-        const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const portBattleST = dayjs.utc(portProperties.portBattle)
+        const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
+
+        const cooldownTimeST = dayjs.utc(portProperties.cooldownTime)
+        const cooldownTimeLT = dayjs.utc(portProperties.cooldownTime).local()
+        const cooldownTimeLocal = cooldownTimeST === cooldownTimeLT ? "" : ` (${cooldownTimeLT.format("H.mm")} local)`
         const portBattleStartTime = portProperties.portBattleStartTime
             ? formatTime((portProperties.portBattleStartTime + 10) % 24, (portProperties.portBattleStartTime + 13) % 24)
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
-        const attackHostility = portProperties.attackerClan
-            ? html`${displayClanLitHtml(portProperties.attackerClan)} (${portProperties.attackerNation})
+        const attackHostility = portProperties.portBattle
+            ? html`${displayClanLitHtml(portProperties.attackerClan!)} (${portProperties.attackerNation})
               attack${portProperties.portBattle
                   ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
                   : html`s: ${formatPercent(portProperties.attackHostility ?? 0)} hostility`}`
@@ -705,11 +709,12 @@ export default class DisplayPorts {
                 (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
             countyCapital: portProperties.countyCapital,
             capital: !portProperties.capturable && portProperties.nation !== "FT",
-            capturer: portProperties.capturer ? html`${displayClanLitHtml(portProperties.capturer)}` : html``,
-            captureTime: portProperties.capturer
-                ? `${capitalizeFirstLetter(dayjs.utc(portProperties.lastPortBattle).fromNow())}`
+            capturer: portProperties.capturer ? displayClanLitHtml(portProperties.capturer) : html``,
+            captureTime: portProperties.captured
+                ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
                 : "",
             attack: portProperties.attackHostility ? attackHostility : html``,
+            cooldownTime: html`${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`,
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
@@ -795,7 +800,11 @@ export default class DisplayPorts {
             </div>
 
             ${port.attack === undefined
-                ? html``
+                ? html`${port.cooldownTime
+                      ? html`<div class="alert alert-info mt-2" role="alert">
+                            Port battle cooldown ends ${port.cooldownTime}
+                        </div>`
+                      : html``}`
                 : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
 
             <div class="d-flex text-left mb-2">
