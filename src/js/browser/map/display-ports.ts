@@ -96,7 +96,7 @@ interface PortForDisplay {
     capital: boolean
     capturer: HtmlResult
     captureTime: string
-    cooldownTime: HtmlResult
+    cooldownTime?: HtmlResult
     attack: HtmlResult
     pbTimeRange: HtmlResult
     brLimit: string
@@ -714,7 +714,6 @@ export default class DisplayPorts {
                 ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
                 : "",
             attack: portProperties.attackHostility ? attackHostility : html``,
-            cooldownTime: html`${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`,
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
@@ -756,6 +755,10 @@ export default class DisplayPorts {
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
             port.dropsNonTrading += " \u2015 "
+        }
+
+        if (portProperties.cooldownTime) {
+            port.cooldownTime = html`${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`
         }
 
         return port
