@@ -17,10 +17,10 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
 
 import { findNationByName, findNationByNationShortName, NationShortName } from "../common/common"
-import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
+import { commonPaths, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { portBattleCooldown, serverNames } from "../common/common-var"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 
@@ -171,93 +171,6 @@ const getTweets = async (): Promise<void> => {
 }
 
 /**
- * Find index by port name
- * @param portName - Port name
- * @returns Index
- */
-const findPortIndex = (portName: string): number => ports.findIndex((port) => port.name === portName)
-
-/**
- * Port captured
- * @param result - Result from tweet regex
- */
-const captured = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-
-    const port = ports[i]
-
-    console.log("      --- captured", i)
-    port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
-    port.capturer = result[3].trim()
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Port captured by NPC raiders
- * @param result - Result from tweet regex
- */
-const npcCaptured = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
-
-    console.log("      --- captured by NPC", i)
-    port.nation = "NT"
-    port.capturer = "RAIDER"
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Port defended
- * @param result - Result from tweet regex
- */
-const defended = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
-
-    console.log("      --- defended", i)
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
-}
-
-/**
- * Hostility increased
- * @param result - Result from tweet regex
- */
-const hostilityLevelUp = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[4])
-    const port = ports[i]
-
-    console.log("      --- hostilityLevelUp", i)
-    port.attackerNation = result[3] as AttackerNationName
-    port.attackerClan = result[2].trim()
-    port.attackHostility = Number(result[6]) / 100
-}
-
-/**
- * Hostility decreased
- * @param result - Result from tweet regex
- */
-const hostilityLevelDown = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[4])
-    const port = ports[i]
-
-    console.log("      --- hostilityLevelDown", i)
-    port.attackerNation = result[3] as AttackerNationName
-    port.attackerClan = result[2].trim()
-    port.attackHostility = Number(result[6]) / 100
-}
-
-/**
  * Find port by name of port owning clan
  * @param clanName - Clan name
  * @returns Port data
@@ -271,9 +184,133 @@ const findPortByClanName = (clanName: string): PortBattlePerServer | undefined =
  */
 const guessNationFromClanName = (clanName: string): AttackerNationName => {
     const port = findPortByClanName(clanName)
-    // noinspection UnnecessaryLocalVariableJS
-    const nation = port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a"
-    return nation
+
+    return port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a"
+}
+
+const getPortIndex = (portName: string): number => ports.findIndex((port) => port.name === portName)
+
+const getPortBattleTime = (portName: string): string | undefined => {
+    const portIndex = getPortIndex(portName)
+    const portBattleTime = ports[portIndex].portBattle ?? ports[portIndex].captured
+
+    return portBattleTime
+}
+
+const getCooldownTime = (portBattleTime: string | undefined): string =>
+    dayjs.utc(portBattleTime, "YYYY-MM-DD HH:mm").add(portBattleCooldown, "hour").format("YYYY-MM-DD HH:mm")
+
+const updatePort = (portName: string, updatedPort: PortBattlePerServer): void => {
+    const portIndex = getPortIndex(portName)
+    const { captured, capturer } = ports[portIndex]
+
+    // Reset to minimal port data
+    ports[portIndex] = {
+        id: ports[portIndex].id,
+        name: ports[portIndex].name,
+        nation: ports[portIndex].nation,
+    }
+
+    if (captured) {
+        ports[portIndex].captured = captured
+        ports[portIndex].capturer = capturer
+    }
+
+    // Add port data from tweet
+    ports[portIndex] = { ...ports[portIndex], ...updatedPort }
+
+    console.log(ports[portIndex])
+}
+
+/**
+ * Port captured
+ * @param result - Result from tweet regex
+ */
+const captured = (result: RegExpExecArray): void => {
+    const portName = result[2]
+    const portBattleTime = getPortBattleTime(portName)
+    const cooldownTime = getCooldownTime(portBattleTime)
+    console.log("      --- captured", portName)
+
+    const updatedPort = {
+        nation: (findNationByName(result[4])?.short as NationShortName) ?? "",
+        capturer: result[3].trim(),
+        captured: portBattleTime,
+        cooldownTime,
+    } as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
+}
+
+/**
+ * Port captured by NPC raiders
+ * @param result - Result from tweet regex
+ */
+const npcCaptured = (result: RegExpExecArray): void => {
+    const portName = result[2]
+    const portBattleTime = getPortBattleTime(portName)
+    const cooldownTime = getCooldownTime(portBattleTime)
+    console.log("      --- captured by NPC", portName)
+
+    const updatedPort = {
+        nation: "NT",
+        capturer: "RAIDER",
+        captured: portBattleTime,
+        cooldownTime,
+    } as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
+}
+
+/**
+ * Port defended
+ * @param result - Result from tweet regex
+ */
+const defended = (result: RegExpExecArray): void => {
+    const portName = result[2]
+    const portBattleTime = getPortBattleTime(portName)
+    const cooldownTime = getCooldownTime(portBattleTime)
+    console.log("      --- defended", portName)
+
+    const updatedPort = {
+        cooldownTime,
+    } as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
+}
+
+/**
+ * Hostility increased
+ * @param result - Result from tweet regex
+ */
+const hostilityLevelUp = (result: RegExpExecArray): void => {
+    const portName = result[4]
+    console.log("      --- hostilityLevelUp", portName)
+
+    const updatedPort = {
+        attackerNation: result[3] as AttackerNationName,
+        attackerClan: result[2].trim(),
+        attackHostility: Number(result[6]) / 100,
+    } as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
+}
+
+/**
+ * Hostility decreased
+ * @param result - Result from tweet regex
+ */
+const hostilityLevelDown = (result: RegExpExecArray): void => {
+    const portName = result[4]
+    console.log("      --- hostilityLevelDown", portName)
+
+    const updatedPort = {
+        attackerNation: result[3] as AttackerNationName,
+        attackerClan: result[2].trim(),
+        attackHostility: Number(result[6]) / 100,
+    } as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
 }
 
 /**
@@ -281,20 +318,18 @@ const guessNationFromClanName = (clanName: string): AttackerNationName => {
  * @param result - Result from tweet regex
  */
 const portBattleScheduled = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
+    const portName = result[2]
     const clanName = result[6].trim()
+    console.log("      --- portBattleScheduled", portName)
 
-    console.log("      --- portBattleScheduled", i)
-    if (result[7]) {
-        port.attackerNation = result[7] as AttackerNationName
-    } else {
-        port.attackerNation = guessNationFromClanName(clanName)
-    }
+    const updatedPort = {
+        attackerNation: result[7] ? (result[7] as AttackerNationName) : guessNationFromClanName(clanName),
+        attackerClan: clanName,
+        attackHostility: 1,
+        portBattle: dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+    } as PortBattlePerServer
 
-    port.attackerClan = clanName
-    port.attackHostility = 1
-    port.portBattle = dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm")
+    updatePort(portName, updatedPort)
 }
 
 /**
@@ -302,14 +337,30 @@ const portBattleScheduled = (result: RegExpExecArray): void => {
  * @param result - Result from tweet regex
  */
 const npcPortBattleScheduled = (result: RegExpExecArray): void => {
-    const i = findPortIndex(result[2])
-    const port = ports[i]
+    const portName = result[2]
+    console.log("      --- npcPortBattleScheduled", portName)
 
-    console.log("      --- npcPortBattleScheduled", i)
-    port.attackerNation = "Neutral"
-    port.attackerClan = "RAIDER"
-    port.attackHostility = 1
-    port.portBattle = dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm")
+    const updatedPort = {
+        attackerNation: "Neutral",
+        attackerClan: "RAIDER",
+        attackHostility: 1,
+        portBattle: dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+    } as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
+}
+
+/**
+ * Port can be attacked again
+ * @param result - Result from tweet regex
+ */
+const cooledOff = (result: RegExpExecArray): void => {
+    const portName = result[2]
+    console.log("      --- cooledOff", portName)
+
+    const updatedPort = {} as PortBattlePerServer
+
+    updatePort(portName, updatedPort)
 }
 
 const portR = "[A-zÀ-ÿ’ -]+"
@@ -363,10 +414,8 @@ const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u")
 /**
  * Update port data from tweets
  */
-// eslint-disable-next-line complexity
 const updatePorts = async (): Promise<void> => {
     let result
-    let tweetTime
 
     for (const tweet of tweets) {
         console.log("\ntweet", tweet)
@@ -375,64 +424,37 @@ const updatePorts = async (): Promise<void> => {
             return
         }
 
-        tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm")
-
-        if (tweetTime.isAfter(serverDate)) {
-            // noinspection AssignmentResultUsedJS,IfStatementWithTooManyBranchesJS
-            if ((result = capturedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                captured(result)
-            } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                npcCaptured(result)
-            } else if ((result = defendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                defended(result)
-            } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                defended(result)
-            } else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                hostilityLevelUp(result)
-            } else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                hostilityLevelDown(result)
-            } else if ((result = portBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                portBattleScheduled(result)
-            } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                npcPortBattleScheduled(result)
-            } else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-                // noop
-            } else if ((result = rumorRegex.exec(tweet)) === null) {
-                console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
-            } else {
-                // noop
-            }
-        } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(1, "day"))) {
-            // Add scheduled port battles (only if battle is in the future)
-            if ((result = portBattleRegex.exec(tweet)) !== null) {
-                if (dayjs.utc().isBefore(dayjs.utc(result[4], "D MMM YYYY HH:mm"))) {
-                    isPortDataChanged = true
-                    portBattleScheduled(result)
-                }
-            } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                npcPortBattleScheduled(result)
-            } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-                isPortDataChanged = true
-                defended(result)
-            }
-        } else if (tweetTime.isAfter(dayjs.utc(serverDate).subtract(2, "day"))) {
-            // Add scheduled NPC raids (only if battle is in the future)
-            if (
-                (result = npcPortBattleRegex.exec(tweet)) !== null &&
-                dayjs.utc().isBefore(dayjs.utc(result[4], "D MMM YYYY HH:mm"))
-            ) {
-                isPortDataChanged = true
-                npcPortBattleScheduled(result)
-            }
+        if ((result = capturedRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            captured(result)
+        } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            npcCaptured(result)
+        } else if ((result = defendedRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            defended(result)
+        } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            defended(result)
+        } else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            hostilityLevelUp(result)
+        } else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            hostilityLevelDown(result)
+        } else if ((result = portBattleRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            portBattleScheduled(result)
+        } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            npcPortBattleScheduled(result)
+        } else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
+            isPortDataChanged = true
+            cooledOff(result)
+        } else if ((result = rumorRegex.exec(tweet)) === null) {
+            console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
+        } else {
+            // noop
         }
     }
 
