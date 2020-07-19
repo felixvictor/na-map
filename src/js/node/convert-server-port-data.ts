@@ -205,21 +205,25 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
 const ticks = 621355968000000000
 const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
     const pb = apiPorts
-        .map(
-            (port) =>
-                ({
-                    id: Number(port.Id),
-                    name: cleanName(port.Name),
-                    nation: nations[port.Nation].short,
-                    capturer: port.Capturer,
-                    lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
-                    attackerNation: "",
-                    attackerClan: "",
-                    attackHostility: 0,
-                    portBattle: "",
-                } as PortBattlePerServer)
-        )
+        .map((port) => {
+            const portData = {
+                id: Number(port.Id),
+                name: cleanName(port.Name),
+                nation: nations[port.Nation].short,
+            } as PortBattlePerServer
+
+            if (port.Capturer !== "") {
+                portData.capturer = port.Capturer
+            }
+
+            if (port.LastPortBattle > 0) {
+                portData.lastPortBattle = dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm")
+            }
+
+            return portData
+        })
         .sort(sortBy(["id"]))
+
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb)
 }
 

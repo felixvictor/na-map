@@ -359,12 +359,13 @@ export interface PortBattlePerServer {
     id: number
     name: string
     nation: NationShortName
-    capturer: string
-    lastPortBattle: string
-    attackerNation: AttackerNationName
-    attackerClan: string
-    attackHostility: number
-    portBattle: string
+    capturer?: string
+    lastPortBattle?: string
+    attackerNation?: AttackerNationName
+    attackerClan?: string
+    attackHostility?: number
+    portBattle?: string
+    cooldown?: string
 }
 
 /****************************
