@@ -23,7 +23,7 @@ import * as d3Zoom from "d3-zoom"
 import { nations, NationShortName, putImportError } from "../../common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { defaultFontSize, roundToThousands } from "../../common/common-math"
-import { PortBasic, PortBattlePerServer, PortWithTrades, Trade } from "../../common/gen-json"
+import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "../../common/gen-json"
 import { Bound, HtmlString } from "../../common/interface"
 import * as d3Selection from "d3-selection"
 
@@ -81,6 +81,7 @@ export default class ShowTrades {
     private _nodeData!: Map<number, Node>
     private _linkDataFiltered!: Trade[]
     private _portDataFiltered!: Set<number>
+    private _tradeItem!: Map<number, string>
 
     // eslint-disable-next-line max-params
     constructor(serverName: string, portSelect: SelectPorts, minScale: number, lowerBound: Bound, upperBound: Bound) {
@@ -152,7 +153,7 @@ export default class ShowTrades {
     }
 
     static _getId(link: Trade): HtmlString {
-        return `trade-${link.source.id}-${link.good.replace(/ /g, "")}-${link.target.id}`
+        return `trade-${link.source.id}-${link.good}-${link.target.id}`
     }
 
     static _addInfo(text: string): HtmlString {
@@ -383,6 +384,10 @@ export default class ShowTrades {
                 const pbPortData = pbData.find((d) => d.id === port.id)
                 return { ...port, ...pbPortData } as PortWithTrades
             })
+            const tradeItems = (await (
+                await fetch(`${dataDirectory}/${this._serverName}-items.json`)
+            ).json()) as TradeItem[]
+            this._tradeItem = new Map(tradeItems.map((item) => [item.id, item.name]))
         } catch (error) {
             putImportError(error)
         }
@@ -441,7 +446,9 @@ export default class ShowTrades {
         const weight = trade.weightPerItem * trade.quantity
 
         let h = "" as HtmlString
-        h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("trade")
+        h +=
+            ShowTrades._addInfo(`${formatInt(trade.quantity)} ${this._tradeItem.get(trade.good)!}`) +
+            ShowTrades._addDes("trade")
         h += ShowTrades._addInfo(`${formatSiCurrency(trade.profit ?? 0)}`) + ShowTrades._addDes(this._profitText)
         h +=
             ShowTrades._addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) +
@@ -472,7 +479,9 @@ export default class ShowTrades {
         let h = "" as HtmlString
 
         h += ShowTrades._startBlock("Trade")
-        h += ShowTrades._addInfo(`${formatInt(trade.quantity)} ${trade.good}`) + ShowTrades._addDes("good")
+        h +=
+            ShowTrades._addInfo(`${formatInt(trade.quantity)} ${this._tradeItem.get(trade.good)!}`) +
+            ShowTrades._addDes("good")
         h += ShowTrades._addInfo(`${formatSiCurrency(trade.source.grossPrice)}`) + ShowTrades._addDes("gross buy price")
         h +=
             ShowTrades._addInfo(`${formatSiCurrency(trade.target.grossPrice)}`) + ShowTrades._addDes("gross sell price")

@@ -343,7 +343,7 @@ export interface PortPerServer {
     inventory: InventoryEntity[]
 }
 export interface InventoryEntity {
-    name: string
+    id: number
     buyQuantity: number
     buyPrice: number
     sellPrice: number
@@ -359,12 +359,13 @@ export interface PortBattlePerServer {
     id: number
     name: string
     nation: NationShortName
-    capturer: string
-    lastPortBattle: string
-    attackerNation: AttackerNationName
-    attackerClan: string
-    attackHostility: number
-    portBattle: string
+    capturer?: string
+    captured?: string
+    attackerNation?: AttackerNationName
+    attackerClan?: string
+    attackHostility?: number
+    portBattle?: string
+    cooldownTime?: string
 }
 
 /****************************
@@ -431,7 +432,7 @@ interface RecipeIngredientEntity {
  */
 
 export interface Trade {
-    good: string
+    good: number
     source: TradePrice
     target: TradePrice
     distance: number
