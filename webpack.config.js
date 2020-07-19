@@ -58,7 +58,7 @@ const dirMap = path.resolve(dirSrc, "images", "map")
 const dirScssSrc = path.resolve(dirSrc, "scss")
 const dirPrefixIcons = path.join("images", "icons")
 
-const fileLogo = path.resolve(dirSrc, "images", "icons", "logo.png")
+const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
 const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
@@ -365,7 +365,7 @@ const config = {
             DESCRIPTION: JSON.stringify(descriptionLong),
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version),
-            ICONSMALL: JSON.stringify("images/icons/android-chrome-48x48.png"),
+            ICONSMALL: JSON.stringify(`${dirPrefixIcons}/android-chrome-48x48.png`),
             REPAIR_ARMOR_VOLUME: JSON.stringify(repairs.armorRepair.volume),
             REPAIR_ARMOR_PERCENT: JSON.stringify(repairs.armorRepair.percent),
             REPAIR_ARMOR_TIME: JSON.stringify(repairs.armorRepair.time),
@@ -378,8 +378,6 @@ const config = {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery",
-            moment: "moment",
-            "window.moment": "moment",
             Popper: ["popper.js", "default"],
         }),
         new CopyPlugin({

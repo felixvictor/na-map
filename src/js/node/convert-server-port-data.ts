@@ -48,7 +48,7 @@ let numberPorts: number
 
 let portData: PortPerServer[]
 let itemNames: Map<number, Item>
-let itemWeights: Map<string, number>
+let itemWeights: Map<number, number>
 
 const getDistance = (fromPortId: number, toPortId: number): number =>
     fromPortId < toPortId
@@ -107,7 +107,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                 .map(
                     (good) =>
                         ({
-                            name: itemNames.get(good.TemplateId)?.name,
+                            id: good.TemplateId,
                             buyQuantity: good.Quantity === -1 ? good.BuyContractQuantity : good.Quantity,
                             buyPrice: Math.round(good.BuyPrice * (1 + apiPort.PortTax)),
                             sellPrice: Math.round(good.SellPrice / (1 + apiPort.PortTax)),
@@ -117,7 +117,7 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                                     : good.SellContractQuantity,
                         } as InventoryEntity)
                 )
-                .sort(sortBy(["name"])),
+                .sort(sortBy(["id"])),
         } as PortPerServer
         // Delete empty entries
         for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
@@ -147,7 +147,7 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
             .forEach((buyGood) => {
                 const { buyPrice, buyQuantity } = buyGood
                 for (const sellPort of portData) {
-                    const sellGood = sellPort.inventory.find((good) => good.name === buyGood.name)
+                    const sellGood = sellPort.inventory.find((good) => good.id === buyGood.id)
                     if (sellPort.id !== buyPort.id && sellGood) {
                         const { sellPrice, sellQuantity } = sellGood
                         const quantity = Math.min(buyQuantity, sellQuantity)
@@ -155,13 +155,13 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
                         const profitTotal = profitPerItem * quantity
                         if (profitTotal >= minProfit) {
                             const trade = {
-                                good: buyGood.name,
+                                good: buyGood.id,
                                 source: { id: Number(buyPort.id), grossPrice: buyPrice },
                                 target: { id: Number(sellPort.id), grossPrice: sellPrice },
                                 distance: getDistance(buyPort.id, sellPort.id),
                                 profitTotal,
                                 quantity,
-                                weightPerItem: itemWeights.get(buyGood.name) ?? 0,
+                                weightPerItem: itemWeights.get(buyGood.id) ?? 0,
                             } as Trade
                             trades.push(trade)
                         }
@@ -176,17 +176,15 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
 }
 
 const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
+    const allowedItems = new Set([
+        600, // Labor Contracts
+        988, // Combat Medal
+        1537, // Victory Mark
+        1758, // Light carriages
+    ])
+
     const items = apiItems
-        .filter(
-            (item) =>
-                !item.NotUsed &&
-                (item.ItemType === "Material" ||
-                    item.SortingGroup === "Resource.Food" ||
-                    item.SortingGroup === "Resource.Resources" ||
-                    item.SortingGroup === "Resource.Trading" ||
-                    item.Name === "American Cotton" ||
-                    item.Name === "Tobacco")
-        )
+        .filter((item) => !item.NotUsed && (item.CanBeSoldToShop || allowedItems.has(item.Id)) && item.BasePrice > 0)
         .map((item) => {
             const tradeItem = {
                 id: item.Id,
@@ -204,25 +202,35 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items)
 }
 
-const ticks = 621355968000000000
+const baseTimeInTicks = 621355968000000000
+const getTimeFromTicks = (timeInTicks: number): string => {
+    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10000).format("YYYY-MM-DD HH:mm")
+}
+
 const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
     const pb = apiPorts
-        .map(
-            (port) =>
-                ({
-                    id: Number(port.Id),
-                    name: cleanName(port.Name),
+        .map((port) => {
+            const portData = {
+                id: Number(port.Id),
+                name: cleanName(port.Name),
+                nation: nations[port.Nation].short,
+            } as PortBattlePerServer
 
-                    nation: nations[port.Nation].short,
-                    capturer: port.Capturer,
-                    lastPortBattle: dayjs((port.LastPortBattle - ticks) / 10000).format("YYYY-MM-DD HH:mm"),
-                    attackerNation: "",
-                    attackerClan: "",
-                    attackHostility: 0,
-                    portBattle: "",
-                } as PortBattlePerServer)
-        )
+            if (port.Capturer !== "") {
+                portData.capturer = port.Capturer
+            }
+
+            if (port.LastPortBattle > 0) {
+                portData.captured = getTimeFromTicks(port.LastPortBattle)
+            } else if (port.LastRaidStartTime > 0) {
+                portData.captured = getTimeFromTicks(port.LastRaidStartTime)
+                portData.capturer = "RAIDER"
+            }
+
+            return portData
+        })
         .sort(sortBy(["id"]))
+
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-pb.json`), pb)
 }
 
@@ -391,7 +399,7 @@ export const convertServerPortData = (): void => {
                         (!apiItem.NotTradeable || apiItem.ShowInContractsSelector) &&
                         apiItem.ItemType !== "RecipeResource"
                 )
-                .map((apiItem) => [cleanName(apiItem.Name), apiItem.ItemWeight])
+                .map((apiItem) => [apiItem.Id, apiItem.ItemWeight])
         )
 
         portData = []
