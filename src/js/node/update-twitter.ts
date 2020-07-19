@@ -20,9 +20,9 @@ import { findNationByName, findNationByNationShortName, NationShortName } from "
 import { commonPaths, serverStartDate as serverDate, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { portBattleCooldown, serverNames } from "../common/common-var"
 
-import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
+import { AttackerNationName, Port, PortBattlePerServer } from "../common/gen-json"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -201,21 +201,41 @@ const guessNationFromClanName = (clanName: string): AttackerNationName => {
     return port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a"
 }
 
+const updatePort = (portName: string, updatedPort: PortBattlePerServer): void => {
+    const portIndex = ports.findIndex((port) => port.name === portName)
+
+    /*
+    ;(Object.keys(updatedPort) as Array<keyof PortBattlePerServer>).forEach((key) => {
+        port[key] = updatedPort[key]
+    })
+
+         */
+
+    // Reset to minimal port data
+    ports[portIndex] = {
+        id: ports[portIndex].id,
+        name: ports[portIndex].name,
+        nation: ports[portIndex].nation,
+    }
+
+    ports[portIndex] = { ...ports[portIndex], ...updatedPort }
+}
+
 /**
  * Port captured
  * @param result - Result from tweet regex
  */
 const captured = (result: RegExpExecArray): void => {
-    const port = getPort(result[2])
-    console.log("      --- captured", port.name)
+    console.log("      --- captured", result[2])
 
-    port.nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
-    port.capturer = result[3].trim()
-    port.lastPortBattle = dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm")
-    port.attackerNation = ""
-    port.attackerClan = ""
-    port.attackHostility = 0
-    port.portBattle = ""
+    const updatedPort = {
+        nation: (findNationByName(result[4])?.short as NationShortName) ?? "",
+        capturer: result[3].trim(),
+        lastPortBattle: dayjs.utc(result[1], "DD-MM-YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+        cooldown: dayjs.utc(result[1], "DD-MM-YYYY HH:mm").add(portBattleCooldown, "hour").format("YYYY-MM-DD HH:mm"),
+    } as PortBattlePerServer
+
+    updatePort(result[2], updatedPort)
 }
 
 /**
