@@ -96,7 +96,7 @@ interface PortForDisplay {
     capital: boolean
     capturer: HtmlResult
     captureTime: string
-    lastPortBattle: string
+    cooldownTime: HtmlResult
     attack: HtmlResult
     pbTimeRange: HtmlResult
     brLimit: string
@@ -249,40 +249,6 @@ export default class DisplayPorts {
         return images
     }
 
-    static _getInventory(port: PortWithTrades): HtmlString {
-        let h: HtmlString = ""
-
-        const buy = port.inventory
-            .filter((good) => good.buyQuantity > 0)
-            .map((good) => {
-                return `${formatInt(good.buyQuantity)} ${good.name} @ ${formatSiCurrency(good.buyPrice)}`
-            })
-            .join("<br>")
-        const sell = port.inventory
-            .filter((good) => good.sellQuantity > 0)
-            .map((good) => {
-                return `${formatInt(good.sellQuantity)} ${good.name} @ ${formatSiCurrency(good.sellPrice)}`
-            })
-            .join("<br>")
-
-        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
-        if (buy.length > 0) {
-            h += "<h6>Buy</h6>"
-            h += buy
-        }
-
-        if (buy.length > 0 && sell.length > 0) {
-            h += "<p></p>"
-        }
-
-        if (sell.length > 0) {
-            h += "<h6>Sell</h6>"
-            h += sell
-        }
-
-        return h
-    }
-
     static _hideDetails(
         _d: PortWithTrades,
         i: number,
@@ -296,26 +262,15 @@ export default class DisplayPorts {
     }
 
     _setupData(data: ReadData): void {
-        const tradingType = ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"] as const
-
         // Combine port data with port battle data
-        const portData = data.ports.map((port: PortBasic) => {
-            const serverData = data.server.find((d: PortPerServer) => d.id === port.id) as PortPerServer
-            const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) as PortBattlePerServer
+        this.portDataDefault = data.ports.map((port: PortBasic) => {
+            const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
+            const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) ?? ({} as PortBattlePerServer)
             const combinedData = { ...port, ...serverData, ...pbData } as PortWithTrades
-
-            // Delete empty entries
-            for (const type of tradingType) {
-                if (!combinedData[type]) {
-                    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                    delete combinedData[type]
-                }
-            }
 
             return combinedData
         })
-        this.portDataDefault = portData
-        this.portData = portData
+        this.portData = this.portDataDefault
 
         this._setupScales()
         this._setupListener()
@@ -727,19 +682,23 @@ export default class DisplayPorts {
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
-        const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const portBattleST = dayjs.utc(portProperties.portBattle)
+        const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
+
+        const cooldownTimeST = dayjs.utc(portProperties.cooldownTime)
+        const cooldownTimeLT = dayjs.utc(portProperties.cooldownTime).local()
+        const cooldownTimeLocal = cooldownTimeST === cooldownTimeLT ? "" : ` (${cooldownTimeLT.format("H.mm")} local)`
         const portBattleStartTime = portProperties.portBattleStartTime
             ? formatTime((portProperties.portBattleStartTime + 10) % 24, (portProperties.portBattleStartTime + 13) % 24)
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
-        const attackHostility = html`${displayClanLitHtml(
-            portProperties.attackerClan
-        )} (${portProperties.attackerNation})
-        attack${portProperties.portBattle.length > 0
-            ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-            : html`s: ${formatPercent(portProperties.attackHostility)} hostility`}`
+        const attackHostility = portProperties.portBattle
+            ? html`${displayClanLitHtml(portProperties.attackerClan!)} (${portProperties.attackerNation})
+              attack${portProperties.portBattle
+                  ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+                  : html`s: ${formatPercent(portProperties.attackHostility ?? 0)} hostility`}`
+            : html``
 
         const port = {
             name: portProperties.name,
@@ -750,11 +709,12 @@ export default class DisplayPorts {
                 (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
             countyCapital: portProperties.countyCapital,
             capital: !portProperties.capturable && portProperties.nation !== "FT",
-            capturer: portProperties.capturer ? html`${displayClanLitHtml(portProperties.capturer)}` : html``,
-            captureTime: portProperties.capturer
-                ? `${capitalizeFirstLetter(dayjs.utc(portProperties.lastPortBattle).fromNow())}`
+            capturer: portProperties.capturer ? displayClanLitHtml(portProperties.capturer) : html``,
+            captureTime: portProperties.captured
+                ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
                 : "",
             attack: portProperties.attackHostility ? attackHostility : html``,
+            cooldownTime: html`${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`,
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
@@ -840,7 +800,11 @@ export default class DisplayPorts {
             </div>
 
             ${port.attack === undefined
-                ? html``
+                ? html`${port.cooldownTime
+                      ? html`<div class="alert alert-info mt-2" role="alert">
+                            Port battle cooldown ends ${port.cooldownTime}
+                        </div>`
+                      : html``}`
                 : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
 
             <div class="d-flex text-left mb-2">
@@ -909,6 +873,43 @@ export default class DisplayPorts {
         return h
     }
 
+    _getInventory(port: PortWithTrades): HtmlString {
+        const getItemName = (id: number): string => this.tradeItem.get(id)?.name ?? ""
+
+        let h: HtmlString = ""
+        const buy = port.inventory
+            .filter((good) => good.buyQuantity > 0 && good.buyPrice > 0)
+            .sort((a, b) => getItemName(a.id).localeCompare(getItemName(b.id)))
+            .map((good) => {
+                return `${formatInt(good.buyQuantity)} ${getItemName(good.id)} @ ${formatSiCurrency(good.buyPrice)}`
+            })
+            .join("<br>")
+        const sell = port.inventory
+            .filter((good) => good.sellQuantity > 0 && good.sellPrice > 0)
+            .sort((a, b) => getItemName(a.id).localeCompare(getItemName(b.id)))
+            .map((good) => {
+                return `${formatInt(good.sellQuantity)} ${getItemName(good.id)} @ ${formatSiCurrency(good.sellPrice)}`
+            })
+            .join("<br>")
+
+        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
+        if (buy.length > 0) {
+            h += "<h6>Buy</h6>"
+            h += buy
+        }
+
+        if (buy.length > 0 && sell.length > 0) {
+            h += "<p></p>"
+        }
+
+        if (sell.length > 0) {
+            h += "<h6>Sell</h6>"
+            h += sell
+        }
+
+        return h
+    }
+
     _showDetails(
         d: PortWithTrades,
         i: number,
@@ -937,7 +938,7 @@ export default class DisplayPorts {
                 this.map.showTrades.listType = "inventory"
             }
 
-            this.map.showTrades.update(DisplayPorts._getInventory(d))
+            this.map.showTrades.update(this._getInventory(d))
         }
     }
 
@@ -1031,8 +1032,8 @@ export default class DisplayPorts {
             this._attackRadius.range([rMin, rMax / 1.5])
             cssClass = (): string => "bubble"
             fill = (d): string =>
-                d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility)
-            r = (d): number => this._attackRadius(d.attackHostility)
+                d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility ?? 0)
+            r = (d): number => this._attackRadius(d.attackHostility ?? 0)
         } else if (this.circleType === "currentGood") {
             cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2
