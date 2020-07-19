@@ -264,8 +264,8 @@ export default class DisplayPorts {
     _setupData(data: ReadData): void {
         // Combine port data with port battle data
         this.portDataDefault = data.ports.map((port: PortBasic) => {
-            const serverData = data.server.find((d: PortPerServer) => d.id === port.id) as PortPerServer
-            const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) as PortBattlePerServer
+            const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
+            const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) ?? ({} as PortBattlePerServer)
             const combinedData = { ...port, ...serverData, ...pbData } as PortWithTrades
 
             return combinedData
@@ -689,12 +689,12 @@ export default class DisplayPorts {
             ? formatTime((portProperties.portBattleStartTime + 10) % 24, (portProperties.portBattleStartTime + 13) % 24)
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
-        const attackHostility = html`${displayClanLitHtml(
-            portProperties.attackerClan
-        )} (${portProperties.attackerNation})
-        attack${portProperties.portBattle.length > 0
-            ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-            : html`s: ${formatPercent(portProperties.attackHostility)} hostility`}`
+        const attackHostility = portProperties.attackerClan
+            ? html`${displayClanLitHtml(portProperties.attackerClan)} (${portProperties.attackerNation})
+              attack${portProperties.portBattle
+                  ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+                  : html`s: ${formatPercent(portProperties.attackHostility ?? 0)} hostility`}`
+            : html``
 
         const port = {
             name: portProperties.name,
@@ -1023,8 +1023,8 @@ export default class DisplayPorts {
             this._attackRadius.range([rMin, rMax / 1.5])
             cssClass = (): string => "bubble"
             fill = (d): string =>
-                d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility)
-            r = (d): number => this._attackRadius(d.attackHostility)
+                d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility ?? 0)
+            r = (d): number => this._attackRadius(d.attackHostility ?? 0)
         } else if (this.circleType === "currentGood") {
             cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2
