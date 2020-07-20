@@ -804,7 +804,7 @@ export default class DisplayPorts {
 
             ${port.attack === undefined
                 ? html`${port.cooldownTime
-                      ? html`<div class="alert alert-info mt-2" role="alert">
+                      ? html`<div class="alert alert-primary mt-2" role="alert">
                             Port battle cooldown ends ${port.cooldownTime}
                         </div>`
                       : html``}`
