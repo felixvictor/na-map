@@ -783,7 +783,7 @@ export default class DisplayPorts {
                 <div class="ml-auto inline-block">
                     <span class="x-large text-lighter align-top mr-2">${port.portPoints}</span>
                     ${port.availableForAll
-                        ? html`<i class="icon icon-light icon-open" aria-hidden="true"></i
+                        ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
                               ><span class="sr-only">Accessible to all</span>`
                         : html``}
                     ${port.laborHoursDiscount
@@ -804,7 +804,7 @@ export default class DisplayPorts {
 
             ${port.attack === undefined
                 ? html`${port.cooldownTime
-                      ? html`<div class="alert alert-info mt-2" role="alert">
+                      ? html`<div class="alert alert-primary mt-2" role="alert">
                             Port battle cooldown ends ${port.cooldownTime}
                         </div>`
                       : html``}`
