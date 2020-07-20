@@ -226,7 +226,7 @@ table a {
 
 .overlay-grid {
     grid-template-rows: 3rem 1fr;
-    grid-template-columns: 4rem 1fr 4fr 23vw;
+    grid-template-columns: 4rem 1fr 4fr 1fr;
     grid-template-areas:
         "x-axis x-axis x-axis x-axis"
         "y-axis wind-predict toasts summary";
@@ -234,7 +234,7 @@ table a {
 
 .overlay-no-grid {
     grid-template-rows: 1fr;
-    grid-template-columns: 1fr 4fr 23vw;
+    grid-template-columns: 1fr 4fr 1fr;
     grid-template-areas: "wind-predict toasts summary";
 }
 
