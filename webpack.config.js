@@ -78,6 +78,7 @@ const descriptionLong =
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
 const regExpFont = /\.(woff2?|ttf)$/
+const regExpCss = /^map\.\w+\.css$/
 
 const setColours = () => {
     const compiledCss = sass
@@ -393,8 +394,18 @@ const config = {
         new PreloadWebpackPlugin({
             rel: "preload",
             include: "allAssets",
-            fileWhitelist: [regExpFont],
-            as: "font",
+            fileWhitelist: [regExpFont, regExpCss],
+            as(entry) {
+                if (regExpCss.test(entry)) {
+                    return "style"
+                }
+
+                if (regExpFont.test(entry)) {
+                    return "font"
+                }
+
+                return "script"
+            },
         }),
         new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
