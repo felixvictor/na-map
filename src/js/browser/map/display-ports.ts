@@ -754,7 +754,7 @@ export default class DisplayPorts {
         } as PortForDisplay
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
-            port.dropsNonTrading += " \u2015 "
+            port.dropsNonTrading += "\u00A0\u2012 "
         }
 
         if (portProperties.cooldownTime) {
@@ -811,7 +811,7 @@ export default class DisplayPorts {
                 : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
 
             <div class="d-flex text-left mb-2">
-                ${port.capital
+                ${port.capital || port.icon === "FT"
                     ? html`<div>${port.portTax}<br /><span class="des">Tax rate</span></div>`
                     : html`
                           <div class="mr-3">
@@ -844,29 +844,29 @@ export default class DisplayPorts {
 
             ${port.producesNonTrading.length > 0
                 ? html`<p class="mb-2">
-                      <span class="caps">Produces―</span><span class="non-trading">${port.producesNonTrading}</span>
+                      <span class="caps">Produces—</span><span class="non-trading">${port.producesNonTrading}</span>
                   </p>`
                 : html``}
             ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
                 ? html`<p class="mb-2">
-                      <span class="caps">Drops―</span>
+                      <span class="caps">Drops—</span>
                       ${port.dropsNonTrading ? html`<span class="non-trading">${port.dropsNonTrading}</span>` : html``}
                       ${port.dropsTrading}
                   </p> `
                 : html``}
             ${port.consumesTrading.length > 0
-                ? html`<p class="mb-2"><span class="caps">Consumes―</span>${port.consumesTrading}</p>`
+                ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
                 : html``}
             ${this.showRadius === "tradePorts"
                 ? html`${port.goodsToSellInTradePort.length > 0
                       ? html`<p class="mb-2">
-                            <span class="caps">Sell in ${port.tradePort}</span> (net profit)―
+                            <span class="caps">Sell in ${port.tradePort}</span> (net profit)—
                             ${port.goodsToSellInTradePort}
                         </p>`
                       : html``}
                   ${port.goodsToBuyInTradePort.length > 0
                       ? html`<p class="mb-2">
-                            <span class="caps">Buy in ${port.tradePort}</span> (net profit)―
+                            <span class="caps">Buy in ${port.tradePort}</span> (net profit)—
                             ${port.goodsToBuyInTradePort}
                         </p>`
                       : html``}`
