@@ -811,7 +811,7 @@ export default class DisplayPorts {
                 : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
 
             <div class="d-flex text-left mb-2">
-                ${port.capital
+                ${port.capital || port.icon === "FT"
                     ? html`<div>${port.portTax}<br /><span class="des">Tax rate</span></div>`
                     : html`
                           <div class="mr-3">
