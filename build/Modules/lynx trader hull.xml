@@ -598,13 +598,13 @@
     <Pair>
       <Key>SHIP_PHYSICS_ACC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.27</Value>
+        <Value>0.215</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.0634</Value>
+        <Value>0.054</Value>
       </Value>
     </Pair>
     <Pair>
@@ -675,13 +675,13 @@
     <Pair>
       <Key>SHIP_RHEAS_DRIFT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.05</Value>
+        <Value>0.06</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_STAYSAILS_DRIFT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1</Value>
+        <Value>1.27</Value>
       </Value>
     </Pair>
     <Pair>
