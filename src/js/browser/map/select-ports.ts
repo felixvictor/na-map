@@ -296,19 +296,19 @@ export default class SelectPorts {
 
     setupInventorySelect(show: boolean): void {
         if (!this._inventorySelector.classList.contains("selectpicker")) {
-            const selectGoods = new Set<string>()
+            const selectGoods = new Map<number, string>()
 
             for (const port of this._ports.portDataDefault) {
                 if (port.inventory) {
                     for (const good of port.inventory) {
-                        selectGoods.add(good.name)
+                        selectGoods.set(good.id, this._ports.tradeItem.get(good.id)?.name ?? "")
                     }
                 }
             }
 
             const options = `${[...selectGoods]
-                .sort(simpleStringSort)
-                .map((good) => `<option>${good}</option>`)
+                .sort((a, b) => a[1].localeCompare(b[1]))
+                .map((good) => `<option value="${good[0]}">${good[1]}</option>`)
                 .join("")}`
 
             this._inventorySelector.insertAdjacentHTML("beforeend", options)
@@ -375,8 +375,8 @@ export default class SelectPorts {
 
     _setupClanSelect(): void {
         const clanList = new Set<string>()
-        for (const d of this._ports.portData.filter((d) => d.capturer !== "")) {
-            clanList.add(d.capturer)
+        for (const d of this._ports.portData.filter((d) => d?.capturer !== "")) {
+            clanList.add(d.capturer!)
         }
 
         // noinspection InnerHTMLJS
@@ -571,14 +571,15 @@ export default class SelectPorts {
     inventorySelected(): void {
         this.isInventorySelected = true
 
-        const goodSelected = this._inventorySelector.options[this._inventorySelector.selectedIndex].value
+        const goodIdSelected = Number(this._inventorySelector.options[this._inventorySelector.selectedIndex].value)
         const buyGoods = new Map() as goodMap
         const sellGoods = new Map() as goodMap
+        console.log(goodIdSelected)
         const portsFiltered = this._ports.portDataDefault
-            .filter((port) => port.inventory.some((good) => good.name === goodSelected))
+            .filter((port) => port.inventory.some((good) => good.id === goodIdSelected))
             .sort(sortBy(["name"]))
             .map((port) => {
-                const item = port.inventory.find((good) => good.name === goodSelected)
+                const item = port.inventory.find((good) => good.id === goodIdSelected)
                 if (item) {
                     port.sellInTradePort = item.buyQuantity > 0
                     if (port.sellInTradePort) {
@@ -597,7 +598,7 @@ export default class SelectPorts {
         const getPortList = (): HtmlString => {
             let h: HtmlString = ""
 
-            h += `<h5>${goodSelected}</h5>`
+            h += `<h5>${this._ports.tradeItem.get(goodIdSelected)?.name ?? ""}</h5>`
             if (buyGoods.size) {
                 h += "<h6>Buy</h6>"
                 for (const [, value] of buyGoods) {
@@ -726,7 +727,7 @@ export default class SelectPorts {
     _filterCaptured(begin: Dayjs, end: Dayjs): void {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
         const portData = this._ports.portDataDefault.filter((port) =>
-            dayjs(port.lastPortBattle, "YYYY-MM-DD HH:mm").isBetween(begin, end, "hour", "(]")
+            dayjs(port.captured, "YYYY-MM-DD HH:mm").isBetween(begin, end, "hour", "(]")
         )
 
         this._ports.portData = portData
