@@ -30,7 +30,7 @@ export const formatF11 = (x) => formatPrefix(x * -1).replace("k", "\u2009k");
 export const formatInt = (x) => formatLocale.format(",d")(x);
 export const formatIntTrunc = (x) => formatLocale.format(",d")(x === 0 ? 0 : x - 0.5);
 export const formatSignInt = (x) => formatLocale.format("+,d")(x).replace("+", "\u002B\u200A");
-export const formatPP = (x) => formatLocale.format(",.0%")(x).replace("%", "pp");
+export const formatPP = (x, f = 0) => formatLocale.format(`,.${f}%`)(x).replace("%", "pp");
 const mSpan = '<span class="caps">m</span>';
 export const formatSiInt = (x) => formatLocale
     .format(",.2s")(x)

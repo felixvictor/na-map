@@ -179,12 +179,14 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
     const allowedItems = new Set([
         600, // Labor Contracts
         988, // Combat Medal
+        1009, // Perks Reset Permit
         1537, // Victory Mark
         1758, // Light carriages
+        2226, // Ship Logbook
     ])
 
     const items = apiItems
-        .filter((item) => !item.NotUsed && (item.CanBeSoldToShop || allowedItems.has(item.Id)) && item.BasePrice > 0)
+        .filter((item) => !item.NotUsed && ((item.CanBeSoldToShop && item.BasePrice > 0) || allowedItems.has(item.Id)))
         .map((item) => {
             const tradeItem = {
                 id: item.Id,
