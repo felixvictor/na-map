@@ -122,11 +122,13 @@ const setAndSaveDroppedItems = async (serverName) => {
     const allowedItems = new Set([
         600,
         988,
+        1009,
         1537,
         1758,
+        2226,
     ]);
     const items = apiItems
-        .filter((item) => !item.NotUsed && (item.CanBeSoldToShop || allowedItems.has(item.Id)) && item.BasePrice > 0)
+        .filter((item) => !item.NotUsed && ((item.CanBeSoldToShop && item.BasePrice > 0) || allowedItems.has(item.Id)))
         .map((item) => {
         const tradeItem = {
             id: item.Id,

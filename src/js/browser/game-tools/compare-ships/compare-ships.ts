@@ -210,7 +210,7 @@ export class CompareShips {
                 } else {
                     amount =
                         property.amount < 1 && property.amount > 0
-                            ? formatPP(property.amount)
+                            ? formatPP(property.amount, 1)
                             : formatSignFloat(property.amount, 2)
                 }
 
