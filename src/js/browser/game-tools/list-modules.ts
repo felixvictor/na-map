@@ -174,7 +174,7 @@ export default class ListModules {
                                     } else {
                                         amount =
                                             property.amount < 1 && property.amount > 0
-                                                ? formatPP(property.amount)
+                                                ? formatPP(property.amount, 1)
                                                 : formatSignInt(property.amount)
                                     }
 

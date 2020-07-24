@@ -133,9 +133,10 @@ export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x
 /**
  * Format percentage point
  * @param   x - Integer
+ * @param   f - Digits following decimal point
  * @returns Formatted percentage point
  */
-export const formatPP = (x: number): string => formatLocale.format(",.0%")(x).replace("%", "pp")
+export const formatPP = (x: number, f = 0): string => formatLocale.format(`,.${f}%`)(x).replace("%", "pp")
 
 const mSpan = '<span class="caps">m</span>'
 
