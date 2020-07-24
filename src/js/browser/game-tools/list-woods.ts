@@ -151,7 +151,7 @@ export default class ListWoods {
 
                                     let formattedAmount
                                     if (modifier === "Repair amount" && amount) {
-                                        formattedAmount = formatPP(amount)
+                                        formattedAmount = formatPP(amount, 1)
                                     } else {
                                         formattedAmount = amount ? formatFloatFixedHTML(amount) : ""
                                     }
