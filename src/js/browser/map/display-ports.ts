@@ -64,7 +64,6 @@ import {
 } from "../../common/gen-json"
 import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
 
-import TrilateratePosition from "../map-tools/get-position"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 import { simpleStringSort } from "../../common/common-node"
@@ -124,7 +123,6 @@ interface ReadData {
 }
 
 export default class DisplayPorts {
-    /* eslint-disable @typescript-eslint/no-explicit-any */
     circleType = ""
     currentPort!: { id: number; coord: Coordinate }
     portData!: PortWithTrades[]
@@ -134,63 +132,61 @@ export default class DisplayPorts {
     showTradePortPartners: boolean
     tradeItem!: Map<number, TradeItem>
     tradePortId!: number
-    zoomLevel: string
-    private _attackRadius!: ScaleLinear<number, number>
-    private _colourScaleCounty!: ScaleOrdinal<string, string>
-    private _colourScaleHostility!: ScaleLinear<string, string>
-    private _colourScaleNet!: ScaleLinear<string, string>
-    private _colourScalePoints!: ScaleLinear<string, string>
-    private _colourScaleTax!: ScaleLinear<string, string>
-    private _countyPolygon!: Area[]
-    private _countyPolygonFiltered!: Area[]
-    private _divPortSummary!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _gCounty!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _gPort!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _gPortCircle!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _gRegion!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _gText!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, any>
-    private _lowerBound!: Bound
-    private _maxNetIncome!: number
-    private _maxPortPoints!: number
-    private _maxTaxIncome!: number
-    private _minNetIncome!: number
-    private _minPortPoints!: number
-    private _minTaxIncome!: number
-    private _nationIcons!: NationListAlternative<string>
-    private _portDataFiltered!: PortWithTrades[]
-    private _portRadius!: ScaleLinear<number, number>
-    private _portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _portSummaryNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _portSummaryTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _portSummaryTextNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _portSummaryTextNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, any>
-    private _regionPolygon!: Area[]
-    private _regionPolygonFiltered!: Area[]
-    private _scale: number
-    private _upperBound!: Bound
-    private readonly _baseId: string
-    private readonly _circleSize: number
-    private readonly _cookie: Cookie
-    private readonly _f11: ShowF11
-    private readonly _fontSize: number
-    private readonly _iconSize: number
-    private readonly _maxRadiusFactor: number
-    private readonly _minRadiusFactor: number
-    private readonly _minScale: number
-    private readonly _radioButtonValues: string[]
-    private readonly _radios: RadioButton
-    private readonly _serverName: string
-    private readonly _showPBZones: string
-    private readonly _tooltipDuration: number
-    private readonly _trilateratePosition: TrilateratePosition
+    zoomLevel = "initial"
+    #attackRadius!: ScaleLinear<number, number>
+    #colourScaleCounty!: ScaleOrdinal<string, string>
+    #colourScaleHostility!: ScaleLinear<string, string>
+    #colourScaleNet!: ScaleLinear<string, string>
+    #colourScalePoints!: ScaleLinear<string, string>
+    #colourScaleTax!: ScaleLinear<string, string>
+    #countyPolygon!: Area[]
+    #countyPolygonFiltered!: Area[]
+    #divPortSummary!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #gCounty!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPort!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPortCircle!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gRegion!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gText!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #lowerBound!: Bound
+    #maxNetIncome!: number
+    #maxPortPoints!: number
+    #maxTaxIncome!: number
+    #minNetIncome!: number
+    #minPortPoints!: number
+    #minTaxIncome!: number
+    #nationIcons!: NationListAlternative<string>
+    #portDataFiltered!: PortWithTrades[]
+    #portRadius!: ScaleLinear<number, number>
+    #portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTextNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTextNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #regionPolygon!: Area[]
+    #regionPolygonFiltered!: Area[]
+    #scale: number
+    #upperBound!: Bound
+    readonly #baseId = "show-radius"
+    readonly #circleSize = defaultCircleSize
+    readonly #cookie: Cookie
+    readonly #f11: ShowF11
+    readonly #fontSize = defaultFontSize
+    readonly #iconSize = 48
+    readonly #maxRadiusFactor = 6
+    readonly #minRadiusFactor = 1
+    readonly #minScale: number
+    readonly #radioButtonValues: string[]
+    readonly #radios: RadioButton
+    readonly #serverName: string
+    readonly #showPBZones = "all"
 
     constructor(readonly map: NAMap) {
-        this._serverName = this.map.serverName
-        this._minScale = this.map.minScale
-        this._scale = this._minScale
-        this._f11 = this.map.f11
+        this.#serverName = this.map.serverName
+        this.#minScale = this.map.minScale
+        this.#scale = this.#minScale
+        this.#f11 = this.map.f11
 
         this.showCurrentGood = false
         this.showTradePortPartners = false
@@ -198,42 +194,36 @@ export default class DisplayPorts {
         // Shroud Cay
         this.currentPort = { id: 366, coord: { x: 4396, y: 2494 } }
 
-        this.zoomLevel = "initial"
-        this._showPBZones = "all"
-        this._tooltipDuration = 200
-        this._iconSize = 48
-        this._fontSize = defaultFontSize
-        this._circleSize = defaultCircleSize
-
-        this._minRadiusFactor = 1
-        this._maxRadiusFactor = 6
-
-        /**
-         * Base Id
-         */
-        this._baseId = "show-radius"
-
         /**
          * Possible values for show radius (first is default value)
          */
-        this._radioButtonValues = ["attack", "county", "points", "position", "tax", "net", "off"]
+        this.#radioButtonValues = ["attack", "county", "points", "position", "tax", "net", "off"]
 
         /**
          * Show radius cookie
          */
-        this._cookie = new Cookie({ id: this._baseId, values: this._radioButtonValues })
+        this.#cookie = new Cookie({ id: this.#baseId, values: this.#radioButtonValues })
 
         /**
          * Show radius radio buttons
          */
-        this._radios = new RadioButton(this._baseId, this._radioButtonValues)
+        this.#radios = new RadioButton(this.#baseId, this.#radioButtonValues)
 
         /**
          * Get showRadius setting from cookie or use default value
          */
         this.showRadius = this._getShowRadiusSetting()
 
-        this._trilateratePosition = new TrilateratePosition(this)
+        /*
+        Tue Antilles Aves
+        Wed Nassau shallow
+        Thu La Mona 4-7
+        Fri Hispaniola
+        Sat Nassau shallow
+        Sun Tumbado
+        Mon Léogane 4-7
+        Tue Tortuga 5-7
+         */
     }
 
     /**
@@ -292,11 +282,11 @@ export default class DisplayPorts {
          */
         const dataSources: DataSource[] = [
             {
-                fileName: `${this._serverName}-ports.json`,
+                fileName: `${this.#serverName}-ports.json`,
                 name: "server",
             },
             {
-                fileName: `${this._serverName}-pb.json`,
+                fileName: `${this.#serverName}-pb.json`,
                 name: "pb",
             },
         ]
@@ -313,7 +303,7 @@ export default class DisplayPorts {
             readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
             const tradeItems = (await (
-                await fetch(`${dataDirectory}/${this._serverName}-items.json`)
+                await fetch(`${dataDirectory}/${this.#serverName}-items.json`)
             ).json()) as TradeItem[]
             this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
             await loadEntries(dataSources)
@@ -330,33 +320,33 @@ export default class DisplayPorts {
     }
 
     _setupScales(): void {
-        this._portRadius = d3ScaleLinear()
-        this._attackRadius = d3ScaleLinear().domain([0, 1])
+        this.#portRadius = d3ScaleLinear()
+        this.#attackRadius = d3ScaleLinear().domain([0, 1])
 
-        this._colourScaleHostility = d3ScaleLinear<string, string>()
+        this.#colourScaleHostility = d3ScaleLinear<string, string>()
             .domain([0, 1])
             .range([colourWhite, colourRedDark])
             .interpolate(d3InterpolateHcl)
-        this._colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
+        this.#colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
 
-        this._minTaxIncome = d3Min(this.portData, (d) => d.taxIncome) ?? 0
-        this._maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
-        this._colourScaleTax = d3ScaleLinear<string, string>()
-            .domain([this._minTaxIncome, this._maxTaxIncome])
+        this.#minTaxIncome = d3Min(this.portData, (d) => d.taxIncome) ?? 0
+        this.#maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
+        this.#colourScaleTax = d3ScaleLinear<string, string>()
+            .domain([this.#minTaxIncome, this.#maxTaxIncome])
             .range([colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
-        this._minNetIncome = d3Min(this.portData, (d) => d.netIncome) ?? 0
-        this._maxNetIncome = d3Max(this.portData, (d) => d.netIncome) ?? 0
-        this._colourScaleNet = d3ScaleLinear<string, string>()
-            .domain([this._minNetIncome, 0, this._maxNetIncome])
+        this.#minNetIncome = d3Min(this.portData, (d) => d.netIncome) ?? 0
+        this.#maxNetIncome = d3Max(this.portData, (d) => d.netIncome) ?? 0
+        this.#colourScaleNet = d3ScaleLinear<string, string>()
+            .domain([this.#minNetIncome, 0, this.#maxNetIncome])
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
-        this._minPortPoints = d3Min(this.portData, (d) => d.portPoints) ?? 0
-        this._maxPortPoints = d3Max(this.portData, (d) => d.portPoints) ?? 0
-        this._colourScalePoints = d3ScaleLinear<string, string>()
-            .domain([this._minPortPoints, this._maxPortPoints])
+        this.#minPortPoints = d3Min(this.portData, (d) => d.portPoints) ?? 0
+        this.#maxPortPoints = d3Max(this.portData, (d) => d.portPoints) ?? 0
+        this.#colourScalePoints = d3ScaleLinear<string, string>()
+            .domain([this.#minPortPoints, this.#maxPortPoints])
             .range([colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
     }
@@ -370,35 +360,35 @@ export default class DisplayPorts {
      * @returns Show setting
      */
     _getShowRadiusSetting(): string {
-        let r = this._cookie.get()
+        let r = this.#cookie.get()
 
         // Radius "position" after reload is useless
         if (r === "position") {
-            ;[r] = this._radioButtonValues
-            this._cookie.set(r)
+            ;[r] = this.#radioButtonValues
+            this.#cookie.set(r)
         }
 
-        this._radios.set(r)
+        this.#radios.set(r)
 
         return r
     }
 
     _showRadiusSelected(): void {
-        this.showRadius = this._radios.get()
-        this._cookie.set(this.showRadius)
+        this.showRadius = this.#radios.get()
+        this.#cookie.set(this.showRadius)
         this.update()
     }
 
     _setupSvg(): void {
-        this._gPort = d3Select<SVGGElement, SVGGDatum>("#map")
+        this.#gPort = d3Select<SVGGElement, SVGGDatum>("#map")
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
-        this._gRegion = this._gPort.append<SVGGElement>("g").attr("class", "region")
-        this._gCounty = this._gPort.append<SVGGElement>("g").attr("class", "county")
-        this._gPortCircle = this._gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
-        this._gIcon = this._gPort.append<SVGGElement>("g").attr("class", "port")
-        this._gText = this._gPort.append<SVGGElement>("g").attr("class", "port-names")
+        this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("class", "region")
+        this.#gCounty = this.#gPort.append<SVGGElement>("g").attr("class", "county")
+        this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
+        this.#gIcon = this.#gPort.append<SVGGElement>("g").attr("class", "port")
+        this.#gText = this.#gPort.append<SVGGElement>("g").attr("class", "port-names")
     }
 
     _setupCounties(): void {
@@ -426,7 +416,7 @@ export default class DisplayPorts {
          */
 
         // noinspection SpellCheckingInspection
-        this._countyPolygon = [
+        this.#countyPolygon = [
             { name: "Abaco", centroid: [4500, 1953], angle: 0 },
             { name: "Andros", centroid: [3870, 2350], angle: 0 },
             { name: "Apalache", centroid: [2800, 1330], angle: 0 },
@@ -506,13 +496,13 @@ export default class DisplayPorts {
 
         // Sort by distance, origin is top left corner
         const origin = { x: this.map.coord.max / 2, y: this.map.coord.max / 2 }
-        this._countyPolygon = this._countyPolygon.sort((a, b) => {
+        this.#countyPolygon = this.#countyPolygon.sort((a, b) => {
             const pointA = { x: a.centroid[0], y: a.centroid[1] }
             const pointB = { x: b.centroid[0], y: b.centroid[1] }
 
             return distancePoints(origin, pointA) - distancePoints(origin, pointB)
         })
-        this._colourScaleCounty.domain(this._countyPolygon.map((county) => county.name))
+        this.#colourScaleCounty.domain(this.#countyPolygon.map((county) => county.name))
     }
 
     _setupRegions(): void {
@@ -536,7 +526,7 @@ export default class DisplayPorts {
         });
         */
 
-        this._regionPolygon = [
+        this.#regionPolygon = [
             { name: "Atlantic Coast", centroid: [4200, 970], angle: 0 },
             { name: "Atlantic", centroid: [6401, 684], angle: 0 },
             { name: "Bahamas", centroid: [5100, 2400], angle: 0 },
@@ -557,29 +547,29 @@ export default class DisplayPorts {
 
     _setupSummary(): void {
         // Main box
-        this._divPortSummary = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
+        this.#divPortSummary = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
             .append<HTMLDivElement>("div")
             .attr("id", "port-summary")
             .attr("class", "port-summary port-summary-no-wind")
 
         // Number of selected ports
-        this._portSummaryNumPorts = this._divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
-        this._portSummaryTextNumPorts = this._portSummaryNumPorts.append<HTMLDivElement>("div")
-        this._portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "summary-des").html("selected<br>ports")
+        this.#portSummaryNumPorts = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
+        this.#portSummaryTextNumPorts = this.#portSummaryNumPorts.append<HTMLDivElement>("div")
+        this.#portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "summary-des").html("selected<br>ports")
 
         // Total tax income
-        this._portSummaryTaxIncome = this._divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
-        this._portSummaryTextTaxIncome = this._portSummaryTaxIncome.append<HTMLDivElement>("div")
-        this._portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("tax<br>income")
+        this.#portSummaryTaxIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
+        this.#portSummaryTextTaxIncome = this.#portSummaryTaxIncome.append<HTMLDivElement>("div")
+        this.#portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("tax<br>income")
 
         // Total net income
-        this._portSummaryNetIncome = this._divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
-        this._portSummaryTextNetIncome = this._portSummaryNetIncome.append<HTMLDivElement>("div")
-        this._portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("net<br>income")
+        this.#portSummaryNetIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
+        this.#portSummaryTextNetIncome = this.#portSummaryNetIncome.append<HTMLDivElement>("div")
+        this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("net<br>income")
     }
 
     _setupFlags(): void {
-        this._nationIcons = DisplayPorts._importAll(
+        this.#nationIcons = DisplayPorts._importAll(
             (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
         )
 
@@ -588,24 +578,24 @@ export default class DisplayPorts {
             pattern.id = id
             pattern.setAttribute("width", "133%")
             pattern.setAttribute("height", "100%")
-            pattern.setAttribute("viewBox", `6 6 ${this._iconSize} ${this._iconSize * 0.75}`)
+            pattern.setAttribute("viewBox", `6 6 ${this.#iconSize} ${this.#iconSize * 0.75}`)
 
             return pattern
         }
 
         const getImage = (nation: NationShortName): SVGImageElement => {
             const image = document.createElementNS("http://www.w3.org/2000/svg", "image")
-            image.setAttribute("width", String(this._iconSize))
-            image.setAttribute("height", String(this._iconSize))
-            image.setAttribute("href", this._nationIcons[nation].replace('"', "").replace('"', ""))
+            image.setAttribute("width", String(this.#iconSize))
+            image.setAttribute("height", String(this.#iconSize))
+            image.setAttribute("href", this.#nationIcons[nation].replace('"', "").replace('"', ""))
 
             return image
         }
 
         const getCircleCapital = (): SVGCircleElement => {
             const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-            circleCapital.setAttribute("cx", String(this._iconSize / 2))
-            circleCapital.setAttribute("cy", String(this._iconSize / 2))
+            circleCapital.setAttribute("cx", String(this.#iconSize / 2))
+            circleCapital.setAttribute("cy", String(this.#iconSize / 2))
             circleCapital.setAttribute("r", "16")
 
             return circleCapital
@@ -772,7 +762,7 @@ export default class DisplayPorts {
                 <img
                     alt="${port.icon}"
                     class="flag-icon mr-3 align-self-stretch ${iconBorder}"
-                    src="${this._nationIcons[port.icon].replace('"', "").replace('"', "")}"
+                    src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
                 />
 
                 <div class="text-left">
@@ -946,11 +936,11 @@ export default class DisplayPorts {
     }
 
     _updateIcons(): void {
-        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
-        const circleSize = roundToThousands(this._circleSize / circleScale)
-        const data = this._portDataFiltered
+        const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
+        const circleSize = roundToThousands(this.#circleSize / circleScale)
+        const data = this.#portDataFiltered
 
-        this._gIcon
+        this.#gIcon
             .selectAll<SVGCircleElement, PortWithTrades>("circle")
             .data(data, (d) => String(d.id))
             .join((enter) =>
@@ -997,10 +987,10 @@ export default class DisplayPorts {
     }
 
     _updatePortCircles(): void {
-        const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
-        const rMin = roundToThousands((this._circleSize / circleScale) * this._minRadiusFactor)
-        const rMax = roundToThousands((this._circleSize / circleScale) * this._maxRadiusFactor)
-        let data = this._portDataFiltered
+        const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
+        const rMin = roundToThousands((this.#circleSize / circleScale) * this.#minRadiusFactor)
+        const rMax = roundToThousands((this.#circleSize / circleScale) * this.#maxRadiusFactor)
+        let data = this.#portDataFiltered
         // eslint-disable-next-line unicorn/consistent-function-scoping
         let cssClass: PortCircleStringF = () => ""
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -1010,40 +1000,40 @@ export default class DisplayPorts {
 
         // noinspection IfStatementWithTooManyBranchesJS
         if (this.showRadius === "tax") {
-            data = this._portDataFiltered.filter((d) => d.capturable)
-            this._portRadius.domain([this._minTaxIncome, this._maxTaxIncome]).range([rMin, rMax])
+            data = this.#portDataFiltered.filter((d) => d.capturable)
+            this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
-            fill = (d): string => this._colourScaleTax(d.taxIncome)
-            r = (d): number => this._portRadius(d.taxIncome)
+            fill = (d): string => this.#colourScaleTax(d.taxIncome)
+            r = (d): number => this.#portRadius(d.taxIncome)
         } else if (this.showRadius === "net") {
-            data = this._portDataFiltered.filter((d) => d.capturable)
-            this._portRadius.domain([this._minNetIncome, this._maxNetIncome]).range([rMin, rMax])
+            data = this.#portDataFiltered.filter((d) => d.capturable)
+            this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
-            fill = (d): string => this._colourScaleNet(d.netIncome)
-            r = (d): number => this._portRadius(Math.abs(d.netIncome))
+            fill = (d): string => this.#colourScaleNet(d.netIncome)
+            r = (d): number => this.#portRadius(Math.abs(d.netIncome))
         } else if (this.showRadius === "points") {
-            data = this._portDataFiltered.filter((d) => d.capturable)
-            this._portRadius.domain([this._minPortPoints, this._maxPortPoints]).range([rMin, rMax / 2])
+            data = this.#portDataFiltered.filter((d) => d.capturable)
+            this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
             cssClass = (): string => "bubble"
-            fill = (d): string => this._colourScalePoints(d.portPoints)
-            r = (d): number => this._portRadius(d.portPoints)
+            fill = (d): string => this.#colourScalePoints(d.portPoints)
+            r = (d): number => this.#portRadius(d.portPoints)
         } else if (this.showRadius === "position") {
             cssClass = (): string => "bubble here"
             r = (d): number => d.distance
         } else if (this.showRadius === "attack") {
-            data = this._portDataFiltered.filter((port) => port.attackHostility)
-            this._attackRadius.range([rMin, rMax / 1.5])
+            data = this.#portDataFiltered.filter((port) => port.attackHostility)
+            this.#attackRadius.range([rMin, rMax / 1.5])
             cssClass = (): string => "bubble"
             fill = (d): string =>
-                d.attackerNation === "Neutral" ? colourOrange : this._colourScaleHostility(d.attackHostility ?? 0)
-            r = (d): number => this._attackRadius(d.attackHostility ?? 0)
+                d.attackerNation === "Neutral" ? colourOrange : this.#colourScaleHostility(d.attackHostility ?? 0)
+            r = (d): number => this.#attackRadius(d.attackHostility ?? 0)
         } else if (this.circleType === "currentGood") {
             cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2
         } else if (this.showRadius === "county") {
             cssClass = (d): string =>
                 d.capturable ? (d.countyCapital ? "bubble capital" : "bubble non-capital") : "bubble not-capturable"
-            fill = (d): string => (d.capturable ? this._colourScaleCounty(d.county) : "")
+            fill = (d): string => (d.capturable ? this.#colourScaleCounty(d.county) : "")
             r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
         } else if (this.showRadius === "tradePorts") {
             cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
@@ -1059,7 +1049,7 @@ export default class DisplayPorts {
             data = []
         }
 
-        this._gPortCircle
+        this.#gPortCircle
             .selectAll<SVGCircleElement, PortWithTrades>("circle")
             .data(data, (d) => String(d.id))
             .join((enter) =>
@@ -1075,7 +1065,7 @@ export default class DisplayPorts {
 
     _updateTextsX(d: PortWithTrades, circleSize: number): number {
         return this.zoomLevel === "pbZone" &&
-            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+            (this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id))
             ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
             : d.coordinates[0]
     }
@@ -1088,7 +1078,7 @@ export default class DisplayPorts {
         }
 
         const dy = d.angle > 90 && d.angle < 270 ? fontSize : 0
-        return this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id)
+        return this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id)
             ? d.coordinates[1] + Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.angle))) + dy
             : d.coordinates[1] + deltaY
     }
@@ -1096,7 +1086,7 @@ export default class DisplayPorts {
     _updateTextsAnchor(d: PortWithTrades): string {
         if (
             this.zoomLevel === "pbZone" &&
-            (this._showPBZones === "all" || (this._showPBZones === "single" && d.id === this.currentPort.id))
+            (this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id))
         ) {
             return d.angle > 0 && d.angle < degreesHalfCircle ? "start" : "end"
         }
@@ -1106,15 +1096,15 @@ export default class DisplayPorts {
 
     updateTexts(): void {
         if (this.zoomLevel === "initial") {
-            this._gText.classed("d-none", true)
+            this.#gText.classed("d-none", true)
         } else {
-            const circleScale = 2 ** Math.log2(Math.abs(this._minScale) + this._scale)
-            const circleSize = roundToThousands(this._circleSize / circleScale)
-            const fontScale = 2 ** Math.log2((Math.abs(this._minScale) + this._scale) * 0.9)
-            const fontSize = roundToThousands(this._fontSize / fontScale)
-            const data = this._portDataFiltered
+            const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
+            const circleSize = roundToThousands(this.#circleSize / circleScale)
+            const fontScale = 2 ** Math.log2((Math.abs(this.#minScale) + this.#scale) * 0.9)
+            const fontSize = roundToThousands(this.#fontSize / fontScale)
+            const data = this.#portDataFiltered
 
-            this._gText
+            this.#gText
                 .selectAll<SVGTextElement, PortWithTrades>("text")
                 .data(data, (d) => String(d.id))
                 .join((enter) => enter.append("text").text((d) => d.name))
@@ -1122,7 +1112,7 @@ export default class DisplayPorts {
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
                 .attr("text-anchor", (d) => this._updateTextsAnchor(d))
 
-            this._gText.attr("font-size", `${fontSize}px`).classed("d-none", false)
+            this.#gText.attr("font-size", `${fontSize}px`).classed("d-none", false)
         }
     }
 
@@ -1136,16 +1126,16 @@ export default class DisplayPorts {
             netTotal = d3Sum(this.portData, (d) => d.netIncome)
         }
 
-        this._portSummaryTextNumPorts.text(`${numberPorts}`)
-        this._portSummaryTextTaxIncome.html(`${formatSiInt(taxTotal)}`)
-        this._portSummaryTextNetIncome.html(`${formatSiInt(netTotal)}`)
+        this.#portSummaryTextNumPorts.text(`${numberPorts}`)
+        this.#portSummaryTextTaxIncome.html(`${formatSiInt(taxTotal)}`)
+        this.#portSummaryTextNetIncome.html(`${formatSiInt(netTotal)}`)
     }
 
     _updateCounties(): void {
         if (this.zoomLevel === "portLabel") {
-            const data = this._countyPolygonFiltered
+            const data = this.#countyPolygonFiltered
 
-            this._gCounty
+            this.#gCounty
                 .selectAll<SVGTextElement, Area>("text")
                 .data(data, (d) => d.name)
                 .join(
@@ -1156,7 +1146,7 @@ export default class DisplayPorts {
                             .text((d) => d.name),
                     (update) =>
                         update.attr("fill", (d: Area): string =>
-                            this.showRadius === "county" ? this._colourScaleCounty(d.name) : ""
+                            this.showRadius === "county" ? this.#colourScaleCounty(d.name) : ""
                         )
                 )
 
@@ -1174,17 +1164,17 @@ export default class DisplayPorts {
                 );
             */
 
-            this._gCounty.classed("d-none", false)
+            this.#gCounty.classed("d-none", false)
         } else {
-            this._gCounty.classed("d-none", true)
+            this.#gCounty.classed("d-none", true)
         }
     }
 
     _updateRegions(): void {
         if (this.zoomLevel === "initial") {
-            const data = this._regionPolygonFiltered
+            const data = this.#regionPolygonFiltered
 
-            this._gRegion
+            this.#gRegion
                 .selectAll<SVGTextElement, Area>("text")
                 .data(data, (d) => d.name)
                 .join((enter) =>
@@ -1208,14 +1198,14 @@ export default class DisplayPorts {
                 .attr("d", d => d3line2(d.polygon))
                 .attr("fill", "#999");
                 */
-            this._gRegion.classed("d-none", false)
+            this.#gRegion.classed("d-none", false)
         } else {
-            this._gRegion.classed("d-none", true)
+            this.#gRegion.classed("d-none", true)
         }
     }
 
     update(scale?: number): void {
-        this._scale = scale ?? this._scale
+        this.#scale = scale ?? this.#scale
 
         this._filterVisible()
         this._updateIcons()
@@ -1228,31 +1218,31 @@ export default class DisplayPorts {
 
     _filterVisible(): void {
         if (this.showRadius === "position") {
-            this._portDataFiltered = this.portData
+            this.#portDataFiltered = this.portData
         } else {
-            this._portDataFiltered = this.portData.filter(
+            this.#portDataFiltered = this.portData.filter(
                 (port) =>
-                    port.coordinates[0] >= this._lowerBound[0] &&
-                    port.coordinates[0] <= this._upperBound[0] &&
-                    port.coordinates[1] >= this._lowerBound[1] &&
-                    port.coordinates[1] <= this._upperBound[1]
+                    port.coordinates[0] >= this.#lowerBound[0] &&
+                    port.coordinates[0] <= this.#upperBound[0] &&
+                    port.coordinates[1] >= this.#lowerBound[1] &&
+                    port.coordinates[1] <= this.#upperBound[1]
             )
         }
 
-        this._countyPolygonFiltered = this._countyPolygon.filter(
+        this.#countyPolygonFiltered = this.#countyPolygon.filter(
             (county) =>
-                county.centroid[0] >= this._lowerBound[0] &&
-                county.centroid[0] <= this._upperBound[0] &&
-                county.centroid[1] >= this._lowerBound[1] &&
-                county.centroid[1] <= this._upperBound[1]
+                county.centroid[0] >= this.#lowerBound[0] &&
+                county.centroid[0] <= this.#upperBound[0] &&
+                county.centroid[1] >= this.#lowerBound[1] &&
+                county.centroid[1] <= this.#upperBound[1]
         )
 
-        this._regionPolygonFiltered = this._regionPolygon.filter(
+        this.#regionPolygonFiltered = this.#regionPolygon.filter(
             (region) =>
-                region.centroid[0] >= this._lowerBound[0] &&
-                region.centroid[0] <= this._upperBound[0] &&
-                region.centroid[1] >= this._lowerBound[1] &&
-                region.centroid[1] <= this._upperBound[1]
+                region.centroid[0] >= this.#lowerBound[0] &&
+                region.centroid[0] <= this.#upperBound[0] &&
+                region.centroid[1] >= this.#lowerBound[1] &&
+                region.centroid[1] <= this.#upperBound[1]
         )
     }
 
@@ -1262,18 +1252,18 @@ export default class DisplayPorts {
      * @param upperBound - Bottom right coordinates of current viewport
      */
     setBounds(lowerBound: Bound, upperBound: Bound): void {
-        this._lowerBound = lowerBound
-        this._upperBound = upperBound
+        this.#lowerBound = lowerBound
+        this.#upperBound = upperBound
     }
 
     _showSummary(): void {
-        this._divPortSummary.classed("hidden", false)
+        this.#divPortSummary.classed("hidden", false)
     }
 
-    setShowRadiusSetting(showRadius = this._radioButtonValues[0]): void {
+    setShowRadiusSetting(showRadius = this.#radioButtonValues[0]): void {
         this.showRadius = showRadius
-        this._radios.set(this.showRadius)
-        this._cookie.set(this.showRadius)
+        this.#radios.set(this.showRadius)
+        this.#cookie.set(this.showRadius)
     }
 
     clearMap(scale?: number): void {
