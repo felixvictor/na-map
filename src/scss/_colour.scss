@@ -194,6 +194,7 @@ $red-light: $red-200;
 $red-dark: $red-800;
 $green-light: $green-200;
 $green-dark: $green-800;
+$yellow-dark: $yellow-900;
 
 $success: $green-dark;
 $info: $blue;
@@ -263,4 +264,5 @@ $colors: (
     "gray": $gray-500,
     "gray-dark": $gray-900,
     "black": $black,
+    "yellow-dark": $yellow-dark,
 );

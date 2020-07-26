@@ -13,15 +13,15 @@
 
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
+
 import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 import * as d3Selection from "d3-selection"
-import { h, render } from "preact"
 import htm from "htm"
-
+import { h, render } from "preact"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import dayjs from "dayjs"
@@ -47,9 +47,12 @@ import {
     degreesHalfCircle,
     degreesToRadians,
     distancePoints,
+    getOrdinalSVG,
     Point,
     roundToThousands,
 } from "../../common/common-math"
+import { simpleStringSort } from "../../common/common-node"
+import { displayClanLitHtml } from "../../common/common-game-tools"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
@@ -64,10 +67,10 @@ import {
 } from "../../common/gen-json"
 import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
 
+// @ts-expect-error
+import { default as swordsIcon } from "Icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
-import { simpleStringSort } from "../../common/common-node"
-import { displayClanLitHtml } from "../../common/common-game-tools"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -122,6 +125,19 @@ interface ReadData {
     pb: PortBattlePerServer[]
 }
 
+interface PatrolZone {
+    name: string
+    coordinates: Point
+    radius: number
+    shallow: boolean
+    shipClass?: MinMax<number>
+}
+
+interface MinMax<amount> {
+    min: amount
+    max: amount
+}
+
 export default class DisplayPorts {
     circleType = ""
     currentPort!: { id: number; coord: Coordinate }
@@ -146,6 +162,7 @@ export default class DisplayPorts {
     #gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gPort!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gPortCircle!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPZ!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gRegion!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gText!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound!: Bound
@@ -213,17 +230,6 @@ export default class DisplayPorts {
          * Get showRadius setting from cookie or use default value
          */
         this.showRadius = this._getShowRadiusSetting()
-
-        /*
-        Tue Antilles Aves
-        Wed Nassau shallow
-        Thu La Mona 4-7
-        Fri Hispaniola
-        Sat Nassau shallow
-        Sun Tumbado
-        Mon Léogane 4-7
-        Tue Tortuga 5-7
-         */
     }
 
     /**
@@ -267,19 +273,13 @@ export default class DisplayPorts {
         this._setupSvg()
         this._setupCounties()
         this._setupRegions()
+        this._setupPatrolZones()
         this._setupSummary()
         this._setupFlags()
     }
 
     async _loadData(): Promise<ReadData> {
-        /**
-         * Data directory
-         */
         const dataDirectory = "data"
-
-        /**
-         * Data sources
-         */
         const dataSources: DataSource[] = [
             {
                 fileName: `${this.#serverName}-ports.json`,
@@ -290,7 +290,6 @@ export default class DisplayPorts {
                 name: "pb",
             },
         ]
-
         const readData = {} as ReadData
 
         const loadEntries = async (dataSources: DataSource[]): Promise<void> => {
@@ -389,6 +388,7 @@ export default class DisplayPorts {
         this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
         this.#gIcon = this.#gPort.append<SVGGElement>("g").attr("class", "port")
         this.#gText = this.#gPort.append<SVGGElement>("g").attr("class", "port-names")
+        this.#gPZ = this.#gPort.append<SVGGElement>("g").attr("class", "pz")
     }
 
     _setupCounties(): void {
@@ -545,6 +545,54 @@ export default class DisplayPorts {
         ] as Area[]
     }
 
+    _setupPatrolZones(): void {
+        const patrolZones = [
+            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
+            { name: "Hispaniola", coordinates: [4900, 3635], radius: 150, shallow: false }, // checked
+            { name: "La Mona", coordinates: [6000, 4200], radius: 250, shallow: false, shipClass: { min: 7, max: 4 } },
+            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
+            { name: "Antilles", coordinates: [7500, 4450], radius: 120, shallow: false },
+            { name: "Tortuga", coordinates: [5400, 3450], radius: 80, shallow: false, shipClass: { min: 7, max: 5 } },
+            { name: "Léogane", coordinates: [5100, 3750], radius: 80, shallow: false, shipClass: { min: 7, max: 4 } },
+            { name: "Tumbado", coordinates: [2400, 3000], radius: 250, shallow: false },
+        ] as PatrolZone[]
+
+        const start = dayjs.utc("2020-07-25").hour(10)
+        const index = dayjs.utc().diff(start, "day") % patrolZones.length
+        // console.log(start.format("YYYY-MM-DD hh.mm"), index)
+        const { radius, name, shallow, shipClass } = patrolZones[index]
+        const [x, y] = patrolZones[index].coordinates
+        const dr = Math.round(radius / 1.6)
+        const fontSize = Math.round((this.#fontSize * radius) / 100)
+
+        const g = this.#gPZ.append("g")
+        g.append("circle").attr("cx", x).attr("cy", y).attr("r", radius)
+        g.append("image")
+            .attr("height", radius)
+            .attr("width", radius)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("transform", `translate(${Math.floor(-radius / 2)},${Math.floor(-radius / 1.3)})`)
+            .attr("xlink:href", swordsIcon)
+            .attr("alt", "Patrol zone")
+        g.append("text")
+            .text(name)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("dy", dr)
+            .attr("font-size", Math.round(fontSize * 1.6))
+        g.append("text")
+            .html(
+                shallow
+                    ? "Shallow water"
+                    : `${shipClass ? `${getOrdinalSVG(shipClass.min)} to ${getOrdinalSVG(shipClass.max)} rate` : "All"}`
+            )
+            .attr("x", x)
+            .attr("y", y)
+            .attr("dy", Math.round(dr / 1.6))
+            .attr("font-size", fontSize)
+    }
+
     _setupSummary(): void {
         // Main box
         this.#divPortSummary = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
@@ -646,6 +694,7 @@ export default class DisplayPorts {
         return id ? this.portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
+    // eslint-disable-next-line complexity
     _getText(portProperties: PortWithTrades): PortForDisplay {
         /*
         const getCoord = (portId: number): Coordinate => {
