@@ -31,6 +31,7 @@ export interface Building {
     byproduct?: []
 }
 export interface BuildingResult {
+    id: number
     name: string
     price: number
 }
@@ -377,13 +378,15 @@ export interface Price {
     seasoned: PriceSeasonedWood[]
 }
 export interface PriceStandardWood {
+    id: number
     name: string
-    real: number
-    labour: number
+    reales: number
+    labour?: number
 }
 export interface PriceSeasonedWood {
+    id: number
     name: string
-    real: number
+    reales: number
     labour: number
     doubloon: number
     tool: number
