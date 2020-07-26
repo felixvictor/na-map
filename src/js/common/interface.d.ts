@@ -40,6 +40,7 @@ export interface NestedIndex<T> {
 
 export type HtmlResult = VNode<unknown> | Array<VNode<unknown>>
 
+export type SVGString = string
 export type HtmlString = string
 export interface BaseModal {
     id: HtmlString
