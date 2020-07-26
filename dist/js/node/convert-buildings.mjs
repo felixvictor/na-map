@@ -32,6 +32,7 @@ let apiItems;
 const getItemsCrafted = (buildingId) => apiItems
     .filter((item) => !item.NotUsed && item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
     .map((recipe) => ({
+    id: recipe.Id,
     name: cleanName(recipe.Name).replace(" Blueprint", ""),
     price: 0,
 }))
@@ -43,7 +44,7 @@ const getBuildings = () => {
     const buildings = new Map();
     const buildingResources = new Map(apiItems.map((apiResource) => [
         Number(apiResource.Id),
-        { name: cleanName(apiResource.Name), price: apiResource.BasePrice },
+        { id: apiResource.Id, name: cleanName(apiResource.Name), price: apiResource.BasePrice },
     ]));
     const apiRecipeResources = apiItems.filter((item) => item.ItemType === "RecipeResource");
     const resourceRecipes = new Map(apiRecipeResources.map((recipe) => [
@@ -77,7 +78,7 @@ const getBuildings = () => {
         if (!buildings.has(building.name)) {
             switch (building.name) {
                 case "Shipyard":
-                    building.result = [{ name: "Ships", price: 0 }];
+                    building.result = [{ id: 0, name: "Ships", price: 0 }];
                     building.byproduct = [];
                     break;
                 case "Academy":
@@ -85,7 +86,7 @@ const getBuildings = () => {
                     building.byproduct = [];
                     break;
                 case "Forge":
-                    building.result = [{ name: "Cannons", price: 0 }];
+                    building.result = [{ id: 0, name: "Cannons", price: 0 }];
                     building.byproduct = [];
                     break;
                 case "Workshop":
@@ -106,24 +107,48 @@ const getAPISeasonedItem = (name) => apiItems.find((item) => item.ItemType === "
     item.Name.replace(" Log", "") === name.replace(/\s/g, " ").replace("White Oak", "White oak"));
 const getPrices = (buildings) => {
     const prices = { standard: [], seasoned: [] };
-    const getStandardPrices = (name) => prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.real;
-    prices.standard = buildings.filter((building) => building.result?.[0].price)
+    const getStandardPrices = (name) => prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.reales;
+    const standardPrices = buildings.filter((building) => building.result?.[0].price)
         .map((building) => {
         const result = building.result[0];
         return {
+            id: result.id,
             name: result.name.replace(" Log", ""),
-            real: result.price,
+            reales: result.price,
             labour: building?.batch?.labour ?? 0,
         };
     })
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.id - b.id);
+    const superWoods = new Set([
+        807,
+        863,
+        1440,
+        1894,
+        1895,
+        1896,
+        1898,
+        1900,
+        1901,
+    ]);
+    const superPrices = [...superWoods]
+        .map((superWoodId) => {
+        const superWood = apiItems.find((item) => item.Id === superWoodId);
+        return {
+            id: superWoodId,
+            name: superWood?.Name ?? "",
+            reales: superWood?.BasePrice ?? 0,
+        };
+    })
+        .sort((a, b) => a.id - b.id);
+    prices.standard = [...standardPrices, ...superPrices];
     prices.seasoned = getItemsCraftedBySeasoningShed()
         .map((seasonedItem) => {
         const name = seasonedItem.name.replace(" Log", "");
         const apiSeasonedItem = getAPISeasonedItem(name);
         return {
+            id: apiSeasonedItem.Id,
             name,
-            real: getStandardPrices(name) ?? 0,
+            reales: getStandardPrices(name) ?? 0,
             labour: apiSeasonedItem.LaborPrice,
             doubloon: apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
                 ?.Amount ?? 0,
@@ -131,7 +156,7 @@ const getPrices = (buildings) => {
                 ?.Amount ?? 0,
         };
     })
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.id - b.id);
     return prices;
 };
 const convertBuildings = async () => {
