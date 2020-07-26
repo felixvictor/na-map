@@ -32,7 +32,7 @@ interface ItemNeeded {
     1: number | string
 }
 interface StandardCost {
-    real: number
+    reales: number
     labour: number
 }
 interface SeasonedCost extends StandardCost {
@@ -95,12 +95,12 @@ export default class ListShipBlueprints {
             const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/prices.json"))
                 .default as Price
             this._extractionCosts = new Map<string, StandardCost>(
-                costs.standard.map((cost) => [cost.name, { real: cost.real, labour: cost.labour }])
+                costs.standard.map((cost) => [cost.name, { reales: cost.reales, labour: cost?.labour ?? 0 }])
             )
             this._craftingCosts = new Map<string, SeasonedCost>(
                 costs.seasoned.map((cost) => [
                     cost.name,
-                    { real: cost.real, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool },
+                    { reales: cost.reales, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool },
                 ])
             )
         } catch (error) {
@@ -359,7 +359,7 @@ export default class ListShipBlueprints {
          * @returns Amount times price
          */
         const getTotalExtractionPrice = (item: ItemNeeded): number =>
-            this._extractionCosts.get(item[0])!.real * (item[1] as number)
+            (this._extractionCosts.get(item[0])?.reales ?? 0) * (item[1] as number)
 
         /**
          * Total labour hours per item
@@ -367,7 +367,7 @@ export default class ListShipBlueprints {
          * @returns Amount times labour hours
          */
         const getTotalExtractionLabour = (item: ItemNeeded): number =>
-            this._extractionCosts.get(item[0])!.labour * (item[1] as number)
+            (this._extractionCosts.get(item[0])?.labour ?? 0) * (item[1] as number)
 
         /**
          * Calculate total extraction costs
@@ -407,29 +407,30 @@ export default class ListShipBlueprints {
          */
         let sLogTools = 0
 
-        // noinspection DuplicatedCode
-        if (this._craftingCosts.has(this._woodsSelected.trim)) {
-            sLogPrice += this._craftingCosts.get(this._woodsSelected.trim)!.real * trimAmount
-            sLogLabour += this._craftingCosts.get(this._woodsSelected.trim)!.labour * trimAmount
-            sLogDoubloons += this._craftingCosts.get(this._woodsSelected.trim)!.doubloon * trimAmount
-            sLogTools += this._craftingCosts.get(this._woodsSelected.trim)!.tool * trimAmount
-        }
-
-        // noinspection DuplicatedCode
-        if (this._craftingCosts.has(this._woodsSelected.frame)) {
-            sLogPrice += this._craftingCosts.get(this._woodsSelected.frame)!.real * frameAmount
-            sLogLabour += this._craftingCosts.get(this._woodsSelected.frame)!.labour * frameAmount
-            sLogDoubloons += this._craftingCosts.get(this._woodsSelected.frame)!.doubloon * frameAmount
-            sLogTools += this._craftingCosts.get(this._woodsSelected.frame)!.tool * frameAmount
+        for (const type of woodType) {
+            const craftingCosts = this._craftingCosts.get(this._woodsSelected[type])
+            if (craftingCosts) {
+                sLogPrice += (craftingCosts.reales ?? 0) * frameAmount
+                sLogLabour += (craftingCosts.labour ?? 0) * frameAmount
+                sLogDoubloons += (craftingCosts.doubloon ?? 0) * frameAmount
+                sLogTools += (craftingCosts.tool ?? 0) * frameAmount
+            }
         }
 
         if (sLogPrice) {
-            materials.push(
-                ["(S) reales", formatInt(sLogPrice)],
-                ["(S) labour hours", formatInt(sLogLabour)],
-                ["(S) doubloons", formatInt(sLogDoubloons)],
-                ["(S) tools", formatInt(sLogTools)]
-            )
+            materials.push(["(S) reales", formatInt(sLogPrice)])
+        }
+
+        if (sLogLabour) {
+            materials.push(["(S) labour hours", formatInt(sLogLabour)])
+        }
+
+        if (sLogDoubloons) {
+            materials.push(["(S) doubloons", formatInt(sLogDoubloons)])
+        }
+
+        if (sLogTools) {
+            materials.push(["(S) tools", formatInt(sLogTools)])
         }
 
         // Format amounts

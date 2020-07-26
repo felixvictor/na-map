@@ -51,6 +51,7 @@ const getItemsCrafted = (buildingId: number): BuildingResult[] =>
     apiItems
         .filter((item) => !item.NotUsed && item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
         .map((recipe) => ({
+            id: recipe.Id,
             name: cleanName(recipe.Name).replace(" Blueprint", ""),
             price: 0,
         }))
@@ -68,7 +69,7 @@ const getBuildings = (): Building[] => {
     const buildingResources = new Map<number, BuildingResult>(
         apiItems.map((apiResource) => [
             Number(apiResource.Id),
-            { name: cleanName(apiResource.Name), price: apiResource.BasePrice },
+            { id: apiResource.Id, name: cleanName(apiResource.Name), price: apiResource.BasePrice },
         ])
     )
 
@@ -122,7 +123,7 @@ const getBuildings = (): Building[] => {
             // eslint-disable-next-line default-case
             switch (building.name) {
                 case "Shipyard":
-                    building.result = [{ name: "Ships", price: 0 }]
+                    building.result = [{ id: 0, name: "Ships", price: 0 }]
                     building.byproduct = []
                     break
                 case "Academy":
@@ -130,7 +131,7 @@ const getBuildings = (): Building[] => {
                     building.byproduct = []
                     break
                 case "Forge":
-                    building.result = [{ name: "Cannons", price: 0 }]
+                    building.result = [{ id: 0, name: "Cannons", price: 0 }]
                     building.byproduct = []
                     break
                 case "Workshop":
@@ -160,21 +161,50 @@ const getAPISeasonedItem = (name: string): APIRecipeResource =>
 const getPrices = (buildings: Building[]): Price => {
     const prices: Price = { standard: [], seasoned: [] }
     const getStandardPrices = (name: string): number | undefined =>
-        prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.real
+        prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.reales
 
-    prices.standard = (buildings.filter((building: Building) => building.result?.[0].price) as BuildingWithResult[])
+    const standardPrices = (buildings.filter(
+        (building: Building) => building.result?.[0].price
+    ) as BuildingWithResult[])
         .map(
             (building: BuildingWithResult): PriceStandardWood => {
                 const result = building.result[0]
                 return {
+                    id: result.id,
                     name: result.name.replace(" Log", ""),
-                    real: result.price,
+                    reales: result.price,
                     labour: building?.batch?.labour ?? 0,
                 }
             }
         )
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => a.id - b.id)
 
+    const superWoods = new Set([
+        807, // Malabar Teak
+        863, // Rangoon Teak
+        1440, // Greenheart
+        1894, // Danzic Oak
+        1895, // African Oak
+        1896, // Riga Fir
+        1898, // New England Fir
+        1900, // African Teak
+        1901, // Italian Larch
+    ])
+    const superPrices = [...superWoods]
+        .map(
+            (superWoodId): PriceStandardWood => {
+                const superWood = apiItems.find((item) => item.Id === superWoodId)
+
+                return {
+                    id: superWoodId,
+                    name: superWood?.Name ?? "",
+                    reales: superWood?.BasePrice ?? 0,
+                }
+            }
+        )
+        .sort((a, b) => a.id - b.id)
+
+    prices.standard = [...standardPrices, ...superPrices]
     prices.seasoned = getItemsCraftedBySeasoningShed()
         .map(
             (seasonedItem: BuildingResult): PriceSeasonedWood => {
@@ -182,8 +212,9 @@ const getPrices = (buildings: Building[]): Price => {
                 const apiSeasonedItem = getAPISeasonedItem(name)
 
                 return {
+                    id: apiSeasonedItem.Id,
                     name,
-                    real: getStandardPrices(name) ?? 0,
+                    reales: getStandardPrices(name) ?? 0,
                     labour: apiSeasonedItem.LaborPrice,
                     doubloon:
                         apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
@@ -194,7 +225,7 @@ const getPrices = (buildings: Building[]): Price => {
                 }
             }
         )
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => a.id - b.id)
 
     return prices
 }
