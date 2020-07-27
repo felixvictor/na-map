@@ -547,17 +547,18 @@ export default class DisplayPorts {
 
     _setupPatrolZones(): void {
         const patrolZones = [
-            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
             { name: "Hispaniola", coordinates: [4900, 3635], radius: 150, shallow: false }, // checked
+            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
+            { name: "Tumbado", coordinates: [2400, 3050], radius: 150, shallow: false }, // checked
+            //
             { name: "La Mona", coordinates: [6000, 4200], radius: 250, shallow: false, shipClass: { min: 7, max: 4 } },
             { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
             { name: "Antilles", coordinates: [7500, 4450], radius: 120, shallow: false },
             { name: "Tortuga", coordinates: [5400, 3450], radius: 80, shallow: false, shipClass: { min: 7, max: 5 } },
             { name: "Léogane", coordinates: [5100, 3750], radius: 80, shallow: false, shipClass: { min: 7, max: 4 } },
-            { name: "Tumbado", coordinates: [2400, 3000], radius: 250, shallow: false },
         ] as PatrolZone[]
 
-        const start = dayjs.utc("2020-07-25").hour(10)
+        const start = dayjs.utc("2020-07-24").hour(10)
         const index = dayjs.utc().diff(start, "day") % patrolZones.length
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
         const { radius, name, shallow, shipClass } = patrolZones[index]
@@ -584,8 +585,10 @@ export default class DisplayPorts {
         g.append("text")
             .html(
                 shallow
-                    ? "Shallow water"
-                    : `${shipClass ? `${getOrdinalSVG(shipClass.min)} to ${getOrdinalSVG(shipClass.max)} rate` : "All"}`
+                    ? "Shallow water ships"
+                    : `${
+                          shipClass ? `${getOrdinalSVG(shipClass.min)} to ${getOrdinalSVG(shipClass.max)} rate` : "All"
+                      } ships`
             )
             .attr("x", x)
             .attr("y", y)
