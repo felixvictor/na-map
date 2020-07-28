@@ -547,15 +547,15 @@ export default class DisplayPorts {
 
     _setupPatrolZones(): void {
         const patrolZones = [
-            { name: "Hispaniola", coordinates: [4900, 3635], radius: 150, shallow: false }, // checked
-            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
-            { name: "Tumbado", coordinates: [2400, 3050], radius: 150, shallow: false }, // checked
+            { name: "Hispaniola", coordinates: [4900, 3635], radius: 150, shallow: false },
+            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true },
+            { name: "Tumbado", coordinates: [2400, 3050], radius: 150, shallow: false },
+            { name: "Léogane", coordinates: [5130, 3770], radius: 90, shallow: false, shipClass: { min: 7, max: 4 } },
             //
             { name: "La Mona", coordinates: [6000, 4200], radius: 250, shallow: false, shipClass: { min: 7, max: 4 } },
-            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true }, // checked
+            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true },
             { name: "Antilles", coordinates: [7500, 4450], radius: 120, shallow: false },
             { name: "Tortuga", coordinates: [5400, 3450], radius: 80, shallow: false, shipClass: { min: 7, max: 5 } },
-            { name: "Léogane", coordinates: [5100, 3750], radius: 80, shallow: false, shipClass: { min: 7, max: 4 } },
         ] as PatrolZone[]
 
         const start = dayjs.utc("2020-07-24").hour(10)
@@ -566,9 +566,8 @@ export default class DisplayPorts {
         const dr = Math.round(radius / 1.6)
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
-        const g = this.#gPZ.append("g")
-        g.append("circle").attr("cx", x).attr("cy", y).attr("r", radius)
-        g.append("image")
+        this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius)
+        this.#gPZ.append("image")
             .attr("height", radius)
             .attr("width", radius)
             .attr("x", x)
@@ -576,13 +575,13 @@ export default class DisplayPorts {
             .attr("transform", `translate(${Math.floor(-radius / 2)},${Math.floor(-radius / 1.3)})`)
             .attr("xlink:href", swordsIcon)
             .attr("alt", "Patrol zone")
-        g.append("text")
+        this.#gPZ.append("text")
             .text(name)
             .attr("x", x)
             .attr("y", y)
             .attr("dy", dr)
             .attr("font-size", Math.round(fontSize * 1.6))
-        g.append("text")
+        this.#gPZ.append("text")
             .html(
                 shallow
                     ? "Shallow water ships"
