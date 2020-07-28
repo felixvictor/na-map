@@ -913,7 +913,8 @@ export class CompareShips {
         }
     }
 
-    _getModuleFromName(moduleName: string): ModuleEntity {
+    // eslint-disable-next-line unicorn/no-null
+    _getModuleFromName(moduleName: string | null): ModuleEntity {
         let module = {} as ModuleEntity | undefined
 
         this._moduleDataDefault.some((type) => {
@@ -933,6 +934,8 @@ export class CompareShips {
             this._selectModule$[columnId] = {}
 
             for (const type of this._moduleTypes) {
+                // eslint-disable-next-line unicorn/no-null
+                const tooltips = new Map<number, JQuery<HTMLLIElement> | null>()
                 this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`)
 
                 this._selectModule$[columnId][type]
@@ -945,12 +948,10 @@ export class CompareShips {
 
                         // Remove 'select all' button
                         $el.parent().find("button.bs-select-all").remove()
-                    })
-                    .on("show.bs.select", (event: Event) => {
-                        const $el = $(event.currentTarget as HTMLSelectElement)
 
                         // Add tooltip
-                        for (const element of $el.data("selectpicker").selectpicker.current.elements) {
+                        for (const element of $el.data("selectpicker").selectpicker.current
+                            .elements as HTMLLIElement[]) {
                             if (
                                 !(
                                     element.classList.contains("dropdown-divider") ||
@@ -963,6 +964,14 @@ export class CompareShips {
                                 $(element)
                                     .attr("data-original-title", CompareShips._getModifierFromModule(module.properties))
                                     .tooltip({ boundary: "viewport", html: true })
+                                    .on("show.bs.tooltip", () => {
+                                        // Remember shown tooltip
+                                        tooltips.set(module.id, $(element))
+                                    })
+                                    .on("hide.bs.tooltip", () => {
+                                        // eslint-disable-next-line unicorn/no-null
+                                        tooltips.set(module.id, null)
+                                    })
                             }
                         }
                     })
@@ -979,6 +988,16 @@ export class CompareShips {
                         selectedTextFormat: "count > 1",
                         title: `${type}`,
                         width: "150px",
+                    })
+                    .on("hide.bs.select", () => {
+                        // Hide remaining tooltips
+                        for (const [, value] of tooltips) {
+                            if (value) {
+                                value.tooltip("hide")
+                            }
+                        }
+
+                        tooltips.clear()
                     })
             }
         }
