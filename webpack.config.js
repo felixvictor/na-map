@@ -330,6 +330,7 @@ const config = {
         runtimeChunk: "single",
         splitChunks: {
             chunks: "all",
+            enforceSizeThreshold: 50000,
         },
     },
 
