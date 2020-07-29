@@ -65,7 +65,7 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "../../common/gen-json"
-import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum } from "../../common/interface"
+import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum, ZoomLevel } from "../../common/interface"
 
 // @ts-expect-error
 import { default as swordsIcon } from "Icons/icon-swords.svg"
@@ -148,7 +148,7 @@ export default class DisplayPorts {
     showTradePortPartners: boolean
     tradeItem!: Map<number, TradeItem>
     tradePortId!: number
-    zoomLevel = "initial"
+    zoomLevel: ZoomLevel = "initial"
     #attackRadius!: ScaleLinear<number, number>
     #colourScaleCounty!: ScaleOrdinal<string, string>
     #colourScaleHostility!: ScaleLinear<string, string>
@@ -567,7 +567,8 @@ export default class DisplayPorts {
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
         this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius)
-        this.#gPZ.append("image")
+        this.#gPZ
+            .append("image")
             .attr("height", radius)
             .attr("width", radius)
             .attr("x", x)
@@ -575,13 +576,15 @@ export default class DisplayPorts {
             .attr("transform", `translate(${Math.floor(-radius / 2)},${Math.floor(-radius / 1.3)})`)
             .attr("xlink:href", swordsIcon)
             .attr("alt", "Patrol zone")
-        this.#gPZ.append("text")
+        this.#gPZ
+            .append("text")
             .text(name)
             .attr("x", x)
             .attr("y", y)
             .attr("dy", dr)
             .attr("font-size", Math.round(fontSize * 1.6))
-        this.#gPZ.append("text")
+        this.#gPZ
+            .append("text")
             .html(
                 shallow
                     ? "Shallow water ships"
