@@ -562,18 +562,20 @@ export default class DisplayPorts {
         const index = dayjs.utc().diff(start, "day") % patrolZones.length
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
         const { radius, name, shallow, shipClass } = patrolZones[index]
+        const swordSize = radius * 1.6
         const [x, y] = patrolZones[index].coordinates
-        const dr = Math.round(radius / 1.6)
+        const dyFactor = 1.2
+        const dy = Math.round(radius / dyFactor)
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
         this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius)
         this.#gPZ
             .append("image")
-            .attr("height", radius)
-            .attr("width", radius)
+            .attr("height", swordSize)
+            .attr("width", swordSize)
             .attr("x", x)
             .attr("y", y)
-            .attr("transform", `translate(${Math.floor(-radius / 2)},${Math.floor(-radius / 1.3)})`)
+            .attr("transform", `translate(${Math.floor(-swordSize / 2)},${Math.floor(-swordSize / 1.6)})`)
             .attr("xlink:href", swordsIcon)
             .attr("alt", "Patrol zone")
         this.#gPZ
@@ -581,7 +583,7 @@ export default class DisplayPorts {
             .text(name)
             .attr("x", x)
             .attr("y", y)
-            .attr("dy", dr)
+            .attr("dy", dy)
             .attr("font-size", Math.round(fontSize * 1.6))
         this.#gPZ
             .append("text")
@@ -594,7 +596,7 @@ export default class DisplayPorts {
             )
             .attr("x", x)
             .attr("y", y)
-            .attr("dy", Math.round(dr / 1.6))
+            .attr("dy", dy - fontSize * 1.6)
             .attr("font-size", fontSize)
     }
 
@@ -1258,6 +1260,14 @@ export default class DisplayPorts {
         }
     }
 
+    _updatePZ(): void {
+        if (this.zoomLevel === "pbZone") {
+            this.#gPZ.classed("d-none", true)
+        } else {
+            this.#gPZ.classed("d-none", false)
+        }
+    }
+
     update(scale?: number): void {
         this.#scale = scale ?? this.#scale
 
@@ -1268,6 +1278,7 @@ export default class DisplayPorts {
         this._updateSummary()
         this._updateCounties()
         this._updateRegions()
+        this._updatePZ()
     }
 
     _filterVisible(): void {
