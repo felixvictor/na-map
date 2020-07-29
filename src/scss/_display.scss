@@ -496,6 +496,15 @@ svg {
     cursor: pointer;
 }
 
+.pz {
+    fill: $yellow-300;
+    fill-opacity: 0.7;
+    text {
+        fill: $yellow-900;
+        text-anchor: middle;
+    }
+}
+
 ////
 //// Display pb zones
 ////
