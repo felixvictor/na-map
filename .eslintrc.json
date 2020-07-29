@@ -20,7 +20,6 @@
             "files": ["*.ts", "*.tsx"],
             "parser": "@typescript-eslint/parser",
             "extends": [
-                "plugin:lit/recommended",
                 "eslint:recommended",
                 "plugin:@typescript-eslint/eslint-recommended",
                 "plugin:@typescript-eslint/recommended",
@@ -31,7 +30,7 @@
                 "prettier/@typescript-eslint",
                 "plugin:prettier/recommended"
             ],
-            "plugins": ["lit", "@typescript-eslint", "eslint-plugin-tsdoc"],
+            "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
             "rules": {
                 "capitalized-comments": "off",
                 "new-cap": "off",
@@ -91,7 +90,6 @@
                 "node": true
             },
             "extends": [
-                "plugin:lit/recommended",
                 "eslint:recommended",
                 "plugin:unicorn/recommended",
                 "xo/esnext",
@@ -116,8 +114,7 @@
                 "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
                 "semi": ["error", "never"],
                 "unicorn/prevent-abbreviations": "off"
-            },
-            "plugins": ["lit"]
+            }
         }
     ]
 }

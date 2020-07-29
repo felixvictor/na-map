@@ -66,3 +66,5 @@ export interface DataSource {
     fileName: string
     name: string
 }
+
+type ZoomLevel = "initial" | "portLabel" | "pbZone"
