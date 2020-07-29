@@ -1,4 +1,4 @@
-import * as d3Selection from "d3-selection"
+import { Selection } from "d3-selection"
 import { ValuesType } from "utility-types"
 import { ShipGunDeck } from "../../../common/gen-json"
 
@@ -62,8 +62,8 @@ export interface DragData {
     initY: number
     initRotate: number
     rotate: number
-    compassText: d3Selection.Selection<SVGTextElement, DragData, HTMLElement, unknown>
-    this: d3Selection.Selection<SVGGElement, DragData, HTMLElement, unknown>
+    compassText: Selection<SVGTextElement, DragData, HTMLElement, unknown>
+    this: Selection<SVGGElement, DragData, HTMLElement, unknown>
     correctionValueDegrees: number
     compassTextX: number
     compassTextY: number
