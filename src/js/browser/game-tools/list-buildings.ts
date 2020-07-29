@@ -117,7 +117,7 @@ export default class ListBuildings {
     }
 
     _getBuildingData(selectedBuildingName: string): Building {
-        return this._buildingData.filter((building) => building.name === selectedBuildingName)[0]
+        return this._buildingData.find((building) => building.name === selectedBuildingName)!
     }
 
     _getProductText(currentBuilding: Building): string {

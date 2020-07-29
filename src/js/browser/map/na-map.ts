@@ -22,7 +22,7 @@ import { appDescription, appTitle, appVersion, insertBaseModal } from "../../com
 import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
 import { displayClan } from "../util"
 
-import { Bound, MinMaxCoord, SVGGDatum, SVGSVGDatum } from "../../common/interface"
+import { Bound, MinMaxCoord, SVGGDatum, SVGSVGDatum, ZoomLevel } from "../../common/interface"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
@@ -72,7 +72,7 @@ class NAMap {
     private _showGrid!: string
     private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
     private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
-    private _zoomLevel!: string
+    private _zoomLevel!: ZoomLevel
     private readonly _doubleClickActionCookie: Cookie
     private readonly _doubleClickActionId: string
     private readonly _doubleClickActionRadios: RadioButton
@@ -539,11 +539,11 @@ class NAMap {
         ;(document.querySelector("#navbar-left") as HTMLElement).classList.remove("d-none")
     }
 
-    get zoomLevel(): string {
+    get zoomLevel(): ZoomLevel {
         return this._zoomLevel
     }
 
-    set zoomLevel(zoomLevel: string) {
+    set zoomLevel(zoomLevel: ZoomLevel) {
         this._zoomLevel = zoomLevel
         this._ports.zoomLevel = zoomLevel
         this._grid.zoomLevel = zoomLevel
