@@ -552,10 +552,10 @@ export default class DisplayPorts {
             { name: "Tumbado", coordinates: [2400, 3050], radius: 150, shallow: false },
             { name: "Léogane", coordinates: [5130, 3770], radius: 90, shallow: false, shipClass: { min: 7, max: 4 } },
             { name: "Tortuga", coordinates: [5435, 3420], radius: 100, shallow: false, shipClass: { min: 7, max: 5 } },
+            { name: "Antilles", coordinates: [7555, 4470], radius: 140, shallow: false },
             //
             { name: "La Mona", coordinates: [6000, 4200], radius: 250, shallow: false, shipClass: { min: 7, max: 4 } },
             { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true },
-            { name: "Antilles", coordinates: [7500, 4450], radius: 120, shallow: false },
         ] as PatrolZone[]
 
         const start = dayjs.utc("2020-07-24").hour(10)
@@ -568,7 +568,7 @@ export default class DisplayPorts {
         const dy = Math.round(radius / dyFactor)
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
-        this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius)
+        this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius).attr("opacity", 0.7)
         this.#gPZ
             .append("image")
             .attr("height", swordSize)
