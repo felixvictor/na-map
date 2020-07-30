@@ -10,7 +10,7 @@
 
 import * as path from "path"
 import Twit from "twit"
-import xss from "xss"
+import filterXSS from "xss"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
@@ -64,7 +64,7 @@ const saveRefreshId = (refresh: string): void => {
 const addTwitterData = (data: Twit.Twitter.SearchResults): void => {
     tweets.push(
         ...data.statuses
-            .flatMap((status: Twit.Twitter.Status) => cleanName(xss.filterXSS(status.full_text ?? "")))
+            .flatMap((status: Twit.Twitter.Status) => cleanName(filterXSS(status.full_text ?? "")))
             .sort(simpleStringSort)
     )
     refresh = data.search_metadata.max_id_str ?? ""
