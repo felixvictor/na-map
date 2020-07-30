@@ -30,8 +30,13 @@ $icon-dir: "~Icons";
     background-color: $primary-100;
 }
 
-$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock close copy deep gift
-    image info labour map pb-list open options shallow trading;
+.icon-clone-left,
+.icon-clone-right {
+    background-color: $secondary-500;
+}
+
+$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left clone-right
+    close copy deep gift image info labour map pb-list open options shallow trading;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {

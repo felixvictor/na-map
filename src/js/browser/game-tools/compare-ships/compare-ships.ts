@@ -29,7 +29,7 @@ import {
     colourWhite,
     insertBaseModal,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, woodType } from "../../../common/common"
+import { isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
 import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format"
 import {
     hashids,
@@ -143,6 +143,8 @@ export class CompareShips {
     private readonly _buttonId: HtmlString
     private readonly _columns: ShipColumnType[]
     private readonly _copyButtonId: HtmlString
+    private readonly _cloneLeftButtonId: HtmlString
+    private readonly _cloneRightButtonId: HtmlString
     private readonly _imageButtonId: HtmlString
     private readonly _modalId: HtmlString
     private readonly _moduleId: HtmlString
@@ -160,6 +162,8 @@ export class CompareShips {
         this._modalId = `modal-${this._baseId}`
         this._moduleId = `${this._baseId}-module`
         this._copyButtonId = `button-copy-${this._baseId}`
+        this._cloneLeftButtonId = `button-clone-left-${this._baseId}`
+        this._cloneRightButtonId = `button-clone-right-${this._baseId}`
         this._imageButtonId = `button-image-${this._baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
@@ -250,6 +254,103 @@ export class CompareShips {
 
         // remove the link when done
         link.remove()
+    }
+
+    _getShipId(columnId: ShipColumnType): number {
+        return this._shipIds[columnId]
+    }
+
+    _setShip(columnId: ShipColumnType, shipId: number): void {
+        this._shipIds[columnId] = shipId
+        CompareShips._setSelect(this._selectShip$[columnId], shipId)
+        if (columnId === "Base" && this._baseId !== "ship-journey") {
+            this._enableCompareSelects()
+        }
+    }
+
+    _cloneShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
+        const shipId = this._getShipId(currentColumnId)
+        if (shipId) {
+            this._setShip(newColumnId, shipId)
+        }
+
+        return shipId !== undefined
+    }
+
+    _getWoodId(columnId: ShipColumnType, type: WoodType): number {
+        return Number(this._selectWood$[columnId][type].val())
+    }
+
+    _setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
+        CompareShips._setSelect(this._selectWood$[columnId][type], woodId)
+        this.woodCompare._woodSelected(columnId as WoodColumnType, type, this._selectWood$[columnId][type])
+    }
+
+    _cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
+        this.woodCompare.enableSelects(newColumnId as WoodColumnType)
+
+        if (this._selectWood$[currentColumnId].frame.val() !== "") {
+            for (const type of woodType) {
+                const woodId = this._getWoodId(currentColumnId, type)
+                this._setWood(newColumnId, type, woodId)
+            }
+        }
+    }
+
+    _getModuleIds(columnId: ShipColumnType, type: ModuleType): number[] {
+        return this._selectedUpgradeIdsPerType[columnId][type]
+    }
+
+    _setModules(columnId: ShipColumnType, type: ModuleType, moduleIds: number[]): void {
+        if (!this._selectedUpgradeIdsPerType[columnId]) {
+            this._selectedUpgradeIdsPerType[columnId] = {} as ArrayIndex<number>
+        }
+
+        if (!this._selectedUpgradeIdsList[columnId]) {
+            this._selectedUpgradeIdsList[columnId] = []
+        }
+
+        // console.log("moduleIds", { columnId }, { type }, { moduleIds });
+
+        this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element))
+        CompareShips._setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type])
+        this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type])
+    }
+
+    _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
+        this._setupModulesSelect(newColumnId)
+        if (this._selectedUpgradeIdsPerType[currentColumnId]) {
+            for (const type of [...this._moduleTypes]) {
+                const moduleIds = this._getModuleIds(currentColumnId, type)
+                this._setModules(newColumnId, type, moduleIds)
+            }
+        }
+    }
+
+    _cloneShipToLeft(currentColumnId: ShipColumnType): void {
+        const newColumnIndex = this._columns.findIndex((element) => element === currentColumnId)
+        const newColumnId = this._columns[newColumnIndex - 1]
+
+        const hasData = this._cloneShipData(currentColumnId, newColumnId)
+        if (hasData) {
+            this._cloneWoodData(currentColumnId, newColumnId)
+            this._cloneModuleData(currentColumnId, newColumnId)
+
+            this._refreshShips(newColumnId)
+        }
+    }
+
+    _cloneShipToRight(currentColumnId: ShipColumnType): void {
+        const newColumnIndex = this._columns.findIndex((element) => element === currentColumnId)
+        const newColumnId = this._columns[newColumnIndex + 1]
+
+        const hasData = this._cloneShipData(currentColumnId, newColumnId)
+        if (hasData) {
+            this._cloneWoodData(currentColumnId, newColumnId)
+            this._cloneModuleData(currentColumnId, newColumnId)
+
+            this._refreshShips(newColumnId)
+        }
     }
 
     async CompareShipsInit(): Promise<void> {
@@ -611,10 +712,12 @@ export class CompareShips {
         const data: number[] = []
 
         for (const columnId of this._columns) {
-            if (this._shipIds[columnId]) {
-                data.push(this._shipIds[columnId])
+            const shipId = this._getShipId(columnId)
+            if (shipId) {
+                data.push(shipId)
                 for (const type of woodType) {
-                    data.push(Number(this._selectWood$[columnId][type].val()))
+                    const woodId = this._getWoodId(columnId, type)
+                    data.push(woodId)
                 }
             }
         }
@@ -641,8 +744,8 @@ export class CompareShips {
                 const columnIndex = this._columns.indexOf(columnId)
                 if (this._selectedUpgradeIdsPerType[columnId]) {
                     for (const type of [...this._moduleTypes]) {
+                        const moduleIds = this._getModuleIds(columnId, type)
                         const typeIndex = [...this._moduleTypes].indexOf(type)
-                        const moduleIds = this._selectedUpgradeIdsPerType[columnId][type]
 
                         // eslint-disable-next-line max-depth
                         if (moduleIds?.length) {
@@ -723,11 +826,40 @@ export class CompareShips {
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
 
             const shipSelectId = this._getShipSelectId(columnId)
-            div.append("label")
+
+            const divShip = div.append("div").attr("class", "d-flex justify-content-between")
+
+            // Add clone icon except for first column
+            if (columnId !== this._columns[0]) {
+                divShip
+                    .append("button")
+                    .attr("class", "btn btn-default")
+                    .attr("id", `${this._cloneLeftButtonId}-${columnId}`)
+                    .attr("title", "Clone ship to left")
+                    .attr("type", "button")
+                    .append("i")
+                    .attr("class", "icon icon-clone-left")
+            }
+
+            divShip
+                .append("label")
                 .append("select")
                 .attr("name", shipSelectId)
                 .attr("id", shipSelectId)
                 .attr("class", "selectpicker")
+
+            // Add clone icon except for last right column
+            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
+                divShip
+                    .append("button")
+                    .attr("class", "btn btn-default")
+                    .attr("id", `${this._cloneRightButtonId}-${columnId}`)
+                    .attr("title", "Clone ship to right")
+                    .attr("type", "button")
+                    .append("i")
+                    .attr("class", "icon icon-clone-right")
+            }
+
             for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId)
                 div.append("label")
@@ -755,19 +887,19 @@ export class CompareShips {
         const footer = d3Select(`#${this._modalId} .modal-footer`)
         footer
             .insert("button", "button")
-            .classed("btn btn-outline-secondary icon-outline-button", true)
+            .attr("class", "btn btn-outline-secondary icon-outline-button")
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button")
             .append("i")
-            .classed("icon icon-copy", true)
+            .attr("class", "icon icon-copy")
         this.#buttonMakeImage = footer
             .insert("button", "button")
-            .classed("btn btn-outline-secondary icon-outline-button", true)
+            .attr("class", "btn btn-outline-secondary icon-outline-button")
             .attr("id", this._imageButtonId)
             .attr("title", "Make image")
             .attr("type", "button")
-        this.#buttonMakeImage.append("i").classed("icon icon-image", true)
+        this.#buttonMakeImage.append("i").attr("class", "icon icon-image")
     }
 
     _initData(): void {
@@ -798,6 +930,26 @@ export class CompareShips {
         this._initSelectColumns()
     }
 
+    _initCloneListeners(): void {
+        for (const columnId of this._columns) {
+            // Clone left
+            if (columnId !== this._columns[0]) {
+                // Add listener except for first column
+                document.querySelector(`#${this._cloneLeftButtonId}-${columnId}`)?.addEventListener("click", () => {
+                    this._cloneShipToLeft(columnId)
+                })
+            }
+
+            // Clone right
+            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
+                // Add listener except for last right column
+                document.querySelector(`#${this._cloneRightButtonId}-${columnId}`)?.addEventListener("click", () => {
+                    this._cloneShipToRight(columnId)
+                })
+            }
+        }
+    }
+
     /**
      * Init modal
      */
@@ -805,6 +957,7 @@ export class CompareShips {
         this._initData()
         this._injectModal()
         this._initSelects()
+        this._initCloneListeners()
     }
 
     /**
@@ -913,7 +1066,6 @@ export class CompareShips {
         }
     }
 
-    // eslint-disable-next-line unicorn/no-null
     _getModuleFromName(moduleName: string | null): ModuleEntity {
         let module = {} as ModuleEntity | undefined
 
@@ -934,7 +1086,6 @@ export class CompareShips {
             this._selectModule$[columnId] = {}
 
             for (const type of this._moduleTypes) {
-                // eslint-disable-next-line unicorn/no-null
                 const tooltips = new Map<number, JQuery<HTMLLIElement> | null>()
                 this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`)
 
@@ -1383,22 +1534,16 @@ export class CompareShips {
                 return false
             }
 
-            this._shipIds[columnId] = ids[i]
+            this._setShip(columnId, ids[i])
             i += 1
-            CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId])
-            if (columnId === "Base" && this._baseId !== "ship-journey") {
-                this._enableCompareSelects()
-            }
 
             this.woodCompare.enableSelects(columnId as WoodColumnType)
             this._setupModulesSelect(columnId)
 
             if (ids[i]) {
                 for (const type of woodType) {
-                    CompareShips._setSelect(this._selectWood$[columnId][type], ids[i])
+                    this._setWood(columnId, type, ids[i])
                     i += 1
-
-                    this.woodCompare._woodSelected(columnId as WoodColumnType, type, this._selectWood$[columnId][type])
                 }
             } else {
                 i += 2
@@ -1419,23 +1564,8 @@ export class CompareShips {
             for (const type of [...this._moduleTypes]) {
                 const typeIndex = [...this._moduleTypes].indexOf(type)
                 if (urlParams.has(`${columnIndex}${typeIndex}`)) {
-                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`)!)
-                    if (!this._selectedUpgradeIdsPerType[columnId]) {
-                        this._selectedUpgradeIdsPerType[columnId] = {} as ArrayIndex<number>
-                    }
-
-                    if (!this._selectedUpgradeIdsList[columnId]) {
-                        this._selectedUpgradeIdsList[columnId] = []
-                    }
-
-                    // console.log("moduleIds", { columnId }, { type }, { moduleIds });
-
-                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element))
-                    CompareShips._setSelect(
-                        this._selectModule$[columnId][type],
-                        this._selectedUpgradeIdsPerType[columnId][type]
-                    )
-                    this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type])
+                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`)!) as number[]
+                    this._setModules(columnId, type, moduleIds)
                     needRefresh = true
                 }
             }
