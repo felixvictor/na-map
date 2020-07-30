@@ -684,7 +684,6 @@ export default class MakeJourney {
         this._setSegmentLabel()
         this._printLabels()
         this._correctJourney()
-        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
@@ -699,7 +698,6 @@ export default class MakeJourney {
 
         this._printLabels()
         this._correctJourney()
-        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
