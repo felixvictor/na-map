@@ -9,7 +9,7 @@
  */
 import * as path from "path";
 import Twit from "twit";
-import xss from "xss";
+import filterXSS from "xss";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
@@ -41,7 +41,7 @@ const saveRefreshId = (refresh) => {
 };
 const addTwitterData = (data) => {
     tweets.push(...data.statuses
-        .flatMap((status) => cleanName(xss.filterXSS(status.full_text ?? "")))
+        .flatMap((status) => cleanName(filterXSS(status.full_text ?? "")))
         .sort(simpleStringSort));
     refresh = data.search_metadata.max_id_str ?? "";
 };

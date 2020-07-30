@@ -62,6 +62,12 @@ export function getOrdinal(n, sup = true) {
     const text = s[(v - 20) % 10] || s[v] || s[0];
     return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`);
 }
+export function getOrdinalSVG(n, sup = true) {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    const text = s[(v - 20) % 10] || s[v] || s[0];
+    return String(n) + (sup ? `<tspan class="super">${text}</tspan>` : `${text}`);
+}
 export const compassDirections = [
     "N",
     "N⅓NE",
