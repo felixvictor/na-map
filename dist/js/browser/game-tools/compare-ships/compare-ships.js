@@ -48,6 +48,8 @@ export class CompareShips {
         this._modalId = `modal-${this._baseId}`;
         this._moduleId = `${this._baseId}-module`;
         this._copyButtonId = `button-copy-${this._baseId}`;
+        this._cloneLeftButtonId = `button-clone-left-${this._baseId}`;
+        this._cloneRightButtonId = `button-clone-right-${this._baseId}`;
         this._imageButtonId = `button-image-${this._baseId}`;
         this.colourScaleSpeedDiff = d3ScaleLinear()
             .range([colourRedDark, colourWhite, colourGreenDark])
@@ -120,6 +122,82 @@ export class CompareShips {
         document.body.append(link);
         link.click();
         link.remove();
+    }
+    _getShipId(columnId) {
+        return this._shipIds[columnId];
+    }
+    _setShip(columnId, shipId) {
+        this._shipIds[columnId] = shipId;
+        CompareShips._setSelect(this._selectShip$[columnId], shipId);
+        if (columnId === "Base" && this._baseId !== "ship-journey") {
+            this._enableCompareSelects();
+        }
+    }
+    _cloneShipData(currentColumnId, newColumnId) {
+        const shipId = this._getShipId(currentColumnId);
+        if (shipId) {
+            this._setShip(newColumnId, shipId);
+        }
+        return shipId !== undefined;
+    }
+    _getWoodId(columnId, type) {
+        return Number(this._selectWood$[columnId][type].val());
+    }
+    _setWood(columnId, type, woodId) {
+        CompareShips._setSelect(this._selectWood$[columnId][type], woodId);
+        this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
+    }
+    _cloneWoodData(currentColumnId, newColumnId) {
+        this.woodCompare.enableSelects(newColumnId);
+        if (this._selectWood$[currentColumnId].frame.val() !== "") {
+            for (const type of woodType) {
+                const woodId = this._getWoodId(currentColumnId, type);
+                this._setWood(newColumnId, type, woodId);
+            }
+        }
+    }
+    _getModuleIds(columnId, type) {
+        return this._selectedUpgradeIdsPerType[columnId][type];
+    }
+    _setModules(columnId, type, moduleIds) {
+        if (!this._selectedUpgradeIdsPerType[columnId]) {
+            this._selectedUpgradeIdsPerType[columnId] = {};
+        }
+        if (!this._selectedUpgradeIdsList[columnId]) {
+            this._selectedUpgradeIdsList[columnId] = [];
+        }
+        this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element));
+        CompareShips._setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
+        this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type]);
+    }
+    _cloneModuleData(currentColumnId, newColumnId) {
+        this._setupModulesSelect(newColumnId);
+        if (this._selectedUpgradeIdsPerType[currentColumnId]) {
+            for (const type of [...this._moduleTypes]) {
+                const moduleIds = this._getModuleIds(currentColumnId, type);
+                this._setModules(newColumnId, type, moduleIds);
+            }
+        }
+    }
+    _cloneShipToLeft(currentColumnId) {
+        const newColumnIndex = this._columns.findIndex((element) => element === currentColumnId);
+        const newColumnId = this._columns[newColumnIndex - 1];
+        const hasData = this._cloneShipData(currentColumnId, newColumnId);
+        if (hasData) {
+            this._cloneWoodData(currentColumnId, newColumnId);
+            this._cloneModuleData(currentColumnId, newColumnId);
+            this._refreshShips(newColumnId);
+        }
+    }
+    _cloneShipToRight(currentColumnId) {
+        const newColumnIndex = this._columns.findIndex((element) => element === currentColumnId);
+        const newColumnId = this._columns[newColumnIndex + 1];
+        const hasData = this._cloneShipData(currentColumnId, newColumnId);
+        if (hasData) {
+            this._cloneWoodData(currentColumnId, newColumnId);
+            this._cloneModuleData(currentColumnId, newColumnId);
+            this._refreshShips(newColumnId);
+        }
     }
     async CompareShipsInit() {
         await this._loadAndSetupData();
@@ -417,10 +495,12 @@ export class CompareShips {
     _getShipAndWoodIds() {
         const data = [];
         for (const columnId of this._columns) {
-            if (this._shipIds[columnId]) {
-                data.push(this._shipIds[columnId]);
+            const shipId = this._getShipId(columnId);
+            if (shipId) {
+                data.push(shipId);
                 for (const type of woodType) {
-                    data.push(Number(this._selectWood$[columnId][type].val()));
+                    const woodId = this._getWoodId(columnId, type);
+                    data.push(woodId);
                 }
             }
         }
@@ -438,8 +518,8 @@ export class CompareShips {
                 const columnIndex = this._columns.indexOf(columnId);
                 if (this._selectedUpgradeIdsPerType[columnId]) {
                     for (const type of [...this._moduleTypes]) {
+                        const moduleIds = this._getModuleIds(columnId, type);
                         const typeIndex = [...this._moduleTypes].indexOf(type);
-                        const moduleIds = this._selectedUpgradeIdsPerType[columnId][type];
                         if (moduleIds?.length) {
                             const param = `${columnIndex}${typeIndex}`;
                             ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds));
@@ -485,11 +565,33 @@ export class CompareShips {
                 .attr("id", `${this._baseId}-${columnId.toLowerCase()}`)
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`);
             const shipSelectId = this._getShipSelectId(columnId);
-            div.append("label")
+            const divShip = div.append("div").attr("class", "d-flex justify-content-between");
+            if (columnId !== this._columns[0]) {
+                divShip
+                    .append("button")
+                    .attr("class", "btn btn-default")
+                    .attr("id", `${this._cloneLeftButtonId}-${columnId}`)
+                    .attr("title", "Clone ship to left")
+                    .attr("type", "button")
+                    .append("i")
+                    .attr("class", "icon icon-clone-left");
+            }
+            divShip
+                .append("label")
                 .append("select")
                 .attr("name", shipSelectId)
                 .attr("id", shipSelectId)
                 .attr("class", "selectpicker");
+            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
+                divShip
+                    .append("button")
+                    .attr("class", "btn btn-default")
+                    .attr("id", `${this._cloneRightButtonId}-${columnId}`)
+                    .attr("title", "Clone ship to right")
+                    .attr("type", "button")
+                    .append("i")
+                    .attr("class", "icon icon-clone-right");
+            }
             for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId);
                 div.append("label")
@@ -514,19 +616,19 @@ export class CompareShips {
         const footer = d3Select(`#${this._modalId} .modal-footer`);
         footer
             .insert("button", "button")
-            .classed("btn btn-outline-secondary icon-outline-button", true)
+            .attr("class", "btn btn-outline-secondary icon-outline-button")
             .attr("id", this._copyButtonId)
             .attr("title", "Copy to clipboard (ctrl-c)")
             .attr("type", "button")
             .append("i")
-            .classed("icon icon-copy", true);
+            .attr("class", "icon icon-copy");
         this.#buttonMakeImage = footer
             .insert("button", "button")
-            .classed("btn btn-outline-secondary icon-outline-button", true)
+            .attr("class", "btn btn-outline-secondary icon-outline-button")
             .attr("id", this._imageButtonId)
             .attr("title", "Make image")
             .attr("type", "button");
-        this.#buttonMakeImage.append("i").classed("icon icon-image", true);
+        this.#buttonMakeImage.append("i").attr("class", "icon icon-image");
     }
     _initData() {
         this._setupShipData();
@@ -548,10 +650,25 @@ export class CompareShips {
     _initSelects() {
         this._initSelectColumns();
     }
+    _initCloneListeners() {
+        for (const columnId of this._columns) {
+            if (columnId !== this._columns[0]) {
+                document.querySelector(`#${this._cloneLeftButtonId}-${columnId}`)?.addEventListener("click", () => {
+                    this._cloneShipToLeft(columnId);
+                });
+            }
+            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
+                document.querySelector(`#${this._cloneRightButtonId}-${columnId}`)?.addEventListener("click", () => {
+                    this._cloneShipToRight(columnId);
+                });
+            }
+        }
+    }
     _initModal() {
         this._initData();
         this._injectModal();
         this._initSelects();
+        this._initCloneListeners();
     }
     _getShipOptions() {
         return this._shipSelectData
@@ -618,6 +735,7 @@ export class CompareShips {
         if (!this._selectModule$[columnId]) {
             this._selectModule$[columnId] = {};
             for (const type of this._moduleTypes) {
+                const tooltips = new Map();
                 this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`);
                 this._selectModule$[columnId][type]
                     .on("changed.bs.select", () => {
@@ -627,16 +745,20 @@ export class CompareShips {
                     .on("show.bs.select", (event) => {
                     const $el = $(event.currentTarget);
                     $el.parent().find("button.bs-select-all").remove();
-                })
-                    .on("show.bs.select", (event) => {
-                    const $el = $(event.currentTarget);
-                    for (const element of $el.data("selectpicker").selectpicker.current.elements) {
+                    for (const element of $el.data("selectpicker").selectpicker.current
+                        .elements) {
                         if (!(element.classList.contains("dropdown-divider") ||
                             element.classList.contains("dropdown-header"))) {
                             const module = this._getModuleFromName(element.textContent);
                             $(element)
                                 .attr("data-original-title", CompareShips._getModifierFromModule(module.properties))
-                                .tooltip({ boundary: "viewport", html: true });
+                                .tooltip({ boundary: "viewport", html: true })
+                                .on("show.bs.tooltip", () => {
+                                tooltips.set(module.id, $(element));
+                            })
+                                .on("hide.bs.tooltip", () => {
+                                tooltips.set(module.id, null);
+                            });
                         }
                     }
                 })
@@ -653,6 +775,14 @@ export class CompareShips {
                     selectedTextFormat: "count > 1",
                     title: `${type}`,
                     width: "150px",
+                })
+                    .on("hide.bs.select", () => {
+                    for (const [, value] of tooltips) {
+                        if (value) {
+                            value.tooltip("hide");
+                        }
+                    }
+                    tooltips.clear();
                 });
             }
         }
@@ -917,19 +1047,14 @@ export class CompareShips {
             if (!this._shipData.find((ship) => ship.id === ids[i])) {
                 return false;
             }
-            this._shipIds[columnId] = ids[i];
+            this._setShip(columnId, ids[i]);
             i += 1;
-            CompareShips._setSelect(this._selectShip$[columnId], this._shipIds[columnId]);
-            if (columnId === "Base" && this._baseId !== "ship-journey") {
-                this._enableCompareSelects();
-            }
             this.woodCompare.enableSelects(columnId);
             this._setupModulesSelect(columnId);
             if (ids[i]) {
                 for (const type of woodType) {
-                    CompareShips._setSelect(this._selectWood$[columnId][type], ids[i]);
+                    this._setWood(columnId, type, ids[i]);
                     i += 1;
-                    this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type]);
                 }
             }
             else {
@@ -947,15 +1072,7 @@ export class CompareShips {
                 const typeIndex = [...this._moduleTypes].indexOf(type);
                 if (urlParams.has(`${columnIndex}${typeIndex}`)) {
                     const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`));
-                    if (!this._selectedUpgradeIdsPerType[columnId]) {
-                        this._selectedUpgradeIdsPerType[columnId] = {};
-                    }
-                    if (!this._selectedUpgradeIdsList[columnId]) {
-                        this._selectedUpgradeIdsList[columnId] = [];
-                    }
-                    this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element));
-                    CompareShips._setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type]);
-                    this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type]);
+                    this._setModules(columnId, type, moduleIds);
                     needRefresh = true;
                 }
             }
