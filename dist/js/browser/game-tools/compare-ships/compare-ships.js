@@ -565,11 +565,13 @@ export class CompareShips {
                 .attr("id", `${this._baseId}-${columnId.toLowerCase()}`)
                 .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`);
             const shipSelectId = this._getShipSelectId(columnId);
-            const divShip = div.append("div").attr("class", "d-flex justify-content-between");
+            const divShip = div.append("div").attr("class", "input-group justify-content-between mb-1");
             if (columnId !== this._columns[0]) {
                 divShip
+                    .append("div")
+                    .attr("class", "input-group-prepend")
                     .append("button")
-                    .attr("class", "btn btn-default")
+                    .attr("class", "btn btn-default icon-outline-button")
                     .attr("id", `${this._cloneLeftButtonId}-${columnId}`)
                     .attr("title", "Clone ship to left")
                     .attr("type", "button")
@@ -584,25 +586,32 @@ export class CompareShips {
                 .attr("class", "selectpicker");
             if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
                 divShip
+                    .append("div")
+                    .attr("class", "input-group-append")
                     .append("button")
-                    .attr("class", "btn btn-default")
+                    .attr("class", "btn btn-default icon-outline-button")
                     .attr("id", `${this._cloneRightButtonId}-${columnId}`)
                     .attr("title", "Clone ship to right")
                     .attr("type", "button")
                     .append("i")
                     .attr("class", "icon icon-clone-right");
             }
+            const divWoods = div.append("div").attr("class", "input-group justify-content-between mb-1");
             for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId);
-                div.append("label")
+                divWoods
+                    .append("label")
                     .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId)
                     .attr("class", "selectpicker");
             }
+            const divModules = div.append("div").attr("class", "input-group justify-content-between");
             for (const type of this._moduleTypes) {
                 const moduleId = this._getModuleSelectId(type, columnId);
-                div.append("label")
+                divModules
+                    .append("label")
+                    .attr("class", "mb-1")
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
@@ -825,15 +834,15 @@ export class CompareShips {
     }
     _adjustValue(value, key, isBaseValueAbsolute) {
         let adjustedValue = value;
-        if (this._modifierAmount.get(key)?.percentage) {
+        if (this._modifierAmount.get(key)?.percentage !== 0) {
             const percentage = this._modifierAmount.get(key).percentage / 100;
             adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute);
         }
-        if (this._modifierAmount.get(key)?.absolute) {
+        if (this._modifierAmount.get(key)?.absolute !== 0) {
             const { absolute } = this._modifierAmount.get(key);
             adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute);
         }
-        const doNotRound = !this.#doNotRound.has(key) && !isBaseValueAbsolute;
+        const doNotRound = this.#doNotRound.has(key) || isBaseValueAbsolute || value === 0;
         return this._roundPropertyValue(value, adjustedValue, doNotRound);
     }
     _setModifier(property) {
@@ -899,6 +908,7 @@ export class CompareShips {
                     for (const modifier of properties) {
                         const index = modifier.split(".");
                         if (index.length > 1) {
+                            console.log(key, data[index[0]][index[1]], this._modifierAmount.get(key), isBaseValueAbsolute);
                             data[index[0]][index[1]] = this._adjustValue(data[index[0]][index[1]], key, isBaseValueAbsolute);
                         }
                         else {
