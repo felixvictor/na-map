@@ -109,6 +109,7 @@ const setColours = () => {
 const colours = setColours()
 const backgroundColour = colours.get("primary-500")
 const themeColour = colours.get("secondary-500")
+const colourYellowDark = colours.get("yellow-dark")
 const primary700 = colours.get("primary-700")
 const primary200 = colours.get("primary-200")
 const primary300 = colours.get("primary-300")
@@ -329,6 +330,7 @@ const config = {
         runtimeChunk: "single",
         splitChunks: {
             chunks: "all",
+            enforceSizeThreshold: 50000,
         },
     },
 
@@ -552,6 +554,13 @@ const config = {
                         options: {
                             search: 'fill="$themeColour"',
                             replace: `fill="${themeColour}"`,
+                        },
+                    },
+                    {
+                        loader: require.resolve("string-replace-loader"),
+                        options: {
+                            search: 'fill="$darkYellow"',
+                            replace: `fill="${colourYellowDark}"`,
                         },
                     },
                 ],

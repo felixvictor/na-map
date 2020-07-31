@@ -8,17 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
-import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format";
-import { degreesToCompass, getOrdinal } from "../../../common/common-math";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { event as d3Event } from "d3-selection";
-import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util";
 import * as d3Drag from "d3-drag";
 import { isEmpty } from "../../../common/common";
 import { pluralise, segmentRadians } from "../../../common/common-browser";
-import { default as shipIcon } from "Icons/icon-ship.svg";
+import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format";
+import { degreesToCompass, getOrdinal } from "../../../common/common-math";
+import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util";
 import { Ship } from "./ship";
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, } from "../../../common/common-game-tools";
+import { default as shipIcon } from "Icons/icon-ship.svg";
 export class ShipBase extends Ship {
     constructor(id, shipData, shipCompare) {
         super(id, shipCompare);
