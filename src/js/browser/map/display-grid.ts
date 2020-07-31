@@ -10,12 +10,14 @@
 
 import { Axis, axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis"
 import { event as d3Event, select as d3Select } from "d3-selection"
+import * as d3Selection from "d3-selection"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
 import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
 import { formatF11 } from "../../common/common-format"
+
+import { ZoomLevel } from "../../common/interface"
 import { NAMap } from "./na-map"
-import * as d3Selection from "d3-selection"
 
 /**
  * Display grid
@@ -35,7 +37,7 @@ export default class DisplayGrid {
     #yScale!: ScaleLinear<number, number>
     #xAxis!: Axis<number>
     #yAxis!: Axis<number>
-    #zoomLevel!: string
+    #zoomLevel!: ZoomLevel
     #gMainXAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     #gMainYAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     #gXAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
@@ -224,11 +226,13 @@ export default class DisplayGrid {
         this.#gXAxis
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
+            // @ts-expect-error
             .call(this.#xAxis.tickPadding(paddingX))
 
         this.#gYAxis
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
+            // @ts-expect-error
             .call(this.#yAxis.tickPadding(paddingY))
     }
 
@@ -248,7 +252,7 @@ export default class DisplayGrid {
         this.#isShown = show
     }
 
-    get zoomLevel(): string {
+    get zoomLevel(): ZoomLevel {
         return this.#zoomLevel
     }
 
@@ -256,7 +260,7 @@ export default class DisplayGrid {
      * Set zoom level
      * @param zoomLevel - Zoom level
      */
-    set zoomLevel(zoomLevel: string) {
+    set zoomLevel(zoomLevel: ZoomLevel) {
         this.#zoomLevel = zoomLevel
     }
 

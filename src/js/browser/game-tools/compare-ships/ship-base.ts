@@ -15,15 +15,15 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
-import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format"
-import { degreesToCompass, getOrdinal } from "../../../common/common-math"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { event as d3Event, Selection as D3Selection } from "d3-selection"
-import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util"
 import * as d3Drag from "d3-drag"
+
 import { isEmpty } from "../../../common/common"
 import { pluralise, segmentRadians } from "../../../common/common-browser"
-import { default as shipIcon } from "Icons/icon-ship.svg"
+import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format"
+import { degreesToCompass, getOrdinal } from "../../../common/common-math"
+import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util"
 
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
@@ -35,6 +35,7 @@ import {
     rigRepairsVolume,
     rumRepairsFactor,
 } from "../../../common/common-game-tools"
+import { default as shipIcon } from "Icons/icon-ship.svg"
 
 import { ShipData } from "../../../common/gen-json"
 import { DragData, ShipDisplayData } from "./types"

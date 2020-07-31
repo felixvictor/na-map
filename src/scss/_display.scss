@@ -42,6 +42,7 @@ p {
     text-align: left;
 }
 
+.input-group > label,
 .nav-item > label {
     margin-bottom: unset;
 }
@@ -494,6 +495,14 @@ svg {
 
 .port {
     cursor: pointer;
+}
+
+.pz {
+    fill: $yellow-300;
+    text {
+        fill: $yellow-900;
+        text-anchor: middle;
+    }
 }
 
 ////

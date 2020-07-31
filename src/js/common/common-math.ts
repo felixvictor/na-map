@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { HtmlString, SVGString } from "./interface"
+
 export const timeFactor = 2.63
 export const speedFactor = 390
 export const speedConstA = 0.074465523706782
@@ -156,13 +158,24 @@ export const getSailingDistanceInK = (pixelDistance: number): number => pixelDis
  * @param   sup - True if superscript tags needed
  * @returns Formatted Ordinal
  */
-export function getOrdinal(n: number, sup = true): string {
+export function getOrdinal(n: number, sup = true): HtmlString {
     const s = ["th", "st", "nd", "rd"]
-    // noinspection MagicNumberJS
     const v = n % 100
-    // noinspection MagicNumberJS
     const text = s[(v - 20) % 10] || s[v] || s[0]
     return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`)
+}
+
+/**
+ * Format ordinal
+ * @param   n - Integer
+ * @param   sup - True if superscript tags needed
+ * @returns Formatted Ordinal (tspan for SVG)
+ */
+export function getOrdinalSVG(n: number, sup = true): SVGString {
+    const s = ["th", "st", "nd", "rd"]
+    const v = n % 100
+    const text = s[(v - 20) % 10] || s[v] || s[0]
+    return String(n) + (sup ? `<tspan class="super">${text}</tspan>` : `${text}`)
 }
 
 /**
