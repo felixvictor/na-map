@@ -864,20 +864,23 @@ export class CompareShips {
                     .attr("class", "icon icon-clone-right")
             }
 
-        const divWoods=div.append("div").attr("class", "input-group justify-content-between mb-1")
+            const divWoods = div.append("div").attr("class", "input-group justify-content-between mb-1")
             for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId)
-                divWoods.append("label")
+                divWoods
+                    .append("label")
                     .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId)
                     .attr("class", "selectpicker")
             }
 
-            const divModules=div.append("div").attr("class", "input-group justify-content-between")
+            const divModules = div.append("div").attr("class", "input-group justify-content-between")
             for (const type of this._moduleTypes) {
                 const moduleId = this._getModuleSelectId(type, columnId)
-                divModules.append("label").attr("class","mb-1")
+                divModules
+                    .append("label")
+                    .attr("class", "mb-1")
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
@@ -1211,17 +1214,18 @@ export class CompareShips {
     _adjustValue(value: number, key: string, isBaseValueAbsolute: boolean): number {
         let adjustedValue = value
 
-        if (this._modifierAmount.get(key)?.percentage) {
+        if (this._modifierAmount.get(key)?.percentage !== 0) {
             const percentage = this._modifierAmount.get(key)!.percentage / 100
             adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute)
         }
 
-        if (this._modifierAmount.get(key)?.absolute) {
+        if (this._modifierAmount.get(key)?.absolute !== 0) {
             const { absolute } = this._modifierAmount.get(key)!
             adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute)
         }
 
-        const doNotRound = !this.#doNotRound.has(key) && !isBaseValueAbsolute
+        const doNotRound = this.#doNotRound.has(key) || isBaseValueAbsolute || value === 0
+
         return this._roundPropertyValue(value, adjustedValue, doNotRound)
     }
 
@@ -1312,6 +1316,12 @@ export class CompareShips {
                     for (const modifier of properties) {
                         const index = modifier.split(".")
                         if (index.length > 1) {
+                            console.log(
+                                key,
+                                data[index[0]][index[1]],
+                                this._modifierAmount.get(key),
+                                isBaseValueAbsolute
+                            )
                             data[index[0]][index[1]] = this._adjustValue(
                                 data[index[0]][index[1]],
                                 key,
