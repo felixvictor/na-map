@@ -827,13 +827,15 @@ export class CompareShips {
 
             const shipSelectId = this._getShipSelectId(columnId)
 
-            const divShip = div.append("div").attr("class", "d-flex justify-content-between")
+            const divShip = div.append("div").attr("class", "input-group justify-content-between mb-1")
 
             // Add clone icon except for first column
             if (columnId !== this._columns[0]) {
                 divShip
+                    .append("div")
+                    .attr("class", "input-group-prepend")
                     .append("button")
-                    .attr("class", "btn btn-default")
+                    .attr("class", "btn btn-default icon-outline-button")
                     .attr("id", `${this._cloneLeftButtonId}-${columnId}`)
                     .attr("title", "Clone ship to left")
                     .attr("type", "button")
@@ -851,8 +853,10 @@ export class CompareShips {
             // Add clone icon except for last right column
             if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
                 divShip
+                    .append("div")
+                    .attr("class", "input-group-append")
                     .append("button")
-                    .attr("class", "btn btn-default")
+                    .attr("class", "btn btn-default icon-outline-button")
                     .attr("id", `${this._cloneRightButtonId}-${columnId}`)
                     .attr("title", "Clone ship to right")
                     .attr("type", "button")
@@ -860,18 +864,20 @@ export class CompareShips {
                     .attr("class", "icon icon-clone-right")
             }
 
+        const divWoods=div.append("div").attr("class", "input-group justify-content-between mb-1")
             for (const type of woodType) {
                 const woodId = this._getWoodSelectId(type, columnId)
-                div.append("label")
+                divWoods.append("label")
                     .append("select")
                     .attr("name", woodId)
                     .attr("id", woodId)
                     .attr("class", "selectpicker")
             }
 
+            const divModules=div.append("div").attr("class", "input-group justify-content-between")
             for (const type of this._moduleTypes) {
                 const moduleId = this._getModuleSelectId(type, columnId)
-                div.append("label")
+                divModules.append("label").attr("class","mb-1")
                     .append("select")
                     .attr("name", moduleId)
                     .attr("id", moduleId)
