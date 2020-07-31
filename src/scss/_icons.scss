@@ -26,13 +26,14 @@ $icon-dir: "~Icons";
     background-color: $navbar-light-color;
 }
 
-.icon-outline-button:hover {
-    background-color: $primary-100;
-}
-
-.icon-clone-left,
-.icon-clone-right {
-    background-color: $secondary-500;
+.icon-outline-button {
+    border-width: 1.4px;
+    i {
+        background-color: $secondary-500;
+    }
+    &:hover {
+        background-color: $secondary-100;
+    }
 }
 
 $icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left clone-right
