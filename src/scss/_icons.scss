@@ -26,12 +26,18 @@ $icon-dir: "~Icons";
     background-color: $navbar-light-color;
 }
 
-.icon-outline-button:hover {
-    background-color: $primary-100;
+.icon-outline-button {
+    border-width: 1.4px;
+    i {
+        background-color: $secondary-500;
+    }
+    &:hover {
+        background-color: $secondary-100;
+    }
 }
 
-$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock close copy deep gift
-    image info labour map pb-list open options shallow trading;
+$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left clone-right
+    close copy deep gift image info labour map pb-list open options shallow trading;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {

@@ -152,7 +152,7 @@ export interface APIItemGeneric {
     Unlocks?: Unlocks
     OverrideTotalXpForUpgradeSlots?: number
     Skins?: SkinsEntity[]
-    Limitations?: null[]
+    Limitations?: undefined[]
     HostilityScore?: number
     LifetimeSeconds?: number
     PlacementDistance?: number
@@ -311,7 +311,7 @@ interface Limit {
     Limitation3: MinMax<number>
 }
 interface Unlocks {
-    UpgradeSlot?: null[]
+    UpgradeSlot?: undefined[]
 }
 interface SkinsEntity {
     SkinName: string
@@ -652,7 +652,7 @@ export interface APIShip {
     Specs: Specs
     VisualTemplateId: number
     HiddenModuleTemplates: number[]
-    DefaultCannons: null[]
+    DefaultCannons: undefined[]
     BotCannons: number[]
     BotCannonsVariants: BotCannonsVariantsEntity[]
     MaxItems: number
