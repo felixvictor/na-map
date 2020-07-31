@@ -554,8 +554,7 @@ export default class DisplayPorts {
             { name: "Tortuga", coordinates: [5435, 3420], radius: 100, shallow: false, shipClass: { min: 7, max: 5 } },
             { name: "Antilles", coordinates: [7555, 4470], radius: 140, shallow: false },
             { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true },
-            //
-            { name: "La Mona", coordinates: [6000, 4200], radius: 250, shallow: false, shipClass: { min: 7, max: 4 } },
+            { name: "La Mona", coordinates: [6180, 4100], radius: 170, shallow: false, shipClass: { min: 7, max: 4 } },
         ] as PatrolZone[]
 
         const start = dayjs.utc("2020-07-24").hour(10)
