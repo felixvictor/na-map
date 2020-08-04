@@ -17,7 +17,7 @@ import { findNationByName, findNationByNationShortName } from "../common/common"
 import { commonPaths, serverStartDateTime } from "../common/common-dir";
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file";
 import { cleanName, simpleStringSort } from "../common/common-node";
-import { portBattleCooldown, serverNames } from "../common/common-var";
+import { flagValidity, portBattleCooldown, serverNames } from "../common/common-var";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 const consumerKey = process.argv[2];
@@ -33,6 +33,8 @@ const refreshDefault = "0";
 let refresh = "0";
 const queryFrom = "from:zz569k";
 let isPortDataChanged = false;
+const dateTimeFormat = "YYYY-MM-DD HH:mm";
+const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm";
 const getRefreshId = () => fileExists(commonPaths.fileTwitterRefreshId)
     ? String(readTextFile(commonPaths.fileTwitterRefreshId))
     : refreshDefault;
@@ -110,10 +112,12 @@ const guessNationFromClanName = (clanName) => {
 const getPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
 const getPortBattleTime = (portName) => {
     const portIndex = getPortIndex(portName);
-    const portBattleTime = ports[portIndex].portBattle ?? ports[portIndex].captured;
+    const portBattleTime = ports[portIndex].portBattle;
     return portBattleTime;
 };
-const getCooldownTime = (portBattleTime) => dayjs.utc(portBattleTime, "YYYY-MM-DD HH:mm").add(portBattleCooldown, "hour").format("YYYY-MM-DD HH:mm");
+const getCooldownTime = (portBattleTime) => getTimeInFuture(portBattleTime, portBattleCooldown);
+const getActiveTime = (time) => dayjs.utc(time, dateTimeFormat).add(flagValidity, "hour").format(dateTimeFormat);
+const getTimeInFuture = (time, hours) => dayjs.utc(time, dateTimeFormat).add(hours, "hour").format(dateTimeFormat);
 const updatePort = (portName, updatedPort) => {
     const portIndex = getPortIndex(portName);
     const { captured, capturer } = ports[portIndex];
@@ -157,11 +161,18 @@ const npcCaptured = (result) => {
 };
 const defended = (result) => {
     const portName = result[2];
-    const portBattleTime = getPortBattleTime(portName);
+    let portBattleTime = getPortBattleTime(portName);
+    let cooldownTimeEstimated = false;
+    if (!portBattleTime) {
+        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat);
+        portBattleTime = tweetTime;
+        cooldownTimeEstimated = true;
+    }
     const cooldownTime = getCooldownTime(portBattleTime);
     console.log("      --- defended", portName);
     const updatedPort = {
         cooldownTime,
+        cooldownTimeEstimated,
     };
     updatePort(portName, updatedPort);
 };
@@ -193,7 +204,7 @@ const portBattleScheduled = (result) => {
         attackerNation: result[7] ? result[7] : guessNationFromClanName(clanName),
         attackerClan: clanName,
         attackHostility: 1,
-        portBattle: dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+        portBattle: dayjs.utc(result[4], "D MMM YYYY HH:mm").format(dateTimeFormat),
     };
     updatePort(portName, updatedPort);
 };
@@ -204,7 +215,7 @@ const npcPortBattleScheduled = (result) => {
         attackerNation: "Neutral",
         attackerClan: "RAIDER",
         attackHostility: 1,
-        portBattle: dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+        portBattle: dayjs.utc(result[3], "D MMM YYYY HH:mm").format(dateTimeFormat),
     };
     updatePort(portName, updatedPort);
 };
@@ -213,6 +224,13 @@ const cooledOff = (result) => {
     console.log("      --- cooledOff", portName);
     const updatedPort = {};
     updatePort(portName, updatedPort);
+};
+const flagAcquired = (result) => {
+    const nation = result[2];
+    const numberOfFlags = Number(result[3]);
+    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat);
+    const active = getActiveTime(tweetTime);
+    console.log("      --- conquest flag", numberOfFlags, nation, active);
 };
 const portR = "[A-zÀ-ÿ’ -]+";
 const portHashR = "[A-zÀ-ÿ]+";
@@ -232,6 +250,7 @@ const portBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] The port battle for (${
 const npcPortBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC port battle for port (${portR})(?: \\(${nationR}\\)) will be started at (${pbTimeR}) UTC`, "u");
 const rumorRegex = new RegExp(`\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`, "u");
 const gainHostilityRegex = new RegExp(`\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`, "u");
+const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+) conquest flag\\(s\\)`, "u");
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
 const updatePorts = async () => {
     let result;
@@ -276,6 +295,9 @@ const updatePorts = async () => {
         else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
             isPortDataChanged = true;
             cooledOff(result);
+        }
+        else if ((result = acquireFlagRegex.exec(tweet)) !== null) {
+            flagAcquired(result);
         }
         else if ((result = rumorRegex.exec(tweet)) === null) {
             console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
