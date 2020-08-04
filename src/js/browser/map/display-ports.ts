@@ -100,6 +100,7 @@ interface PortForDisplay {
     captureTime: string
     cooldownTime?: HtmlResult
     attack: HtmlResult
+    isNPCAttacker: boolean
     pbTimeRange: HtmlResult
     brLimit: string
     portPoints: string
@@ -191,8 +192,8 @@ export default class DisplayPorts {
     readonly #f11: ShowF11
     readonly #fontSize = defaultFontSize
     readonly #iconSize = 48
-    readonly #maxRadiusFactor = 6
-    readonly #minRadiusFactor = 1
+    readonly #maxRadiusFactor = 1.618 * 3
+    readonly #minRadiusFactor = 1.618
     readonly #minScale: number
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
@@ -759,6 +760,7 @@ export default class DisplayPorts {
                 ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
                 : "",
             attack: portProperties.attackHostility ? attackHostility : html``,
+            isNPCAttacker: portProperties.attackerNation === "Neutral",
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: formatInt(portProperties.portPoints),
@@ -849,11 +851,13 @@ export default class DisplayPorts {
 
             ${port.attack === undefined
                 ? html`${port.cooldownTime
-                      ? html`<div class="alert alert-primary mt-2" role="alert">
+                      ? html`<div class="alert alert-success mt-2" role="alert">
                             Port battle cooldown ends ${port.cooldownTime}
                         </div>`
                       : html``}`
-                : html`<div class="alert alert-danger mt-2" role="alert">${port.attack}</div>`}
+                : html`<div class="alert mt-2 ${port.isNPCAttacker ? "alert-warning" : "alert-danger"}" role="alert">
+                      ${port.attack}
+                  </div>`}
 
             <div class="d-flex text-left mb-2">
                 ${port.capital || port.icon === "FT"
@@ -1030,6 +1034,17 @@ export default class DisplayPorts {
         return marker
     }
 
+    _getAttackMarker(port: PortWithTrades): string {
+        let marker = ""
+        if (port.cooldownTime) {
+            marker = "cooldown"
+        } else if (port.attackerNation === "Neutral") {
+            marker = "raider"
+        }
+
+        return marker
+    }
+
     _getFrontlineMarker(port: PortWithTrades): string {
         let marker = ""
         if (port.ownPort) {
@@ -1076,12 +1091,13 @@ export default class DisplayPorts {
             cssClass = (): string => "bubble here"
             r = (d): number => d.distance
         } else if (this.showRadius === "attack") {
-            data = this.#portDataFiltered.filter((port) => port.attackHostility)
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
             this.#attackRadius.range([rMin, rMax / 1.5])
-            cssClass = (): string => "bubble"
+            cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
             fill = (d): string =>
-                d.attackerNation === "Neutral" ? colourOrange : this.#colourScaleHostility(d.attackHostility ?? 0)
-            r = (d): number => this.#attackRadius(d.attackHostility ?? 0)
+                d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0)
+            r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0))
         } else if (this.circleType === "currentGood") {
             cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2
