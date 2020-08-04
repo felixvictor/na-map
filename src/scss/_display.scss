@@ -36,6 +36,7 @@ body {
 
 text {
     cursor: default;
+    user-select: none;
 }
 
 p {
@@ -453,6 +454,14 @@ svg {
 .pos {
     opacity: 0.4;
     fill: $green;
+}
+
+.cooldown {
+    fill: $green-800;
+}
+
+.raider {
+    fill: $orange-600;
 }
 
 .not-capturable {
