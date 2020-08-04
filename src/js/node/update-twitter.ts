@@ -20,7 +20,7 @@ import { findNationByName, findNationByNationShortName, NationShortName } from "
 import { commonPaths, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
-import { portBattleCooldown, serverNames } from "../common/common-var"
+import { flagValidity, portBattleCooldown, serverNames } from "../common/common-var"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 
@@ -41,6 +41,9 @@ const refreshDefault = "0"
 let refresh = "0"
 const queryFrom = "from:zz569k"
 let isPortDataChanged = false
+
+const dateTimeFormat = "YYYY-MM-DD HH:mm"
+const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm"
 
 /**
  * Get refresh id, either from file or set default value (0)
@@ -192,13 +195,17 @@ const getPortIndex = (portName: string): number => ports.findIndex((port) => por
 
 const getPortBattleTime = (portName: string): string | undefined => {
     const portIndex = getPortIndex(portName)
-    const portBattleTime = ports[portIndex].portBattle ?? ports[portIndex].captured
+    const portBattleTime = ports[portIndex].portBattle
 
     return portBattleTime
 }
 
 const getCooldownTime = (portBattleTime: string | undefined): string =>
-    dayjs.utc(portBattleTime, "YYYY-MM-DD HH:mm").add(portBattleCooldown, "hour").format("YYYY-MM-DD HH:mm")
+    getTimeInFuture(portBattleTime, portBattleCooldown)
+const getActiveTime = (time: string): string =>
+    dayjs.utc(time, dateTimeFormat).add(flagValidity, "hour").format(dateTimeFormat)
+const getTimeInFuture = (time: string | undefined, hours: number): string =>
+    dayjs.utc(time, dateTimeFormat).add(hours, "hour").format(dateTimeFormat)
 
 const updatePort = (portName: string, updatedPort: PortBattlePerServer): void => {
     const portIndex = getPortIndex(portName)
@@ -268,12 +275,22 @@ const npcCaptured = (result: RegExpExecArray): void => {
  */
 const defended = (result: RegExpExecArray): void => {
     const portName = result[2]
-    const portBattleTime = getPortBattleTime(portName)
+    let portBattleTime = getPortBattleTime(portName)
+    let cooldownTimeEstimated = false
+    if (!portBattleTime) {
+        // noinspection UnnecessaryLocalVariableJS
+        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat)
+        portBattleTime = tweetTime
+        cooldownTimeEstimated = true
+    }
+
     const cooldownTime = getCooldownTime(portBattleTime)
+
     console.log("      --- defended", portName)
 
     const updatedPort = {
         cooldownTime,
+        cooldownTimeEstimated,
     } as PortBattlePerServer
 
     updatePort(portName, updatedPort)
@@ -326,7 +343,7 @@ const portBattleScheduled = (result: RegExpExecArray): void => {
         attackerNation: result[7] ? (result[7] as AttackerNationName) : guessNationFromClanName(clanName),
         attackerClan: clanName,
         attackHostility: 1,
-        portBattle: dayjs.utc(result[4], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+        portBattle: dayjs.utc(result[4], "D MMM YYYY HH:mm").format(dateTimeFormat),
     } as PortBattlePerServer
 
     updatePort(portName, updatedPort)
@@ -344,7 +361,7 @@ const npcPortBattleScheduled = (result: RegExpExecArray): void => {
         attackerNation: "Neutral",
         attackerClan: "RAIDER",
         attackHostility: 1,
-        portBattle: dayjs.utc(result[3], "D MMM YYYY HH:mm").format("YYYY-MM-DD HH:mm"),
+        portBattle: dayjs.utc(result[3], "D MMM YYYY HH:mm").format(dateTimeFormat),
     } as PortBattlePerServer
 
     updatePort(portName, updatedPort)
@@ -361,6 +378,18 @@ const cooledOff = (result: RegExpExecArray): void => {
     const updatedPort = {} as PortBattlePerServer
 
     updatePort(portName, updatedPort)
+}
+
+/**
+ * A nation acquired one or more conquest flags
+ * @param result - Result from tweet regex
+ */
+const flagAcquired = (result: RegExpExecArray): void => {
+    const nation = result[2]
+    const numberOfFlags = Number(result[3])
+    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat)
+    const active = getActiveTime(tweetTime)
+    console.log("      --- conquest flag", numberOfFlags, nation, active)
 }
 
 const portR = "[A-zÀ-ÿ’ -]+"
@@ -409,6 +438,7 @@ const gainHostilityRegex = new RegExp(
     `\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`,
     "u"
 )
+const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+) conquest flag\\(s\\)`, "u")
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u")
 
 /**
@@ -451,6 +481,8 @@ const updatePorts = async (): Promise<void> => {
         } else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
             isPortDataChanged = true
             cooledOff(result)
+        } else if ((result = acquireFlagRegex.exec(tweet)) !== null) {
+            flagAcquired(result)
         } else if ((result = rumorRegex.exec(tweet)) === null) {
             console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
         } else {

@@ -805,7 +805,8 @@ export default class DisplayPorts {
         }
 
         if (portProperties.cooldownTime) {
-            port.cooldownTime = html`${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`
+            port.cooldownTime = html`${portProperties.cooldownTimeEstimated ? html`<em>approximately</em> ` : ""}
+            ${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`
         }
 
         return port
