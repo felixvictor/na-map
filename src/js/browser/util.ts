@@ -395,6 +395,6 @@ export const colourRamp = (
 }
 
 export const drawSvgCircle = (x: number, y: number, r: number): string =>
-    `M${x},${y} m${-r},0 a${r},${r} 0,1,0 ${r * 2},0 a${r},${r} 0,1,0 ${-r * 2},0`
+    `M${x - r},${y}a${r},${r} 0 10${r * 2},0a${r},${r} 0 10${-r * 2},0`
 export const drawSvgRect = (x: number, y: number, r: number): string => `M${x - r / 2},${y - r / 2}h${r}v${r}h${-r}z`
 export const drawSvgLine = (x: number, y: number, l: number): string => `M${x},${y}v${l}`
