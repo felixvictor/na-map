@@ -133,31 +133,35 @@ const updatePort = (portName, updatedPort) => {
     ports[portIndex] = { ...ports[portIndex], ...updatedPort };
     console.log(ports[portIndex]);
 };
-const captured = (result) => {
+const portCaptured = (result, nation, capturer) => {
     const portName = result[2];
-    const portBattleTime = getPortBattleTime(portName);
+    let portBattleTime = getPortBattleTime(portName);
+    let cooldownTimeEstimated = false;
+    if (!portBattleTime) {
+        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat);
+        portBattleTime = tweetTime;
+        cooldownTimeEstimated = true;
+    }
     const cooldownTime = getCooldownTime(portBattleTime);
     console.log("      --- captured", portName);
     const updatedPort = {
-        nation: findNationByName(result[4])?.short ?? "",
-        capturer: result[3].trim(),
+        nation,
+        capturer,
         captured: portBattleTime,
         cooldownTime,
+        cooldownTimeEstimated,
     };
     updatePort(portName, updatedPort);
 };
+const captured = (result) => {
+    const nation = findNationByName(result[4])?.short ?? "";
+    const capturer = result[3].trim();
+    portCaptured(result, nation, capturer);
+};
 const npcCaptured = (result) => {
-    const portName = result[2];
-    const portBattleTime = getPortBattleTime(portName);
-    const cooldownTime = getCooldownTime(portBattleTime);
-    console.log("      --- captured by NPC", portName);
-    const updatedPort = {
-        nation: "NT",
-        capturer: "RAIDER",
-        captured: portBattleTime,
-        cooldownTime,
-    };
-    updatePort(portName, updatedPort);
+    const nation = "NT";
+    const capturer = "RAIDER";
+    portCaptured(result, nation, capturer);
 };
 const defended = (result) => {
     const portName = result[2];
