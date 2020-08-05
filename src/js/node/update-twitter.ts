@@ -232,21 +232,44 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
 /**
  * Port captured
  * @param result - Result from tweet regex
+ * @param nation - Nation
+ * @param capturer - Capturing clan
  */
-const captured = (result: RegExpExecArray): void => {
+const portCaptured = (result: RegExpExecArray, nation: string, capturer: string): void => {
     const portName = result[2]
-    const portBattleTime = getPortBattleTime(portName)
+    let portBattleTime = getPortBattleTime(portName)
+    let cooldownTimeEstimated = false
+    if (!portBattleTime) {
+        // noinspection UnnecessaryLocalVariableJS
+        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat)
+        portBattleTime = tweetTime
+        cooldownTimeEstimated = true
+    }
+
     const cooldownTime = getCooldownTime(portBattleTime)
+
     console.log("      --- captured", portName)
 
     const updatedPort = {
-        nation: (findNationByName(result[4])?.short as NationShortName) ?? "",
-        capturer: result[3].trim(),
+        nation,
+        capturer,
         captured: portBattleTime,
         cooldownTime,
+        cooldownTimeEstimated,
     } as PortBattlePerServer
 
     updatePort(portName, updatedPort)
+}
+
+/**
+ * Port captured
+ * @param result - Result from tweet regex
+ */
+const captured = (result: RegExpExecArray): void => {
+    const nation = (findNationByName(result[4])?.short as NationShortName) ?? ""
+    const capturer = result[3].trim()
+
+    portCaptured(result, nation, capturer)
 }
 
 /**
@@ -254,19 +277,10 @@ const captured = (result: RegExpExecArray): void => {
  * @param result - Result from tweet regex
  */
 const npcCaptured = (result: RegExpExecArray): void => {
-    const portName = result[2]
-    const portBattleTime = getPortBattleTime(portName)
-    const cooldownTime = getCooldownTime(portBattleTime)
-    console.log("      --- captured by NPC", portName)
+    const nation = "NT"
+    const capturer = "RAIDER"
 
-    const updatedPort = {
-        nation: "NT",
-        capturer: "RAIDER",
-        captured: portBattleTime,
-        cooldownTime,
-    } as PortBattlePerServer
-
-    updatePort(portName, updatedPort)
+    portCaptured(result, nation, capturer)
 }
 
 /**
