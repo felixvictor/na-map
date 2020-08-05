@@ -10,6 +10,9 @@
 
 import { ArrayIndex } from "./interface"
 
+export const woodFamily = ["regular", "seasoned", "exceptional"] as const
+export type WoodFamily = typeof woodFamily[number]
+
 export const woodType = ["frame", "trim"] as const
 export type WoodType = typeof woodType[number]
 export type WoodTypeList<T> = {
