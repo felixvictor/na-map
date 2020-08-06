@@ -16,7 +16,7 @@ import { cleanName, sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { serverNames } from "../common/common-var";
 let apiItems;
-const woodsNotUsed = new Set([
+const notUsedExceptionalWoodIds = new Set([
     2358,
     2363,
     2367,
@@ -25,6 +25,24 @@ const woodsNotUsed = new Set([
     2372,
     2375,
     2379,
+]);
+const exceptionalWoodIds = new Set([
+    2356,
+    2357,
+    2359,
+    2360,
+    2361,
+    2362,
+    2364,
+    2365,
+    2366,
+    2369,
+    2371,
+    2373,
+    2374,
+    2376,
+    2377,
+    2378,
 ]);
 export const convertModulesAndWoodData = async () => {
     const modules = new Map();
@@ -226,6 +244,15 @@ export const convertModulesAndWoodData = async () => {
                 isPercentage,
             };
         });
+        if (module.name.includes("(S)")) {
+            wood.family = "seasoned";
+        }
+        else if (exceptionalWoodIds.has(wood.id)) {
+            wood.family = "exceptional";
+        }
+        else {
+            wood.family = "regular";
+        }
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
             wood.type = "trim";
             wood.name = module.name.replace(" Planking", "");
@@ -325,7 +352,7 @@ export const convertModulesAndWoodData = async () => {
     const apiModules = apiItems
         .filter((item) => item.ItemType === "Module" &&
         ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent"))
-        .filter((item) => !woodsNotUsed.has(item.Id));
+        .filter((item) => !notUsedExceptionalWoodIds.has(item.Id));
     apiModules.forEach((apiModule) => {
         let dontSave = false;
         const module = {
