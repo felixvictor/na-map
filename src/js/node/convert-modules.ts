@@ -34,7 +34,7 @@ type APIModifierName = string
 let apiItems: APIItemGeneric[]
 
 // noinspection SpellCheckingInspection
-const woodsNotUsed = new Set([
+const notUsedExceptionalWoodIds = new Set([
     2358, // Danzic Fir Frame
     2363, // Moulmein Teak Frame
     2367, // Virginia Pine Frame
@@ -43,6 +43,25 @@ const woodsNotUsed = new Set([
     2372, // Greenheart Planking
     2375, // Moulmein Teak Planking
     2379, // Virginia Pine Planking
+])
+
+const exceptionalWoodIds = new Set([
+    2356, // African Oak Frame
+    2357, // African Teak Frame
+    2359, // Danzic Oak Frame
+    2360, // Greenheart Frame
+    2361, // Italian Larch Frame
+    2362, // Malabar Teak Frame
+    2364, // New England Fir Frame
+    2365, // Rangoon Teak Frame
+    2366, // Riga Fir Frame
+    2369, // African Teak Planking
+    2371, // Danzic Oak Planking
+    2373, // Italian Larch Planking
+    2374, // Malabar Teak Planking
+    2376, // New England Fir Planking
+    2377, // Rangoon Teak Planking
+    2378, // Riga Fir Planking
 ])
 
 /**
@@ -272,6 +291,14 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
         })
 
+        if (module.name.includes("(S)")) {
+            wood.family = "seasoned"
+        } else if (exceptionalWoodIds.has(wood.id)) {
+            wood.family = "exceptional"
+        } else {
+            wood.family = "regular"
+        }
+
         if (module.name.endsWith(" Planking") || module.name === "Crew Space") {
             wood.type = "trim"
             wood.name = module.name.replace(" Planking", "")
@@ -397,7 +424,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 item.ItemType === "Module" &&
                 ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
         )
-        .filter((item) => !woodsNotUsed.has(item.Id)) as APIModule[]
+        .filter((item) => !notUsedExceptionalWoodIds.has(item.Id)) as APIModule[]
 
     apiModules.forEach((apiModule) => {
         let dontSave = false
