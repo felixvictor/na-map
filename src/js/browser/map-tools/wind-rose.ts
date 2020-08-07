@@ -102,7 +102,7 @@ export default class WindRose {
     }
 
     _getHeight(): number {
-        const div = document.querySelector("#port-summary .block")
+        const div = document.querySelector<HTMLDivElement>("#port-summary .block")
         if (div) {
             const { height, top } = div.getBoundingClientRect()
             const paddingTop = Number.parseFloat(window.getComputedStyle(div).getPropertyValue("padding-top"))

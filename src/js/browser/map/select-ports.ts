@@ -67,22 +67,22 @@ export default class SelectPorts {
     private _nation!: NationShortName
     private _ports: DisplayPorts
     private readonly _buyGoodsId: string
-    private readonly _buyGoodsSelector: HTMLSelectElement
+    private readonly _buyGoodsSelector: HTMLSelectElement | null
     private readonly _frontlineAttackingNationId: string
-    private readonly _frontlineAttackingNationSelector: HTMLSelectElement
+    private readonly _frontlineAttackingNationSelector: HTMLSelectElement | null
     private readonly _frontlineDefendingNationId: string
-    private readonly _frontlineDefendingNationSelector: HTMLSelectElement
+    private readonly _frontlineDefendingNationSelector: HTMLSelectElement | null
     private readonly _inventoryId: string
-    private readonly _inventorySelector: HTMLSelectElement
+    private readonly _inventorySelector: HTMLSelectElement | null
     private readonly _map: NAMap
     private readonly _numberPorts: number
     private readonly _pbZone: DisplayPbZones
     private readonly _portNamesId: string
-    private readonly _portNamesSelector: HTMLSelectElement
+    private readonly _portNamesSelector: HTMLSelectElement | null
     private readonly _propClanId: string
-    private readonly _propClanSelector: HTMLSelectElement
+    private readonly _propClanSelector: HTMLSelectElement | null
     private readonly _propNationId: string
-    private readonly _propNationSelector: HTMLSelectElement
+    private readonly _propNationSelector: HTMLSelectElement | null
     private readonly _sellProfit: Map<string, TradeProfit> = new Map()
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
@@ -93,29 +93,29 @@ export default class SelectPorts {
         this._numberPorts = this._ports.portData.length
 
         this._frontlineAttackingNationId = "frontlines-attacking-nation-select"
-        this._frontlineAttackingNationSelector = document.querySelector(
+        this._frontlineAttackingNationSelector = document.querySelector<HTMLSelectElement>(
             `#${this._frontlineAttackingNationId}`
-        ) as HTMLSelectElement
+        )
 
         this._frontlineDefendingNationId = "frontlines-defending-nation-select"
-        this._frontlineDefendingNationSelector = document.querySelector(
+        this._frontlineDefendingNationSelector = document.querySelector<HTMLSelectElement>(
             `#${this._frontlineDefendingNationId}`
-        ) as HTMLSelectElement
+        )
 
         this._portNamesId = "port-names-select"
-        this._portNamesSelector = document.querySelector(`#${this._portNamesId}`) as HTMLSelectElement
+        this._portNamesSelector = document.querySelector<HTMLSelectElement>(`#${this._portNamesId}`)
 
         this._buyGoodsId = "buy-goods-select"
-        this._buyGoodsSelector = document.querySelector(`#${this._buyGoodsId}`) as HTMLSelectElement
+        this._buyGoodsSelector = document.querySelector<HTMLSelectElement>(`#${this._buyGoodsId}`)
 
         this._inventoryId = "inventory-select"
-        this._inventorySelector = document.querySelector(`#${this._inventoryId}`) as HTMLSelectElement
+        this._inventorySelector = document.querySelector<HTMLSelectElement>(`#${this._inventoryId}`)
 
         this._propNationId = "prop-nation-select"
-        this._propNationSelector = document.querySelector(`#${this._propNationId}`) as HTMLSelectElement
+        this._propNationSelector = document.querySelector<HTMLSelectElement>(`#${this._propNationId}`)
 
         this._propClanId = "prop-clan-select"
-        this._propClanSelector = document.querySelector(`#${this._propClanId}`) as HTMLSelectElement
+        this._propClanSelector = document.querySelector<HTMLSelectElement>(`#${this._propClanId}`)
 
         this.isInventorySelected = false
 
@@ -129,7 +129,7 @@ export default class SelectPorts {
         this._setupClanSelect()
     }
 
-    _resetOtherSelects(activeSelectSelector: HTMLSelectElement): void {
+    _resetOtherSelects(activeSelectSelector: HTMLSelectElement | null): void {
         for (const selectSelector of [
             this._portNamesSelector,
             this._buyGoodsSelector,
@@ -139,8 +139,8 @@ export default class SelectPorts {
             this._propNationSelector,
             this._propClanSelector,
         ]) {
-            // noinspection OverlyComplexBooleanExpressionJS
             if (
+                selectSelector &&
                 selectSelector !== activeSelectSelector &&
                 !(selectSelector === this._propClanSelector && activeSelectSelector === this._propNationSelector) &&
                 !(selectSelector === this._propNationSelector && activeSelectSelector === this._propClanSelector)
@@ -177,10 +177,10 @@ export default class SelectPorts {
     }
 
     _setupListener(): void {
-        $(this._portNamesSelector).one("show.bs.select", () => {
+        $(this._portNamesSelector!).one("show.bs.select", () => {
             this._injectPortSelect()
         })
-        this._portNamesSelector.addEventListener("change", async (event) => {
+        this._portNamesSelector?.addEventListener("change", async (event) => {
             registerEvent("Menu", "Trade relations")
             await this._loadData()
             this._resetOtherSelects(this._portNamesSelector)
@@ -188,25 +188,25 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        $(this._buyGoodsSelector).one("show.bs.select", async () => {
+        $(this._buyGoodsSelector!).one("show.bs.select", async () => {
             await this._loadData()
             this._injectGoodsSelect()
         })
-        this._buyGoodsSelector.addEventListener("change", (event) => {
+        this._buyGoodsSelector?.addEventListener("change", (event) => {
             registerEvent("Menu", "Goods’ relations")
             this._resetOtherSelects(this._buyGoodsSelector)
             this._goodSelected()
             event.preventDefault()
         })
 
-        this._inventorySelector.addEventListener("change", (event) => {
+        this._inventorySelector?.addEventListener("change", (event) => {
             registerEvent("Menu", "Inventory")
             this._resetOtherSelects(this._inventorySelector)
             this.inventorySelected()
             event.preventDefault()
         })
 
-        this._frontlineAttackingNationSelector.addEventListener("change", async (event) => {
+        this._frontlineAttackingNationSelector?.addEventListener("change", async (event) => {
             registerEvent("Menu", "Frontlines Attack")
             await this._loadData()
             this._resetOtherSelects(this._frontlineAttackingNationSelector)
@@ -214,7 +214,7 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        this._frontlineDefendingNationSelector.addEventListener("change", async (event) => {
+        this._frontlineDefendingNationSelector?.addEventListener("change", async (event) => {
             registerEvent("Menu", "Frontlines Defence")
             await this._loadData()
             this._resetOtherSelects(this._frontlineDefendingNationSelector)
@@ -222,13 +222,13 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        this._propNationSelector.addEventListener("change", (event) => {
+        this._propNationSelector?.addEventListener("change", (event) => {
             this._resetOtherSelects(this._propNationSelector)
             this._nationSelected()
             event.preventDefault()
         })
 
-        this._propClanSelector.addEventListener("change", (event) => {
+        this._propClanSelector?.addEventListener("change", (event) => {
             this._resetOtherSelects(this._propClanSelector)
             this._clanSelected()
             event.preventDefault()
@@ -268,8 +268,8 @@ export default class SelectPorts {
             )
             .join("")}`
 
-        this._portNamesSelector.insertAdjacentHTML("beforeend", options)
-        $(this._portNamesSelector).selectpicker("refresh")
+        this._portNamesSelector?.insertAdjacentHTML("beforeend", options)
+        $(this._portNamesSelector!).selectpicker("refresh")
     }
 
     _injectGoodsSelect(): void {
@@ -290,12 +290,12 @@ export default class SelectPorts {
 
         const sortedGoods = [...selectGoods].sort((a, b) => a[1].localeCompare(b[1]))
         const options = `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
-        this._buyGoodsSelector.insertAdjacentHTML("beforeend", options)
-        $(this._buyGoodsSelector).selectpicker("refresh")
+        this._buyGoodsSelector?.insertAdjacentHTML("beforeend", options)
+        $(this._buyGoodsSelector!).selectpicker("refresh")
     }
 
     setupInventorySelect(show: boolean): void {
-        if (!this._inventorySelector.classList.contains("selectpicker")) {
+        if (!this._inventorySelector?.classList.contains("selectpicker")) {
             const selectGoods = new Map<number, string>()
 
             for (const port of this._ports.portDataDefault) {
@@ -311,9 +311,9 @@ export default class SelectPorts {
                 .map((good) => `<option value="${good[0]}">${good[1]}</option>`)
                 .join("")}`
 
-            this._inventorySelector.insertAdjacentHTML("beforeend", options)
-            this._inventorySelector.classList.add("selectpicker")
-            $(this._inventorySelector).selectpicker({
+            this._inventorySelector?.insertAdjacentHTML("beforeend", options)
+            this._inventorySelector?.classList.add("selectpicker")
+            $(this._inventorySelector!).selectpicker({
                 dropupAuto: false,
                 liveSearch: true,
                 liveSearchNormalize: true,
@@ -324,11 +324,11 @@ export default class SelectPorts {
         }
 
         if (show) {
-            this._inventorySelector.classList.remove("d-none")
-            ;(this._inventorySelector.parentNode as HTMLSelectElement).classList.remove("d-none")
+            this._inventorySelector?.classList.remove("d-none")
+            ;(this._inventorySelector?.parentNode as HTMLSelectElement).classList.remove("d-none")
         } else {
-            this._inventorySelector.classList.add("d-none")
-            ;(this._inventorySelector.parentNode as HTMLSelectElement).classList.add("d-none")
+            this._inventorySelector?.classList.add("d-none")
+            ;(this._inventorySelector?.parentNode as HTMLSelectElement).classList.add("d-none")
         }
     }
 
@@ -344,17 +344,17 @@ export default class SelectPorts {
     _setupFrontlinesNationSelect(): void {
         const options = this._getNationOptions(false)
 
-        this._frontlineAttackingNationSelector.insertAdjacentHTML("beforeend", options)
-        this._frontlineAttackingNationSelector.classList.add("selectpicker")
-        $(this._frontlineAttackingNationSelector).selectpicker({
+        this._frontlineAttackingNationSelector?.insertAdjacentHTML("beforeend", options)
+        this._frontlineAttackingNationSelector?.classList.add("selectpicker")
+        $(this._frontlineAttackingNationSelector!).selectpicker({
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
         } as BootstrapSelectOptions)
 
-        this._frontlineDefendingNationSelector.insertAdjacentHTML("beforeend", options)
-        this._frontlineDefendingNationSelector.classList.add("selectpicker")
-        $(this._frontlineDefendingNationSelector).selectpicker({
+        this._frontlineDefendingNationSelector?.insertAdjacentHTML("beforeend", options)
+        this._frontlineDefendingNationSelector?.classList.add("selectpicker")
+        $(this._frontlineDefendingNationSelector!).selectpicker({
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
@@ -364,9 +364,9 @@ export default class SelectPorts {
     _setupNationSelect(): void {
         const options = this._getNationOptions(true)
 
-        this._propNationSelector.insertAdjacentHTML("beforeend", options)
-        this._propNationSelector.classList.add("selectpicker")
-        $(this._propNationSelector).selectpicker({
+        this._propNationSelector?.insertAdjacentHTML("beforeend", options)
+        this._propNationSelector?.classList.add("selectpicker")
+        $(this._propNationSelector!).selectpicker({
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
@@ -379,27 +379,29 @@ export default class SelectPorts {
             clanList.add(d.capturer!)
         }
 
-        // noinspection InnerHTMLJS
-        this._propClanSelector.innerHTML = ""
-        let options = ""
+        if (this._propClanSelector) {
+            // noinspection InnerHTMLJS
+            this._propClanSelector.innerHTML = ""
+            let options = ""
 
-        if (clanList.size === 0) {
-            this._propClanSelector.disabled = true
-        } else {
-            this._propClanSelector.disabled = false
-            options = `${[...clanList]
-                .sort(simpleStringSort)
-                .map((clan) => `<option value="${clan}" class="caps">${clan}</option>`)
-                .join("")}`
+            if (clanList.size === 0) {
+                this._propClanSelector.disabled = true
+            } else {
+                this._propClanSelector.disabled = false
+                options = `${[...clanList]
+                    .sort(simpleStringSort)
+                    .map((clan) => `<option value="${clan}" class="caps">${clan}</option>`)
+                    .join("")}`
+            }
+
+            this._propClanSelector.insertAdjacentHTML("beforeend", options)
+            this._propClanSelector.classList.add("selectpicker")
+            $(this._propClanSelector).selectpicker({
+                dropupAuto: false,
+                liveSearch: false,
+                virtualScroll: true,
+            } as BootstrapSelectOptions)
         }
-
-        this._propClanSelector.insertAdjacentHTML("beforeend", options)
-        this._propClanSelector.classList.add("selectpicker")
-        $(this._propClanSelector).selectpicker({
-            dropupAuto: false,
-            liveSearch: false,
-            virtualScroll: true,
-        } as BootstrapSelectOptions)
     }
 
     _getSailingDistance(fromPortId: number, toPortId: number): number {
@@ -512,13 +514,13 @@ export default class SelectPorts {
     }
 
     _portSelected(): void {
-        const port = this._portNamesSelector.options[this._portNamesSelector.selectedIndex]
-        const c = port.value.split(",")
-        const id = Number(port.getAttribute("data-id"))
+        const port = this._portNamesSelector?.options[this._portNamesSelector.selectedIndex]
+        const c = port?.value.split(",")
+        const id = Number(port?.getAttribute("data-id"))
 
         this._ports.currentPort = {
             id,
-            coord: { x: Number(c[0]), y: Number(c[1]) },
+            coord: { x: Number(c?.[0]), y: Number(c?.[1]) },
         }
         this._ports.tradePortId = id
 
@@ -534,7 +536,7 @@ export default class SelectPorts {
     }
 
     _goodSelected(): void {
-        const goodSelectedId = Number(this._buyGoodsSelector.options[this._buyGoodsSelector.selectedIndex].value)
+        const goodSelectedId = Number(this._buyGoodsSelector?.options[this._buyGoodsSelector.selectedIndex].value)
 
         const sourcePorts = (JSON.parse(
             JSON.stringify(
@@ -571,7 +573,7 @@ export default class SelectPorts {
     inventorySelected(): void {
         this.isInventorySelected = true
 
-        const goodIdSelected = Number(this._inventorySelector.options[this._inventorySelector.selectedIndex].value)
+        const goodIdSelected = Number(this._inventorySelector?.options[this._inventorySelector.selectedIndex].value)
         const buyGoods = new Map() as goodMap
         const sellGoods = new Map() as goodMap
         console.log(goodIdSelected)
@@ -648,7 +650,7 @@ export default class SelectPorts {
     }
 
     _frontlineAttackingNationSelected(): void {
-        const nation = this._frontlineAttackingNationSelector.options[
+        const nation = this._frontlineAttackingNationSelector?.options[
             this._frontlineAttackingNationSelector.selectedIndex
         ].value as NationShortName
 
@@ -661,7 +663,7 @@ export default class SelectPorts {
     }
 
     _frontlineDefendingNationSelected(): void {
-        const nation = this._frontlineDefendingNationSelector.options[
+        const nation = this._frontlineDefendingNationSelector?.options[
             this._frontlineDefendingNationSelector.selectedIndex
         ].value as NationShortName
 
@@ -674,21 +676,22 @@ export default class SelectPorts {
     }
 
     _nationSelected(): void {
-        this._nation = this._propNationSelector.options[this._propNationSelector.selectedIndex].value as NationShortName
+        this._nation = this._propNationSelector?.options[this._propNationSelector.selectedIndex]
+            .value as NationShortName
 
         if (validNationShortName(this._nation)) {
             this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)
             this._ports.showRadius = ""
             this._ports.update()
             this._setupClanSelect()
-            $(this._propClanSelector).selectpicker("refresh")
+            $(this._propClanSelector!).selectpicker("refresh")
         } else {
             this._nation = "NT"
         }
     }
 
     _clanSelected(): void {
-        const clan = this._propClanSelector.options[this._propClanSelector.selectedIndex].value
+        const clan = this._propClanSelector?.options[this._propClanSelector.selectedIndex].value
 
         if (clan) {
             this._ports.portData = this._ports.portDataDefault.filter((port) => port.capturer === clan)
@@ -778,6 +781,6 @@ export default class SelectPorts {
     clearMap(): void {
         this.isInventorySelected = false
         this._setupClanSelect()
-        $(this._propClanSelector).selectpicker("refresh")
+        $(this._propClanSelector!).selectpicker("refresh")
     }
 }
