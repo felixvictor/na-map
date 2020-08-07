@@ -37,7 +37,6 @@ export const appVersion = VERSION
 export const colourGreen = CGREEN
 export const colourGreenDark = CGREENDARK
 export const colourGreenLight = CGREENLIGHT
-export const colourOrange = CORANGE
 export const colourRed = CRED
 export const colourRedDark = CREDDARK
 export const colourRedLight = CREDLIGHT

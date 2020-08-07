@@ -31,14 +31,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
 import { capitalizeFirstLetter, nations, NationShortName, putImportError } from "../../common/common"
-import {
-    colourGreenDark,
-    colourList,
-    colourOrange,
-    colourRedDark,
-    colourWhite,
-    primary300,
-} from "../../common/common-browser"
+import { colourGreenDark, colourList, colourRedDark, colourWhite, primary300 } from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "../../common/common-format"
 import {
     Coordinate,
@@ -666,7 +659,7 @@ export default class DisplayPorts {
             return rectAvail
         }
 
-        const svgDefNode = document.querySelector("#na-svg defs")!
+        const svgDefNode = document.querySelector<SVGDefsElement>("#na-svg defs")!
 
         nations
             .map((d) => d.short)
@@ -740,7 +733,7 @@ export default class DisplayPorts {
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
         const attackHostility = portProperties.portBattle
-            ? html`${displayClanLitHtml(portProperties.attackerClan!)} (${portProperties.attackerNation})
+            ? html`${displayClanLitHtml(portProperties.attackerClan)} (${portProperties.attackerNation})
               attack${portProperties.portBattle
                   ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
                   : html`s: ${formatPercent(portProperties.attackHostility ?? 0)} hostility`}`
@@ -812,6 +805,7 @@ export default class DisplayPorts {
         return port
     }
 
+    // eslint-disable-next-line complexity
     _tooltipData(port: PortForDisplay): HtmlResult {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
