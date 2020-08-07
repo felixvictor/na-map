@@ -11,51 +11,109 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import { select as d3Select } from "d3-selection"
-import Tablesort from "tablesort"
-import { h, render } from "preact"
-import htm from "htm"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter, putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
+import {
+    capitalizeFirstLetter,
+    putImportError,
+    WoodFamily,
+    woodFamily,
+    woodType,
+    WoodType,
+    WoodTypeList,
+} from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
-import { formatPP } from "../../common/common-format"
-import { formatFloatFixedHTML, initTablesort } from "../../common/common-game-tools"
+import { formatFloatFixed, formatPP } from "../../common/common-format"
 import { simpleStringSort } from "../../common/common-node"
 
-import { WoodData } from "../../common/gen-json"
-import { HtmlResult, HtmlString } from "../../common/interface"
-import * as d3Selection from "d3-selection"
-
-const html = htm.bind(h)
+import { WoodData, WoodProperty, WoodTrimOrFrame } from "../../common/gen-json"
+import { HtmlString } from "../../common/interface"
 
 /**
  *
  */
 export default class ListWoods {
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
+    private _modifiers: WoodTypeList<Set<string>> = {} as WoodTypeList<Set<string>>
+    private _rows: WoodTypeList<
+        Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>
+    > = {} as WoodTypeList<Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>>
+
+    private _sortAscending = false
+    private _sortIndex = 0
+    private _switchesSel!: HTMLInputElement[]
+    private _tables: WoodTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>> = {} as WoodTypeList<
+        Selection<HTMLTableElement, unknown, HTMLElement, unknown>
+    >
+
     private _woodData: WoodData = {} as WoodData
-    private _div!: WoodTypeList<d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>>
+    private _woodDataDefault: WoodData = {} as WoodData
+    private readonly _baseId: HtmlString
+    private readonly _baseName: string
+    private readonly _buttonId: HtmlString
+    private readonly _checkboxId: HtmlString
+    private readonly _modalId: HtmlString
+    private readonly _modifiersNotUsed = new Set(["Ship material", "Boarding morale"])
 
     constructor() {
         this._baseName = "List woods"
         this._baseId = "wood-list"
         this._buttonId = `button-${this._baseId}`
+        this._checkboxId = `checkbox-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         this._setupListener()
     }
 
-    async _loadAndSetupData(): Promise<void> {
+    _getModifiers(type: WoodType): string[] {
+        const modifiers = new Set<string>()
+
+        this._woodDataDefault[type].forEach((wood) => {
+            wood.properties
+                .filter((property) => !this._modifiersNotUsed.has(property.modifier))
+                .forEach((property) => {
+                    modifiers.add(property.modifier)
+                })
+        })
+        return [...modifiers].sort(simpleStringSort)
+    }
+
+    async _loadData(): Promise<void> {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
+            this._woodDataDefault = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
                 .default as WoodData
         } catch (error) {
             putImportError(error)
         }
+    }
+
+    _setupData(): void {
+        for (const type of woodType) {
+            this._modifiers[type] = new Set(this._getModifiers(type))
+
+            // Add missing properties to each wood
+            this._woodDataDefault[type].forEach((wood) => {
+                const currentWoodProperties = new Set(wood.properties.map((property) => property.modifier))
+                for (const modifier of this._modifiers[type]) {
+                    if (!currentWoodProperties.has(modifier)) {
+                        wood.properties.push({
+                            modifier,
+                            amount: 0,
+                            isPercentage: false,
+                        })
+                    }
+                }
+
+                wood.properties.sort((a, b) => a.modifier.localeCompare(b.modifier))
+            })
+        }
+
+        this._woodData = { ...this._woodDataDefault }
+    }
+
+    async _loadAndSetupData(): Promise<void> {
+        await this._loadData()
+        this._setupData()
     }
 
     _setupListener(): void {
@@ -73,23 +131,139 @@ export default class ListWoods {
         })
     }
 
+    _sortRows(type: WoodType, index: number, changeOrder = true): void {
+        if (changeOrder) {
+            this._sortAscending = !this._sortAscending
+        }
+
+        this._sortIndex = index
+        const sign = this._sortAscending ? -1 : 1
+        this._rows[type].sort((a, b): number => {
+            if (this._sortIndex === 0) {
+                return a.name.localeCompare(b.name) * sign
+            }
+
+            return (a.properties[this._sortIndex - 1].amount - b.properties[this._sortIndex - 1].amount) * sign
+        })
+    }
+
+    _initTable(type: WoodType): void {
+        this._tables[type]
+            .append("thead")
+            .append("tr")
+            .selectAll("th")
+            .data(["Wood", ...this._modifiers[type]])
+            .enter()
+            .append("th")
+            .classed("text-right", (d, i) => i !== 0)
+            .attr("role", "columnheader")
+            .text((d) => d)
+            .on("click", (d, i) => {
+                this._sortRows(type, i)
+            })
+        this._tables[type].append("tbody")
+    }
+
     _injectModal(): void {
         insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-xl" })
 
         const body = d3Select(`#${this._modalId} .modal-body`)
-        this._div = {} as WoodTypeList<d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>>
+
+        const divSwitches = body.append("div").attr("class", "mb-3")
+        for (const family of woodFamily) {
+            const divSwitch = divSwitches
+                .append("div")
+                .attr("class", "custom-control custom-switch custom-control-inline")
+            divSwitch
+                .append("input")
+                .attr("id", `${this._checkboxId}-${family}`)
+                .attr("name", `${this._checkboxId}`)
+                .attr("class", "custom-control-input")
+                .attr("type", "checkbox")
+                .property("checked", true)
+            divSwitch
+                .append("label")
+                .attr("for", `${this._checkboxId}-${family}`)
+                .attr("class", "custom-control-label")
+                .text(capitalizeFirstLetter(family))
+        }
+
+        this._switchesSel = [...document.querySelectorAll<HTMLInputElement>(`input[name=${this._checkboxId}]`)]
+        for (const input of this._switchesSel) {
+            input.addEventListener("change", (event: Event) => {
+                event.preventDefault()
+                this._woodFamilySelected()
+            })
+        }
+
         for (const type of woodType) {
             body.append("h5").text(capitalizeFirstLetter(`${type}s`))
-            this._div[type] = body.append("div").attr("id", `${type}-list`)
+            this._tables[type] = body.append("table").attr("class", "table table-sm small na-table")
+            this._initTable(type)
+            this._updateTable(type)
         }
     }
 
     _initModal(): void {
-        initTablesort()
         this._injectModal()
+    }
+
+    _getFormattedAmount(property: WoodProperty): HtmlString {
+        let formattedAmount
+        if (property.modifier === "Repair amount" && property.amount) {
+            formattedAmount = formatPP(property.amount, 1)
+        } else {
+            formattedAmount = property.amount ? formatFloatFixed(property.amount) : ""
+        }
+
+        return formattedAmount
+    }
+
+    _updateTable(type: WoodType): void {
+        // Data join rows
+        this._rows[type] = this._tables[type]
+            .select<HTMLTableSectionElement>("tbody")
+            .selectAll<HTMLTableRowElement, WoodTrimOrFrame>("tr")
+            .data(this._woodData[type], (d: WoodTrimOrFrame): number => d.id)
+            .join(
+                (enter) => enter.append("tr")
+                //    (exit) => exit.remove()
+            )
+
+        // Data join cells
+        this._rows[type]
+            .selectAll<HTMLTableCellElement, string>("td")
+            .data((row): string[] => {
+                return [
+                    row.name,
+                    ...row.properties
+                        .filter((property) => !this._modifiersNotUsed.has(property.modifier))
+                        .map((property) => this._getFormattedAmount(property)),
+                ]
+            })
+            .join((enter) =>
+                enter
+                    .append("td")
+                    .classed("text-right", (d, i) => i !== 0)
+                    .html((d) => {
+                        return d
+                    })
+            )
+        this._sortRows(type, this._sortIndex, false)
+    }
+
+    _woodFamilySelected(): void {
+        const activeFamilies = new Set<WoodFamily>()
+        for (const input of this._switchesSel) {
+            if (input.checked) {
+                const family = input.id.replace(`${this._checkboxId}-`, "") as WoodFamily
+                activeFamilies.add(family)
+            }
+        }
 
         for (const type of woodType) {
-            this._injectList(type)
+            this._woodData[type] = this._woodDataDefault[type].filter((wood) => activeFamilies.has(wood.family))
+            this._updateTable(type)
         }
     }
 
@@ -101,86 +275,5 @@ export default class ListWoods {
 
         // Show modal
         $(`#${this._modalId}`).modal("show")
-    }
-
-    _getModifiers(type: WoodType): string[] {
-        const modifiers = new Set<string>()
-        this._woodData[type].forEach((wood) => {
-            wood.properties.forEach((property) => {
-                if (property.modifier !== "Ship material" && property.modifier !== "Boarding morale") {
-                    modifiers.add(property.modifier)
-                }
-            })
-        })
-        return [...modifiers].sort(simpleStringSort)
-    }
-
-    _getList(type: WoodType): HtmlResult {
-        const modifiers = this._getModifiers(type)
-
-        const addLineBreak = (string: string): HtmlResult => {
-            const strings = string.split(" ", 2)
-            const rest = string.slice(strings.join(" ").length)
-            return html`${strings[0]}<br />${strings[1]} ${rest}`
-        }
-
-        const getHead = () => {
-            return html` <thead>
-                <tr>
-                    <th data-sort-default>Wood</th>
-                    ${modifiers.map(
-                        (modifier) => html`<th class="text-right">
-                            ${addLineBreak(modifier)}
-                        </th>`
-                    )}
-                </tr>
-            </thead>`
-        }
-
-        const getBody = (type: WoodType): HtmlResult => {
-            return html`<tbody>
-                ${this._woodData[type].map(
-                    (wood) =>
-                        html`
-                            <tr>
-                                <td>${wood.name}</td>
-
-                                ${modifiers.map((modifier) => {
-                                    const amount =
-                                        wood.properties.find((property) => property.modifier === modifier)?.amount ?? 0
-
-                                    let formattedAmount
-                                    if (modifier === "Repair amount" && amount) {
-                                        formattedAmount = formatPP(amount, 1)
-                                    } else {
-                                        formattedAmount = amount ? formatFloatFixedHTML(amount) : ""
-                                    }
-
-                                    return html`<td class="text-right" data-sort="${amount ?? 0}">
-                                        ${formattedAmount}
-                                    </td>`
-                                })}
-                            </tr>
-                        `
-                )}
-            </tbody>`
-        }
-
-        return html`
-            <table id="table-${this._baseId}-${type}-list" class="table table-sm small tablesort na-table">
-                ${getHead()} ${getBody(type)}
-            </table>
-        `
-    }
-
-    /**
-     * Show wood type
-     */
-    _injectList(type: WoodType): void {
-        render(this._getList(type), this._div[type].node() as HTMLDivElement)
-
-        const table = document.querySelector(`#table-${this._baseId}-${type}-list`) as HTMLTableElement
-        // @ts-expect-error
-        void new Tablesort(table)
     }
 }

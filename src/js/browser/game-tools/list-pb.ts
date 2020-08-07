@@ -160,7 +160,7 @@ export default class ListPortBattles {
     _injectList(): void {
         render(this._getList(), this.#div.node() as HTMLDivElement)
 
-        const table = document.querySelector(`#${this.#tableId}`) as HTMLTableElement
+        const table = document.querySelector<HTMLTableElement>(`#${this.#tableId}`)
         // @ts-expect-error
         void new Tablesort(table)
     }

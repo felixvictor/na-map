@@ -144,4 +144,4 @@ export const getContrastColour = (colour: string): string => {
     return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
 }
 
-export const displayClanLitHtml = (clan: string): HtmlResult => html`<span class="caps">${clan}</span>`
+export const displayClanLitHtml = (clan: string | undefined): HtmlResult => html`<span class="caps">${clan}</span>`

@@ -49,8 +49,8 @@ export default class ShowF11 {
     private _modal$!: JQuery
     private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _formSel!: HTMLFormElement
-    private _xInputSel!: HTMLInputElement
-    private _zInputSel!: HTMLInputElement
+    private _xInputSel!: HTMLInputElement | null
+    private _zInputSel!: HTMLInputElement | null
 
     constructor(map: NAMap, coord: MinMaxCoord) {
         this._map = map
@@ -181,8 +181,8 @@ export default class ShowF11 {
         if (!this._modal$) {
             this._initModal()
             this._modal$ = $(`#${this._modalId}`)
-            this._xInputSel = document.querySelector(`#${this._xInputId}`) as HTMLInputElement
-            this._zInputSel = document.querySelector(`#${this._zInputId}`) as HTMLInputElement
+            this._xInputSel = document.querySelector<HTMLInputElement>(`#${this._xInputId}`)
+            this._zInputSel = document.querySelector<HTMLInputElement>(`#${this._zInputId}`)
             // Submit handler
             this._formSel.addEventListener("submit", (event) => {
                 this._modal$.modal("hide")
@@ -204,12 +204,12 @@ export default class ShowF11 {
 
         // Show modal
         this._modal$.modal("show")
-        this._xInputSel.focus()
-        this._xInputSel.select()
+        this._xInputSel?.focus()
+        this._xInputSel?.select()
     }
 
-    _getInputValue(element: HTMLInputElement): number {
-        const { value } = element
+    _getInputValue(element: HTMLInputElement | null): number {
+        const { value } = element as HTMLInputElement
         return value === "" ? Infinity : Number(value)
     }
 
