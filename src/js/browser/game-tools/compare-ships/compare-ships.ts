@@ -371,19 +371,23 @@ export class CompareShips {
 
     _setupArrow(): void {
         // Get current arrow
-        const arrow = document.querySelector("#journey-arrow") as SVGMarkerElement
-        // Clone arrow and change properties
-        const arrowNew = arrow.cloneNode(true) as SVGMarkerElement
-        arrowNew.id = "wind-profile-arrow-head"
-        if (arrowNew.hasChildNodes()) {
-            for (const child of arrowNew.childNodes) {
-                ;(child as SVGPathElement).classList.replace("journey-arrow-head", "wind-profile-arrow-head")
+        const arrow = document.querySelector<SVGMarkerElement>("#journey-arrow")
+        if (arrow) {
+            // Clone arrow and change properties
+            const arrowNew = arrow.cloneNode(true) as SVGMarkerElement
+            arrowNew.id = "wind-profile-arrow-head"
+            if (arrowNew.hasChildNodes()) {
+                for (const child of arrowNew.childNodes) {
+                    ;(child as SVGPathElement).classList.replace("journey-arrow-head", "wind-profile-arrow-head")
+                }
+            }
+
+            // Insert new arrow
+            const defs = document.querySelector<SVGDefsElement>("#na-map svg defs")
+            if (defs) {
+                defs.append(arrowNew)
             }
         }
-
-        // Insert new arrow
-        const defs = document.querySelector("#na-map svg defs") as SVGDefsElement
-        defs.append(arrowNew)
     }
 
     _setupData(): void {
@@ -652,9 +656,9 @@ export class CompareShips {
         this._setMakeImageSpinner()
 
         const html2canvas = await import(/* webpackChunkName: "html2canvas" */ "html2canvas")
-        const element = document.querySelector(
+        const element = document.querySelector<HTMLElement>(
             `#${this._modalId} .modal-dialog .modal-content .modal-body`
-        ) as HTMLElement
+        )
         if (element) {
             const canvas = await html2canvas.default(element, {
                 allowTaint: true,
@@ -1247,13 +1251,13 @@ export class CompareShips {
 
     _showCappingAdvice(compareId: ShipColumnType, modifiers: Set<string>): void {
         const id = `${this._baseId}-${compareId}-capping`
-        let div = document.querySelector(`#${id}`)
+        let div = document.querySelector<HTMLDivElement>(`#${id}`)
 
         if (!div) {
             div = document.createElement("p")
             div.id = id
             div.className = "alert alert-warning"
-            const element = document.querySelector(`#${this._baseId}-${compareId}`)
+            const element = document.querySelector<HTMLDivElement>(`#${this._baseId}-${compareId}`)
             element?.firstChild?.after(div)
         }
 
@@ -1263,7 +1267,7 @@ export class CompareShips {
 
     _removeCappingAdvice(compareId: ShipColumnType): void {
         const id = `${this._baseId}-${compareId}-capping`
-        const div = document.querySelector(`#${id}`)
+        const div = document.querySelector<HTMLDivElement>(`#${id}`)
 
         if (div) {
             div.remove()

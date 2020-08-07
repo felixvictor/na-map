@@ -290,11 +290,11 @@ export default class ListCannons {
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter,
             } as BaseModalHtml),
-            document.querySelector("#modal-section") as HTMLElement
+            document.querySelector("#modal-section") as HTMLDivElement
         )
 
         for (const type of cannonType) {
-            const table = document.querySelector(`#table-${this._baseId}-${type}-list`) as HTMLTableElement
+            const table = document.querySelector<HTMLTableElement>(`#table-${this._baseId}-${type}-list`)
             if (table) {
                 // @ts-expect-error
                 void new Tablesort(table)
