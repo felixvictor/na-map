@@ -418,15 +418,14 @@ class NAMap {
 
     _showAbout(): void {
         const modalId = "modal-about"
-        const modal$ = $(`#${modalId}`)
 
         // If the modal has no content yet, insert it
-        if (modal$.length === 0) {
+        if (!document.querySelector(`#${modalId}`)) {
             NAMap._initModal(modalId)
         }
 
         // Show modal
-        modal$.modal("show")
+        $(`#${modalId}`).modal("show")
     }
 
     _doDoubleClickAction(self: SVGSVGElement): void {
