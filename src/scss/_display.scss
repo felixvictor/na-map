@@ -34,7 +34,8 @@ body {
     font-variant-numeric: oldstyle-nums; // onum
 }
 
-text {
+text,
+.map-tiles {
     cursor: default;
     user-select: none;
 }
