@@ -763,7 +763,7 @@ export default class DisplayPorts {
             isNPCAttacker: portProperties.attackerNation === "Neutral",
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
-            portPoints: formatInt(portProperties.portPoints),
+            portPoints: portProperties.capturable ? formatInt(portProperties.portPoints) : "",
             taxIncome: formatSiIntHtml(portProperties.taxIncome),
             portTax: formatPercent(portProperties.portTax),
             netIncome: formatSiIntHtml(portProperties.netIncome),
@@ -829,18 +829,20 @@ export default class DisplayPorts {
                 </div>
 
                 <div class="ml-auto inline-block">
-                    <span class="x-large text-lighter align-top mr-2">${port.portPoints}</span>
-                    ${port.availableForAll
-                        ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
-                              ><span class="sr-only">Accessible to all</span>`
+                    ${port.portPoints
+                        ? html`<span class="x-large text-lighter align-top mr-1">${port.portPoints}</span>`
                         : html``}
                     ${port.laborHoursDiscount
-                        ? html`<i class="icon icon-light icon-labour" aria-hidden="true"></i
+                        ? html`<i class="icon icon-light icon-labour mr-1" aria-hidden="true"></i
                               ><span class="sr-only">Labour hour discount level ${port.laborHoursDiscount}</span>`
                         : html``}
                     ${port.tradingCompany
                         ? html`<i class="icon icon-light icon-trading mr-1" aria-hidden="true"></i
                               ><span class="sr-only">Trading company level ${port.tradingCompany}</span>`
+                        : html``}
+                    ${port.availableForAll
+                        ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
+                              ><span class="sr-only">Accessible to all</span>`
                         : html``}
                     ${port.shallow
                         ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
