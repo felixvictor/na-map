@@ -216,7 +216,7 @@ export default class ListLoot {
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter,
             }),
-            document.querySelector("#modal-section")!
+            document.querySelector("#modal-section") as HTMLDivElement
         )
     }
 

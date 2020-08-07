@@ -14,7 +14,7 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodType } from "./common"
+import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodFamily, WoodType } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType } from "./types"
 
@@ -621,6 +621,7 @@ interface WoodTrimOrFrame {
     properties: WoodProperty[]
     type: WoodType
     name: string
+    family: WoodFamily
 }
 interface WoodProperty extends ObjectIndexer<boolean | number | string> {
     modifier: string

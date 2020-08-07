@@ -167,7 +167,7 @@ class NAMap {
          */
         this.showGrid = this._getShowGridValue()
 
-        this.gridOverlay = document.querySelectorAll(".overlay")[0] as HTMLElement
+        this.gridOverlay = document.querySelectorAll<HTMLElement>(".overlay")[0]
 
         this._setHeightWidth()
         this._setupScale()
@@ -418,15 +418,14 @@ class NAMap {
 
     _showAbout(): void {
         const modalId = "modal-about"
-        const modal$ = $(`#${modalId}`)
 
         // If the modal has no content yet, insert it
-        if (modal$.length === 0) {
+        if (!document.querySelector(`#${modalId}`)) {
             NAMap._initModal(modalId)
         }
 
         // Show modal
-        modal$.modal("show")
+        $(`#${modalId}`).modal("show")
     }
 
     _doDoubleClickAction(self: SVGSVGElement): void {
@@ -536,7 +535,7 @@ class NAMap {
         this.initialZoomAndPan()
         this._checkF11Coord()
         this._setFlexOverlayHeight()
-        ;(document.querySelector("#navbar-left") as HTMLElement).classList.remove("d-none")
+        document.querySelector<HTMLElement>("#navbar-left")?.classList.remove("d-none")
     }
 
     get zoomLevel(): ZoomLevel {
@@ -562,7 +561,7 @@ class NAMap {
     }
 
     getDimensions(): DOMRect {
-        const selector = document.querySelectorAll(".overlay")[0]
+        const selector = document.querySelectorAll<HTMLDivElement>(".overlay")[0]
 
         return selector.getBoundingClientRect()
     }
@@ -598,7 +597,7 @@ class NAMap {
 
     _setFlexOverlayHeight(): void {
         const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0)
-        document.querySelector("#summary-column")?.setAttribute("style", `height:${height}px`)
+        document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${height}px`)
     }
 
     initialZoomAndPan(): void {

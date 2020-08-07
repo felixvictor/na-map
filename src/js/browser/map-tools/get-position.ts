@@ -42,7 +42,7 @@ export default class TrilateratePosition {
     readonly #NumberOfInputs: number
     readonly #numbers: number[]
     readonly #select: HtmlString[] = [] as HtmlString[]
-    readonly #selector: HTMLSelectElement[] = [] as HTMLSelectElement[]
+    readonly #selector: Array<HTMLSelectElement | null> = [] as Array<HTMLSelectElement | null>
 
     /**
      * @param ports - Port data
@@ -131,17 +131,18 @@ export default class TrilateratePosition {
             .map((port) => `<option data-subtext="${port.nation}">${port.name}</option>`)
             .join("")}`
         for (const inputNumber of this.#numbers) {
-            this.#selector[inputNumber] = document.querySelector(`#${this.#select[inputNumber]}`) as HTMLSelectElement
-
-            this.#selector[inputNumber].insertAdjacentHTML("beforeend", options)
-            $(this.#selector[inputNumber]).selectpicker({
-                dropupAuto: false,
-                liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
-                title: "Select port",
-                virtualScroll: true,
-            } as BootstrapSelectOptions)
+            this.#selector[inputNumber] = document.querySelector<HTMLSelectElement>(`#${this.#select[inputNumber]}`)
+            if (this.#selector[inputNumber]) {
+                this.#selector[inputNumber]!.insertAdjacentHTML("beforeend", options)
+                $(this.#selector[inputNumber]!).selectpicker({
+                    dropupAuto: false,
+                    liveSearch: true,
+                    liveSearchNormalize: true,
+                    liveSearchPlaceholder: "Search ...",
+                    title: "Select port",
+                    virtualScroll: true,
+                } as BootstrapSelectOptions)
+            }
         }
     }
 
@@ -209,13 +210,17 @@ export default class TrilateratePosition {
 
         const ports = new Map()
         for (const inputNumber of this.#numbers) {
-            const port = this.#selector[inputNumber].selectedIndex
-                ? this.#selector[inputNumber].options[this.#selector[inputNumber].selectedIndex].text
-                : ""
-            const distance = Number((document.querySelector(`#${this.#input[inputNumber]}`) as HTMLSelectElement).value)
+            if (this.#selector[inputNumber]) {
+                const port = this.#selector[inputNumber]!.selectedIndex
+                    ? this.#selector[inputNumber]!.options[this.#selector[inputNumber]!.selectedIndex].text
+                    : ""
+                const distance = Number(
+                    document.querySelector<HTMLSelectElement>(`#${this.#input[inputNumber]}`)!.value
+                )
 
-            if (distance && port !== "") {
-                ports.set(port, distance * roundingFactor * circleRadiusFactor)
+                if (distance && port !== "") {
+                    ports.set(port, distance * roundingFactor * circleRadiusFactor)
+                }
             }
         }
 

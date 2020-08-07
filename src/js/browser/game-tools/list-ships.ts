@@ -196,7 +196,7 @@ export default class ShipList {
         // Add new ship list
         render(this._getList(), this._mainDiv.node() as HTMLDivElement)
 
-        const table = document.querySelector(`#table-${this._baseId}`) as HTMLTableElement
+        const table = document.querySelector<HTMLTableElement>(`#table-${this._baseId}`)
         // @ts-expect-error
         void new Tablesort(table)
     }
