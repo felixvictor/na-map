@@ -39,8 +39,8 @@ export default class ListWoods {
         Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>
     > = {} as WoodTypeList<Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>>
 
-    private _sortAscending = false
-    private _sortIndex = 0
+    private _sortAscending: WoodTypeList<boolean> = {} as WoodTypeList<boolean>
+    private _sortIndex: WoodTypeList<number> = {} as WoodTypeList<number>
     private _switchesSel!: HTMLInputElement[]
     private _tables: WoodTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>> = {} as WoodTypeList<
         Selection<HTMLTableElement, unknown, HTMLElement, unknown>
@@ -132,22 +132,24 @@ export default class ListWoods {
     }
 
     _sortRows(type: WoodType, index: number, changeOrder = true): void {
-        if (changeOrder) {
-            this._sortAscending = !this._sortAscending
+        if (changeOrder && this._sortIndex[type] === index) {
+            this._sortAscending[type] = !this._sortAscending[type]
         }
 
-        this._sortIndex = index
-        const sign = this._sortAscending ? -1 : 1
+        this._sortIndex[type] = index
+        const sign = this._sortAscending[type] ? 1 : -1
         this._rows[type].sort((a, b): number => {
-            if (this._sortIndex === 0) {
+            if (index === 0) {
                 return a.name.localeCompare(b.name) * sign
             }
 
-            return (a.properties[this._sortIndex - 1].amount - b.properties[this._sortIndex - 1].amount) * sign
+            return (a.properties[index - 1].amount - b.properties[index - 1].amount) * sign
         })
+        console.log(type, index, this._sortAscending[type])
     }
 
     _initTable(type: WoodType): void {
+        this._sortAscending[type] = true
         this._tables[type]
             .append("thead")
             .append("tr")
@@ -201,6 +203,7 @@ export default class ListWoods {
             this._tables[type] = body.append("table").attr("class", "table table-sm small na-table")
             this._initTable(type)
             this._updateTable(type)
+            this._sortRows(type, 0, false)
         }
     }
 
@@ -249,7 +252,6 @@ export default class ListWoods {
                         return d
                     })
             )
-        this._sortRows(type, this._sortIndex, false)
     }
 
     _woodFamilySelected(): void {
@@ -264,6 +266,7 @@ export default class ListWoods {
         for (const type of woodType) {
             this._woodData[type] = this._woodDataDefault[type].filter((wood) => activeFamilies.has(wood.family))
             this._updateTable(type)
+            this._sortRows(type, this._sortIndex[type], false)
         }
     }
 
