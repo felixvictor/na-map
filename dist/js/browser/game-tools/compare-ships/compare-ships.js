@@ -215,16 +215,20 @@ export class CompareShips {
     }
     _setupArrow() {
         const arrow = document.querySelector("#journey-arrow");
-        const arrowNew = arrow.cloneNode(true);
-        arrowNew.id = "wind-profile-arrow-head";
-        if (arrowNew.hasChildNodes()) {
-            for (const child of arrowNew.childNodes) {
-                ;
-                child.classList.replace("journey-arrow-head", "wind-profile-arrow-head");
+        if (arrow) {
+            const arrowNew = arrow.cloneNode(true);
+            arrowNew.id = "wind-profile-arrow-head";
+            if (arrowNew.hasChildNodes()) {
+                for (const child of arrowNew.childNodes) {
+                    ;
+                    child.classList.replace("journey-arrow-head", "wind-profile-arrow-head");
+                }
+            }
+            const defs = document.querySelector("#na-map svg defs");
+            if (defs) {
+                defs.append(arrowNew);
             }
         }
-        const defs = document.querySelector("#na-map svg defs");
-        defs.append(arrowNew);
     }
     _setupData() {
         this._moduleAndWoodChanges = new Map([
