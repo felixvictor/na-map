@@ -16,7 +16,7 @@ import { ValuesType } from "utility-types"
 
 import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodFamily, WoodType } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
-import { FrontlinesType, LootType } from "./types"
+import { FrontlinesType, LootType, PortBonus } from "./types"
 
 /****************************
  * buildings.json
@@ -292,6 +292,7 @@ type PortIntersection =
     | GoodList
     | Point
     | Array<string | InventoryEntity | TradeGoodProfit>
+    | PortBonus
 export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
 }
@@ -342,6 +343,7 @@ export interface PortPerServer {
     producesNonTrading?: GoodList
     dropsNonTrading?: GoodList
     inventory: InventoryEntity[]
+    portBonus?: PortBonus
 }
 export interface InventoryEntity {
     id: number
