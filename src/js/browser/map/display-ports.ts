@@ -64,6 +64,7 @@ import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum, ZoomLev
 import { default as swordsIcon } from "Icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
+import { PortBonus, portBonusType } from "../../common/types"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -110,6 +111,7 @@ interface PortForDisplay {
     tradePortId?: number
     goodsToSellInTradePort: string
     goodsToBuyInTradePort: string
+    portBonus?: PortBonus
 }
 
 interface ReadData {
@@ -802,11 +804,28 @@ export default class DisplayPorts {
             ${cooldownTimeST.fromNow()} at ${cooldownTimeST.format("H.mm")}${cooldownTimeLocal}`
         }
 
+        if (portProperties.portBonus) {
+            port.portBonus = portProperties.portBonus
+        }
+
         return port
     }
 
     // eslint-disable-next-line complexity
     _tooltipData(port: PortForDisplay): HtmlResult {
+        const getPortBonus = (): HtmlResult => {
+            return html`${portBonusType.map((bonus) => {
+                return html`${port?.portBonus?.[bonus]
+                    ? html`<div>
+                          <i class="icon icon-light icon-${bonus} mr-1" aria-hidden="true"></i>
+                          <span class="sr-only">${bonus} bonus </span>
+                          <span class="x-large text-lighter align-top mr-1">${port.portBonus[bonus]}</span>
+                      </div>`
+                    : html``}`
+            })}`
+        }
+
+        console.log(getPortBonus())
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
@@ -817,10 +836,12 @@ export default class DisplayPorts {
                     src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
                 />
 
-                <div class="text-left">
+                <div class="text-left mr-1">
                     <div class="large">${port.name}</div>
                     <div class="caps">${port.county}</div>
                 </div>
+
+                ${port.portBonus ? html`<div class="d-flex mr-1">${getPortBonus()}</div>` : html``}
 
                 <div class="ml-auto inline-block">
                     ${port.portPoints

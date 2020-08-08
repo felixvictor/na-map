@@ -303,6 +303,8 @@ const whitelistPatternsChildren = [
     /slide/,
     /tooltip/,
 ]
+const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]
+const whitelist = portBonusType.map((bonus) => `icon-${bonus}`)
 
 const config = {
     devServer: {
@@ -351,6 +353,7 @@ const config = {
         }),
         new PurgecssPlugin({
             whitelistPatternsChildren,
+            whitelist,
             paths: glob.sync(`${dirSrc}/**/*`, { nodir: true }),
         }),
         new webpack.DefinePlugin({
