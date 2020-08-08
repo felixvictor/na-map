@@ -199,7 +199,6 @@ export interface APIItemGeneric {
     WoodTypes?: number[]
     Hidden1?: number[]
     Hidden2?: number[]
-    PortBonuses?: PortBonusesEntity[]
     ShipPermanentSlotsCount?: MinMax<number>
     ShipPersistentModuleSlotsCount?: MinMax<number>
     PortBonusesCount?: MinMax<number>
@@ -340,10 +339,6 @@ export interface LevelsEntity {
 interface FlagsEntity {
     NationId: number
     FlagId: number
-}
-interface PortBonusesEntity {
-    Name: string
-    PortBonuses?: number[]
 }
 
 /****************************
