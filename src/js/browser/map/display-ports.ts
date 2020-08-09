@@ -88,6 +88,7 @@ interface PortForDisplay {
     availableForAll: boolean
     shallow: boolean
     county: string
+    region: string
     countyCapital: boolean
     capital: boolean
     capturer: HtmlResult
@@ -746,8 +747,8 @@ export default class DisplayPorts {
             icon: portProperties.nation,
             availableForAll: portProperties.availableForAll,
             shallow: portProperties.shallow,
-            county:
-                (portProperties.county === "" ? "" : `${portProperties.county}\u200A/\u200A`) + portProperties.region,
+            county: portProperties.county === "" ? "" : portProperties.county,
+            region: portProperties.region === "" ? "" : portProperties.region,
             countyCapital: portProperties.countyCapital,
             capital: !portProperties.capturable && portProperties.nation !== "FT",
             capturer: portProperties.capturer ? displayClanLitHtml(portProperties.capturer) : html``,
@@ -829,41 +830,48 @@ export default class DisplayPorts {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
-            <div class="d-flex align-items-center mb-4">
-                <img
-                    alt="${port.icon}"
-                    class="flag-icon mr-3 align-self-stretch ${iconBorder}"
-                    src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
-                />
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center ">
+                    <img
+                        alt="${port.icon}"
+                        class="flag-icon mr-3 align-self-stretch ${iconBorder}"
+                        src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
+                    />
 
-                <div class="text-left mr-1">
-                    <div class="large">${port.name}</div>
-                    <div class="caps">${port.county}</div>
+                    <div class="text-left mr-1">
+                        <div class="large">${port.name}</div>
+                        <div class="caps">${port.county}</div>
+                        <div class="caps">${port.region}</div>
+                    </div>
                 </div>
 
                 ${port.portBonus ? html`<div class="d-flex mr-1">${getPortBonus()}</div>` : html``}
 
-                <div class="ml-auto inline-block">
-                    ${port.portPoints
-                        ? html`<span class="x-large text-lighter align-top mr-1">${port.portPoints}</span>`
-                        : html``}
-                    ${port.laborHoursDiscount
-                        ? html`<i class="icon icon-light icon-labour mr-1" aria-hidden="true"></i
-                              ><span class="sr-only">Labour hour discount level ${port.laborHoursDiscount}</span>`
-                        : html``}
-                    ${port.tradingCompany
-                        ? html`<i class="icon icon-light icon-trading mr-1" aria-hidden="true"></i
-                              ><span class="sr-only">Trading company level ${port.tradingCompany}</span>`
-                        : html``}
-                    ${port.availableForAll
-                        ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
-                              ><span class="sr-only">Accessible to all</span>`
-                        : html``}
-                    ${port.shallow
-                        ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
-                              ><span class="sr-only">Shallow</span>`
-                        : html`<i class="icon icon-light icon-deep" aria-hidden="true"></i
-                              ><span class="sr-only">Deep</span>`}
+                <div class="d-flex flex-column justify-content-end">
+                    <div class="ml-auto">
+                        ${port.portPoints
+                            ? html`<span class="x-large text-lighter">${port.portPoints}</span>`
+                            : html``}
+                    </div>
+                    <div class="ml-auto">
+                        ${port.laborHoursDiscount
+                            ? html`<i class="icon icon-light icon-labour mr-1" aria-hidden="true"></i
+                                  ><span class="sr-only">Labour hour discount level ${port.laborHoursDiscount}</span>`
+                            : html``}
+                        ${port.tradingCompany
+                            ? html`<i class="icon icon-light icon-trading mr-1" aria-hidden="true"></i
+                                  ><span class="sr-only">Trading company level ${port.tradingCompany}</span>`
+                            : html``}
+                        ${port.availableForAll
+                            ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
+                                  ><span class="sr-only">Accessible to all</span>`
+                            : html``}
+                        ${port.shallow
+                            ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
+                                  ><span class="sr-only">Shallow</span>`
+                            : html`<i class="icon icon-light icon-deep" aria-hidden="true"></i
+                                  ><span class="sr-only">Deep</span>`}
+                    </div>
                 </div>
             </div>
 
@@ -1010,6 +1018,11 @@ export default class DisplayPorts {
 
             this.map.showTrades.update(this._getInventory(d))
         }
+
+        const body = document.querySelector("body")
+        const div = document.createElement("div")
+        body?.appendChild(div)
+        render(this._tooltipData(this._getText(d)), div)
     }
 
     _updateIcons(): void {
