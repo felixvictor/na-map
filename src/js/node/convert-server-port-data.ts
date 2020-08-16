@@ -19,12 +19,13 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { serverNames, serverTwitterNames } from "../common/common-var"
 
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
 import { InventoryEntity, NationList, PortBattlePerServer, PortPerServer, Trade, TradeItem } from "../common/gen-json"
+import { PortBonus, PortBonusJson } from "../common/types"
 
 interface Item {
     name: string
@@ -49,6 +50,7 @@ let numberPorts: number
 let portData: PortPerServer[]
 let itemNames: Map<number, Item>
 let itemWeights: Map<number, number>
+let portBonuses: Map<number, PortBonus>
 
 const getDistance = (fromPortId: number, toPortId: number): number =>
     fromPortId < toPortId
@@ -119,6 +121,12 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
                 )
                 .sort(sortBy(["id"])),
         } as PortPerServer
+
+        // Add port bonuses
+        if (portBonuses.has(portFeaturesPerServer.id)) {
+            portFeaturesPerServer.portBonus = portBonuses.get(portFeaturesPerServer.id)
+        }
+
         // Delete empty entries
         for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
             if ((portFeaturesPerServer[type] as string[]).length === 0) {
@@ -370,6 +378,13 @@ export const convertServerPortData = (): void => {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))
+
+        if (serverTwitterNames.has(serverName)) {
+            const portBonusesJson: PortBonusJson[] = readJson(commonPaths.filePortBonus)
+            portBonuses = new Map(portBonusesJson.map((port) => [port.id, port.portBonus]))
+        } else {
+            portBonuses = new Map() as Map<number, PortBonus>
+        }
 
         /**
          * Item names

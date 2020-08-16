@@ -41,6 +41,8 @@ export const commonPaths = {
     fileTwitterRefreshId: path.resolve(dirAPI, "response-id.txt"),
 
     filePbSheet: path.resolve(dirGenGeneric, "port-battle.xlsx"),
+    filePortBonusCSV: path.resolve(dirGenServer, "eu1-port-bonus.csv"),
+    filePortBonus: path.resolve(dirGenServer, "eu1-port-bonus.json"),
 
     fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
     fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
