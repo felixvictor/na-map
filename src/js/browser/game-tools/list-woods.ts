@@ -145,7 +145,6 @@ export default class ListWoods {
 
             return (a.properties[index - 1].amount - b.properties[index - 1].amount) * sign
         })
-        console.log(type, index, this._sortAscending[type])
     }
 
     _initTable(type: WoodType): void {
@@ -228,10 +227,7 @@ export default class ListWoods {
             .select<HTMLTableSectionElement>("tbody")
             .selectAll<HTMLTableRowElement, WoodTrimOrFrame>("tr")
             .data(this._woodData[type], (d: WoodTrimOrFrame): number => d.id)
-            .join(
-                (enter) => enter.append("tr")
-                //    (exit) => exit.remove()
-            )
+            .join((enter) => enter.append("tr"))
 
         // Data join cells
         this._rows[type]
