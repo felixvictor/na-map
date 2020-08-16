@@ -15,7 +15,7 @@ import { findNationById, nations, nationShortName } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node";
-import { serverNames } from "../common/common-var";
+import { serverNames, serverTwitterNames } from "../common/common-var";
 const minProfit = 30000;
 const frontlinePorts = 2;
 let apiItems;
@@ -28,6 +28,7 @@ let numberPorts;
 let portData;
 let itemNames;
 let itemWeights;
+let portBonuses;
 const getDistance = (fromPortId, toPortId) => fromPortId < toPortId
     ? distances.get(fromPortId * numberPorts + toPortId) ?? 0
     : distances.get(toPortId * numberPorts + fromPortId) ?? 0;
@@ -71,6 +72,9 @@ const setPortFeaturePerServer = (apiPort) => {
             }))
                 .sort(sortBy(["id"])),
         };
+        if (portBonuses.has(portFeaturesPerServer.id)) {
+            portFeaturesPerServer.portBonus = portBonuses.get(portFeaturesPerServer.id);
+        }
         for (const type of ["dropsTrading", "consumesTrading", "producesNonTrading", "dropsNonTrading"]) {
             if (portFeaturesPerServer[type].length === 0) {
                 delete portFeaturesPerServer[type];
@@ -245,6 +249,13 @@ export const convertServerPortData = () => {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));
+        if (serverTwitterNames.has(serverName)) {
+            const portBonusesJson = readJson(commonPaths.filePortBonus);
+            portBonuses = new Map(portBonusesJson.map((port) => [port.id, port.portBonus]));
+        }
+        else {
+            portBonuses = new Map();
+        }
         itemNames = new Map(apiItems
             .filter((item) => !item.NotUsed)
             .map((item) => [
