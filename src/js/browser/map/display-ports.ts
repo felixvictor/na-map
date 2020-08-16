@@ -826,7 +826,6 @@ export default class DisplayPorts {
             })}`
         }
 
-        console.log(getPortBonus())
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
@@ -849,9 +848,7 @@ export default class DisplayPorts {
 
                 <div class="d-flex flex-column justify-content-end">
                     <div class="ml-auto">
-                        ${port.portPoints
-                            ? html`<span class="x-large text-lighter">${port.portPoints}</span>`
-                            : html``}
+                        ${port.portPoints ? html`<span class="x-large text-lighter">${port.portPoints}</span>` : html``}
                     </div>
                     <div class="ml-auto">
                         ${port.laborHoursDiscount
@@ -1019,10 +1016,12 @@ export default class DisplayPorts {
             this.map.showTrades.update(this._getInventory(d))
         }
 
+        /*
         const body = document.querySelector("body")
         const div = document.createElement("div")
         body?.appendChild(div)
         render(this._tooltipData(this._getText(d)), div)
+        */
     }
 
     _updateIcons(): void {
