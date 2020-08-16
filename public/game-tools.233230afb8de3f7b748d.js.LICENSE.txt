@@ -71,6 +71,16 @@
 /*!
  * This file is part of na-map.
  *
+ * @file      List port bonus.
+ * @module    game-tools/list-port-bonus
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
  * @file      List recipes.
  * @module    game-tools/list-recipes
  * @author    iB aka Felix Victor
