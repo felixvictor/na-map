@@ -81,7 +81,7 @@
     <Pair>
       <Key>SAIL_RISING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>4.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -141,7 +141,13 @@
     <Pair>
       <Key>MAST_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>80</Value>
+        <Value>100</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>SAIL_DECREASING_SPEED</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>2.3</Value>
       </Value>
     </Pair>
   </Attributes>

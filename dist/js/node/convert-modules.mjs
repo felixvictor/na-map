@@ -189,6 +189,7 @@ export const convertModulesAndWoodData = async () => {
         ["NONE PERK_START_ALL_GUNS_LOADED", "Guns loaded at start"],
         ["NONE PREPARATION_BONUS_PER_ROUND", "Preparation"],
         ["NONE RHEA_TURN_SPEED", "Yard turn speed"],
+        ["NONE SAIL_DECREASING_SPEED", "Sail decreasing speed"],
         ["NONE SAIL_RISING_SPEED", "Sail rising speed"],
         ["NONE SHIP_BOARDING_PREPARATION_BONUS", "Preparation"],
         ["NONE SHIP_EXTRA_CHAIN_UNITS", "Additional chains"],
