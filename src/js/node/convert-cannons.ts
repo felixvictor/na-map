@@ -22,7 +22,7 @@ import { Cannon, CannonEntity, CannonPenetration, CannonValue } from "../common/
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
 
 // noinspection MagicNumberJS
-const peneDistances = [50, 100, 250, 500, 750, 1000]
+const peneDistances = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500]
 
 const countDecimals = (value: number | undefined): number => {
     if (value === undefined) {
@@ -162,19 +162,15 @@ const addData = (fileData: XmlGeneric): void => {
     const penetrations: Map<number, number> = new Map(
         (fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
             .Value as TangentEntity[])
-            .filter((penetration) => Number(penetration.Time._text) > 0)
             .map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
     )
-
-    // noinspection MagicNumberJS
-    penetrations.set(250, ((penetrations.get(200) ?? 0) + (penetrations.get(300) ?? 0)) / 2)
-    // noinspection MagicNumberJS
-    penetrations.set(500, ((penetrations.get(400) ?? 0) + (penetrations.get(600) ?? 0)) / 2)
-    // noinspection MagicNumberJS
+console.log(penetrations)
+    penetrations.set(50, ((penetrations.get(0) ?? 0) + (penetrations.get(100) ?? 0)) / 2)
     penetrations.set(
         750,
         (penetrations.get(800) ?? 0) + ((penetrations.get(600) ?? 0) - (penetrations.get(800) ?? 0)) * 0.25
     )
+    penetrations.set(1250, ((penetrations.get(1200) ?? 0) + (penetrations.get(1300) ?? 0)) / 2)
 
     cannon.penetration = {} as CannonPenetration
     for (const distance of peneDistances) {
