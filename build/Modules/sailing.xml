@@ -94,5 +94,31 @@
         </Value>
       </Value>
     </Pair>
+    <Pair>
+      <Key>SAIL_DECREASING_SPEED</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="false" IsPermanent="false" IsNegative="true">
+        <EffectCurve>
+          <Value>
+            <Time>2.09896825E-07</Time>
+            <Value>0</Value>
+            <TangentIn>1.24726152</TangentIn>
+            <TangentOut>1.24726152</TangentOut>
+          </Value>
+          <Value>
+            <Time>0.8012914</Time>
+            <Value>0.9994197</Value>
+            <TangentIn>0.0447874665</TangentIn>
+            <TangentOut>0.0447874665</TangentOut>
+          </Value>
+          <Value>
+            <Time>1</Time>
+            <Value>1</Value>
+            <TangentIn>0.00292041129</TangentIn>
+            <TangentOut>0.00292041129</TangentOut>
+          </Value>
+        </EffectCurve>
+        <Value>-0.99</Value>
+      </Value>
+    </Pair>
   </Attributes>
 </ModuleTemplate>
