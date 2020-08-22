@@ -200,12 +200,16 @@ const getPortBattleTime = (portName: string): string | undefined => {
     return portBattleTime
 }
 
-const getCooldownTime = (portBattleTime: string | undefined): string =>
-    getTimeInFuture(portBattleTime, portBattleCooldown)
+const getCooldownTime = (tweetTime: string | undefined): string => {
+    const tweetTimeDayjs = dayjs.utc(tweetTime, dateTimeFormatTwitter)
+    // Tweets every 5 minutes, get the estimated time at 2.5 minutes
+    const portBattleEndTimeEstimated = tweetTimeDayjs.subtract((5 * 60) / 2, "second")
+
+    return portBattleEndTimeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat)
+}
+
 const getActiveTime = (time: string): string =>
     dayjs.utc(time, dateTimeFormat).add(flagValidity, "hour").format(dateTimeFormat)
-const getTimeInFuture = (time: string | undefined, hours: number): string =>
-    dayjs.utc(time, dateTimeFormat).add(hours, "hour").format(dateTimeFormat)
 
 const updatePort = (portName: string, updatedPort: PortBattlePerServer): void => {
     const portIndex = getPortIndex(portName)
@@ -237,16 +241,8 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
  */
 const portCaptured = (result: RegExpExecArray, nation: string, capturer: string): void => {
     const portName = result[2]
-    let portBattleTime = getPortBattleTime(portName)
-    let cooldownTimeEstimated = false
-    if (!portBattleTime) {
-        // noinspection UnnecessaryLocalVariableJS
-        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat)
-        portBattleTime = tweetTime
-        cooldownTimeEstimated = true
-    }
-
-    const cooldownTime = getCooldownTime(portBattleTime)
+    const portBattleTime = getPortBattleTime(portName)
+    const cooldownTime = getCooldownTime(result[1])
 
     console.log("      --- captured", portName)
 
@@ -255,7 +251,6 @@ const portCaptured = (result: RegExpExecArray, nation: string, capturer: string)
         capturer,
         captured: portBattleTime,
         cooldownTime,
-        cooldownTimeEstimated,
     } as PortBattlePerServer
 
     updatePort(portName, updatedPort)
@@ -289,22 +284,12 @@ const npcCaptured = (result: RegExpExecArray): void => {
  */
 const defended = (result: RegExpExecArray): void => {
     const portName = result[2]
-    let portBattleTime = getPortBattleTime(portName)
-    let cooldownTimeEstimated = false
-    if (!portBattleTime) {
-        // noinspection UnnecessaryLocalVariableJS
-        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat)
-        portBattleTime = tweetTime
-        cooldownTimeEstimated = true
-    }
-
-    const cooldownTime = getCooldownTime(portBattleTime)
+    const cooldownTime = getCooldownTime(result[1])
 
     console.log("      --- defended", portName)
 
     const updatedPort = {
         cooldownTime,
-        cooldownTimeEstimated,
     } as PortBattlePerServer
 
     updatePort(portName, updatedPort)
