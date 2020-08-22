@@ -88,9 +88,10 @@ const addData = (fileData) => {
         };
     }
     const penetrations = new Map(fileData.Attributes.Pair.find((pair) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
-        .Value
-        .map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)]));
-    console.log(penetrations);
+        .Value.map((penetration) => [
+        Number(penetration.Time._text) * 1000,
+        Number(penetration.Value._text),
+    ]));
     penetrations.set(50, ((penetrations.get(0) ?? 0) + (penetrations.get(100) ?? 0)) / 2);
     penetrations.set(750, (penetrations.get(800) ?? 0) + ((penetrations.get(600) ?? 0) - (penetrations.get(800) ?? 0)) * 0.25);
     penetrations.set(1250, ((penetrations.get(1200) ?? 0) + (penetrations.get(1300) ?? 0)) / 2);

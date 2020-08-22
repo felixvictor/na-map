@@ -369,7 +369,6 @@ export interface PortBattlePerServer {
     attackHostility?: number
     portBattle?: string
     cooldownTime?: string
-    cooldownTimeEstimated?: boolean
 }
 
 /****************************

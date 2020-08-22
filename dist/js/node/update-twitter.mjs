@@ -115,9 +115,12 @@ const getPortBattleTime = (portName) => {
     const portBattleTime = ports[portIndex].portBattle;
     return portBattleTime;
 };
-const getCooldownTime = (portBattleTime) => getTimeInFuture(portBattleTime, portBattleCooldown);
+const getCooldownTime = (tweetTime) => {
+    const tweetTimeDayjs = dayjs.utc(tweetTime, dateTimeFormatTwitter);
+    const portBattleEndTimeEstimated = tweetTimeDayjs.subtract((5 * 60) / 2, "second");
+    return portBattleEndTimeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat);
+};
 const getActiveTime = (time) => dayjs.utc(time, dateTimeFormat).add(flagValidity, "hour").format(dateTimeFormat);
-const getTimeInFuture = (time, hours) => dayjs.utc(time, dateTimeFormat).add(hours, "hour").format(dateTimeFormat);
 const updatePort = (portName, updatedPort) => {
     const portIndex = getPortIndex(portName);
     const { captured, capturer } = ports[portIndex];
@@ -135,21 +138,14 @@ const updatePort = (portName, updatedPort) => {
 };
 const portCaptured = (result, nation, capturer) => {
     const portName = result[2];
-    let portBattleTime = getPortBattleTime(portName);
-    let cooldownTimeEstimated = false;
-    if (!portBattleTime) {
-        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat);
-        portBattleTime = tweetTime;
-        cooldownTimeEstimated = true;
-    }
-    const cooldownTime = getCooldownTime(portBattleTime);
+    const portBattleTime = getPortBattleTime(portName);
+    const cooldownTime = getCooldownTime(result[1]);
     console.log("      --- captured", portName);
     const updatedPort = {
         nation,
         capturer,
         captured: portBattleTime,
         cooldownTime,
-        cooldownTimeEstimated,
     };
     updatePort(portName, updatedPort);
 };
@@ -165,18 +161,10 @@ const npcCaptured = (result) => {
 };
 const defended = (result) => {
     const portName = result[2];
-    let portBattleTime = getPortBattleTime(portName);
-    let cooldownTimeEstimated = false;
-    if (!portBattleTime) {
-        const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat);
-        portBattleTime = tweetTime;
-        cooldownTimeEstimated = true;
-    }
-    const cooldownTime = getCooldownTime(portBattleTime);
+    const cooldownTime = getCooldownTime(result[1]);
     console.log("      --- defended", portName);
     const updatedPort = {
         cooldownTime,
-        cooldownTimeEstimated,
     };
     updatePort(portName, updatedPort);
 };

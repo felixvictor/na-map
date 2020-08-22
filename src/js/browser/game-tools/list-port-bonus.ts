@@ -16,8 +16,6 @@ import { select as d3Select, Selection } from "d3-selection"
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, findNationByNationShortName, putImportError } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixed, formatPP } from "../../common/common-format"
-import { simpleStringSort } from "../../common/common-node"
 
 import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
