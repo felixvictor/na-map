@@ -161,10 +161,12 @@ const addData = (fileData: XmlGeneric): void => {
     // Calculate penetrations
     const penetrations: Map<number, number> = new Map(
         (fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
-            .Value as TangentEntity[])
-            .map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
+            .Value as TangentEntity[]).map((penetration) => [
+            Number(penetration.Time._text) * 1000,
+            Number(penetration.Value._text),
+        ])
     )
-console.log(penetrations)
+
     penetrations.set(50, ((penetrations.get(0) ?? 0) + (penetrations.get(100) ?? 0)) / 2)
     penetrations.set(
         750,
