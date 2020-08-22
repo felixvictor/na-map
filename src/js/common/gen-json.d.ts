@@ -14,7 +14,16 @@ import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
 
-import { CannonType, NationFullName, NationShortName, NationShortNameAlternative, WoodFamily, WoodType } from "./common"
+import {
+    CannonFamily,
+    CannonType,
+    NationFullName,
+    NationShortName,
+    NationShortNameAlternative,
+    PeneDistance,
+    WoodFamily,
+    WoodType
+} from "./common";
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType, PortBonus } from "./types"
 
@@ -73,9 +82,8 @@ type Cannon = {
 }
 export interface CannonEntity {
     name: string
+    family: CannonFamily
     damage: CannonDamage
-    traverse: CannonTraverse
-    dispersion: CannonDispersion
     generic: CannonGeneric
     penetration: CannonPenetration
 }
@@ -99,13 +107,8 @@ export interface CannonGeneric extends ObjectIndexer<CannonElementIndex> {
     weight: CannonValue
     crew: CannonValue
 }
-export interface CannonPenetration extends ObjectIndexer<CannonElementIndex> {
-    50: CannonValue
-    100: CannonValue
-    250: CannonValue
-    500: CannonValue
-    750: CannonValue
-    1000: CannonValue
+export type CannonPenetration = {
+    [K in PeneDistance]: CannonValue
 }
 export interface CannonValue {
     value: number
