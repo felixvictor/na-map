@@ -17,12 +17,9 @@ import { commonPaths } from "../common/common-dir"
 import { readTextFile, saveJsonAsync } from "../common/common-file"
 import { round } from "../common/common-math"
 
-import { cannonEntityType, CannonEntityType, CannonType, cannonType } from "../common/common"
+import { cannonEntityType, CannonEntityType, CannonType, cannonType, peneDistance } from "../common/common"
 import { Cannon, CannonEntity, CannonPenetration, CannonValue } from "../common/gen-json"
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
-
-// noinspection MagicNumberJS
-const peneDistances = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500]
 
 const countDecimals = (value: number | undefined): number => {
     if (value === undefined) {
@@ -82,10 +79,10 @@ const dataMapping: Map<string, { group: CannonEntityType; element: string }> = n
     // ["DAMAGE_MULTIPLIER", { group: "damage", element: "multiplier" }],
     ["CANNON_BASIC_DAMAGE", { group: "damage", element: "basic" }],
     // ["CANNON_FIREPOWER", { group: "damage", element: "firepower" }],
-    ["CANNON_MIN_ANGLE", { group: "traverse", element: "up" }],
-    ["CANNON_MAX_ANGLE", { group: "traverse", element: "down" }],
-    ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "horizontal" }],
-    ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical" }],
+    // ["CANNON_MIN_ANGLE", { group: "traverse", element: "up" }],
+    // ["CANNON_MAX_ANGLE", { group: "traverse", element: "down" }],
+    // ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "horizontal" }],
+    // ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical" }],
     // ["CANNON_DISPERSION_REDUCTION_SPEED", { group: "dispersion", element: "reduction speed" }],
     ["CANNON_RELOAD_TIME", { group: "damage", element: "reload time" }],
     ["CANNON_MASS", { group: "generic", element: "weight" }],
@@ -113,6 +110,18 @@ const dataMapping: Map<string, { group: CannonEntityType; element: string }> = n
 const cannons = {} as Cannon
 for (const type of cannonType) {
     cannons[type] = []
+}
+
+const defenseFamily = new Set(["fort", "tower", "unicorn"])
+
+const getFamily = (name: string): string => {
+    const regex = /\((.+)\)/
+    let family = regex.exec(name)?.[1].toLocaleLowerCase() ?? "regular"
+    if (defenseFamily.has(family)) {
+        family = "defense"
+    }
+
+    return family
 }
 
 /**
@@ -143,6 +152,7 @@ const addData = (fileData: XmlGeneric): void => {
 
     const cannon = {
         name,
+        family: getFamily(name),
     } as CannonEntity
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
@@ -150,6 +160,7 @@ const addData = (fileData: XmlGeneric): void => {
             cannon[group] = {}
         }
 
+        // @ts-expect-error
         cannon[group][element] = {
             value: Number(
                 (fileData.Attributes.Pair.find((pair) => pair.Key._text === value)?.Value.Value as TextEntity)._text ??
@@ -175,7 +186,7 @@ const addData = (fileData: XmlGeneric): void => {
     penetrations.set(1250, ((penetrations.get(1200) ?? 0) + (penetrations.get(1300) ?? 0)) / 2)
 
     cannon.penetration = {} as CannonPenetration
-    for (const distance of peneDistances) {
+    for (const distance of peneDistance) {
         cannon.penetration[distance] = {
             value: Math.trunc((penetrations.get(distance) ?? 0) * (cannon.damage.penetration?.value ?? 0)),
         }
@@ -222,6 +233,7 @@ export const convertCannons = async (): Promise<void> => {
     for (const [key, value] of maxDigits) {
         if (value > 0) {
             for (const cannon of cannons[key[0]]) {
+                // @ts-expect-error
                 cannon[key[1]][key[2]]!.digits = value
             }
         }
