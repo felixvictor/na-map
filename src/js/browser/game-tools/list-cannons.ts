@@ -147,8 +147,6 @@ export default class ListCannons {
                 }
             )
         }
-
-        console.log("this._cannonData", this._cannonDataDefault)
     }
 
     _setupListener(): void {
