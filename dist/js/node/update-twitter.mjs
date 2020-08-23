@@ -134,7 +134,6 @@ const updatePort = (portName, updatedPort) => {
         ports[portIndex].capturer = capturer;
     }
     ports[portIndex] = { ...ports[portIndex], ...updatedPort };
-    console.log(ports[portIndex]);
 };
 const portCaptured = (result, nation, capturer) => {
     const portName = result[2];

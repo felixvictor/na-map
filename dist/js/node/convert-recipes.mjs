@@ -27,25 +27,28 @@ const groups = new Map([
     ["Manufacturing", "Manufacturing"],
     ["WoodWorking", "Cannons"],
 ]);
+const recipeItemTypes = new Set(["Recipe", "RecipeModule", "RecipeResource"]);
+const recipeUsingResults = new Set(["Recipe", "RecipeResource"]);
+const itemIsUsed = new Set([
+    1525,
+    1939,
+    2336,
+]);
 const convertRecipes = async () => {
     const data = {};
     const recipes = [];
     const ingredients = new Map();
     data.recipe = [];
     data.ingredient = [];
-    const getItemNames = () => new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]));
-    const itemNames = getItemNames();
-    const getModuleNames = () => new Map(apiItems.filter((item) => item.ItemType === "ShipUpgradeBookItem").map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""]));
-    const moduleNames = getModuleNames();
-    const getIngredientIds = () => new Map(apiItems
+    const itemNames = new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]));
+    const moduleNames = new Map(apiItems.filter((item) => item.ItemType === "ShipUpgradeBookItem").map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""]));
+    const ingredientIds = new Map(apiItems
         .filter((item) => !item.NotUsed &&
         (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"))
         .map((item) => [item.Id, item.Id]));
-    const ingredientIds = getIngredientIds();
-    const getUpgradeIds = () => new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0]));
-    const upgradeIds = getUpgradeIds();
-    apiItems.filter((apiRecipe) => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed).forEach((apiRecipe) => {
-        const resultReference = apiRecipe.ItemType === "Recipe"
+    const upgradeIds = new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0]));
+    apiItems.filter((apiRecipe) => recipeItemTypes.has(apiRecipe.ItemType) && (!apiRecipe.NotUsed || itemIsUsed.has(apiRecipe.Id))).forEach((apiRecipe) => {
+        const resultReference = recipeUsingResults.has(apiRecipe.ItemType)
             ? apiRecipe.Results[0]
             : apiRecipe.Qualities[0].Results[0];
         const recipe = {
