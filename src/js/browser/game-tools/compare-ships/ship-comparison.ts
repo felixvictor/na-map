@@ -438,6 +438,11 @@ export class ShipComparison extends Ship {
                 this.shipCompareData.ship.turnAcceleration,
                 2
             )}`,
+            turnSpeed: `${formatFloat(this.shipCompareData.ship.turnSpeed)}\u00A0${getDiff(
+                this.shipCompareData.ship.turnSpeed,
+                this._shipBaseData.ship.turnSpeed,
+                2
+            )}`,
             decks: pluralise(this.shipCompareData.guns.decks, "deck"),
             fireResistance: `${formatSignInt(this.shipCompareData.resistance!.fire * 100)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.fire,
@@ -513,14 +518,9 @@ export class ShipComparison extends Ship {
                 this.shipCompareData.crew.max,
                 this._shipBaseData.crew.max
             )}`,
-            maxSpeed: `${formatFloat(this.shipCompareData.speed.max, 4)}\u00A0${getDiff(
+            maxSpeed: `${formatFloat(this.shipCompareData.speed.max, 3)}\u00A0${getDiff(
                 this.shipCompareData.speed.max,
                 this._shipBaseData.speed.max,
-                2
-            )}`,
-            maxTurningSpeed: `${formatFloat(this.shipCompareData.rudder.turnSpeed, 4)}\u00A0${getDiff(
-                this.shipCompareData.rudder.turnSpeed,
-                this._shipBaseData.rudder.turnSpeed,
                 2
             )}`,
             maxWeight: `${formatInt(this.shipCompareData.maxWeight)}\u00A0${getDiff(
