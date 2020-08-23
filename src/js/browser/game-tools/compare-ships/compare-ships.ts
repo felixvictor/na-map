@@ -39,12 +39,12 @@ import {
     rigRepairsPercent,
     stripShipName,
 } from "../../../common/common-game-tools"
-import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
+import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { WoodColumnType } from "../../../common/types"
 
 import CompareWoods from "../compare-woods"
@@ -463,7 +463,7 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness"],
-                    cap: { amount: 0.5, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
             [
