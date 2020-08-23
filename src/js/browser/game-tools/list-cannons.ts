@@ -14,6 +14,8 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tab"
 import "bootstrap/js/dist/modal"
 
+import { select as d3Select, Selection } from "d3-selection"
+
 import { registerEvent } from "../analytics"
 import {
     CannonFamily,
@@ -24,19 +26,22 @@ import {
     capitalizeFirstLetter,
     putImportError,
 } from "../../common/common"
-import { formatFloatFixedHTML } from "../../common/common-game-tools"
+import { insertBaseModal } from "../../common/common-browser"
+import { formatFloatFixed } from "../../common/common-format"
+
 import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
 import { HtmlResult, HtmlString } from "../../common/interface"
-import { insertBaseModal } from "../../common/common-browser"
-import { select as d3Select, Selection } from "d3-selection"
-import { formatFloatFixed } from "../../common/common-format"
 
 type Key = string
 interface HeaderMap {
     group: Map<Key, number>
     element: Set<Key>
 }
-interface ElementData {
+interface FamilyRowData {
+    family: CannonFamily
+    data: RowData[]
+}
+interface RowData {
     value: number | string
     formattedValue: HtmlString
 }
@@ -46,7 +51,7 @@ interface ElementData {
  */
 export default class ListCannons {
     private readonly _rows = {} as CannonTypeList<
-        Selection<HTMLTableRowElement, ElementData[], HTMLTableSectionElement, unknown>
+        Selection<HTMLTableRowElement, RowData[], HTMLTableSectionElement, unknown>
     >
 
     private _sortAscending = {} as CannonTypeList<boolean>
@@ -54,8 +59,8 @@ export default class ListCannons {
     private readonly _switchesSel = {} as CannonTypeList<HTMLInputElement[]>
     private readonly _tables = {} as CannonTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>>
     private readonly _groupOrder = ["name", "damage", "penetration", "generic", "family"]
-    private _cannonData = {} as CannonTypeList<ElementData[][]>
-    private _cannonDataDefault = {} as CannonTypeList<ElementData[][]>
+    private _cannonData = {} as CannonTypeList<RowData[][]>
+    private _cannonDataDefault = {} as CannonTypeList<FamilyRowData[]>
     private readonly _baseName: string
     private readonly _baseId: HtmlString
     private readonly _buttonId: HtmlString
@@ -84,7 +89,7 @@ export default class ListCannons {
         }
     }
 
-    _getFormattedName(name: string): ElementData {
+    _getFormattedName(name: string): RowData {
         let nameConverted: HtmlResult | string = name
         const nameSplit = name.split(" ")
         const sortPre = `c${nameSplit[0].padStart(3, "0")}`
@@ -98,7 +103,7 @@ export default class ListCannons {
     }
 
     _setupData(cannonData: Cannon): void {
-        // Take group and element header from first long cannon, sort by groupOrder
+        // Get group and element header from first long cannon, sort by groupOrder
         const cannon = Object.entries(cannonData.long[0]).sort(
             (a, b) => this._groupOrder.indexOf(a[0]) - this._groupOrder.indexOf(b[0])
         )
@@ -107,36 +112,43 @@ export default class ListCannons {
                 this._header.group.set("", 1)
                 this._header.element.add("Lb")
             } else if (groupKey !== "family") {
-                this._header.group.set(groupKey, Object.entries(groupValue).length)
+                this._header.group.set(capitalizeFirstLetter(groupKey), Object.entries(groupValue).length)
                 for (const elementKey of Object.keys(groupValue)) {
-                    this._header.element.add(elementKey)
+                    this._header.element.add(capitalizeFirstLetter(elementKey))
                 }
             }
         }
 
-        // Sort data and groups (for table header)
+        // Get data, sort by groupOrder
         for (const type of cannonType) {
-            this._cannonDataDefault[type] = cannonData[type].map((cannon: CannonEntity): ElementData[] => {
-                const elements = [] as ElementData[]
-                for (const [groupKey, groupValue] of Object.entries(cannon)) {
-                    if (groupKey === "name") {
-                        elements.push(this._getFormattedName(groupValue))
-                    } else if (groupKey !== "family") {
-                        for (const [, elementValue] of Object.entries<CannonValue>(groupValue)) {
-                            elements.push({
-                                value: elementValue.value,
-                                formattedValue: formatFloatFixed(elementValue.value, elementValue.digits ?? 0),
-                            })
+            this._cannonDataDefault[type] = cannonData[type].map(
+                (cannon: CannonEntity): FamilyRowData => {
+                    const elements = [] as RowData[]
+                    const cannonSorted = Object.entries(cannon).sort(
+                        (a, b) => this._groupOrder.indexOf(a[0]) - this._groupOrder.indexOf(b[0])
+                    )
+                    for (const [groupKey, groupValue] of cannonSorted) {
+                        if (groupKey === "name") {
+                            elements.push(this._getFormattedName(groupValue))
+                        } else if (groupKey !== "family") {
+                            for (const [, elementValue] of Object.entries<CannonValue>(groupValue)) {
+                                elements.push({
+                                    value: elementValue.value,
+                                    formattedValue:
+                                        elementValue.value === 0
+                                            ? ""
+                                            : formatFloatFixed(elementValue.value, elementValue.digits ?? 0),
+                                })
+                            }
                         }
                     }
-                }
 
-                return elements
-            })
+                    return { family: cannon.family, data: elements }
+                }
+            )
         }
 
-        this._cannonData = { ...this._cannonDataDefault }
-        console.log("this._cannonData", this._cannonData)
+        console.log("this._cannonData", this._cannonDataDefault)
     }
 
     _setupListener(): void {
@@ -153,94 +165,6 @@ export default class ListCannons {
         })
     }
 
-    _getList(type: CannonType): HtmlResult {
-        const getColumnGroupHeads = (groupValue: GroupObject): HtmlResult => html`
-            <th scope="col" class="text-center" colspan="${groupValue[1].count}">
-                ${capitalizeFirstLetter(groupValue[0])}
-            </th>
-        `
-
-        const getColumnHeads = (groupValue: GroupObject): HtmlResult => html`
-            ${Object.entries(groupValue[1].values).map(
-                (modifierValue) => html`<th class="text-right">${capitalizeFirstLetter(modifierValue[0])}</th>`
-            )}
-        `
-
-        const getRowHead = (name: string): HtmlResult => {
-            let nameConverted: HtmlResult | string = name
-            const nameSplit = name.split(" ")
-            const sortPre = `c${nameSplit[0].padStart(3, "0")}`
-            const sortPost = nameSplit[1] ? nameSplit[1][1] : "0"
-
-            if (nameSplit.length > 1) {
-                nameConverted = html`${nameSplit[0]} <em>${nameSplit[1]}</em>`
-            }
-
-            return html`
-                <td class="text-right" data-sort="${sortPre}${sortPost}">
-                    ${nameConverted}
-                </td>
-            `
-        }
-
-        const getRow = (cannon: CannonEntity): HtmlResult => html`
-            ${Object.entries(cannon).map((groupValue): HtmlResult | HtmlResult[] => {
-                if (groupValue[0] === "name") {
-                    return html``
-                }
-
-                return Object.entries<CannonValue>(groupValue[1]).map(
-                    (modifierValue) =>
-                        html`
-                            <td class="text-right" data-sort="${modifierValue[1].value ?? 0}">
-                                ${modifierValue[1]
-                                    ? formatFloatFixedHTML(modifierValue[1].value, modifierValue[1].digits ?? 0)
-                                    : ""}
-                            </td>
-                        `
-                )
-            })}
-        `
-
-        return html`
-            <table id="table-${this._baseId}-${type}-list" class="table table-sm small tablesort na-table">
-                <thead>
-                    <tr class="thead-group">
-                        <th scope="col" class="border-bottom-0"></th>
-                        ${[...this._header].map((groupValue) => getColumnGroupHeads(groupValue))}
-                    </tr>
-                    <tr data-sort-method="thead">
-                        <th scope="col" class="text-right border-top-0" data-sort-default>Lb</th>
-                        ${[...this._header].map((groupValue) => getColumnHeads(groupValue))}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${/*
-            repeat(
-                        // @ts-expect-error
-                        this._cannonData[type],
-                        (cannon: CannonEntity) => cannon.name,
-                        (cannon: CannonEntity) => {
-                            return html`
-                                <tr>
-                                    ${getRowHead(cannon.name)}${getRow(cannon)}
-                                </tr>
-                            `
-                        }
-                    )
-            */
-                    this._cannonData[type].map((cannon: CannonEntity) => {
-                        return html`
-                            <tr>
-                                ${getRowHead(cannon.name)}${getRow(cannon)}
-                            </tr>
-                        `
-                    })}
-                </tbody>
-            </table>
-        `
-    }
-
     _sortRows(type: CannonType, index: number, changeOrder = true): void {
         if (changeOrder && this._sortIndex[type] === index) {
             this._sortAscending[type] = !this._sortAscending[type]
@@ -249,7 +173,6 @@ export default class ListCannons {
         this._sortIndex[type] = index
         const sign = this._sortAscending[type] ? 1 : -1
         this._rows[type].sort((a, b): number => {
-            console.log("sort", sign, a[index].value, a[index].value)
             if (index === 0) {
                 return (a[index].value as string).localeCompare(b[index].value as string) * sign
             }
@@ -325,7 +248,7 @@ export default class ListCannons {
             .classed("text-center", (d, i) => i !== 0)
             .attr("colspan", (d) => `${d[1]}`)
             .attr("scope", "col")
-            .text((d) => capitalizeFirstLetter(d[0]))
+            .text((d) => d[0])
         this._tables[type]
             .append("thead")
             .append("tr")
@@ -335,7 +258,7 @@ export default class ListCannons {
             .append("th")
             .classed("border-top-0", (d, i) => i === 0)
             .classed("text-right", (d, i) => i !== 0)
-            .text((d) => capitalizeFirstLetter(d))
+            .text((d) => d)
             .on("click", (d, i) => {
                 this._sortRows(type, i)
             })
@@ -371,9 +294,9 @@ export default class ListCannons {
 
         const tab = body.append("div").attr("class", "tab-content pt-2")
         for (const [index, type] of cannonType.entries()) {
+            this._sortIndex[type] = 0
             this._insertTabContent(tab, type, index)
-            this._updateTable(type)
-            this._sortRows(type, 0, false)
+            this._cannonFamilySelected(type)
         }
     }
 
@@ -385,14 +308,14 @@ export default class ListCannons {
         // Data join rows
         this._rows[type] = this._tables[type]
             .select<HTMLTableSectionElement>("tbody")
-            .selectAll<HTMLTableRowElement, ElementData[]>("tr")
-            .data(this._cannonData[type], (d: ElementData[]): string => d[0].formattedValue)
+            .selectAll<HTMLTableRowElement, RowData[]>("tr")
+            .data(this._cannonData[type], (d: RowData[]): string => d[0].formattedValue)
             .join((enter) => enter.append("tr"))
 
         // Data join cells
         this._rows[type]
             .selectAll<HTMLTableCellElement, string>("td")
-            .data((row): ElementData[] => row)
+            .data((row): RowData[] => row)
             .join((enter) =>
                 enter
                     .append("td")
@@ -413,7 +336,9 @@ export default class ListCannons {
             }
         }
 
-        this._cannonData[type] = this._cannonDataDefault[type].filter((cannon) => activeFamilies.has(cannon.family))
+        this._cannonData[type] = this._cannonDataDefault[type]
+            .filter((cannon) => activeFamilies.has(cannon.family))
+            .map((cannon) => cannon.data)
         this._updateTable(type)
         this._sortRows(type, this._sortIndex[type], false)
     }
