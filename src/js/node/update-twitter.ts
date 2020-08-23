@@ -229,8 +229,6 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
 
     // Add port data from tweet
     ports[portIndex] = { ...ports[portIndex], ...updatedPort }
-
-    console.log(ports[portIndex])
 }
 
 /**

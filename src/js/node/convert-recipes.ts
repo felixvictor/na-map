@@ -43,6 +43,14 @@ const groups = new Map([
     ["WoodWorking", "Cannons"],
 ])
 
+const recipeItemTypes = new Set(["Recipe", "RecipeModule", "RecipeResource"])
+const recipeUsingResults = new Set(["Recipe", "RecipeResource"])
+const itemIsUsed = new Set([
+    1525, // Labor Contract
+    1939, // Extra Labor Contracts Blueprint
+    2336, // Labor Contract
+])
+
 const convertRecipes = async (): Promise<void> => {
     const data = {} as Recipe
     const recipes = [] as RecipeEntity[]
@@ -51,48 +59,35 @@ const convertRecipes = async (): Promise<void> => {
     data.recipe = []
     data.ingredient = []
 
-    /**
-     * Get item names
-     */
-    const getItemNames = (): Map<number, string> =>
-        new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]))
+    const itemNames = new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]))
 
-    const itemNames = getItemNames()
+    const moduleNames = new Map(
+        ((apiItems.filter(
+            (item) => item.ItemType === "ShipUpgradeBookItem"
+        ) as unknown) as APIShipUpgradeBookItem[]).map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""])
+    )
 
-    const getModuleNames = (): Map<number, string> =>
-        new Map(
-            ((apiItems.filter(
-                (item) => item.ItemType === "ShipUpgradeBookItem"
-            ) as unknown) as APIShipUpgradeBookItem[]).map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""])
-        )
+    const ingredientIds = new Map(
+        apiItems
+            .filter(
+                (item) =>
+                    !item.NotUsed &&
+                    (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading")
+            )
+            .map((item) => [item.Id, item.Id])
+    )
 
-    const moduleNames = getModuleNames()
+    const upgradeIds = new Map(
+        apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0])
+    )
 
-    const getIngredientIds = (): Map<number, number> =>
-        new Map(
-            apiItems
-                .filter(
-                    (item) =>
-                        !item.NotUsed &&
-                        (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading")
-                )
-                .map((item) => [item.Id, item.Id])
-        )
-
-    const ingredientIds = getIngredientIds()
-
-    const getUpgradeIds = (): Map<number, number> =>
-        new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0]))
-
-    const upgradeIds = getUpgradeIds()
     ;(apiItems.filter(
-        (apiRecipe) => (apiRecipe.ItemType === "Recipe" || apiRecipe.ItemType === "RecipeModule") && !apiRecipe.NotUsed
+        (apiRecipe) => recipeItemTypes.has(apiRecipe.ItemType) && (!apiRecipe.NotUsed || itemIsUsed.has(apiRecipe.Id))
     ) as APIRecipeResource[] | APIRecipeModuleResource[]).forEach(
         (apiRecipe: APIRecipeResource | APIRecipeModuleResource) => {
-            const resultReference =
-                apiRecipe.ItemType === "Recipe"
-                    ? apiRecipe.Results[0]
-                    : (apiRecipe as APIRecipeModuleResource).Qualities[0].Results[0]
+            const resultReference = recipeUsingResults.has(apiRecipe.ItemType)
+                ? apiRecipe.Results[0]
+                : (apiRecipe as APIRecipeModuleResource).Qualities[0].Results[0]
             const recipe = {
                 id: apiRecipe.Id,
                 name: cleanName(apiRecipe.Name)

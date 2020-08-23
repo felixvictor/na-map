@@ -85,7 +85,7 @@ export const convertModulesAndWoodData = async () => {
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acceleration"],
-        ["NONE SHIP_TURNING_SPEED", "Turn rate"],
+        ["NONE SHIP_TURNING_SPEED", "Turn speed"],
         ["REPAIR_ARMOR REPAIR_PERCENT", "Repair amount"],
         ["SAIL MAST_THICKNESS", "Mast thickness"],
         ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
@@ -215,7 +215,12 @@ export const convertModulesAndWoodData = async () => {
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hit points"],
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ]);
-    const flipAmountForModule = new Set(["Fire resistance", "Leak resistance", "Rudder speed"]);
+    const flipAmountForModule = new Set([
+        "Fire resistance",
+        "Leak resistance",
+        "Turn acceleration",
+        "Rudder speed",
+    ]);
     const notPercentage = new Set(["Crew with muskets", "Melee attack", "Melee defense", "Morale"]);
     const setWood = (module) => {
         const wood = {};

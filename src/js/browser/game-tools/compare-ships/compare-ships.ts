@@ -39,12 +39,12 @@ import {
     rigRepairsPercent,
     stripShipName,
 } from "../../../common/common-game-tools"
-import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
+import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { WoodColumnType } from "../../../common/types"
 
 import CompareWoods from "../compare-woods"
@@ -447,11 +447,11 @@ export class CompareShips {
             ["Roll angle", { properties: ["ship.rollAngle"], isBaseValueAbsolute: true }],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
-            ["Rudder turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
             ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
             ["Turn acceleration", { properties: ["ship.turnAcceleration"], isBaseValueAbsolute: true }],
+            ["Turn speed", { properties: ["ship.turnSpeed"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
         ])
 
@@ -463,7 +463,7 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness"],
-                    cap: { amount: 0.5, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
             [
@@ -1320,12 +1320,15 @@ export class CompareShips {
                     for (const modifier of properties) {
                         const index = modifier.split(".")
                         if (index.length > 1) {
+                            /*
                             console.log(
                                 key,
                                 data[index[0]][index[1]],
                                 this._modifierAmount.get(key),
-                                isBaseValueAbsolute
+                                isBaseValueAbsolute,
+                                this._adjustValue(data[index[0]][index[1]], key, isBaseValueAbsolute)
                             )
+                            */
                             data[index[0]][index[1]] = this._adjustValue(
                                 data[index[0]][index[1]],
                                 key,

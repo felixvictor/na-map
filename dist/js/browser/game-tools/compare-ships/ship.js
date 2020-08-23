@@ -92,11 +92,11 @@ export class Ship {
         text += displayFirstColumn("Speed");
         text += Ship.displaySecondBlock();
         text += displayColumn("maxSpeed", "Maximum");
-        text += displayColumn("deceleration", "Deceleration");
-        text += displayColumn("acceleration", "Acceleration");
-        text += displayColumn("turnAcceleration", "Turn acceleration");
-        text += displayColumn("maxTurningSpeed", "Rudder turn speed");
         text += displayColumn("halfturnTime", "Rudder half time");
+        text += displayColumn("acceleration", "Acceleration");
+        text += displayColumn("deceleration", "Deceleration");
+        text += displayColumn("turnSpeed", "Turn speed");
+        text += displayColumn("turnAcceleration", "Turn acceleration");
         text += "</div></div></div>";
         text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>');
         text += Ship.displaySecondBlock();

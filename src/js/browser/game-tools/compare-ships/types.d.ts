@@ -24,7 +24,7 @@ export interface ShipDisplayData {
     guns: string
     gunsBack: number | string
     gunsFront: number | string
-    halfturnTime: string
+    turnSpeed: string
     holdSize: string
     hullRepairAmount: string
     hullRepairsNeeded: string
@@ -36,7 +36,6 @@ export interface ShipDisplayData {
     mastTopArmor: string
     maxCrew: string
     maxSpeed: string
-    maxTurningSpeed: string
     maxWeight: string
     minCrew: string
     minSpeed?: string
