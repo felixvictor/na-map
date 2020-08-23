@@ -112,7 +112,7 @@ for (const type of cannonType) {
     cannons[type] = []
 }
 
-const defenseFamily = new Set(["fort", "tower", "unicorn"])
+const defenseFamily = new Set(["fort", "tower"])
 
 const getFamily = (name: string): string => {
     const regex = /\((.+)\)/
@@ -199,7 +199,9 @@ const addData = (fileData: XmlGeneric): void => {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
     }
 
-    cannons[type].push(cannon)
+    if (cannon.family !== "unicorn") {
+        cannons[type].push(cannon)
+    }
 }
 
 /**
