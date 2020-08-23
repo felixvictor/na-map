@@ -13,8 +13,7 @@ import convert from "xml-js";
 import { commonPaths } from "../common/common-dir";
 import { readTextFile, saveJsonAsync } from "../common/common-file";
 import { round } from "../common/common-math";
-import { cannonEntityType, cannonType } from "../common/common";
-const peneDistances = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500];
+import { cannonEntityType, cannonType, peneDistance } from "../common/common";
 const countDecimals = (value) => {
     if (value === undefined) {
         return 0;
@@ -42,10 +41,6 @@ const getBaseFileNames = (directory) => {
 };
 const dataMapping = new Map([
     ["CANNON_BASIC_DAMAGE", { group: "damage", element: "basic" }],
-    ["CANNON_MIN_ANGLE", { group: "traverse", element: "up" }],
-    ["CANNON_MAX_ANGLE", { group: "traverse", element: "down" }],
-    ["CANNON_DISPERSION_PER100M", { group: "dispersion", element: "horizontal" }],
-    ["CANNON_DISPERSION_VERTICAL_PER100M", { group: "dispersion", element: "vertical" }],
     ["CANNON_RELOAD_TIME", { group: "damage", element: "reload time" }],
     ["CANNON_MASS", { group: "generic", element: "weight" }],
     ["CANNON_BASIC_PENETRATION", { group: "damage", element: "penetration" }],
@@ -56,6 +51,15 @@ const cannons = {};
 for (const type of cannonType) {
     cannons[type] = [];
 }
+const defenseFamily = new Set(["fort", "tower"]);
+const getFamily = (name) => {
+    const regex = /\((.+)\)/;
+    let family = regex.exec(name)?.[1].toLocaleLowerCase() ?? "regular";
+    if (defenseFamily.has(family)) {
+        family = "defense";
+    }
+    return family;
+};
 const addData = (fileData) => {
     let type = "medium";
     if (fileData._attributes.Name.includes("Carronade")) {
@@ -77,6 +81,7 @@ const addData = (fileData) => {
         .replace("24 (Edinorog)", "18 (Edinorog)");
     const cannon = {
         name,
+        family: getFamily(name),
     };
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
@@ -96,7 +101,7 @@ const addData = (fileData) => {
     penetrations.set(750, (penetrations.get(800) ?? 0) + ((penetrations.get(600) ?? 0) - (penetrations.get(800) ?? 0)) * 0.25);
     penetrations.set(1250, ((penetrations.get(1200) ?? 0) + (penetrations.get(1300) ?? 0)) / 2);
     cannon.penetration = {};
-    for (const distance of peneDistances) {
+    for (const distance of peneDistance) {
         cannon.penetration[distance] = {
             value: Math.trunc((penetrations.get(distance) ?? 0) * (cannon.damage.penetration?.value ?? 0)),
         };
@@ -105,7 +110,9 @@ const addData = (fileData) => {
     cannon.damage["per second"] = {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
     };
-    cannons[type].push(cannon);
+    if (cannon.family !== "unicorn") {
+        cannons[type].push(cannon);
+    }
 };
 export const convertCannons = async () => {
     getBaseFileNames(commonPaths.dirModules);

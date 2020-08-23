@@ -286,11 +286,11 @@ export class CompareShips {
             ["Roll angle", { properties: ["ship.rollAngle"], isBaseValueAbsolute: true }],
             ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
             ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
-            ["Rudder turn rate", { properties: ["rudder.turnSpeed"], isBaseValueAbsolute: true }],
             ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
             ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
             ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
             ["Turn acceleration", { properties: ["ship.turnAcceleration"], isBaseValueAbsolute: true }],
+            ["Turn speed", { properties: ["ship.turnSpeed"], isBaseValueAbsolute: true }],
             ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
         ]);
         this.#doNotRound = new Set(["Turn acceleration"]);
@@ -299,7 +299,7 @@ export class CompareShips {
                 "Armor thickness",
                 {
                     properties: ["sides.thickness"],
-                    cap: { amount: 0.5, isPercentage: true },
+                    cap: { amount: 1, isPercentage: true },
                 },
             ],
             [
@@ -912,7 +912,6 @@ export class CompareShips {
                     for (const modifier of properties) {
                         const index = modifier.split(".");
                         if (index.length > 1) {
-                            console.log(key, data[index[0]][index[1]], this._modifierAmount.get(key), isBaseValueAbsolute);
                             data[index[0]][index[1]] = this._adjustValue(data[index[0]][index[1]], key, isBaseValueAbsolute);
                         }
                         else {
