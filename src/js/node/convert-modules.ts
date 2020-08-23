@@ -248,7 +248,12 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ])
 
-    const flipAmountForModule = new Set<ModifierName>(["Fire resistance", "Leak resistance", "Rudder speed"])
+    const flipAmountForModule = new Set<ModifierName>([
+        "Fire resistance",
+        "Leak resistance",
+        "Turn acceleration",
+        "Rudder speed",
+    ])
     const notPercentage = new Set<ModifierName>(["Crew with muskets", "Melee attack", "Melee defense", "Morale"])
 
     /**
