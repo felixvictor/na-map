@@ -571,7 +571,6 @@ interface ShipSails {
 }
 interface ShipRudder {
     armour: number
-    turnSpeed: number
     halfturnTime: number
     thickness: number
 }
@@ -602,6 +601,7 @@ interface ShipShip {
     maxSpeed: number
     rollAngle: number
     turnAcceleration: number
+    turnSpeed: number
     waterlineHeight: number
     yardTurningAcceleration: number
 }
