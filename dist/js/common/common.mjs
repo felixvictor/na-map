@@ -10,7 +10,13 @@
 export const woodFamily = ["regular", "seasoned", "exceptional"];
 export const woodType = ["frame", "trim"];
 export const cannonType = ["medium", "long", "carronade"];
-export const cannonEntityType = ["damage", "traverse", "dispersion", "generic", "penetration"];
+export const cannonFamilyList = {
+    medium: ["regular", "congreve", "defense"],
+    long: ["regular", "navy", "blomefield"],
+    carronade: ["regular", "obusiers"],
+};
+export const cannonEntityType = ["damage", "generic", "penetration"];
+export const peneDistance = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500];
 export const nationShortName = [
     "CN",
     "DE",
