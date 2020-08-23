@@ -406,8 +406,7 @@ export class ShipBase extends Ship {
                 this.shipData.mast.topThickness
             )}</span>`,
             maxCrew: formatInt(this.shipData.crew.max),
-            maxSpeed: formatFloat(this.shipData.speed.max, 4),
-            maxTurningSpeed: formatFloat(this.shipData.rudder.turnSpeed, 4),
+            maxSpeed: formatFloat(this.shipData.speed.max, 3),
             maxWeight: formatInt(this.shipData.maxWeight),
             minCrew: formatInt(this.shipData.crew.min),
             cannonCrew: formatInt(this.shipData.crew.cannons),
@@ -437,6 +436,7 @@ export class ShipBase extends Ship {
             sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
             structure: formatInt(this.shipData.structure.armour),
             turnAcceleration: formatFloat(this.shipData.ship.turnAcceleration, 4),
+            turnSpeed: formatFloat(this.shipData.ship.turnSpeed, 3),
             upgradeXP: formatInt(this.shipData.upgradeXP),
             waterlineHeight: formatFloat(this.shipData.ship.waterlineHeight),
             cannonWeight: formatInt(this.shipData.guns.weight.cannons),
