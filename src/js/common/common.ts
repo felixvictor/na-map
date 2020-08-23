@@ -27,8 +27,19 @@ export type WoodTypeNestedArray<T> = {
 
 export const cannonType = ["medium", "long", "carronade"] as const
 export type CannonType = typeof cannonType[number]
-export const cannonEntityType = ["damage", "traverse", "dispersion", "generic", "penetration"] as const
+export type CannonTypeList<T> = {
+    [K in CannonType]: T
+}
+export type CannonFamily = string
+export const cannonFamilyList: Record<CannonType, CannonFamily[]> = {
+    medium: ["regular", "congreve", "defense"],
+    long: ["regular", "navy", "blomefield"],
+    carronade: ["regular", "obusiers"],
+}
+export const cannonEntityType = ["damage", "generic", "penetration"] as const
 export type CannonEntityType = typeof cannonEntityType[number]
+export const peneDistance = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500]
+export type PeneDistance = typeof peneDistance[number]
 
 export interface Nation {
     id: number

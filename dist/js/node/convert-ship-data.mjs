@@ -148,7 +148,7 @@ const subFileStructure = [
             ["ARMOR_THICKNESS", { group: "rudder", element: "thickness" }],
             ["REPAIR_MODULE_TIME", { group: "repairTime", element: "rudder" }],
             ["RUDDER_HALFTURN_TIME", { group: "rudder", element: "halfturnTime" }],
-            ["SHIP_TURNING_SPEED", { group: "rudder", element: "turnSpeed" }],
+            ["SHIP_TURNING_SPEED", { group: "ship", element: "turnSpeed" }],
         ]),
     },
     {
