@@ -434,8 +434,8 @@ export class ShipComparison extends Ship {
                 this.shipCompareData.ship.rollAngle
             )}`,
             turnAcceleration: `${formatFloat(this.shipCompareData.ship.turnAcceleration)}\u00A0${getDiff(
-                this._shipBaseData.ship.turnAcceleration,
                 this.shipCompareData.ship.turnAcceleration,
+                this._shipBaseData.ship.turnAcceleration,
                 2
             )}`,
             turnSpeed: `${formatFloat(this.shipCompareData.ship.turnSpeed)}\u00A0${getDiff(
