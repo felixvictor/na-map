@@ -32,7 +32,7 @@ export type CannonTypeList<T> = {
 }
 export type CannonFamily = string
 export const cannonFamilyList: Record<CannonType, CannonFamily[]> = {
-    medium: ["regular", "congreve", "defense"],
+    medium: ["regular", "congreve", "defense", "edinorog"],
     long: ["regular", "navy", "blomefield"],
     carronade: ["regular", "obusiers"],
 }
