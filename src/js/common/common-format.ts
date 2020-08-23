@@ -95,7 +95,7 @@ export const formatSignFloat = (x: number, s = 2): string =>
  * @param   f - Digits following decimal point
  * @returns Formatted float
  */
-export const formatFloatFixed = (x: number, f = 2): string =>
+export const formatFloatFixed = (x: number, f = 2): HtmlString =>
     formatLocale
         .format(`.${f}f`)(x)
         .replace(".00", '<span class="hidden">.00</span>')
