@@ -11,7 +11,7 @@ export const woodFamily = ["regular", "seasoned", "exceptional"];
 export const woodType = ["frame", "trim"];
 export const cannonType = ["medium", "long", "carronade"];
 export const cannonFamilyList = {
-    medium: ["regular", "congreve", "defense"],
+    medium: ["regular", "congreve", "defense", "edinorog"],
     long: ["regular", "navy", "blomefield"],
     carronade: ["regular", "obusiers"],
 };
