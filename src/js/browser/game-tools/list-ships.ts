@@ -76,7 +76,7 @@ export default class ShipList {
                     battleRating: [ship.battleRating, formatInt(ship.battleRating)],
                     crew: [ship.crew.max, formatInt(ship.crew.max)],
                     maxSpeed: [ship.ship.maxSpeed, formatFloatFixedHTML(ship.ship.maxSpeed)],
-                    turnSpeed: [ship.rudder.turnSpeed, formatFloatFixedHTML(ship.rudder.turnSpeed)],
+                    turnSpeed: [ship.ship.turnSpeed, formatFloatFixedHTML(ship.ship.turnSpeed)],
                     broadside: [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
                     bowChaser: [
                         ship.guns.gunsPerDeck[4].amount,
