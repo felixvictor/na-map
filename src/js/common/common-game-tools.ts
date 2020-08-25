@@ -12,7 +12,6 @@ import { color as d3Color, rgb as d3Rgb } from "d3-color"
 import Hashids from "hashids"
 import htm from "htm"
 import { h } from "preact"
-import { default as Tablesort } from "tablesort"
 
 import { colourWhite } from "./common-browser"
 import { formatLocale } from "./common-format"
@@ -101,34 +100,6 @@ export const getBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }:
             </div>
         </div>
     `
-}
-
-const cleanNumber = (i: string): string => i.replace(/[^\d-.?]/g, "")
-
-const compareNumber = (a: string, b: string): number => {
-    let aa = Number.parseFloat(a)
-    let bb = Number.parseFloat(b)
-
-    aa = Number.isNaN(aa) ? 0 : aa
-    bb = Number.isNaN(bb) ? 0 : bb
-
-    return aa - bb
-}
-
-export const initTablesort = (): void => {
-    Tablesort.extend(
-        "number",
-        (item: string) =>
-            /^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/.exec(item) ?? // Prefixed currency
-            /^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/.exec(item) ?? // Suffixed currency
-            /^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/.exec(item), // Number
-        (a: string, b: string) => {
-            const aa = cleanNumber(a)
-            const bb = cleanNumber(b)
-
-            return compareNumber(bb, aa)
-        }
-    )
 }
 
 /**
