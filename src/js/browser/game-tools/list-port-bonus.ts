@@ -11,6 +11,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
+import { sum as d3Sum } from "d3-array"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
@@ -26,6 +27,8 @@ interface PortData {
     name: string
     nation: string
     portBonusLevel: PortBonusValue[]
+    points: number
+    pointsInvested: number
 }
 
 /**
@@ -74,25 +77,28 @@ export default class ListPortBonus {
     }
 
     _setupData(): void {
+        const pointsNeeded = [0, 1, 3, 7, 15]
         const portBonusDefault = {} as PortBonus
         for (const type of portBonusType) {
             portBonusDefault[type] = 0
         }
 
-        const portNames = new Map(this.#portBasicData.map((port) => [port.id, port.name]))
+        const portNames = new Map(
+            this.#portBasicData.map((port) => [port.id, { name: port.name, points: port.portPoints }])
+        )
         const portNation = new Map(this.#pbPerServer.map((port) => [port.id, port.nation]))
         this.#portData = this.#portPerServer
             .filter((port) => port.portBonus)
             .map(
                 (port): PortData => ({
                     id: port.id,
-                    name: portNames.get(port.id) ?? "",
+                    name: portNames.get(port.id)?.name ?? "",
                     nation: findNationByNationShortName(portNation.get(port.id) ?? "")?.name ?? "",
                     portBonusLevel: Object.values({ ...portBonusDefault, ...port.portBonus }),
+                    points: portNames.get(port.id)?.points ?? 0,
+                    pointsInvested: d3Sum(Object.values(port.portBonus!).map((bonusLevel) => pointsNeeded[bonusLevel])),
                 })
             )
-
-        console.log(this.#portData)
     }
 
     async _loadAndSetupData(): Promise<void> {
@@ -131,9 +137,16 @@ export default class ListPortBonus {
                 return a.nation.localeCompare(b.nation) * sign
             }
 
+            if (index === 7) {
+                return (a.points - b.points) * sign
+            }
+
+            if (index === 8) {
+                return (a.pointsInvested - b.pointsInvested) * sign
+            }
+
             return (a.portBonusLevel[index - 2] - b.portBonusLevel[index - 2]) * sign
         })
-        console.log(index, this.#sortAscending)
     }
 
     _initTable(): void {
@@ -142,12 +155,13 @@ export default class ListPortBonus {
             .append("thead")
             .append("tr")
             .selectAll("th")
-            .data(["Port", "Nation", ...portBonusType])
+            .data(["Port", "Nation", ...portBonusType, "Port points", "Points invested"])
 
             .enter()
             .append("th")
             .classed("text-right", (d, i) => i > 1)
             .attr("role", "columnheader")
+            .style("width", (d, i) => (i > 2 ? "3rem" : ""))
             .text((d) => capitalizeFirstLetter(d))
             .on("click", (d, i) => {
                 this._sortRows(i)
@@ -181,7 +195,15 @@ export default class ListPortBonus {
         // Data join cells
         this.#rows
             .selectAll<HTMLTableCellElement, string>("td")
-            .data((row): Array<string | PortBonusValue> => [row.name, row.nation, ...row.portBonusLevel])
+            .data(
+                (row): Array<number | string | PortBonusValue> => [
+                    row.name,
+                    row.nation,
+                    ...row.portBonusLevel,
+                    row.points,
+                    row.pointsInvested,
+                ]
+            )
             .join((enter) =>
                 enter
                     .append("td")

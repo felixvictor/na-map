@@ -1,6 +1,6 @@
 {
     "name": "na-map",
-    "version": "10.11.1",
+    "version": "10.11.2",
     "private": true,
     "description": "Naval Action map",
     "license": "ISC",
@@ -92,7 +92,6 @@
         "js-cookie": "^2.2.1",
         "preact": "^10.4.7",
         "round-slider": "^1.6.1",
-        "tablesort": "^5.2.1",
         "timelines-chart": "^2.10.0"
     },
     "devDependencies": {
