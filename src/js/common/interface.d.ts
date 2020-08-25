@@ -68,3 +68,10 @@ export interface DataSource {
 }
 
 type ZoomLevel = "initial" | "portLabel" | "pbZone"
+
+
+type Key = string
+export interface HeaderMap {
+    group: Map<Key, number>
+    element: Set<Key>
+}

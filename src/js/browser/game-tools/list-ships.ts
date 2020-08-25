@@ -11,54 +11,40 @@
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
-import { select as d3Select } from "d3-selection"
-import { h, render } from "preact"
-import htm from "htm"
-import Tablesort from "tablesort"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { putImportError } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
-import { formatInt } from "../../common/common-format"
-import { beautifyShipNameHTML, formatFloatFixedHTML, initTablesort } from "../../common/common-game-tools"
+import { formatFloatFixed, formatInt } from "../../common/common-format"
+import { beautifyShipName } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
 
 import { ShipData } from "../../common/gen-json"
-import { HtmlResult, HtmlString } from "../../common/interface"
-import * as d3Selection from "d3-selection"
+import { HeaderMap, HtmlString } from "../../common/interface"
 
-const html = htm.bind(h)
-
-interface ShipListData {
-    class: [number, number]
-    name: [string, HtmlResult]
-    guns: [number, number]
-    battleRating: [number, string]
-    crew: [number, string]
-    maxSpeed: [number, HtmlResult]
-    turnSpeed: [number, HtmlResult]
-    broadside: [number, string]
-    bowChaser: [number, string]
-    sternChaser: [number, string]
-    sides: [number, string]
-}
+type ShipListData = Array<[number | string, string]>
 
 /**
  *
  */
 export default class ShipList {
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
-    private _shipListData: ShipListData[] = {} as ShipListData[]
-    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    readonly #baseName: string
+    readonly #baseId: HtmlString
+    readonly #buttonId: HtmlString
+    readonly #modalId: HtmlString
+    #shipListData = {} as ShipListData[]
+    #mainDiv!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #rows = {} as Selection<HTMLTableRowElement, ShipListData, HTMLTableSectionElement, unknown>
+    #sortAscending = true
+    #sortIndex = 0
+    #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
 
     constructor() {
-        this._baseName = "List ships"
-        this._baseId = "ship-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseName = "List ships"
+        this.#baseId = "ship-list"
+        this.#buttonId = `button-${this.#baseId}`
+        this.#modalId = `modal-${this.#baseId}`
 
         this._setupListener()
     }
@@ -68,26 +54,26 @@ export default class ShipList {
             const shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json")).default // @ts-expect-error
                 .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
 
-            this._shipListData = shipData.map(
-                (ship: ShipData): ShipListData => ({
-                    class: [ship.class, ship.class],
-                    name: [ship.name, beautifyShipNameHTML(ship.name)],
-                    guns: [ship.guns.total, ship.guns.total],
-                    battleRating: [ship.battleRating, formatInt(ship.battleRating)],
-                    crew: [ship.crew.max, formatInt(ship.crew.max)],
-                    maxSpeed: [ship.ship.maxSpeed, formatFloatFixedHTML(ship.ship.maxSpeed)],
-                    turnSpeed: [ship.ship.turnSpeed, formatFloatFixedHTML(ship.ship.turnSpeed)],
-                    broadside: [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
-                    bowChaser: [
+            this.#shipListData = shipData.map(
+                (ship: ShipData): ShipListData => [
+                    [ship.class, String(ship.class)],
+                    [ship.name, beautifyShipName(ship.name)],
+                    [ship.guns.total, String(ship.guns.total)],
+                    [ship.battleRating, formatInt(ship.battleRating)],
+                    [ship.crew.max, formatInt(ship.crew.max)],
+                    [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed)],
+                    [ship.ship.turnSpeed, formatFloatFixed(ship.ship.turnSpeed)],
+                    [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
+                    [
                         ship.guns.gunsPerDeck[4].amount,
-                        ship.guns.gunsPerDeck[4] ? String(ship.guns.gunsPerDeck[4].amount) : "",
+                        ship.guns.gunsPerDeck[4].amount ? String(ship.guns.gunsPerDeck[4].amount) : "",
                     ],
-                    sternChaser: [
+                    [
                         ship.guns.gunsPerDeck[5].amount,
-                        ship.guns.gunsPerDeck[5] ? String(ship.guns.gunsPerDeck[5].amount) : "",
+                        ship.guns.gunsPerDeck[5].amount ? String(ship.guns.gunsPerDeck[5].amount) : "",
                     ],
-                    sides: [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
-                })
+                    [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
+                ]
             )
         } catch (error) {
             putImportError(error)
@@ -97,107 +83,127 @@ export default class ShipList {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
+        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this._baseName)
+            registerEvent("Tools", this.#baseName)
 
             this._shipListSelected()
         })
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-lg" })
+    _sortRows(index: number, changeOrder = true): void {
+        if (changeOrder && this.#sortIndex === index) {
+            this.#sortAscending = !this.#sortAscending
+        }
 
-        this._mainDiv = d3Select(`#${this._modalId} .modal-body`).append("div").attr("id", `${this._baseId}`)
+        this.#sortIndex = index
+        const sign = this.#sortAscending ? 1 : -1
+        this.#rows.sort((a, b): number => {
+            if (index === 1) {
+                return (a[index][0] as string).localeCompare(b[index][0] as string) * sign
+            }
+
+            return ((a[index][0] as number) - (b[index][0] as number)) * sign
+        })
+    }
+
+    _initTable(): void {
+        const header: HeaderMap = {
+            group: new Map([
+                ["dummy1", 5],
+                ["Speed", 2],
+                ["dummy2", 1],
+                ["Chasers", 2],
+                ["dummy3", 1],
+            ]),
+            element: new Set([
+                "Class",
+                "Name",
+                "Guns",
+                "Battle rating",
+                "Crew",
+                "Maximum",
+                "Turn",
+                "Broadside",
+                "Bow",
+                "Stern",
+                "Sides",
+            ]),
+        }
+
+        const head = this.#table.append("thead")
+        head.append("tr")
+            .attr("class", "thead-group")
+            .selectAll("th")
+            .data([...header.group])
+            .enter()
+            .append("th")
+            .classed("border-bottom-0", (d) => d[0].startsWith("dummy"))
+            .classed("text-center", true)
+            .attr("colspan", (d) => d[1])
+            .attr("scope", "col")
+            .text((d) => (d[0].startsWith("dummy") ? "" : d[0]))
+        head.append("tr")
+            .selectAll("th")
+            .data([...header.element])
+            .enter()
+            .append("th")
+            .classed("border-top-0", true)
+            .classed("text-right", (d, i) => i !== 1)
+            .text((d) => d)
+            .on("click", (d, i) => {
+                this._sortRows(i)
+            })
+
+        this.#table.append("tbody")
+    }
+
+    _injectModal(): void {
+        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-lg" })
+
+        const body = d3Select(`#${this.#modalId} .modal-body`)
+
+        this.#table = body.append("table").attr("class", "table table-sm small na-table")
+        this._initTable()
+        this._updateTable()
+        this._sortRows(0, false)
     }
 
     _initModal(): void {
-        initTablesort()
         this._injectModal()
+    }
 
-        this._injectList()
+    _updateTable(): void {
+        // Data join rows
+        this.#rows = this.#table
+            .select<HTMLTableSectionElement>("tbody")
+            .selectAll<HTMLTableRowElement, ShipListData>("tr")
+            .data(this.#shipListData, (d: ShipListData): string => d[1][0] as string)
+            .join((enter) => enter.append("tr"))
+
+        // Data join cells
+        this.#rows
+            .selectAll<HTMLTableCellElement, string>("td")
+            .data((row) => row)
+            .join((enter) =>
+                enter
+                    .append("td")
+                    .classed("text-right", (d, i) => i !== 1)
+                    .html((d) => d[1])
+            )
     }
 
     _shipListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
+        if (!document.querySelector(`#${this.#modalId}`)) {
             this._initModal()
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show")
-    }
-
-    _getHead(): HtmlResult {
-        return html`
-            <thead>
-                <tr class="thead-group">
-                    <th scope="col" class="border-bottom-0"></th>
-                    <th scope="col" class="border-bottom-0"></th>
-                    <th scope="col" class="text-right border-bottom-0"></th>
-                    <th scope="col" class="text-right border-bottom-0"></th>
-                    <th scope="col" class="text-right border-bottom-0"></th>
-                    <th scope="col" class="text-center" colspan="2">Speed</th>
-                    <th scope="col" class="text-right border-bottom-0"></th>
-                    <th scope="col" class="text-center" colspan="2">Chasers</th>
-                    <th scope="col" class="text-right border-bottom-0"></th>
-                </tr>
-
-                <tr data-sort-method="thead">
-                    <th scope="col" class="text-right border-top-0">Class</th>
-                    <th scope="col" class="border-top-0">Name</th>
-                    <th scope="col" class="text-right border-top-0">Guns</th>
-                    <th scope="col" class="text-right border-top-0">Battle rating</th>
-                    <th scope="col" class="text-right border-top-0">Crew</th>
-                    <th scope="col" class="text-right">Maximum</th>
-                    <th scope="col" class="text-right">Turn</th>
-                    <th scope="col" class="text-right border-top-0">Broadside</th>
-                    <th scope="col" class="text-right border-top-0">Bow</th>
-                    <th scope="col" class="text-right">Stern</th>
-                    <th scope="col" class="text-right border-top-0">Sides</th>
-                </tr>
-            </thead>
-        `
-    }
-
-    _getBody(): HtmlResult {
-        return html`
-            <tbody>
-                ${this._shipListData.map(
-                    (ship) => html`<tr>
-                        ${Object.entries(ship).map(
-                            (item) =>
-                                html`<td class="${item[0] === "name" ? "" : "text-right"}" data-sort="${item[1][0]}">
-                                    ${item[1][1]}
-                                </td>`
-                        )}
-                    </tr>`
-                )}
-            </tbody>
-        `
-    }
-
-    _getList(): HtmlResult {
-        return html`
-            <table id="table-${this._baseId}" class="table table-sm small tablesort na-table">
-                ${this._getHead()} ${this._getBody()}
-            </table>
-        `
-    }
-
-    /**
-     * Show ships
-     */
-    _injectList(): void {
-        // Add new ship list
-        render(this._getList(), this._mainDiv.node() as HTMLDivElement)
-
-        const table = document.querySelector<HTMLTableElement>(`#table-${this._baseId}`)
-        // @ts-expect-error
-        void new Tablesort(table)
+        $(`#${this.#modalId}`).modal("show")
     }
 }
