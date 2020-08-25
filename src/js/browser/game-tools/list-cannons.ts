@@ -30,13 +30,8 @@ import { insertBaseModal } from "../../common/common-browser"
 import { formatFloatFixed } from "../../common/common-format"
 
 import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
-import { HtmlResult, HtmlString } from "../../common/interface"
+import { HeaderMap, HtmlResult, HtmlString } from "../../common/interface"
 
-type Key = string
-interface HeaderMap {
-    group: Map<Key, number>
-    element: Set<Key>
-}
 interface FamilyRowData {
     family: CannonFamily
     data: RowData[]
@@ -234,8 +229,8 @@ export default class ListCannons {
     ): void {
         this._sortAscending[type] = true
         this._tables[type] = tabContent.append("table").attr("class", "table table-sm small na-table")
-        this._tables[type]
-            .append("thead")
+        const head = this._tables[type]
+        head.append("thead")
             .append("tr")
             .attr("class", "thead-group")
             .selectAll("th")
@@ -247,9 +242,7 @@ export default class ListCannons {
             .attr("colspan", (d) => `${d[1]}`)
             .attr("scope", "col")
             .text((d) => d[0])
-        this._tables[type]
-            .append("thead")
-            .append("tr")
+        head.append("tr")
             .selectAll("th")
             .data([...this._header.element])
             .enter()
