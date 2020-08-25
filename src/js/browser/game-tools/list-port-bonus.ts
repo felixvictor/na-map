@@ -147,7 +147,6 @@ export default class ListPortBonus {
 
             return (a.portBonusLevel[index - 2] - b.portBonusLevel[index - 2]) * sign
         })
-        console.log(index, this.#sortAscending)
     }
 
     _initTable(): void {
