@@ -12,9 +12,6 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import { select as d3Select, Selection } from "d3-selection"
-import Tablesort from "tablesort"
-import { h, render } from "preact"
-import htm from "htm"
 import dayjs from "dayjs"
 import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
@@ -24,37 +21,44 @@ import utc from "dayjs/plugin/utc.js"
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, findNationByNationShortName, putImportError } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
-import { displayClanLitHtml, initTablesort } from "../../common/common-game-tools"
-
+import { displayClan } from "../util"
 import { PortBattlePerServer } from "../../common/gen-json"
-import { HtmlResult, HtmlString } from "../../common/interface"
+import { HtmlString } from "../../common/interface"
 
-const html = htm.bind(h)
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
+type RowData = string[]
+interface RowSortData {
+    sort: string
+    data: RowData
+}
+
 /**
  *
  */
 export default class ListPortBattles {
-    #div!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #tableId!: HtmlString
-    #data!: PortBattlePerServer[]
+    #data!: RowSortData[]
     #serverId!: string
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
+    readonly #baseName: string
+    readonly #baseId: HtmlString
+    readonly #buttonId: HtmlString
+    readonly #modalId: HtmlString
+    #rows = {} as Selection<HTMLTableRowElement, RowSortData, HTMLTableSectionElement, unknown>
+    #sortAscending = true
+    #sortIndex = 0
+    #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
 
     constructor(serverId: string) {
         this.#serverId = serverId
-        this._baseName = "List of port battles"
-        this._baseId = "pb-list"
-        this._buttonId = `button-${this._baseId}`
-        this.#tableId = `table-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseName = "List of port battles"
+        this.#baseId = "pb-list"
+        this.#buttonId = `button-${this.#baseId}`
+        this.#tableId = `table-${this.#baseId}`
+        this.#modalId = `modal-${this.#baseId}`
 
         this._setupListener()
     }
@@ -66,7 +70,29 @@ export default class ListPortBattles {
             const data = (await (
                 await fetch(`${dataDirectory}/${this.#serverId}-pb.json`)
             ).json()) as PortBattlePerServer[]
-            this.#data = data.filter((port) => port.attackHostility === 1)
+            this.#data = data
+                .filter((port) => port.attackHostility === 1)
+                .map((port) => {
+                    const portBattleLT = dayjs.utc(port.portBattle).local()
+                    const portBattleST = dayjs.utc(port.portBattle)
+                    const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
+                    const defenderNation = findNationByNationShortName(port.nation)?.name
+                    const defender = port.capturer
+                        ? `${defenderNation ?? ""} (${displayClan(port.capturer)})`
+                        : defenderNation ?? ""
+
+                    return {
+                        sort: port.portBattle ?? "",
+                        data: [
+                            `${capitalizeFirstLetter(portBattleST.fromNow())} at ${portBattleST.format(
+                                "H.mm"
+                            )} ${localTime}`,
+                            port.name,
+                            `${port?.attackerNation ?? ""} (${displayClan(port?.attackerClan ?? "")})`,
+                            defender,
+                        ],
+                    }
+                })
         } catch (error) {
             putImportError(error)
         }
@@ -75,93 +101,88 @@ export default class ListPortBattles {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
+        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this._baseName)
+            registerEvent("Tools", this.#baseName)
 
             this._pbListSelected()
         })
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-xl" })
+    _sortRows(index: number, changeOrder = true): void {
+        if (changeOrder && this.#sortIndex === index) {
+            this.#sortAscending = !this.#sortAscending
+        }
 
-        const body = d3Select(`#${this._modalId} .modal-body`)
-        this.#div = body.append("div").attr("id", this._baseId)
+        this.#sortIndex = index
+        const sign = this.#sortAscending ? 1 : -1
+        this.#rows.sort((a, b): number => {
+            if (index === 0) {
+                return a.sort.localeCompare(b.sort) * sign
+            }
+
+            return a.data[index].localeCompare(b.data[index]) * sign
+        })
+    }
+
+    _initTable(): void {
+        this.#table
+            .append("thead")
+            .append("tr")
+            .selectAll("th")
+            .data(["Time", "Port", "Attacker", "Defender"])
+
+            .enter()
+            .append("th")
+            .attr("role", "columnheader")
+            .text((d) => d)
+            .on("click", (d, i) => {
+                this._sortRows(i)
+            })
+        this.#table.append("tbody")
+    }
+
+    _injectModal(): void {
+        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-lg" })
+
+        const body = d3Select(`#${this.#modalId} .modal-body`)
+
+        this.#table = body.append("table").attr("class", "table table-sm small na-table")
+        this._initTable()
+        this._updateTable()
+        this._sortRows(0, false)
     }
 
     _initModal(): void {
-        initTablesort()
         this._injectModal()
-        this._injectList()
+    }
+
+    _updateTable(): void {
+        // Data join rows
+        this.#rows = this.#table
+            .select<HTMLTableSectionElement>("tbody")
+            .selectAll<HTMLTableRowElement, RowSortData>("tr")
+            .data(this.#data, (d: RowSortData): string => d.sort)
+            .join((enter) => enter.append("tr"))
+
+        // Data join cells
+        this.#rows
+            .selectAll<HTMLTableCellElement, string>("td")
+            .data((row) => row.data)
+            .join((enter) => enter.append("td").html((d) => d))
     }
 
     _pbListSelected(): void {
         // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
+        if (!document.querySelector(`#${this.#modalId}`)) {
             this._initModal()
         }
 
         // Show modal
-        $(`#${this._modalId}`).modal("show")
-    }
-
-    _getList(): HtmlResult {
-        const getHead = () => {
-            return html` <thead>
-                <tr>
-                    <th data-sort-default>Time</th>
-                    <th>Port</th>
-                    <th>Attacker</th>
-                    <th>Defender</th>
-                </tr>
-            </thead>`
-        }
-
-        const getBody = (): HtmlResult => {
-            return html`<tbody>
-                ${this.#data.map((port) => {
-                    const portBattleLT = dayjs.utc(port.portBattle).local()
-                    const portBattleST = dayjs.utc(port.portBattle)
-                    const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
-                    const defenderNation = findNationByNationShortName(port.nation)?.name
-                    const defender = port.capturer
-                        ? html`${defenderNation} (${displayClanLitHtml(port.capturer)})`
-                        : defenderNation
-                    return html`
-                        <tr>
-                            <td data-sort="${port.portBattle}">
-                                ${capitalizeFirstLetter(portBattleST.fromNow())} at ${portBattleST.format("H.mm")}
-                                ${localTime}
-                            </td>
-                            <td>${port.name}</td>
-                            <td>${port.attackerNation} (${displayClanLitHtml(port.attackerClan)})</td>
-                            <td>${defender}</td>
-                        </tr>
-                    `
-                })}
-            </tbody>`
-        }
-
-        return html`
-            <table id="${this.#tableId}" class="table table-sm tablesort na-table">
-                ${getHead()} ${getBody()}
-            </table>
-        `
-    }
-
-    /**
-     * Show list
-     */
-    _injectList(): void {
-        render(this._getList(), this.#div.node() as HTMLDivElement)
-
-        const table = document.querySelector<HTMLTableElement>(`#${this.#tableId}`)
-        // @ts-expect-error
-        void new Tablesort(table)
+        $(`#${this.#modalId}`).modal("show")
     }
 }
