@@ -72,30 +72,42 @@
           <Time>5.322509E-07</Time>
           <Value>1.44681544E-05</Value>
           <TangentIn>0</TangentIn>
-          <TangentOut>0</TangentOut>
+          <TangentOut>1.00376511</TangentOut>
         </Value>
         <Value>
           <Time>0.0994965658</Time>
           <Value>0.09988511</Value>
-          <TangentIn>1.92528081</TangentIn>
-          <TangentOut>1.92528081</TangentOut>
+          <TangentIn>1.00376511</TangentIn>
+          <TangentOut>6.966079</TangentOut>
         </Value>
         <Value>
-          <Time>0.300572962</Time>
-          <Value>1.00022149</Value>
-          <TangentIn>0</TangentIn>
+          <Time>0.2</Time>
+          <Value>0.8</Value>
+          <TangentIn>6.966079</TangentIn>
+          <TangentOut>0.6666666</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.5</Time>
+          <Value>1</Value>
+          <TangentIn>0.6666666</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.8506044</Time>
-          <Value>1.00009632</Value>
-          <TangentIn>-0.000596046448</TangentIn>
-          <TangentOut>-0.000596046448</TangentOut>
+          <Time>0.85</Time>
+          <Value>1</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>-1.0000006</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.95</Time>
+          <Value>0.9</Value>
+          <TangentIn>-1.0000006</TangentIn>
+          <TangentOut>-1.99560249</TangentOut>
         </Value>
         <Value>
           <Time>1.00011015</Time>
-          <Value>0.90135324</Value>
-          <TangentIn>0</TangentIn>
+          <Value>0.8</Value>
+          <TangentIn>-1.99560249</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
       </Value>
@@ -229,26 +241,14 @@
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.8007199</Time>
-          <Value>-0.00105203979</Value>
-          <TangentIn>0.0174606889</TangentIn>
-          <TangentOut>0.0174606889</TangentOut>
-        </Value>
-        <Value>
-          <Time>0.8014491</Time>
-          <Value>0.747595549</Value>
-          <TangentIn>3.48774457</TangentIn>
-          <TangentOut>3.48774457</TangentOut>
-        </Value>
-        <Value>
-          <Time>0.850882947</Time>
-          <Value>0.997543037</Value>
+          <Time>0.8</Time>
+          <Value>0</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>1</Value>
+          <Value>0</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -260,18 +260,18 @@
         <Value>
           <Time>0</Time>
           <Value>0</Value>
-          <TangentIn>2</TangentIn>
-          <TangentOut>2</TangentOut>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.100099877</Time>
-          <Value>0.132990927</Value>
-          <TangentIn>0.5187243</TangentIn>
-          <TangentOut>0.5187243</TangentOut>
+          <Time>0.8</Time>
+          <Value>0</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.27</Value>
+          <Value>0</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -728,6 +728,12 @@
     </Pair>
     <Pair>
       <Key>SHIP_EXTRA_DOBULE_CHARGE_UNITS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MAST_DAMAGE_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
         <Value>0</Value>
       </Value>
