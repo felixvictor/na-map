@@ -11,7 +11,6 @@ import { color as d3Color, rgb as d3Rgb } from "d3-color";
 import Hashids from "hashids";
 import htm from "htm";
 import { h } from "preact";
-import { default as Tablesort } from "tablesort";
 import { colourWhite } from "./common-browser";
 import { formatLocale } from "./common-format";
 const html = htm.bind(h);
@@ -64,23 +63,6 @@ export const getBaseModalHTML = ({ id, title, size = "modal-xl", body, footer })
             </div>
         </div>
     `;
-};
-const cleanNumber = (i) => i.replace(/[^\d-.?]/g, "");
-const compareNumber = (a, b) => {
-    let aa = Number.parseFloat(a);
-    let bb = Number.parseFloat(b);
-    aa = Number.isNaN(aa) ? 0 : aa;
-    bb = Number.isNaN(bb) ? 0 : bb;
-    return aa - bb;
-};
-export const initTablesort = () => {
-    Tablesort.extend("number", (item) => /^[+-]?[$¢£´Û€]?\d+\s*([,.]\d{0,2})/.exec(item) ??
-        /^[+-]?\d+\s*([,.]\d{0,2})?[$¢£´Û€]/.exec(item) ??
-        /^[+-]?(\d)*-?([,.])?-?(\d)+([,Ee][+-]\d+)?%?$/.exec(item), (a, b) => {
-        const aa = cleanNumber(a);
-        const bb = cleanNumber(b);
-        return compareNumber(bb, aa);
-    });
 };
 export const getCurrencyAmount = (amount) => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
 export const getContrastColour = (colour) => {
