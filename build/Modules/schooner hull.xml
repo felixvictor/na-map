@@ -219,30 +219,18 @@
         <Value>
           <Time>0</Time>
           <Value>0</Value>
-          <TangentIn>0.00105343468</TangentIn>
-          <TangentOut>0.00105343468</TangentOut>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.65113616</Time>
-          <Value>0.0007866025</Value>
-          <TangentIn>0.0148456525</TangentIn>
-          <TangentOut>0.0148456525</TangentOut>
-        </Value>
-        <Value>
-          <Time>0.6551082</Time>
-          <Value>0.7520729</Value>
-          <TangentIn>3.60806036</TangentIn>
-          <TangentOut>3.60806036</TangentOut>
-        </Value>
-        <Value>
-          <Time>0.850357533</Time>
-          <Value>1.00161588</Value>
+          <Time>0.8</Time>
+          <Value>0</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>1</Value>
+          <Value>0</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -254,18 +242,18 @@
         <Value>
           <Time>0</Time>
           <Value>0</Value>
-          <TangentIn>2</TangentIn>
-          <TangentOut>2</TangentOut>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.100532442</Time>
-          <Value>0.251064539</Value>
-          <TangentIn>0.5083171</TangentIn>
-          <TangentOut>0.5083171</TangentOut>
+          <Time>0.8</Time>
+          <Value>0</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.9978836</Time>
-          <Value>0.399287045</Value>
+          <Time>1</Time>
+          <Value>0</Value>
           <TangentIn>0</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
@@ -705,6 +693,12 @@
     </Pair>
     <Pair>
       <Key>SHIP_EXTRA_DOBULE_CHARGE_UNITS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MAST_DAMAGE_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
         <Value>0</Value>
       </Value>
