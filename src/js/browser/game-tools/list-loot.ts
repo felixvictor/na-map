@@ -42,8 +42,8 @@ export default class ListLoot {
     readonly #modalId: HtmlString
     readonly #types = lootType
     #selectedType: LootType = "" as LootType
-    readonly #selectId: LootTypeList<HtmlString> = {} as LootTypeList<HtmlString>
-    #select$: LootTypeList<JQuery> = {} as LootTypeList<JQuery>
+    readonly #selectId = {} as LootTypeList<HtmlString>
+    #select$ = {} as LootTypeList<JQuery>
     #selectedItemId = 0
     #mainDiv!: HTMLDivElement
     #items!: Map<number, { name: string; sources: Map<number, LootLootItemsEntity> }>
@@ -200,11 +200,7 @@ export default class ListLoot {
     }
 
     _getModalFooter(): HtmlResult {
-        return html`
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                Close
-            </button>
-        `
+        return html` <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> `
     }
 
     _injectModal(): void {
@@ -279,9 +275,7 @@ export default class ListLoot {
                                               ${ListLoot._printChance((item as LootLootItemsEntity).chance)}
                                           </td>`
                                         : ""}
-                                    <td class="text-right">
-                                        ${ListLoot._printAmount(item.amount)}
-                                    </td>
+                                    <td class="text-right">${ListLoot._printAmount(item.amount)}</td>
                                 </tr>
                             `
                     )}
@@ -333,11 +327,7 @@ export default class ListLoot {
      * Construct item table
      */
     _getTable(): HtmlResult {
-        return html`
-            <div class="mt-4">
-                ${this._getText()}
-            </div>
-        `
+        return html` <div class="mt-4">${this._getText()}</div> `
     }
 
     _resetOtherSelects(): void {

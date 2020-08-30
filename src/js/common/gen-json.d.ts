@@ -22,8 +22,8 @@ import {
     NationShortNameAlternative,
     PeneDistance,
     WoodFamily,
-    WoodType
-} from "./common";
+    WoodType,
+} from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType, PortBonus } from "./types"
 
