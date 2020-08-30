@@ -54,9 +54,7 @@ interface CountyNested {
  * @param compressedContent - Compressed file content
  * @returns Decompressed file content or void
  */
-// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 const decompress = (compressedContent: Buffer): void | Buffer => {
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     return lzma.decompress(compressedContent, {}, (decompressedContent: void | Buffer, error?: string) => {
         if (error) {
             throw new Error(error)
