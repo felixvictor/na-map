@@ -18,8 +18,7 @@ import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import htm from "htm"
 import { h, render } from "preact"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
@@ -154,14 +153,14 @@ export default class DisplayPorts {
     #colourScaleTax!: ScaleLinear<string, string>
     #countyPolygon!: Area[]
     #countyPolygonFiltered!: Area[]
-    #divPortSummary!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #gCounty!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gIcon!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPort!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPortCircle!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPZ!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gRegion!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gText!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #divPortSummary!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #gCounty!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gIcon!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPort!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPortCircle!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound!: Bound
     #maxNetIncome!: number
     #maxPortPoints!: number
@@ -172,12 +171,12 @@ export default class DisplayPorts {
     #nationIcons!: NationListAlternative<string>
     #portDataFiltered!: PortWithTrades[]
     #portRadius!: ScaleLinear<number, number>
-    #portSummaryNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTextNetIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTextNumPorts!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTextTaxIncome!: d3Selection.Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryNumPorts!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTextNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTextNumPorts!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
+    #portSummaryTextTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #regionPolygon!: Area[]
     #regionPolygonFiltered!: Area[]
     #scale: number
@@ -242,12 +241,8 @@ export default class DisplayPorts {
         return images
     }
 
-    static _hideDetails(
-        _d: PortWithTrades,
-        i: number,
-        nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
-    ): void {
-        $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
+    static _hideDetails(this: JQuery.PlainObject): void {
+        $(this).tooltip("dispose")
     }
 
     async init(): Promise<void> {
@@ -986,12 +981,9 @@ export default class DisplayPorts {
         return h
     }
 
-    _showDetails(
-        d: PortWithTrades,
-        i: number,
-        nodes: SVGCircleElement[] | d3Selection.ArrayLike<SVGCircleElement>
-    ): void {
-        const node$ = $(d3Select(nodes[i]).node() as JQuery.PlainObject)
+    _showDetails(event: MouseEvent, d: PortWithTrades): void {
+        console.log("_showDetails", this, event, d)
+        const node$ = $(event.currentTarget as JQuery.PlainObject)
             .tooltip("dispose")
             .tooltip({
                 html: true,
@@ -1044,7 +1036,7 @@ export default class DisplayPorts {
                     })
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
-                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
+                    .on("click", (event: MouseEvent, d: PortWithTrades) => this._showDetails(event, d))
                     .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize)
