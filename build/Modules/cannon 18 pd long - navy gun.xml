@@ -423,7 +423,7 @@
     <Pair>
       <Key>ARMOR_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>33</Value>
+        <Value>90</Value>
       </Value>
     </Pair>
     <Pair>
