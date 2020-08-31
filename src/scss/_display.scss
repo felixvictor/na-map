@@ -133,14 +133,6 @@ table,
     }
 }
 
-p a,
-table a {
-    text-decoration: underline dotted $secondary-600 !important;
-    @include hover-focus() {
-        text-decoration-style: solid !important;
-    }
-}
-
 #input-toggle {
     display: flex;
 
