@@ -69,7 +69,7 @@ const convert = async (csvData: CSVData[]) => {
 
             return port
         })
-        .sort(sortBy(["portId"]))
+        .sort(sortBy(["id"]))
 
     await saveJsonAsync(commonPaths.filePortBonus, ports)
 }
