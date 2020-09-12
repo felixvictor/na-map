@@ -195,6 +195,7 @@ export default class DisplayPbZones {
                 }
             )
 
+        const rangeRadius = 11
         this._g
             .selectAll<SVGGElement, PbZoneDefence>("g.defence")
             .data(this._defencesFiltered, (d) => String(d.id))
@@ -206,6 +207,9 @@ export default class DisplayPbZones {
                     g.append("path")
                         .attr("class", "fort")
                         .attr("d", (d) => d.forts.map((fort) => drawSvgRect(fort[0], fort[1], 3)).join(""))
+                    g.append("path")
+                        .attr("class", "fort-range")
+                        .attr("d", (d) => d.forts.map((fort) => drawSvgCircle(fort[0], fort[1], rangeRadius)).join(""))
                     g.append("text")
                         .attr("class", "pb-text pb-fort-text")
                         .attr("x", (d) => d.forts.map((fort) => fort[0]).join(","))
@@ -216,6 +220,11 @@ export default class DisplayPbZones {
                     g.append("path")
                         .attr("class", "tower")
                         .attr("d", (d) => d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], 1.5)).join(""))
+                    g.append("path")
+                        .attr("class", "tower-range")
+                        .attr("d", (d) =>
+                            d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], rangeRadius)).join("")
+                        )
                     g.append("text")
                         .attr("class", "pb-text pb-tower-text")
                         .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))

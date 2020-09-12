@@ -533,12 +533,22 @@ svg {
     fill: darken($red, 30);
 }
 
+.fort-range {
+    fill: $red;
+    fill-opacity: 0.2;
+}
+
 .pb-fort-text {
     fill: lighten($red, 30);
 }
 
 .tower {
     fill: $secondary-900;
+}
+
+.tower-range {
+    fill: $secondary-900;
+    fill-opacity: 0.2;
 }
 
 .pb-tower-text {
