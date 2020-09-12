@@ -166,9 +166,8 @@ const htmlMinifyOpt = {
 }
 
 const postcssOpt = {
-    config: {
-        path: filePostcssConfig,
-        ctx: { isProduction },
+    postcssOptions: {
+        config: filePostcssConfig,
     },
     sourceMap: true,
 }
