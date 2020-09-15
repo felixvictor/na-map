@@ -196,7 +196,8 @@ export default class DisplayPbZones {
                 }
             )
 
-        const rangeRadius = 11
+        const fortRangeRadius = 10
+        const towerRangeRadius = 8
         const fortSize = 3
         const towerSize = 1.5
         this._g
@@ -213,7 +214,7 @@ export default class DisplayPbZones {
                             const path = enter
                                 .append("path")
                                 .attr("class", "tower-range")
-                                .attr("d", (d) => drawSvgCircle(d[0], d[1], rangeRadius))
+                                .attr("d", (d) => drawSvgCircle(d[0], d[1], towerRangeRadius))
                             return path
                         })
                     g.selectAll<SVGPathElement, Point[]>("path.fort-range")
@@ -222,7 +223,7 @@ export default class DisplayPbZones {
                             const path = enter
                                 .append("path")
                                 .attr("class", "fort-range")
-                                .attr("d", (d) => drawSvgCircle(d[0], d[1], rangeRadius))
+                                .attr("d", (d) => drawSvgCircle(d[0], d[1], fortRangeRadius))
                             return path
                         })
 
