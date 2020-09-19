@@ -22,13 +22,10 @@ import { formatInt, formatSignPercent } from "../../common/common-format"
 import { getCurrencyAmount } from "../../common/common-game-tools"
 import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
+import { servers } from "../../common/servers"
 
-import { Server } from "../../common/servers"
 import { Module, RecipeEntity, RecipeGroup } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers: Server[] = require("../../common/servers")
 
 const replacer = (match: string, p1: number, p2: number): string =>
     `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`
