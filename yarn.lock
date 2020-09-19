@@ -5581,7 +5581,7 @@ d3-brush@^1.1.5:
     d3-selection "1"
     d3-transition "1"
 
-d3-collection@^1.0.4, d3-collection@^1.0.7:
+d3-collection@^1.0.4:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/d3-collection/-/d3-collection-1.0.7.tgz#349bd2aa9977db071091c13144d5e4f16b5b310e"
   integrity sha512-ii0/r5f4sjKNTfh84Di+DpztYwqKhEyUlKoPrzUFfeSkWxjW49xU2QzO9qrPrNkpdI0XJkfzvmTu8V2Zylln6A==
