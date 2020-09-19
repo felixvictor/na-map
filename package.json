@@ -74,7 +74,7 @@
         "bootstrap-select": "^1.13.18",
         "d3-area-label": "^1.5.0",
         "d3-array": "^2.7.1",
-        "d3-axis": "^1.0.12",
+        "d3-axis": "^2.0.0",
         "d3-collection": "^1.0.7",
         "d3-drag": "^2.0.0",
         "d3-format": "^2.0.0",
