@@ -14,7 +14,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { getOrdinal } from "../common/common-math"
 import { cleanName, sortBy } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import {
     APIItemGeneric,
