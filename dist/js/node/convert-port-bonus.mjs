@@ -48,7 +48,7 @@ const convert = async (csvData) => {
         });
         return port;
     })
-        .sort(sortBy(["portId"]));
+        .sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.filePortBonus, ports);
 };
 const apiPortJson = `${serverNames[0]}-Ports-${serverDate}.json`;
