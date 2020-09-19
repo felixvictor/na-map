@@ -39,7 +39,7 @@
     <Pair>
       <Key>SHIP_MAX_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>12.22</Value>
+        <Value>13.68</Value>
       </Value>
     </Pair>
     <Pair>
