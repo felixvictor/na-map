@@ -133,14 +133,6 @@ table,
     }
 }
 
-p a,
-table a {
-    text-decoration: underline dotted $secondary-600 !important;
-    @include hover-focus() {
-        text-decoration-style: solid !important;
-    }
-}
-
 #input-toggle {
     display: flex;
 
@@ -541,12 +533,22 @@ svg {
     fill: darken($red, 30);
 }
 
+.fort-range {
+    fill: $red;
+    fill-opacity: 0.2;
+}
+
 .pb-fort-text {
     fill: lighten($red, 30);
 }
 
 .tower {
     fill: $secondary-900;
+}
+
+.tower-range {
+    fill: $secondary-200;
+    fill-opacity: 0.3;
 }
 
 .pb-tower-text {
