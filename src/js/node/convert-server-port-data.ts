@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 import dayjs from "dayjs"
 
 import d3Collection from "d3-collection"
@@ -19,7 +19,8 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"
-import { serverNames, serverTwitterNames } from "../common/common-var"
+import { serverTwitterNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"

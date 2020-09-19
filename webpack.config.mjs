@@ -2,49 +2,36 @@
  * webpack.config
  */
 
-/*
+import glob from "glob"
 import path from "path"
-import webpack from "webpack"
 import process from "process"
+import { fileURLToPath } from "url"
+
+import webpack from "webpack"
+
 import sass from "node-sass"
-import { css as parseCss } from "css"
+import { default as parseCss } from "css"
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
-import { CleanWebpackPlugin } from "clean-webpack-plugin"
+import CleanWebpackPlugin from "clean-webpack-plugin"
 import CopyPlugin from "copy-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
-import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin"
 import HtmlPlugin from "html-webpack-plugin"
-import ExtractCssChunks from "extract-css-chunks-webpack-plugin"
-import { default as SitemapPlugin } from "sitemap-webpack-plugin"
+import MiniCssExtractPlugin from "mini-css-extract-plugin"
+import PreloadWebpackPlugin from "preload-webpack-plugin"
+import PurgecssPlugin from "purgecss-webpack-plugin"
+import SitemapPlugin from "sitemap-webpack-plugin"
 import SriPlugin from "webpack-subresource-integrity"
 import TerserPlugin from "terser-webpack-plugin"
 
-import Servers from "./dist/js/common/servers"
-const { servers } = Servers
+console.log("SitemapPlugin", SitemapPlugin)
+
+import { servers } from "./dist/js/common/servers"
 import PACKAGE from "./package.json"
-import repairs from "./lib/gen-generic/repairs.json"
+import repairs from "./src/lib/gen-generic/repairs.json"
 import WebpackMode from "webpack-mode"
 const { isProduction } = WebpackMode
- */
 
-const path = require("path")
-const glob = require("glob")
-const webpack = require("webpack")
-
-// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-const CopyPlugin = require("copy-webpack-plugin")
-const FaviconsPlugin = require("favicons-webpack-plugin")
-const HtmlPlugin = require("html-webpack-plugin")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const parseCss = require("css")
-const PreloadWebpackPlugin = require("preload-webpack-plugin")
-const PurgecssPlugin = require("purgecss-webpack-plugin")
-const sass = require("node-sass")
-const SitemapPlugin = require("sitemap-webpack-plugin").default
-const SriPlugin = require("webpack-subresource-integrity")
-const TerserPlugin = require("terser-webpack-plugin")
-const { CleanWebpackPlugin } = require("clean-webpack-plugin")
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
 const dirDist = path.resolve(__dirname, "dist")
@@ -62,13 +49,8 @@ const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
 const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
-const PACKAGE = require("./package.json")
-const repairs = require(`${dirLib}/gen-generic/repairs.json`)
-const servers = require(`${dirDist}/js/common/servers`)
-
 // Environment
 const { TARGET, QUIET } = process.env
-const { isProduction } = require("webpack-mode")
 const isQuiet = Boolean(QUIET)
 const targetUrl = TARGET ? `https://${TARGET}.netlify.app/` : `http://localhost/na/`
 
@@ -342,7 +324,7 @@ const config = {
     },
 
     plugins: [
-        new CleanWebpackPlugin({
+        new CleanWebpackPlugin.CleanWebpackPlugin({
             verbose: false,
         }),
         new MiniCssExtractPlugin({
@@ -409,7 +391,7 @@ const config = {
                 return "script"
             },
         }),
-        new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin.default(targetUrl, sitemapPaths, { skipGzip: false }),
         new FaviconsPlugin(faviconsOpt),
         new SriPlugin({
             hashFuncNames: ["sha384"],
@@ -438,7 +420,7 @@ const config = {
             {
                 test: /\.(ts|js)$/,
                 include: dirJsSrc,
-                use: [{ loader: require.resolve("babel-loader"), options: babelOpt }],
+                use: [{ loader: "babel-loader", options: babelOpt }],
             },
             {
                 test: /\.scss$/,
@@ -449,22 +431,22 @@ const config = {
                         options: MiniCssExtractPluginOpt,
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: "url(ata:image",
                             replace: "url(data:image",
                         },
                     },
                     {
-                        loader: require.resolve("css-loader"),
+                        loader: "css-loader",
                         options: cssOpt,
                     },
                     {
-                        loader: require.resolve("postcss-loader"),
+                        loader: "postcss-loader",
                         options: postcssOpt,
                     },
                     {
-                        loader: require.resolve("sass-loader"),
+                        loader: "sass-loader",
                         options: sassOpt,
                     },
                 ],
@@ -477,11 +459,11 @@ const config = {
                         options: MiniCssExtractPluginOpt,
                     },
                     {
-                        loader: require.resolve("css-loader"),
+                        loader: "css-loader",
                         options: cssOpt,
                     },
                     {
-                        loader: require.resolve("postcss-loader"),
+                        loader:"postcss-loader",
                         options: postcssOpt,
                     },
                 ],
@@ -490,7 +472,7 @@ const config = {
                 test: regExpFont,
                 include: dirFonts,
                 use: {
-                    loader: require.resolve("file-loader"),
+                    loader: "file-loader",
                     options: {
                         name: "[name].[ext]",
                         outputPath: "fonts/",
@@ -502,7 +484,7 @@ const config = {
                 include: dirFlags,
                 use: [
                     {
-                        loader: require.resolve("svg-url-loader"),
+                        loader:"svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -510,20 +492,20 @@ const config = {
                         },
                     },
                     {
-                        loader: require.resolve("image-webpack-loader"),
+                        loader: "image-webpack-loader",
                         options: {
                             svgo: svgoOpt,
                         },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader:"string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
                             replace: `fill="${primary700}" fill-opacity="0.3"/>`,
                         },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="1"/>',
                             replace: `fill="${primary200}" fill-opacity="1"/>`,
@@ -536,7 +518,7 @@ const config = {
                 include: dirIcons,
                 use: [
                     {
-                        loader: require.resolve("svg-url-loader"),
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -544,20 +526,20 @@ const config = {
                         },
                     },
                     {
-                        loader: require.resolve("image-webpack-loader"),
+                        loader: "image-webpack-loader",
                         options: {
                             svgo: svgoOpt,
                         },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="$themeColour"',
                             replace: `fill="${themeColour}"`,
                         },
                     },
                     {
-                        loader: require.resolve("string-replace-loader"),
+                        loader:"string-replace-loader",
                         options: {
                             search: 'fill="$darkYellow"',
                             replace: `fill="${colourYellowDark}"`,
@@ -612,5 +594,4 @@ if (isProduction) {
     config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
-// export default config
-module.exports = () => config
+export default () => config

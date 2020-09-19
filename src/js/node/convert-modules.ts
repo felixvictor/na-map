@@ -17,7 +17,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { capitalizeFirstLetter, woodType } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
 import {

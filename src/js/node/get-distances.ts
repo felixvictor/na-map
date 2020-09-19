@@ -17,7 +17,8 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
 import { simpleNumberSort } from "../common/common-node"
-import { distanceMapSize, mapSize, serverNames } from "../common/common-var"
+import { distanceMapSize, mapSize } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIPort } from "./api-port"
 

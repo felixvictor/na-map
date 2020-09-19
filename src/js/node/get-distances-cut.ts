@@ -16,7 +16,7 @@ import { default as PNG } from "pngjs"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIPort } from "./api-port"
 
