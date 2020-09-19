@@ -23,7 +23,7 @@ import {
     Point,
     rotationAngleInDegrees,
 } from "../common/common-math"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson, PbZone, PortBasic } from "../common/gen-json"

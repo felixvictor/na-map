@@ -13,8 +13,9 @@ import { default as fs, promises as pfs } from "fs"
 import path from "path"
 import { promisify } from "util"
 
-import { apiBaseFiles, serverNames } from "./common-var"
+import { apiBaseFiles } from "./common-var"
 import { baseAPIFilename, serverStartDate } from "./common-dir"
+import { serverNames } from "./servers"
 
 const execP = promisify(exec)
 

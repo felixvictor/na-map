@@ -15,7 +15,7 @@ import * as path from "path"
 import d3Collection from "d3-collection"
 import d3Array from "d3-array"
 const { nest: d3Nest } = d3Collection
-const { ascending: d3Ascending } = d3Array
+const { ascending: d3Ascending, group: d3Group } = d3Array
 
 import dayjs from "dayjs"
 
@@ -25,8 +25,8 @@ import { default as readDirRecursive } from "recursive-readdir"
 import { capitalToCounty, nations, NationShortName } from "../common/common"
 import { commonPaths } from "../common/common-dir"
 import { saveJsonAsync } from "../common/common-file"
-import { serverNames } from "../common/common-var"
 import { cleanName } from "../common/common-node"
+import { serverNames } from "../common/servers"
 
 import { APIPort } from "./api-port"
 import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json"
@@ -270,6 +270,16 @@ const convertOwnership = (): void => {
             .key((d) => d.county)
             .sortKeys(d3Ascending)
             .entries(portsArray) as RegionNested[]
+
+        const nestedNew = d3Group(
+            portsArray,
+            (d) => d.region,
+            // @ts-expect-error
+            (d) => d.county
+        )
+
+        console.log("nested", nested)
+        console.log("nestedNew", nestedNew)
 
         // Convert to data structure needed for timelines-chart
         // region

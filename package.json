@@ -16,7 +16,6 @@
         "build:js:1:pre": "rm -rf dist",
         "build:js:2:node": "tsc --project src/js/tsconfig.json",
         "build:js:3:post:mv": "find ./dist/js -name \"*.js\" -type f -regextype posix-egrep -regex \".*/(common|node)/.+\" -exec bash -c 'mv \"$1\" \"${1%.js}\".mjs' - '{}' ';'",
-        "build:js:4:post:cp": "cp dist/js/common/servers.mjs dist/js/common/servers.js",
         "build:load": "yarn node --experimental-specifier-resolution=node dist/js/node/load-api-data.mjs",
         "clean:src:js": "find ./src/js -name \"*.ts\" -type f -regextype posix-egrep -regex \".*/(browser|common|node)/.+\" -exec bash -c 'for file in \"${1%.ts}\".js \"${1%.ts}\".js.map; do [ -e \"$file\" ] && rm -f \"$file\"; done' - '{}' ';'",
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",
@@ -46,10 +45,10 @@
         "pre-build:tiles:1:pre": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/",
         "pre-build:tiles:2:build": "yarn node --experimental-specifier-resolution=node dist/js/node/make-tiles.mjs src/images/map.tif",
         "pre-build:tiles:3:post": "rm src/images/map.tif",
-        "prod": "                 webpack --env.production --mode=production --colors --config webpack.config.js",
-        "prod-quiet": "QUIET=true webpack --env.production --mode=production          --config webpack.config.js",
-        "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.js",
-        "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.js"
+        "prod": "                 webpack --env.production --mode=production --colors --config webpack.config.cjs -r esm",
+        "prod-quiet": "QUIET=true webpack --env.production --mode=production          --config webpack.config.cjs -r esm",
+        "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.cjs -r esm",
+        "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.cjs -r esm"
     },
     "browserslist": [
         ">= 1%",
@@ -159,6 +158,7 @@
         "eslint-plugin-prettier": "^3.1.4",
         "eslint-plugin-tsdoc": "^0.2.7",
         "eslint-plugin-unicorn": "^22.0.0",
+        "esm": "^3.2.25",
         "exceljs": "^4.1.1",
         "exports-loader": "^1.1.0",
         "favicons-webpack-plugin": "^4.2.0",

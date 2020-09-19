@@ -15,7 +15,7 @@ import { default as csvParser } from "csv-parser"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIPort } from "./api-port"
 import { PortBonus, PortBonusJson, PortBonusType, PortBonusValue } from "../common/types"
