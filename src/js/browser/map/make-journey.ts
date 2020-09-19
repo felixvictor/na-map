@@ -153,19 +153,23 @@ export default class MakeJourney {
         const dragStart = (event: Event): void => {
             console.log("dragStart", this, event)
             this._removeLabels()
+            // @ts-expect-error
             d3Select(event.currentTarget).classed("drag-active", true)
         }
 
         const dragged = (event: Event, d: Segment): void => {
             console.log("dragged", this, event)
             // Set compass position
+            // @ts-expect-error
             const newX = d.position[0] + Number(event.dx)
+            // @ts-expect-error
             const newY = d.position[1] + Number(event.dy)
             /*
             if (i === 0) {
                 this._compass.attr("x", newX).attr("y", newY)
             }
 */
+            // @ts-expect-error
             d3Select(event.currentTarget).attr("cx", event.x).attr("cy", event.y)
             d.position = [newX, newY]
             this._printLines()
@@ -173,6 +177,7 @@ export default class MakeJourney {
 
         const dragEnd = (event: Event): void => {
             console.log("dragEnd", this, event)
+            // @ts-expect-error
             d3Select(event.currentTarget).classed("drag-active", false)
             //  this._journey.segments[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
             this._printJourney()
@@ -180,6 +185,7 @@ export default class MakeJourney {
 
         this._drag = d3Drag<SVGSVGElement | SVGGElement, Event, Segment>()
             .on("start", dragStart)
+            // @ts-expect-error
             .on("drag", (event: Event, d: Segment): void => dragged(event, d))
             .on("end", dragEnd)
     }
@@ -665,6 +671,7 @@ console.log("node/text", node, text)
         this._setSegmentLabel()
         this._printLabels()
         this._correctJourney()
+        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
@@ -679,6 +686,7 @@ console.log("node/text", node, text)
 
         this._printLabels()
         this._correctJourney()
+        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 

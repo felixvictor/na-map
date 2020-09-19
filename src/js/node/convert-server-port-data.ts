@@ -11,8 +11,8 @@
 import path from "path"
 import dayjs from "dayjs"
 
-import d3Collection from "d3-collection"
-const { nest: d3Nest } = d3Collection
+import d3Array from "d3-array"
+const { group: d3Group } = d3Array
 
 import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
@@ -280,6 +280,9 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     const frontlineAttackingNationGroupedByToPort = {} as NationList<FANToPort[]>
     const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANFromPort[]>
 
+    let newG
+    let newFF
+
     nations
         .filter(({ short: nationShort }) => !outNations.has(nationShort))
         .forEach(({ id: nationId, short: nationShortName }) => {
@@ -307,27 +310,28 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
                         .slice(0, frontlinePorts)
                 )
 
-            frontlineAttackingNationGroupedByToPort[nationShortName] = d3Nest<DistanceExtended, number[]>()
-                // .key(d => `${d.toPortId} ${d.toPortName}`)
-                .key((d) => String(d.toPortId))
-                // .rollup(values => values.map(value => [value.fromPortId, value.fromPortName, value.distance]))
-                .rollup((values) => values.map((value) => value.fromPortId))
-                .entries(frontlinesFrom)
+            frontlineAttackingNationGroupedByToPort[nationShortName] = [
+                ...d3Group(frontlinesFrom, (d) => String(d.toPortId)),
+                // ...d3Group(frontlinesFrom, (d) => `${d.toPortId} ${d.toPortName}`),
+            ].map(([key, value]) => ({
+                key,
+                value: value.map((port) => port.fromPortId),
+                // value: value.map((port) => [port.fromPortId, port.fromPortName, port.distance]),
+            }))
 
-            frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
-                .nest<DistanceExtended, FANValue[]>()
-                // .key((d: DistanceExtended) => `${d.fromPortId} ${d.fromPortName}`)
-                .key((d) => String(d.fromPortId))
-                .rollup((values) =>
-                    values.map(
-                        (value) =>
-                            ({
-                                id: value.toPortId,
-                                nation: value.toPortNation,
-                            } as FANValue)
-                    )
-                )
-                .entries(frontlinesFrom)
+            frontlineAttackingNationGroupedByFromPort[nationShortName] = [
+                ...d3Group(frontlinesFrom, (d) => String(d.fromPortId)),
+                // ...d3Group(frontlinesFrom, (d) => `${d.fromPortId} ${d.fromPortName}`),
+            ].map(([key, value]) => ({
+                key,
+                value: value.map(
+                    (port) =>
+                        ({
+                            id: port.toPortId,
+                            nation: port.toPortNation,
+                        } as FANValue)
+                ),
+            }))
         })
 
     const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()

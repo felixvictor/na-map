@@ -10,12 +10,10 @@
 
 import * as fs from "fs"
 import { Stats } from "fs"
-import * as path from "path"
+import path from "path"
 
-import d3Collection from "d3-collection"
 import d3Array from "d3-array"
-const { nest: d3Nest } = d3Collection
-const { ascending: d3Ascending, group: d3Group } = d3Array
+const { group: d3Group } = d3Array
 
 import dayjs from "dayjs"
 
@@ -25,7 +23,7 @@ import { default as readDirRecursive } from "recursive-readdir"
 import { capitalToCounty, nations, NationShortName } from "../common/common"
 import { commonPaths } from "../common/common-dir"
 import { saveJsonAsync } from "../common/common-file"
-import { cleanName } from "../common/common-node"
+import { cleanName, sortBy } from "../common/common-node"
 import { serverNames } from "../common/servers"
 
 import { APIPort } from "./api-port"
@@ -40,14 +38,8 @@ interface Port {
     data: Segment[]
     id?: string
 }
-interface RegionNested {
-    key: string
-    values: CountyNested[]
-}
-interface CountyNested {
-    key: string
-    values: Port[]
-}
+type RegionGroup = Map<string, CountyGroup>
+type CountyGroup = Map<string, Port[]>
 
 /**
  * Decompress file content
@@ -258,51 +250,43 @@ const convertOwnership = (): void => {
      * Write out result
      */
     const writeResult = async (): Promise<void> => {
-        const portsArray = [...ports.entries()].map(([key, value]) => {
-            value.id = key
-            return value
-        })
-
-        // Nest by region and county
-        const nested = d3Nest<Port>()
-            .key((d) => d.region)
-            .sortKeys(d3Ascending)
-            .key((d) => d.county)
-            .sortKeys(d3Ascending)
-            .entries(portsArray) as RegionNested[]
-
-        const nestedNew = d3Group(
-            portsArray,
+        const groups = (d3Group<Port, string>(
+            [...ports.values()],
             (d) => d.region,
             // @ts-expect-error
             (d) => d.county
-        )
-
-        console.log("nested", nested)
-        console.log("nestedNew", nestedNew)
+        ) as unknown) as RegionGroup
 
         // Convert to data structure needed for timelines-chart
         // region
         // -- group (counties)
         //    -- label (ports)
-        const result = nested.map((region) => {
-            const newRegion = {} as Ownership
-            newRegion.region = region.key
-            newRegion.data = region.values.map((county) => {
-                const group = {} as Group
-                group.group = county.key
-                group.data = county.values.map((port) => {
-                    const label = {} as Line
-                    label.label = port.name
-                    label.data = port.data
-                    return label
-                })
-                return group
-            })
-            return newRegion
-        })
+        const grouped = [...groups]
+            .map(
+                ([regionKey, regionValue]) =>
+                    ({
+                        region: regionKey,
+                        data: [...regionValue]
+                            .map(
+                                ([countyKey, countyValue]) =>
+                                    ({
+                                        group: countyKey,
+                                        data: countyValue
+                                            .map((port) => {
+                                                return {
+                                                    label: port.name,
+                                                    data: port.data,
+                                                } as Line
+                                            })
+                                            .sort(sortBy(["label"])),
+                                    } as Group)
+                            )
+                            .sort(sortBy(["group"])),
+                    } as Ownership)
+            )
+            .sort(sortBy(["region"]))
 
-        await saveJsonAsync(commonPaths.fileOwnership, result)
+        await saveJsonAsync(commonPaths.fileOwnership, grouped)
         await saveJsonAsync(commonPaths.fileNation, numPortsDates)
     }
 
