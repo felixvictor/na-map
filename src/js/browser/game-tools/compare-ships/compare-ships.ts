@@ -42,6 +42,7 @@ import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
+import JQuery from "jquery"
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { WoodColumnType } from "../../../common/types"
@@ -1025,7 +1026,7 @@ export class CompareShips {
             }))
             .sort(sortBy(["key"]))
 
-        let options = ""
+        let options: string
         const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
         if (modules.length > 1) {
             // Get options with sub types as optgroups

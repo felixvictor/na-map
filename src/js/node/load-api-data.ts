@@ -9,7 +9,7 @@
  */
 
 import * as fs from "fs"
-import * as path from "path"
+import path from "path"
 import { default as nodeFetch } from "node-fetch"
 
 import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir"

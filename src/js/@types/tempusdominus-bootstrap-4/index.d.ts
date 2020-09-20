@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/// <reference types="jquery"/>
 
 import { Dayjs } from "dayjs"
 
@@ -103,10 +102,9 @@ export interface DatetimepickerEvent extends JQuery.Event {
     date: Dayjs
 }
 
-declare global {
-    interface JQuery {
-        datetimepicker: ((options?: DatetimepickerOption) => void) & ((value: "viewDate") => Dayjs)
-        /*
+interface JQuery {
+    datetimepicker: ((options?: DatetimepickerOption) => void) & ((value: "viewDate") => Dayjs)
+    /*
         on<TType extends string>(
             events: TType,
             handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType> |
@@ -114,7 +112,5 @@ declare global {
         ): this;
         */
 
-        // @ts-expect-error
-        on: (events: "change.datetimepicker", handler: (eventobject: DatetimepickerEvent) => any) => JQuery
-    }
+    on: (events: "change.datetimepicker", handler: (eventobject: DatetimepickerEvent) => any) => JQuery
 }

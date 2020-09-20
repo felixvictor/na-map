@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 /// <reference types="webpack-env" />
 
 import "bootstrap/js/dist/util"
@@ -46,8 +45,7 @@ import {
 import { simpleStringSort } from "../../common/common-node"
 import { displayClanLitHtml } from "../../common/common-game-tools"
 
-import Cookie from "../util/cookie"
-import RadioButton from "../util/radio-button"
+import JQuery from "jquery"
 import {
     PortBattlePerServer,
     PortBasic,
@@ -58,12 +56,14 @@ import {
     TradeGoodProfit,
 } from "../../common/gen-json"
 import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum, ZoomLevel } from "../../common/interface"
+import { PortBonus, portBonusType } from "../../common/types"
 
+import Cookie from "../util/cookie"
+import RadioButton from "../util/radio-button"
 // @ts-expect-error
 import { default as swordsIcon } from "Icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
-import { PortBonus, portBonusType } from "../../common/types"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -233,6 +233,7 @@ export default class DisplayPorts {
      * @param r - webpack require.context
      * @returns Images
      */
+    // eslint-disable-next-line no-undef
     static _importAll(r: __WebpackModuleApi.RequireContext): NationListAlternative<string> {
         const images = {} as NationListAlternative<string>
         r.keys().forEach((item) => {
@@ -616,6 +617,7 @@ export default class DisplayPorts {
 
     _setupFlags(): void {
         this.#nationIcons = DisplayPorts._importAll(
+            // eslint-disable-next-line no-undef
             (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
         )
 
@@ -945,6 +947,7 @@ export default class DisplayPorts {
     }
 
     _getInventory(port: PortWithTrades): HtmlString {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getItemName = (id: number): string => this.tradeItem.get(id)?.name ?? ""
 
         let h: HtmlString = ""
@@ -981,8 +984,7 @@ export default class DisplayPorts {
         return h
     }
 
-    _showDetails(event: MouseEvent, d: PortWithTrades): void {
-        console.log("_showDetails", this, event, d)
+    _showDetails(event: Event, d: PortWithTrades): void {
         const node$ = $(event.currentTarget as JQuery.PlainObject)
             .tooltip("dispose")
             .tooltip({
@@ -1036,7 +1038,7 @@ export default class DisplayPorts {
                     })
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
-                    .on("click", (event: MouseEvent, d: PortWithTrades) => this._showDetails(event, d))
+                    .on("click", (event: Event, d: PortWithTrades) => this._showDetails(event, d))
                     .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize)

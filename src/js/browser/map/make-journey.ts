@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -22,6 +21,7 @@ import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from
 
 import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
+import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, insertBaseModal, pluralise } from "../../common/common-browser"
@@ -467,7 +467,7 @@ export default class MakeJourney {
             const text = node.select("text")
             const lines = d.label.split("|")
             const lineHeight = fontSize * 1.3
-console.log("node/text", node, text)
+            console.log("node/text", node, text)
             text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
             lines.forEach((line, j) => {
                 console.log("line", line, j)

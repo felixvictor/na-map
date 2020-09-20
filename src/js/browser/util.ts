@@ -8,10 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="jquery" />
-
 import { scaleBand as d3ScaleBand, ScaleLinear } from "d3-scale"
-import { BaseType, Selection } from "d3-selection"
 
 import { numberSegments } from "../common/common-browser"
 import {
@@ -22,6 +19,9 @@ import {
     degreesToCompass,
     radiansToDegrees,
 } from "../common/common-math"
+
+import JQuery from "jquery"
+import { BaseType, Selection } from "d3-selection"
 
 /**
  * Display formatted compass
