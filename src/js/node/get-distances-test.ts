@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 import { default as Immutable } from "immutable"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"

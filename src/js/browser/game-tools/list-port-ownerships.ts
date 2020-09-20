@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -37,6 +36,7 @@ import { NationFullName, nations, NationShortName, putImportError } from "../../
 import { colourList, insertBaseModal } from "../../common/common-browser"
 import { getContrastColour } from "../../common/common-game-tools"
 
+import JQuery from "jquery"
 import { Group, Ownership, OwnershipNation } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
 

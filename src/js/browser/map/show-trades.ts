@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/collapse"
 import "bootstrap/js/dist/tooltip"
@@ -17,15 +15,16 @@ import "bootstrap/js/dist/tooltip"
 import "bootstrap-select/js/bootstrap-select"
 import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
-import { select as d3Select } from "d3-selection"
+import { ArrayLike, select as d3Select, Selection } from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import { nations, NationShortName, putImportError } from "../../common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { defaultFontSize, roundToThousands } from "../../common/common-math"
+
+import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "../../common/gen-json"
 import { Bound, HtmlString } from "../../common/interface"
-import * as d3Selection from "d3-selection"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
@@ -69,12 +68,12 @@ export default class ShowTrades {
     private _upperBound!: Bound
     private _profitText!: string
 
-    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
-    private _labelG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
-    private _tradeDetailsDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _tradeDetailsHead!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _g!: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _labelG!: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _tradeDetailsDiv!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _tradeDetailsHead!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _nationSelector!: HTMLSelectElement
-    private _list!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _list!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _linkDataDefault!: Trade[]
     private _linkData!: Trade[]
     private _portData!: PortWithTrades[]
@@ -182,15 +181,15 @@ export default class ShowTrades {
         return "</div>"
     }
 
-    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | d3Selection.ArrayLike<SVGPathElement>): void {
+    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | ArrayLike<SVGPathElement>): void {
         $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
     }
 
-    static _showElem(elem: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+    static _showElem(elem: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         elem.classed("d-none", false)
     }
 
-    static _hideElem(elem: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+    static _hideElem(elem: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         elem.classed("d-none", true)
     }
 
@@ -237,7 +236,7 @@ export default class ShowTrades {
         $(this._nationSelector).selectpicker({
             actionsBox: true,
             selectedTextFormat: "count > 1",
-            countSelectedText(amount) {
+            countSelectedText(amount: number) {
                 let text = ""
                 if (amount === nations.length) {
                     text = "All"
@@ -516,7 +515,7 @@ export default class ShowTrades {
         return h
     }
 
-    _showDetails(d: Trade, i: number, nodes: SVGPathElement[] | d3Selection.ArrayLike<SVGPathElement>): void {
+    _showDetails(d: Trade, i: number, nodes: SVGPathElement[] | ArrayLike<SVGPathElement>): void {
         const trade = d3Select(nodes[i])
         const title = this._getTradeFullData(d)
 
@@ -676,7 +675,7 @@ export default class ShowTrades {
     }
 
     _updateTradeList(): void {
-        let highlightLink: d3Selection.Selection<SVGPathElement, unknown, HTMLElement, unknown>
+        let highlightLink: Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
         const highlightOn = (d: Trade): void => {
             highlightLink = d3Select<SVGPathElement, unknown>(`path#${ShowTrades._getId(d)}`).attr("class", "highlight")

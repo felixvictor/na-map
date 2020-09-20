@@ -103,6 +103,7 @@
         "@babel/preset-typescript": "^7.10.4",
         "@microsoft/tsdoc": "^0.12.21",
         "@types/bootstrap": "^4.5.0",
+        "@types/bootstrap-select": "^1.13.0",
         "@types/copy-webpack-plugin": "^6.0.0",
         "@types/css": "^0.0.31",
         "@types/d3": "^5.7.2",

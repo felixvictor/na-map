@@ -280,9 +280,6 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     const frontlineAttackingNationGroupedByToPort = {} as NationList<FANToPort[]>
     const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANFromPort[]>
 
-    let newG
-    let newFF
-
     nations
         .filter(({ short: nationShort }) => !outNations.has(nationShort))
         .forEach(({ id: nationId, short: nationShortName }) => {
