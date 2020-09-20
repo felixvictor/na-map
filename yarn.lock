@@ -1930,6 +1930,13 @@
     "@types/connect" "*"
     "@types/node" "*"
 
+"@types/bootstrap-select@^1.13.0":
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/@types/bootstrap-select/-/bootstrap-select-1.13.0.tgz#32e8b1340b3c7a7b0d233230e20fba9c5caeeaec"
+  integrity sha512-dpx8WoAoZUTzPGZrj4wA0ARr5lj1zhUldU4I5e/emsXcml9EBrqMC/Wf19/jD52d0mibu0jy5lwbI2Y9NoQRDg==
+  dependencies:
+    "@types/jquery" "*"
+
 "@types/bootstrap@^4.5.0":
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-4.5.0.tgz#07a079d3ee2b1646491082d6162048d7bf4610b5"

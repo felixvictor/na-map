@@ -9,7 +9,7 @@
  */
 
 import * as fs from "fs"
-import * as path from "path"
+import path from "path"
 
 import { commonPaths } from "../common/common-dir"
 import { makeDirAsync } from "../common/common-file"

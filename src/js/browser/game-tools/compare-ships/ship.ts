@@ -13,7 +13,6 @@ import { arc as d3Arc, pie as d3Pie } from "d3-shape"
 
 import { numberSegments } from "../../../common/common-browser"
 
-
 import { Selection } from "d3-selection"
 
 import { CompareShips } from "./compare-ships"

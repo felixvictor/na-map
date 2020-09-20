@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -24,6 +23,7 @@ import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
 import { servers } from "../../common/servers"
 
+import JQuery from "jquery"
 import { Module, RecipeEntity, RecipeGroup } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
 
@@ -129,7 +129,7 @@ export default class ListRecipes {
                 liveSearchPlaceholder: "Search ...",
                 title: "Select item",
                 virtualScroll: true,
-            } as BootstrapSelectOptions)
+            })
     }
 
     _initModal(): void {

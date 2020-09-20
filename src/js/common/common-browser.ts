@@ -17,7 +17,6 @@ import { BaseModalPure } from "./interface"
 declare const CGREEN: string,
     CGREENDARK: string,
     CGREENLIGHT: string,
-    CORANGE: string,
     CPRIMARY300: string,
     CRED: string,
     CREDDARK: string,

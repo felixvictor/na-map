@@ -9,7 +9,7 @@
  */
 
 import * as fs from "fs"
-import * as path from "path"
+import path from "path"
 import { default as Immutable } from "immutable"
 import { default as PNG } from "pngjs"
 

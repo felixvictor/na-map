@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-/// <reference types="jquery"/>
-
-interface RoundSliderPos {
-    "margin-top"?: number
-    "margin-left"?: number
+declare module "round-slider" {
+    interface RoundSliderPos {
+        "margin-top"?: number
+        "margin-left"?: number
+    }
 }
 
 interface JQuery {

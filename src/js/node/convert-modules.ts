@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 
 import d3Array from "d3-array"
 const { group: d3Group } = d3Array

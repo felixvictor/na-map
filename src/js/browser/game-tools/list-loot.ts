@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import "bootstrap-select/js/bootstrap-select"
@@ -21,6 +20,7 @@ import { formatInt } from "../../common/common-format"
 import { getBaseModalHTML } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
 
+import JQuery from "jquery"
 import {
     Loot,
     LootAmount,
@@ -230,7 +230,7 @@ export default class ListLoot {
                     liveSearchPlaceholder: "Search ...",
                     title: `Select ${type}`,
                     virtualScroll: true,
-                } as BootstrapSelectOptions)
+                })
         }
     }
 
