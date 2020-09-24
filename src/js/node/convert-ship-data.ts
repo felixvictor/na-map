@@ -82,7 +82,6 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["hermione", { id: 592, master: [] }],
     ["indefatiable", { id: 787, master: [] }],
     ["indiaman", { id: 425, master: [] }],
-    ["indiaman rookie", { id: 2223, master: ["indiaman"] }],
     ["ingermanland", { id: 395, master: [] }],
     ["implacable", { id: 2235, master: [] }],
     ["leopard", { id: 2078, master: [] }],
@@ -102,8 +101,6 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["rattlesnakeheavy", { id: 284, master: [] }],
     ["renommee", { id: 285, master: [] }],
     ["requin", { id: 1676, master: [] }],
-    ["rookie brig", { id: 1535, master: ["brig"] }],
-    ["rookie snow", { id: 1536, master: ["snow"] }],
     ["santisima", { id: 286, master: [] }],
     ["snow", { id: 287, master: [] }],
     ["surprise", { id: 288, master: [] }],
@@ -113,9 +110,6 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["trader lynx", { id: 291, master: ["lynx"] }],
     ["trader snow", { id: 292, master: ["snow"] }],
     ["trincomalee", { id: 293, master: [] }],
-    ["tutorial trader", { id: 2339, master: ["trader brig", "brig"] }],
-    ["tutorial brig", { id: 2343, master: ["brig"] }],
-    ["tutorial cerberus", { id: 2338, master: ["cerberus"] }],
     ["victory", { id: 294, master: [] }],
     ["victory1765", { id: 2350, master: [] }],
     ["wasa", { id: 1021, master: [] }],
@@ -295,7 +289,14 @@ const convertGenericShipData = (): ShipData[] => {
         2318, // Admiraal de Ruyter
     ])
     const shipsNotUsed = new Set([
+        1535, // rookie brig
+        1536, // rookie snow
+        2223, // indiaman rookie
+        2338, // tutorial cerberus
+        2339, // tutorial trader
+        2343, // tutorial brig
         2352, // Diana (i)
+        2454, // tutorial brig 2
     ])
 
     return ((apiItems.filter(
