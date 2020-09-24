@@ -15,7 +15,7 @@ import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-
 import { range as d3Range } from "d3-array"
 import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { select as d3Select, Selection } from "d3-selection"
+import { select as d3Select, selection, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
 
@@ -157,8 +157,10 @@ export default class MakeJourney {
             d3Select(event.currentTarget).classed("drag-active", true)
         }
 
-        const dragged = (event: Event, d: Segment): void => {
-            console.log("dragged", this, event)
+        const dragged = (self: SVGCircleElement, event: Event, d: Segment): void => {
+            const e = d3Select((self.parentElement).parentElement).nodes()
+            const i = e.indexOf(self as HTMLElement)
+            console.log("dragged", self, event, e, i)
             // Set compass position
             // @ts-expect-error
             const newX = d.position[0] + Number(event.dx)
@@ -186,7 +188,9 @@ export default class MakeJourney {
         this._drag = d3Drag<SVGSVGElement | SVGGElement, Event, Segment>()
             .on("start", dragStart)
             // @ts-expect-error
-            .on("drag", (event: Event, d: Segment): void => dragged(event, d))
+            .on("drag", function (event: Event, d: Segment): void {
+                dragged(this, event, d)
+            })
             .on("end", dragEnd)
     }
 
