@@ -48,7 +48,6 @@ const shipNames = new Map([
     ["hermione", { id: 592, master: [] }],
     ["indefatiable", { id: 787, master: [] }],
     ["indiaman", { id: 425, master: [] }],
-    ["indiaman rookie", { id: 2223, master: ["indiaman"] }],
     ["ingermanland", { id: 395, master: [] }],
     ["implacable", { id: 2235, master: [] }],
     ["leopard", { id: 2078, master: [] }],
@@ -68,8 +67,6 @@ const shipNames = new Map([
     ["rattlesnakeheavy", { id: 284, master: [] }],
     ["renommee", { id: 285, master: [] }],
     ["requin", { id: 1676, master: [] }],
-    ["rookie brig", { id: 1535, master: ["brig"] }],
-    ["rookie snow", { id: 1536, master: ["snow"] }],
     ["santisima", { id: 286, master: [] }],
     ["snow", { id: 287, master: [] }],
     ["surprise", { id: 288, master: [] }],
@@ -79,9 +76,6 @@ const shipNames = new Map([
     ["trader lynx", { id: 291, master: ["lynx"] }],
     ["trader snow", { id: 292, master: ["snow"] }],
     ["trincomalee", { id: 293, master: [] }],
-    ["tutorial trader", { id: 2339, master: ["trader brig", "brig"] }],
-    ["tutorial brig", { id: 2343, master: ["brig"] }],
-    ["tutorial cerberus", { id: 2338, master: ["cerberus"] }],
     ["victory", { id: 294, master: [] }],
     ["victory1765", { id: 2350, master: [] }],
     ["wasa", { id: 1021, master: [] }],
@@ -206,7 +200,14 @@ const convertGenericShipData = () => {
         2318,
     ]);
     const shipsNotUsed = new Set([
+        1535,
+        1536,
+        2223,
+        2338,
+        2339,
+        2343,
         2352,
+        2454,
     ]);
     return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)).map((apiShip) => {
         const guns = {
