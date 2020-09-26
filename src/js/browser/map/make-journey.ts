@@ -15,7 +15,7 @@ import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-
 import { range as d3Range } from "d3-array"
 import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { select as d3Select, selection, Selection } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
 
@@ -94,7 +94,7 @@ export default class MakeJourney {
     private _journeySummaryWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _journeySummaryTextWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _gJourneyPath!: Selection<SVGPathElement, Segment, HTMLElement, unknown>
-    private _drag!: DragBehavior<SVGSVGElement | SVGGElement, Event, Segment | SubjectPosition>
+    private _drag!: DragBehavior<SVGCircleElement, DragEvent, Segment | SubjectPosition>
 
     constructor(fontSize: number) {
         this._fontSize = fontSize
@@ -151,15 +151,12 @@ export default class MakeJourney {
     }
 
     _setupDrag(): void {
-        const dragStart = (event: Event): void => {
-            console.log("dragStart", this, event)
+        const dragStart = (self: SVGCircleElement): void => {
             this._removeLabels()
-            // @ts-expect-error
-            d3Select(event.currentTarget).classed("drag-active", true)
+            d3Select(self).classed("drag-active", true)
         }
 
-        const dragged = (event: Event, d: Segment): void => {
-            console.log("dragged", event, d, d.index)
+        const dragged = (self: SVGCircleElement, event: DragEvent, d: Segment): void => {
             // Set compass position
             // @ts-expect-error
             const newX = d.position[0] + Number(event.dx)
@@ -169,27 +166,27 @@ export default class MakeJourney {
                 this._compass.attr("x", newX).attr("y", newY)
             }
 
-            // @ts-expect-error
-            d3Select(event.currentTarget).attr("cx", event.x).attr("cy", event.y)
+            d3Select(self).attr("cx", event.x).attr("cy", event.y)
             d.position = [newX, newY]
             this._printLines()
         }
 
-        const dragEnd = (event: Event): void => {
-            console.log("dragEnd", this, event)
-            // @ts-expect-error
-            d3Select(event.currentTarget).classed("drag-active", false)
-            //  this._journey.segments[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
+        const dragEnd = (self: SVGCircleElement): void => {
+            d3Select(self).classed("drag-active", false)
             this._printJourney()
         }
 
-        this._drag = d3Drag<SVGSVGElement | SVGGElement, Event, Segment>()
-            .on("start", dragStart)
-            // @ts-expect-error
-            .on("drag", (event: Event, d: Segment): void => {
-                dragged(event, d)
+        this._drag = d3Drag<SVGCircleElement, DragEvent, Segment>()
+            .on("start", function (this) {
+                dragStart(this)
             })
-            .on("end", dragEnd)
+            // @ts-expect-error
+            .on("drag", function (this: SVGCircleElement, event: DragEvent, d: Segment) {
+                dragged(this, event, d)
+            })
+            .on("end", function (this) {
+                dragEnd(this)
+            })
     }
 
     _setupSvg(): void {
@@ -463,16 +460,13 @@ export default class MakeJourney {
          * {@link https://stackoverflow.com/a/13275930}
          */
         const correctTextBox = (self: SVGGElement, d: Segment, i: number): void => {
-            console.log("correctTextBox", self, d3Select(self), d, i, this._journey.segments.length)
             // Split text into lines
             const node = d3Select(self)
             const text = node.select("text")
             const lines = d.label.split("|")
             const lineHeight = fontSize * 1.3
-            console.log("node/text", node, text)
             text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
             lines.forEach((line, j) => {
-                console.log("line", line, j)
                 const tspan = text.append("tspan").html(line)
                 if (j > 0) {
                     tspan.attr("x", 0).attr("dy", lineHeight)
@@ -542,7 +536,6 @@ export default class MakeJourney {
                     i: number,
                     nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
                 ): Point => {
-                    console.log("size", d, i, nodes)
                     // measure the label and add the required padding
                     const numberLines = d.label.split("|").length
                     const bbText = nodes[i].querySelectorAll("text")[0].getBBox()
@@ -718,7 +711,7 @@ export default class MakeJourney {
 
     plotCourse(x: number, y: number): void {
         if (this._journey.segments[0].position[0] > 0) {
-            this._journey.segments.push({ position: [x, y], label: "", index: this._journey.segments.length - 1 })
+            this._journey.segments.push({ position: [x, y], label: "", index: this._journey.segments.length })
             this._printSegment()
         } else {
             this._journey.segments[0] = { position: [x, y], label: "", index: 0 }
