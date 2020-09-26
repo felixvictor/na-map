@@ -8,20 +8,20 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout"
 import { range as d3Range } from "d3-array"
-import * as d3Drag from "d3-drag"
+import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { event as d3Event, select as d3Select, Selection } from "d3-selection"
+import { select as d3Select, selection, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
 
 import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
+import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, insertBaseModal, pluralise } from "../../common/common-browser"
@@ -55,6 +55,7 @@ interface Journey {
 export interface Segment {
     position: Point
     label: string
+    index: number
 }
 
 /**
@@ -93,7 +94,7 @@ export default class MakeJourney {
     private _journeySummaryWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _journeySummaryTextWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _gJourneyPath!: Selection<SVGPathElement, Segment, HTMLElement, unknown>
-    private _drag!: d3Drag.DragBehavior<SVGSVGElement | SVGGElement, Segment, Segment | d3Drag.SubjectPosition>
+    private _drag!: DragBehavior<SVGSVGElement | SVGGElement, Event, Segment | SubjectPosition>
 
     constructor(fontSize: number) {
         this._fontSize = fontSize
@@ -150,57 +151,44 @@ export default class MakeJourney {
     }
 
     _setupDrag(): void {
-        const dragStart = (
-            _d: unknown,
-            i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
-        ): void => {
-            const event = d3Event as d3Drag.D3DragEvent<
-                SVGSVGElement | SVGGElement,
-                Segment,
-                Segment | d3Drag.SubjectPosition
-            >
-            ;(event.sourceEvent as Event).stopPropagation()
+        const dragStart = (event: Event): void => {
+            console.log("dragStart", this, event)
             this._removeLabels()
-            d3Select(nodes[i]).classed("drag-active", true)
+            // @ts-expect-error
+            d3Select(event.currentTarget).classed("drag-active", true)
         }
 
-        const dragged = (
-            d: Segment,
-            i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
-        ): void => {
-            const event = d3Event as d3Drag.D3DragEvent<
-                SVGSVGElement | SVGGElement,
-                Segment,
-                Segment | d3Drag.SubjectPosition
-            >
+        const dragged = (event: Event, d: Segment): void => {
+            console.log("dragged", event, d, d.index)
             // Set compass position
+            // @ts-expect-error
             const newX = d.position[0] + Number(event.dx)
+            // @ts-expect-error
             const newY = d.position[1] + Number(event.dy)
-            if (i === 0) {
+            if (d.index === 0) {
                 this._compass.attr("x", newX).attr("y", newY)
             }
 
-            d3Select(nodes[i]).attr("cx", event.x).attr("cy", event.y)
+            // @ts-expect-error
+            d3Select(event.currentTarget).attr("cx", event.x).attr("cy", event.y)
             d.position = [newX, newY]
             this._printLines()
         }
 
-        const dragEnd = (
-            _d: Segment,
-            i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
-        ): void => {
-            d3Select(nodes[i]).classed("drag-active", false)
+        const dragEnd = (event: Event): void => {
+            console.log("dragEnd", this, event)
+            // @ts-expect-error
+            d3Select(event.currentTarget).classed("drag-active", false)
             //  this._journey.segments[i].position = [d.position[0] + d3Event.x, d.position[1] + d3Event.y];
             this._printJourney()
         }
 
-        this._drag = d3Drag
-            .drag<SVGSVGElement | SVGGElement, Segment>()
+        this._drag = d3Drag<SVGSVGElement | SVGGElement, Event, Segment>()
             .on("start", dragStart)
-            .on("drag", dragged)
+            // @ts-expect-error
+            .on("drag", (event: Event, d: Segment): void => {
+                dragged(event, d)
+            })
             .on("end", dragEnd)
     }
 
@@ -474,19 +462,17 @@ export default class MakeJourney {
          *  - remove last circle
          * {@link https://stackoverflow.com/a/13275930}
          */
-        const correctTextBox = (
-            d: Segment,
-            i: number,
-            nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
-        ): void => {
+        const correctTextBox = (self: SVGGElement, d: Segment, i: number): void => {
+            console.log("correctTextBox", self, d3Select(self), d, i, this._journey.segments.length)
             // Split text into lines
-            const node = d3Select(nodes[i])
+            const node = d3Select(self)
             const text = node.select("text")
             const lines = d.label.split("|")
             const lineHeight = fontSize * 1.3
-
+            console.log("node/text", node, text)
             text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
             lines.forEach((line, j) => {
+                console.log("line", line, j)
                 const tspan = text.append("tspan").html(line)
                 if (j > 0) {
                     tspan.attr("x", 0).attr("dy", lineHeight)
@@ -511,13 +497,15 @@ export default class MakeJourney {
             }
 
             // Hide last circle
-            if (i === nodes.length - 1) {
+            if (i === this._journey.segments.length - 1) {
                 circle.attr("r", circleRadius).attr("class", "drag-hidden")
             }
         }
 
         // Correct text boxes
-        this._g.selectAll<SVGGElement, Segment>("g.journey g.label").each(correctTextBox)
+        this._g.selectAll<SVGGElement, Segment>("g.journey g.label").each(function (this, d, i) {
+            correctTextBox(this, d, i)
+        })
         // Correct journey stroke width
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`)
@@ -554,6 +542,7 @@ export default class MakeJourney {
                     i: number,
                     nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
                 ): Point => {
+                    console.log("size", d, i, nodes)
                     // measure the label and add the required padding
                     const numberLines = d.label.split("|").length
                     const bbText = nodes[i].querySelectorAll("text")[0].getBBox()
@@ -684,6 +673,7 @@ export default class MakeJourney {
         this._setSegmentLabel()
         this._printLabels()
         this._correctJourney()
+        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
@@ -698,6 +688,7 @@ export default class MakeJourney {
 
         this._printLabels()
         this._correctJourney()
+        // @ts-expect-error
         this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
     }
 
@@ -727,10 +718,10 @@ export default class MakeJourney {
 
     plotCourse(x: number, y: number): void {
         if (this._journey.segments[0].position[0] > 0) {
-            this._journey.segments.push({ position: [x, y], label: "" })
+            this._journey.segments.push({ position: [x, y], label: "", index: this._journey.segments.length - 1 })
             this._printSegment()
         } else {
-            this._journey.segments[0] = { position: [x, y], label: "" }
+            this._journey.segments[0] = { position: [x, y], label: "", index: 0 }
             this._initJourney()
         }
     }

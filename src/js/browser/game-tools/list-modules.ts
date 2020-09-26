@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -23,6 +22,7 @@ import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
 import { chunkify } from "../util"
 
+import JQuery from "jquery"
 import { Module } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
 

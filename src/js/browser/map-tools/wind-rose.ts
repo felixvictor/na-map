@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import "bootstrap/js/dist/tooltip"
@@ -19,11 +18,13 @@ import { Line, line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
-
 import { registerEvent } from "../analytics"
+
 import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
 import { compassDirections, degreesToRadians } from "../../common/common-math"
 import { displayCompass, getUserWind, printSmallCompassRose } from "../util"
+
+import { RoundSliderPos } from "round-slider"
 import { HtmlString } from "../../common/interface"
 
 import dayjs from "dayjs"

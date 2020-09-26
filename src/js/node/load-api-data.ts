@@ -9,13 +9,15 @@
  */
 
 import * as fs from "fs"
-import * as path from "path"
+import path from "path"
 import { default as nodeFetch } from "node-fetch"
 
 import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir"
-import { apiBaseFiles, serverNames } from "../common/common-var"
+import { apiBaseFiles } from "../common/common-var"
 import { saveJsonAsync, xzAsync } from "../common/common-file"
 import { sortBy } from "../common/common-node"
+import { serverNames } from "../common/servers"
+
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"

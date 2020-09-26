@@ -8,12 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select/js/bootstrap-select"
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
@@ -21,7 +20,7 @@ import { insertBaseModal } from "../../common/common-browser"
 import { formatInt } from "../../common/common-format"
 import { sortBy } from "../../common/common-node"
 
-import * as d3Selection from "d3-selection"
+import JQuery from "jquery"
 import { Price, ShipBlueprint, WoodData } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
 
@@ -59,11 +58,11 @@ export default class ListShipBlueprints {
     private _woodOptions: WoodTypeList<HtmlString> = {} as WoodTypeList<HtmlString>
     private readonly _defaultWood: WoodTypeList<string>
     private _woodsSelected: WoodTypeList<string> = {} as WoodTypeList<string>
-    private _blueprintList!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _blueprintList!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _currentBlueprint: ShipBlueprint = {} as ShipBlueprint
-    private _tables: TableTypeList<
-        d3Selection.Selection<HTMLTableElement, unknown, HTMLElement, unknown>
-    > = {} as TableTypeList<d3Selection.Selection<HTMLTableElement, unknown, HTMLElement, unknown>>
+    private _tables: TableTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>> = {} as TableTypeList<
+        Selection<HTMLTableElement, unknown, HTMLElement, unknown>
+    >
 
     constructor() {
         this._baseName = "List ship blueprint"
@@ -232,10 +231,7 @@ export default class ListShipBlueprints {
         $(`#${this._modalId}`).modal("show")
     }
 
-    _updateTable(
-        elem: d3Selection.Selection<HTMLTableElement, unknown, HTMLElement, unknown>,
-        dataBody: ItemNeeded[]
-    ): void {
+    _updateTable(elem: Selection<HTMLTableElement, unknown, HTMLElement, unknown>, dataBody: ItemNeeded[]): void {
         const addBody = (): void => {
             // Data join rows
             const rows = elem

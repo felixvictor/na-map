@@ -10,9 +10,10 @@
 
 import { select as d3Select } from "d3-selection"
 import { arc as d3Arc, pie as d3Pie } from "d3-shape"
-import * as d3Selection from "d3-selection"
 
 import { numberSegments } from "../../../common/common-browser"
+
+import { Selection } from "d3-selection"
 
 import { CompareShips } from "./compare-ships"
 import { ShipDisplayData } from "./types"
@@ -25,10 +26,10 @@ export class Ship {
     // Class instance of the ship to be compared to
     readonly _shipCompare: CompareShips
     readonly select!: HtmlString
-    _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    _mainG!: Selection<SVGGElement, unknown, HTMLElement, unknown>
     // Column id
     private readonly _id: string
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     constructor(id: string, shipCompare: CompareShips) {
         this._id = id
         this._shipCompare = shipCompare
