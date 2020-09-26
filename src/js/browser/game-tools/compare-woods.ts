@@ -418,8 +418,8 @@ export default class CompareWoods {
             this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
                 .default as WoodData
             this._setupData()
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

@@ -71,8 +71,8 @@ export default class ListPortBonus {
             ).json()) as PortBattlePerServer[]
             this.#portBasicData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

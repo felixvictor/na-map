@@ -89,8 +89,8 @@ export default class ListPortOwnerships {
             this._ownershipData = (
                 await import(/* webpackChunkName: "data-ownership" */ "Lib/gen-generic/ownership.json")
             ).default as Ownership[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

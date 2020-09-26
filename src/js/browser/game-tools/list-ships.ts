@@ -74,8 +74,8 @@ export default class ShipList {
                     [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
                 ]
             )
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

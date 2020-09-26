@@ -153,6 +153,7 @@ const setAndSaveTradeData = async (serverName: string): Promise<void> => {
     for (const buyPort of portData) {
         buyPort.inventory
             .filter((buyGood) => buyGood.buyQuantity > 0)
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             .forEach((buyGood) => {
                 const { buyPrice, buyQuantity } = buyGood
                 for (const sellPort of portData) {
@@ -424,6 +425,7 @@ export const convertServerPortData = (): void => {
         portData = []
         numberPorts = apiPorts.length
         distances = new Map(
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             distancesOrig.map(([fromPortId, toPortId, distance]) => [fromPortId * numberPorts + toPortId, distance])
         )
 

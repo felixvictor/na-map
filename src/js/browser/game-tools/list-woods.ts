@@ -82,8 +82,8 @@ export default class ListWoods {
         try {
             this._woodDataDefault = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
                 .default as WoodData
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

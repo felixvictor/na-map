@@ -299,7 +299,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
 
         try {
             return document.execCommand("copy")
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Copy to clipboard failed.", error)
             return false
         } finally {

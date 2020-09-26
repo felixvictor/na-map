@@ -112,8 +112,8 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
         window.addEventListener("resize", () => {
             map.resize()
         })
-    } catch (error) {
-        putImportError(error)
+    } catch (error: unknown) {
+        putImportError(error as string)
     }
 }
 
@@ -126,8 +126,8 @@ const loadGameTools = async (serverId: string, searchParams: URLSearchParams): P
     try {
         const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)
-    } catch (error) {
-        putImportError(error)
+    } catch (error: unknown) {
+        putImportError(error as string)
     }
 }
 
@@ -138,8 +138,8 @@ const loadMapTools = async (): Promise<void> => {
     try {
         const mapTools = await import(/* webpackChunkName: "map-tools" */ "./map-tools")
         mapTools.init()
-    } catch (error) {
-        putImportError(error)
+    } catch (error: unknown) {
+        putImportError(error as string)
     }
 }
 
