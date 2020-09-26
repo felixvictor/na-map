@@ -46,8 +46,8 @@ export default class ListIngredients {
                 .default as Module[]
             this._ingredientData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json"))
                 .default.ingredient as RecipeIngredientEntity[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

@@ -102,8 +102,8 @@ export default class ListShipBlueprints {
                     { reales: cost.reales, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool },
                 ])
             )
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

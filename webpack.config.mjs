@@ -23,8 +23,6 @@ import SitemapPlugin from "sitemap-webpack-plugin"
 import SriPlugin from "webpack-subresource-integrity"
 import TerserPlugin from "terser-webpack-plugin"
 
-console.log("SitemapPlugin", SitemapPlugin)
-
 import { servers } from "./dist/js/common/servers"
 import PACKAGE from "./package.json"
 import repairs from "./src/lib/gen-generic/repairs.json"
@@ -34,7 +32,6 @@ const { isProduction } = WebpackMode
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
-const dirDist = path.resolve(__dirname, "dist")
 
 const dirFlags = path.resolve(dirSrc, "images", "flags")
 const dirFonts = path.resolve(dirSrc, "fonts")

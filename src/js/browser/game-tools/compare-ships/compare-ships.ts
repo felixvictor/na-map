@@ -519,8 +519,8 @@ export class CompareShips {
                 this.woodCompare = new CompareWoods(this._woodId)
                 await this.woodCompare.woodInit()
             }
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

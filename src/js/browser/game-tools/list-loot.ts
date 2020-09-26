@@ -79,8 +79,8 @@ export default class ListLoot {
                 .default as Loot
             this.#lootData = sourceData.loot as LootLootEntity[]
             this.#chestsData = sourceData.chests as LootChestsEntity[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

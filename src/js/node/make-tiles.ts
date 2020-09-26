@@ -41,8 +41,8 @@ const convert = async (): Promise<void> => {
                 }
             }
         )
-    } catch (error) {
-        throw new Error(error)
+    } catch (error: unknown) {
+        throw new Error(error as string)
     }
 }
 

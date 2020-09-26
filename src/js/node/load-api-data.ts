@@ -62,8 +62,8 @@ const readNAJson = async (url: URL): Promise<Error | APIType[]> => {
         }
 
         return new Error(`Cannot load ${url.href}: ${response.statusText}`)
-    } catch (error) {
-        throw new Error(error)
+    } catch (error: unknown) {
+        throw new Error(error as string)
     }
 }
 

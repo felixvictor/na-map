@@ -60,8 +60,8 @@ export default class ListRecipes {
             this._recipes = new Map<number, RecipeEntity>(
                 this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))
             )
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
