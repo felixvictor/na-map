@@ -125,6 +125,7 @@ export class ShipComparison extends Ship {
                 this._updateSpeedText()
             }
 
+            // @ts-expect-error
             const { x: xMouse, y: yMouse } = event
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
