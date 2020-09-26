@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as fs from "fs";
-import * as path from "path";
+import path from "path";
 import { commonPaths } from "../common/common-dir";
 import { makeDirAsync } from "../common/common-file";
 const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/;

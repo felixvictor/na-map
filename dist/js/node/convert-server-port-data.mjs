@@ -7,15 +7,16 @@
  * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import dayjs from "dayjs";
-import d3Collection from "d3-collection";
-const { nest: d3Nest } = d3Collection;
+import d3Array from "d3-array";
+const { group: d3Group } = d3Array;
 import { findNationById, nations, nationShortName } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node";
-import { serverNames, serverTwitterNames } from "../common/common-var";
+import { serverTwitterNames } from "../common/common-var";
+import { serverNames } from "../common/servers";
 const minProfit = 30000;
 const frontlinePorts = 2;
 let apiItems;
@@ -194,18 +195,21 @@ const setAndSaveFrontlines = async (serverName) => {
         }))
             .sort(sortBy(["distance"]))
             .slice(0, frontlinePorts));
-        frontlineAttackingNationGroupedByToPort[nationShortName] = d3Nest()
-            .key((d) => String(d.toPortId))
-            .rollup((values) => values.map((value) => value.fromPortId))
-            .entries(frontlinesFrom);
-        frontlineAttackingNationGroupedByFromPort[nationShortName] = d3Collection
-            .nest()
-            .key((d) => String(d.fromPortId))
-            .rollup((values) => values.map((value) => ({
-            id: value.toPortId,
-            nation: value.toPortNation,
-        })))
-            .entries(frontlinesFrom);
+        frontlineAttackingNationGroupedByToPort[nationShortName] = [
+            ...d3Group(frontlinesFrom, (d) => String(d.toPortId)),
+        ].map(([key, value]) => ({
+            key,
+            value: value.map((port) => port.fromPortId),
+        }));
+        frontlineAttackingNationGroupedByFromPort[nationShortName] = [
+            ...d3Group(frontlinesFrom, (d) => String(d.fromPortId)),
+        ].map(([key, value]) => ({
+            key,
+            value: value.map((port) => ({
+                id: port.toPortId,
+                nation: port.toPortNation,
+            })),
+        }));
     });
     const frontlineDefendingNationMap = new Map();
     for (const attackingNation of nationShortName) {

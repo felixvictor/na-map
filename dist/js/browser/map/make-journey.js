@@ -11,9 +11,9 @@ import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout";
 import { range as d3Range } from "d3-array";
-import * as d3Drag from "d3-drag";
+import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { event as d3Event, select as d3Select } from "d3-selection";
+import { select as d3Select } from "d3-selection";
 import { line as d3Line } from "d3-shape";
 import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom";
 import "round-slider/src/roundslider";
@@ -70,32 +70,34 @@ export default class MakeJourney {
         return s;
     }
     _setupDrag() {
-        const dragStart = (_d, i, nodes) => {
-            const event = d3Event;
-            event.sourceEvent.stopPropagation();
+        const dragStart = (self) => {
             this._removeLabels();
-            d3Select(nodes[i]).classed("drag-active", true);
+            d3Select(self).classed("drag-active", true);
         };
-        const dragged = (d, i, nodes) => {
-            const event = d3Event;
+        const dragged = (self, event, d) => {
             const newX = d.position[0] + Number(event.dx);
             const newY = d.position[1] + Number(event.dy);
-            if (i === 0) {
+            if (d.index === 0) {
                 this._compass.attr("x", newX).attr("y", newY);
             }
-            d3Select(nodes[i]).attr("cx", event.x).attr("cy", event.y);
+            d3Select(self).attr("cx", event.x).attr("cy", event.y);
             d.position = [newX, newY];
             this._printLines();
         };
-        const dragEnd = (_d, i, nodes) => {
-            d3Select(nodes[i]).classed("drag-active", false);
+        const dragEnd = (self) => {
+            d3Select(self).classed("drag-active", false);
             this._printJourney();
         };
-        this._drag = d3Drag
-            .drag()
-            .on("start", dragStart)
-            .on("drag", dragged)
-            .on("end", dragEnd);
+        this._drag = d3Drag()
+            .on("start", function () {
+            dragStart(this);
+        })
+            .on("drag", function (event, d) {
+            dragged(this, event, d);
+        })
+            .on("end", function () {
+            dragEnd(this);
+        });
     }
     _setupSvg() {
         const width = this._courseArrowWidth;
@@ -285,8 +287,8 @@ export default class MakeJourney {
         const textPadding = this._labelPadding / scale;
         const circleRadius = 10 / scale;
         const pathWidth = 5 / scale;
-        const correctTextBox = (d, i, nodes) => {
-            const node = d3Select(nodes[i]);
+        const correctTextBox = (self, d, i) => {
+            const node = d3Select(self);
             const text = node.select("text");
             const lines = d.label.split("|");
             const lineHeight = fontSize * 1.3;
@@ -306,11 +308,13 @@ export default class MakeJourney {
             if (i === 0) {
                 circle.attr("r", circleRadius * 4).attr("class", "drag-hidden");
             }
-            if (i === nodes.length - 1) {
+            if (i === this._journey.segments.length - 1) {
                 circle.attr("r", circleRadius).attr("class", "drag-hidden");
             }
         };
-        this._g.selectAll("g.journey g.label").each(correctTextBox);
+        this._g.selectAll("g.journey g.label").each(function (d, i) {
+            correctTextBox(this, d, i);
+        });
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`);
         }
@@ -456,11 +460,11 @@ export default class MakeJourney {
     }
     plotCourse(x, y) {
         if (this._journey.segments[0].position[0] > 0) {
-            this._journey.segments.push({ position: [x, y], label: "" });
+            this._journey.segments.push({ position: [x, y], label: "", index: this._journey.segments.length });
             this._printSegment();
         }
         else {
-            this._journey.segments[0] = { position: [x, y], label: "" };
+            this._journey.segments[0] = { position: [x, y], label: "", index: 0 };
             this._initJourney();
         }
     }

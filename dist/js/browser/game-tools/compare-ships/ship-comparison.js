@@ -8,9 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import { max as d3Max, min as d3Min } from "d3-array";
-import * as d3Drag from "d3-drag";
+import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { event as d3Event } from "d3-selection";
 import { curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
 import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "../../../common/common-format";
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math";
@@ -60,10 +59,10 @@ export class ShipComparison extends Ship {
             .domain(domain)
             .range([...this.shipCompareData.speedDegrees, this.shipCompareData.speedDegrees[0]])
             .clamp(true);
-        const dragStart = (d) => {
+        const dragStart = (event, d) => {
             d.this.classed("drag-active", true);
         };
-        const dragged = (d) => {
+        const dragged = (event, d) => {
             const update = () => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`);
                 d.compassText
@@ -72,18 +71,17 @@ export class ShipComparison extends Ship {
                 this._shipRotate = d.rotate;
                 this._updateSpeedText();
             };
-            const { x: xMouse, y: yMouse } = d3Event;
+            const { x: xMouse, y: yMouse } = event;
             d.rotate = this._getHeadingInDegrees(rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }), d.correctionValueDegrees);
             update();
         };
-        const dragEnd = (d) => {
+        const dragEnd = (event, d) => {
             d.this.classed("drag-active", false);
         };
-        this._drag = d3Drag
-            .drag()
-            .on("start", dragStart)
-            .on("drag", dragged)
-            .on("end", dragEnd)
+        this._drag = d3Drag()
+            .on("start", (event, d) => dragStart(event, d))
+            .on("drag", (event, d) => dragged(event, d))
+            .on("end", (event, d) => dragEnd(event, d))
             .container(() => this._mainG.node());
     }
     _setupShipOutline() {
