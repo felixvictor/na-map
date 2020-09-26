@@ -169,8 +169,8 @@ export default class SelectPorts {
                 )
 
                 this._dataLoaded = true
-            } catch (error) {
-                putImportError(error)
+            } catch (error: unknown) {
+                putImportError(error as string)
             }
         }
     }

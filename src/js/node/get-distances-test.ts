@@ -348,7 +348,7 @@ class PixelMap {
             console.timeEnd("findPath")
 
             await saveJsonAsync(this.#distancesFile, this.#distances)
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Map distance error:", error)
         }
     }

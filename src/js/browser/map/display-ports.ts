@@ -299,8 +299,8 @@ export default class DisplayPorts {
             ).json()) as TradeItem[]
             this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
             await loadEntries(dataSources)
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
 
         return readData

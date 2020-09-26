@@ -109,8 +109,8 @@ export default class DisplayPbZones {
             this._pbZonesDefault = (
                 await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json")
             ).default as PbZone[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

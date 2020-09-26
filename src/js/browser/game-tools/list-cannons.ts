@@ -79,8 +79,8 @@ export default class ListCannons {
             const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "Lib/gen-generic/cannons.json"))
                 .default as Cannon
             this._setupData(cannonData)
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

@@ -387,8 +387,8 @@ export default class ShowTrades {
                 await fetch(`${dataDirectory}/${this._serverName}-items.json`)
             ).json()) as TradeItem[]
             this._tradeItem = new Map(tradeItems.map((item) => [item.id, item.name]))
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -396,8 +396,8 @@ export default class ShowTrades {
         try {
             await this._loadData()
             this._setupData()
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

@@ -93,8 +93,8 @@ export default class ListPortBattles {
                         ],
                     }
                 })
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
