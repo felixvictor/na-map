@@ -8,19 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as fs from "fs";
-import * as path from "path";
-import d3Collection from "d3-collection";
+import path from "path";
 import d3Array from "d3-array";
-const { nest: d3Nest } = d3Collection;
-const { ascending: d3Ascending } = d3Array;
+const { group: d3Group } = d3Array;
 import dayjs from "dayjs";
 import { default as lzma } from "lzma-native";
 import { default as readDirRecursive } from "recursive-readdir";
 import { capitalToCounty, nations } from "../common/common";
 import { commonPaths } from "../common/common-dir";
 import { saveJsonAsync } from "../common/common-file";
-import { serverNames } from "../common/common-var";
-import { cleanName } from "../common/common-node";
+import { cleanName, sortBy } from "../common/common-node";
+import { serverNames } from "../common/servers";
 const fileExtension = ".json.xz";
 const decompress = (compressedContent) => {
     return lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
@@ -149,33 +147,26 @@ const convertOwnership = () => {
         return !stats.isDirectory() && fileBaseNameRegex.exec(path.basename(fileName)) === null;
     };
     const writeResult = async () => {
-        const portsArray = [...ports.entries()].map(([key, value]) => {
-            value.id = key;
-            return value;
-        });
-        const nested = d3Nest()
-            .key((d) => d.region)
-            .sortKeys(d3Ascending)
-            .key((d) => d.county)
-            .sortKeys(d3Ascending)
-            .entries(portsArray);
-        const result = nested.map((region) => {
-            const newRegion = {};
-            newRegion.region = region.key;
-            newRegion.data = region.values.map((county) => {
-                const group = {};
-                group.group = county.key;
-                group.data = county.values.map((port) => {
-                    const label = {};
-                    label.label = port.name;
-                    label.data = port.data;
-                    return label;
-                });
-                return group;
-            });
-            return newRegion;
-        });
-        await saveJsonAsync(commonPaths.fileOwnership, result);
+        const groups = d3Group([...ports.values()], (d) => d.region, (d) => d.county);
+        const grouped = [...groups]
+            .map(([regionKey, regionValue]) => ({
+            region: regionKey,
+            data: [...regionValue]
+                .map(([countyKey, countyValue]) => ({
+                group: countyKey,
+                data: countyValue
+                    .map((port) => {
+                    return {
+                        label: port.name,
+                        data: port.data,
+                    };
+                })
+                    .sort(sortBy(["label"])),
+            }))
+                .sort(sortBy(["group"])),
+        }))
+            .sort(sortBy(["region"]));
+        await saveJsonAsync(commonPaths.fileOwnership, grouped);
         await saveJsonAsync(commonPaths.fileNation, numPortsDates);
     };
     readDirRecursive(commonPaths.dirAPI, [ignoreFileName])

@@ -7,10 +7,8 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import servers from "../../../dist/js/common/servers.js";
 export const GA_TRACKING_ID = "UA-109520372-1";
 export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"];
-export const serverNames = servers.map((server) => server.id);
 export const serverTwitterNames = new Set(["eu1"]);
 export const serverMaintenanceHour = 10;
 export const mapSize = 8192;

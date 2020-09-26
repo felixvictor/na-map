@@ -7,12 +7,12 @@
  * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import { default as Immutable } from "immutable";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { convertCoordX, convertCoordY } from "../common/common-math";
-import { serverNames } from "../common/common-var";
+import { serverNames } from "../common/servers";
 class Port {
     constructor() {
         this.apiPorts = [];

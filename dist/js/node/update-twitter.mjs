@@ -7,7 +7,7 @@
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import Twit from "twit";
 import filterXSS from "xss";
 import dayjs from "dayjs";
@@ -17,7 +17,8 @@ import { findNationByName, findNationByNationShortName } from "../common/common"
 import { commonPaths, serverStartDateTime } from "../common/common-dir";
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file";
 import { cleanName, simpleStringSort } from "../common/common-node";
-import { flagValidity, portBattleCooldown, serverNames } from "../common/common-var";
+import { flagValidity, portBattleCooldown } from "../common/common-var";
+import { serverNames } from "../common/servers";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 const consumerKey = process.argv[2];

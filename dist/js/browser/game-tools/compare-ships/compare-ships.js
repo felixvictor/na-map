@@ -9,8 +9,7 @@
  */
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
-import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array";
-import { nest as d3Nest } from "d3-collection";
+import { group as d3Group, max as d3Max, min as d3Min } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
@@ -535,18 +534,20 @@ export class CompareShips {
         }
     }
     _setupShipData() {
-        this._shipSelectData = d3Nest()
-            .key((ship) => String(ship.class))
-            .sortKeys(d3Ascending)
-            .entries(this._shipData
-            .map((ship) => ({
-            id: ship.id,
-            name: ship.name,
-            class: ship.class,
-            battleRating: ship.battleRating,
-            guns: ship.guns.total,
+        this._shipSelectData = [...d3Group(this._shipData, (ship) => ship.class)]
+            .map(([key, value]) => ({
+            key,
+            values: value
+                .map((ship) => ({
+                id: ship.id,
+                name: ship.name,
+                class: ship.class,
+                battleRating: ship.battleRating,
+                guns: ship.guns.total,
+            }))
+                .sort(sortBy(["name"])),
         }))
-            .sort(sortBy(["name"])));
+            .sort(sortBy(["key"]));
     }
     _setupModuleData() {
         this._moduleProperties = new Map(this._moduleDataDefault.flatMap((type) => type[1]
@@ -699,13 +700,14 @@ export class CompareShips {
         }
     }
     _getUpgradesOptions(moduleType, shipClass) {
-        const modules = d3Nest()
-            .key((module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))
-            .sortKeys(d3Ascending)
-            .sortValues((a, b) => a[1].name.localeCompare(b[1].name))
-            .entries([...this._moduleProperties].filter((module) => module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
-            (module[1].moduleLevel === "U" ||
-                module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))));
+        const moduleDataForShipClass = [...this._moduleProperties].filter((module) => module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
+            (module[1].moduleLevel === "U" || module[1].moduleLevel === CompareShips._getModuleLevel(shipClass)));
+        const modules = [...d3Group(moduleDataForShipClass, (module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))]
+            .map(([key, value]) => ({
+            key,
+            values: value.sort((a, b) => a[1].name.localeCompare(b[1].name)),
+        }))
+            .sort(sortBy(["key"]));
         let options;
         const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"]);
         if (modules.length > 1) {

@@ -7,11 +7,11 @@
  * @copyright 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, sortBy } from "../common/common-node";
-import { serverNames } from "../common/common-var";
+import { serverNames } from "../common/servers";
 const idWorkshop = 450;
 const idAcademy = 879;
 const idSeasoningShed = 2291;
