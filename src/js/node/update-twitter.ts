@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 import Twit from "twit"
 import filterXSS from "xss"
 
@@ -20,7 +20,8 @@ import { findNationByName, findNationByNationShortName, NationShortName } from "
 import { commonPaths, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
-import { flagValidity, portBattleCooldown, serverNames } from "../common/common-var"
+import { flagValidity, portBattleCooldown } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 

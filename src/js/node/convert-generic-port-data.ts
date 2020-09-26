@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 import polylabel from "polylabel"
 
 import { capitalToCounty } from "../common/common"
@@ -23,7 +23,7 @@ import {
     Point,
     rotationAngleInDegrees,
 } from "../common/common-math"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson, PbZone, PortBasic } from "../common/gen-json"
