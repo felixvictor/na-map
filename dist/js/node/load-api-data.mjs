@@ -8,12 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as fs from "fs";
-import * as path from "path";
+import path from "path";
 import { default as nodeFetch } from "node-fetch";
 import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir";
-import { apiBaseFiles, serverNames } from "../common/common-var";
+import { apiBaseFiles } from "../common/common-var";
 import { saveJsonAsync, xzAsync } from "../common/common-file";
 import { sortBy } from "../common/common-node";
+import { serverNames } from "../common/servers";
 const sourceBaseUrl = "https://storage.googleapis.com/";
 const sourceBaseDir = "nacleanopenworldprodshards";
 const serverBaseName = "cleanopenworldprod";
