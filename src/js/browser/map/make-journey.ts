@@ -55,6 +55,7 @@ interface Journey {
 export interface Segment {
     position: Point
     label: string
+    index: number
 }
 
 /**
@@ -157,20 +158,17 @@ export default class MakeJourney {
             d3Select(event.currentTarget).classed("drag-active", true)
         }
 
-        const dragged = (self: SVGCircleElement, event: Event, d: Segment): void => {
-            const e = d3Select((self.parentElement).parentElement).nodes()
-            const i = e.indexOf(self as HTMLElement)
-            console.log("dragged", self, event, e, i)
+        const dragged = (event: Event, d: Segment): void => {
+            console.log("dragged", event, d, d.index)
             // Set compass position
             // @ts-expect-error
             const newX = d.position[0] + Number(event.dx)
             // @ts-expect-error
             const newY = d.position[1] + Number(event.dy)
-            /*
-            if (i === 0) {
+            if (d.index === 0) {
                 this._compass.attr("x", newX).attr("y", newY)
             }
-*/
+
             // @ts-expect-error
             d3Select(event.currentTarget).attr("cx", event.x).attr("cy", event.y)
             d.position = [newX, newY]
@@ -188,8 +186,8 @@ export default class MakeJourney {
         this._drag = d3Drag<SVGSVGElement | SVGGElement, Event, Segment>()
             .on("start", dragStart)
             // @ts-expect-error
-            .on("drag", function (event: Event, d: Segment): void {
-                dragged(this, event, d)
+            .on("drag", (event: Event, d: Segment): void => {
+                dragged(event, d)
             })
             .on("end", dragEnd)
     }
@@ -720,10 +718,10 @@ export default class MakeJourney {
 
     plotCourse(x: number, y: number): void {
         if (this._journey.segments[0].position[0] > 0) {
-            this._journey.segments.push({ position: [x, y], label: "" })
+            this._journey.segments.push({ position: [x, y], label: "", index: this._journey.segments.length - 1 })
             this._printSegment()
         } else {
-            this._journey.segments[0] = { position: [x, y], label: "" }
+            this._journey.segments[0] = { position: [x, y], label: "", index: 0 }
             this._initJourney()
         }
     }
