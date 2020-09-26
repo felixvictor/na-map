@@ -8,21 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-// @ts-expect-error
-import servers from "../../../dist/js/common/servers.js"
-import { Server } from "./servers"
-
 export const GA_TRACKING_ID = "UA-109520372-1"
-
 export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"]
-export const serverNames = servers.map((server: Server) => server.id)
 export const serverTwitterNames = new Set(["eu1"])
-
-/* testbed
-   server_base_name="clean"
-   source_base_url="http://storage.googleapis.com/nacleandevshards/"
-   server_names=(dev)
-*/
 
 export const serverMaintenanceHour = 10
 export const mapSize = 8192

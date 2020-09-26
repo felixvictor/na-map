@@ -11,18 +11,16 @@
 import { select as d3Select, Selection } from "d3-selection"
 
 import { putImportError } from "../../common/common"
+import { servers } from "../../common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
+
 import DisplayPorts from "./display-ports"
 
 import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "../../common/gen-json"
 import { Bound } from "../../common/interface"
-import { Server } from "../../common/servers"
 import { Point } from "../../common/common-math"
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers: Server[] = require("../../common/servers")
 
 export default class DisplayPbZones {
     showPB: string

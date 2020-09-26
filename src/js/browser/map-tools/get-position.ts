@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -24,6 +22,7 @@ import { copyF11ToClipboard } from "../util"
 import { trilaterate, Vector } from "../util/transliterate"
 import Toast from "../util/toast"
 
+import JQuery from "jquery"
 import { HtmlString } from "../../common/interface"
 
 import DisplayPorts from "../map/display-ports"
@@ -141,7 +140,7 @@ export default class TrilateratePosition {
                     liveSearchPlaceholder: "Search ...",
                     title: "Select port",
                     virtualScroll: true,
-                } as BootstrapSelectOptions)
+                })
             }
         }
     }

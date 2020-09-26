@@ -4,8 +4,9 @@
     "extends": "../../tsconfig-main.json",
     "compilerOptions": {
         // "outFile": "./",                       /* Concatenate and emit output to single file. */
-        "outDir": "../../dist/" /* Redirect output structure to the directory. */
+        "outDir": "../../dist/", /* Redirect output structure to the directory. */
         // "rootDir": "./" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     },
-    "exclude": ["./browser"]
+    "exclude": ["./browser"],
+    "typeRoots": ["../../node_modules/@types", "./@types"]
 }

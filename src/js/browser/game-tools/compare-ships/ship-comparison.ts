@@ -9,20 +9,21 @@
  */
 
 import { max as d3Max, min as d3Min } from "d3-array"
-import * as d3Drag from "d3-drag"
+import { drag as d3Drag, DragBehavior, DragContainerElement, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { event as d3Event, Selection } from "d3-selection"
 import {
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
     pie as d3Pie,
     PieArcDatum,
     lineRadial as d3LineRadial,
 } from "d3-shape"
-
 import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "../../../common/common-format"
+
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math"
 import { rotationAngleInDegrees } from "../../util"
 import { default as shipIcon } from "Icons/icon-ship.svg"
+
+import { Selection } from "d3-selection"
 
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
@@ -50,7 +51,7 @@ export class ShipComparison extends Ship {
     private _maxSpeedDiff!: number
     private _shipRotate!: number
     private _speedText!: Selection<SVGTextElement, DragData, HTMLElement, unknown>
-    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | d3Drag.SubjectPosition>
+    private _drag!: DragBehavior<SVGCircleElement | SVGPathElement, Event, DragData | SubjectPosition>
     private _windProfile!: DragData
     private _gWindProfile!: Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _arcsComp!: Array<PieArcDatum<number | { valueOf: () => number }>>
@@ -110,12 +111,11 @@ export class ShipComparison extends Ship {
             .range([...this.shipCompareData.speedDegrees, this.shipCompareData.speedDegrees[0]])
             .clamp(true)
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragStart = (d: DragData): void => {
+        const dragStart = (event: Event, d: DragData): void => {
             d.this.classed("drag-active", true)
         }
 
-        const dragged = (d: DragData): void => {
+        const dragged = (event: Event, d: DragData): void => {
             const update = (): void => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`)
                 d.compassText
@@ -125,7 +125,7 @@ export class ShipComparison extends Ship {
                 this._updateSpeedText()
             }
 
-            const { x: xMouse, y: yMouse } = d3Event
+            const { x: xMouse, y: yMouse } = event
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
                 d.correctionValueDegrees
@@ -133,17 +133,18 @@ export class ShipComparison extends Ship {
             update()
         }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragEnd = (d: DragData): void => {
+        const dragEnd = (event: Event, d: DragData): void => {
             d.this.classed("drag-active", false)
         }
 
-        this._drag = d3Drag
-            .drag<SVGCircleElement | SVGPathElement, DragData>()
-            .on("start", dragStart)
-            .on("drag", dragged)
-            .on("end", dragEnd)
-            .container(() => this._mainG.node() as d3Drag.DragContainerElement)
+        this._drag = d3Drag<SVGCircleElement | SVGPathElement, Event, DragData>()
+            // @ts-expect-error
+            .on("start", (event: Event, d: DragData): void => dragStart(event, d))
+            // @ts-expect-error
+            .on("drag", (event: Event, d: DragData): void => dragged(event, d))
+            // @ts-expect-error
+            .on("end", (event: Event, d: DragData): void => dragEnd(event, d))
+            .container(() => this._mainG.node() as DragContainerElement)
     }
 
     _setupShipOutline(): void {

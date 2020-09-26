@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 
 import d3Array from "d3-array"
 const { group: d3Group } = d3Array
@@ -16,7 +16,7 @@ const { group: d3Group } = d3Array
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { serverNames } from "../common/servers"
 
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
 import { Recipe, RecipeEntity, RecipeGroup } from "../common/gen-json"

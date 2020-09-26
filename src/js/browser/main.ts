@@ -9,9 +9,7 @@
 
 import { initAnalytics, registerPage } from "./analytics"
 import { putImportError } from "../common/common"
-import { Server } from "../common/servers"
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers: Server[] = require("../common/servers")
+import { servers, Server } from "../common/servers"
 
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"

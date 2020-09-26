@@ -14,9 +14,15 @@ export interface Server {
     type: string
 }
 
-const servers = [
+export const servers = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" },
 ]
 
-module.exports = servers
+export const serverNames = servers.map((server: Server) => server.id)
+
+/* testbed
+   server_base_name="clean"
+   source_base_url="http://storage.googleapis.com/nacleandevshards/"
+   server_names=(dev)
+*/

@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -18,6 +16,7 @@ import * as d3Selection from "d3-selection"
 import { line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
+import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
@@ -29,6 +28,7 @@ import { HtmlString } from "../../common/interface"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
+
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.locale("en-gb")

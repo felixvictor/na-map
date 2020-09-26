@@ -13,16 +13,23 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select/js/bootstrap-select"
-import * as d3Range from "d3-array"
-import * as d3Selection from "d3-selection"
-import * as d3Zoom from "d3-zoom"
+import { range as d3Range } from "d3-array"
+import {
+    zoom as d3Zoom,
+    zoomIdentity as d3ZoomIdentity,
+    zoomTransform as d3ZoomTransform,
+    ZoomBehavior,
+    ZoomTransform,
+} from "d3-zoom"
+import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { appDescription, appTitle, appVersion, insertBaseModal } from "../../common/common-browser"
 import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
+
 import { displayClan } from "../util"
 
-import { Bound, MinMaxCoord, SVGGDatum, SVGSVGDatum, ZoomLevel } from "../../common/interface"
+import { Bound, MinMaxCoord, SVGGDatum, ZoomLevel } from "../../common/interface"
 
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
@@ -60,18 +67,18 @@ class NAMap {
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
     private _currentScale = 0
-    private _currentTranslate!: d3Zoom.ZoomTransform
+    private _currentTranslate!: ZoomTransform
     private _doubleClickAction: string
-    private _gMap!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    private _mainG!: d3Selection.Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    private _gMap!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    private _mainG!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
     private _pbZone!: DisplayPbZones
     private _ports!: DisplayPorts
     private _portSelect!: SelectPorts
     private _showGrid!: string
-    private _svg!: d3Selection.Selection<SVGSVGElement, SVGSVGDatum, HTMLElement, unknown>
-    private _zoom!: d3Zoom.ZoomBehavior<SVGSVGElement, SVGSVGDatum>
+    private _svg!: Selection<SVGSVGElement, Event, HTMLElement, unknown>
+    private _zoom!: ZoomBehavior<SVGSVGElement, Event>
     private _zoomLevel!: ZoomLevel
     private readonly _doubleClickActionCookie: Cookie
     private readonly _doubleClickActionId: string
@@ -183,7 +190,7 @@ class NAMap {
             size: "modal-lg",
         })
 
-        const body = d3Selection.select(`#${id} .modal-body`)
+        const body = d3Select(`#${id} .modal-body`)
         body.html(
             `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
                     <p>Designed by iB aka Felix Victor, <em>Bastards</em> clan ${displayClan("(BSTD)")}</a>.</p>
@@ -191,9 +198,9 @@ class NAMap {
         )
     }
 
-    static _stopProperty(): void {
-        if (d3Selection.event.defaultPrevented) {
-            d3Selection.event.stopPropagation()
+    static _stopProperty(event: Event): void {
+        if (event.defaultPrevented) {
+            event.stopPropagation()
         }
     }
 
@@ -264,12 +271,8 @@ class NAMap {
         this._svg
             // eslint-disable-next-line unicorn/no-null
             .on("dblclick.zoom", null)
-            .on("click", NAMap._stopProperty, true)
-            .on(
-                "dblclick",
-                (_d: SVGSVGDatum, i: number, nodes: SVGSVGElement[] | d3Selection.ArrayLike<SVGSVGElement>): void =>
-                    this._doDoubleClickAction(nodes[i])
-            )
+            .on("click", (event: Event) => NAMap._stopProperty(event), true)
+            .on("dblclick", (event: Event) => this._doDoubleClickAction(event))
 
         document.querySelector("#propertyDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Select port on property")
@@ -301,9 +304,8 @@ class NAMap {
     }
 
     _setupSvg(): void {
-        this._zoom = d3Zoom
-            .zoom<SVGSVGElement, SVGSVGDatum>()
-            .wheelDelta(() => -this._wheelDelta * Math.sign(d3Selection.event.deltaY))
+        this._zoom = d3Zoom<SVGSVGElement, Event>()
+            .wheelDelta((event: Event) => -this._wheelDelta * Math.sign(event.deltaY))
             .translateExtent([
                 [
                     this.coord.min - this.yGridBackgroundWidth * this.minScale,
@@ -312,10 +314,9 @@ class NAMap {
                 [this.coord.max, this.coord.max],
             ])
             .scaleExtent([this.minScale, this._maxScale])
-            .on("zoom", () => this._naZoomed())
+            .on("zoom", (event: Event) => this._naZoomed(event))
 
-        this._svg = d3Selection
-            .select<SVGSVGElement, SVGSVGDatum>("#na-map")
+        this._svg = d3Select<SVGSVGElement, Event>("#na-map")
             .append<SVGSVGElement>("svg")
             .attr("id", "na-svg")
             .call(this._zoom)
@@ -342,7 +343,7 @@ class NAMap {
         this._grid.update()
     }
 
-    _displayMap(transform: d3Zoom.ZoomTransform): void {
+    _displayMap(transform: ZoomTransform): void {
         // Based on d3-tile v0.0.3
         // https://github.com/d3/d3-tile/blob/0f8cc9f52564d4439845f651c5fab2fcc2fdef9e/src/tile.js
         const { x: tx, y: ty, k: tk } = transform
@@ -366,11 +367,11 @@ class NAMap {
             dx = maxCoordScaled < x1 ? tx : 0
         // Crop bottom
         const dy = maxCoordScaled < y1 ? ty : 0
-        const cols = d3Range.range(
+        const cols = d3Range(
             Math.max(0, Math.floor((x0 - tx) / tileSizeScaled)),
             Math.max(0, Math.min(Math.ceil((x1 - tx - dx) / tileSizeScaled), 2 ** tileZoom))
         )
-        const rows = d3Range.range(
+        const rows = d3Range(
             Math.max(0, Math.floor((y0 - ty) / tileSizeScaled)),
             Math.max(0, Math.min(Math.ceil((y1 - ty - dy) / tileSizeScaled), 2 ** tileZoom))
         )
@@ -387,12 +388,12 @@ class NAMap {
             }
         }
 
-        const transformNew = d3Zoom.zoomIdentity.translate(tx, ty).scale(roundToThousands(k))
+        const transformNew = d3ZoomIdentity.translate(tx, ty).scale(roundToThousands(k))
 
         this._updateMap(tiles, transformNew)
     }
 
-    _updateMap(tiles: Tile[], transform: d3Zoom.ZoomTransform): void {
+    _updateMap(tiles: Tile[], transform: ZoomTransform): void {
         this._gMap
             .attr("transform", transform.toString())
             .selectAll<HTMLImageElement, Tile>("image")
@@ -428,10 +429,9 @@ class NAMap {
         $(`#${modalId}`).modal("show")
     }
 
-    _doDoubleClickAction(self: SVGSVGElement): void {
-        const coord = d3Selection.mouse(self)
-        const transform = d3Zoom.zoomTransform(self)
-        const [mx, my] = coord
+    _doDoubleClickAction(event: MouseEvent): void {
+        const transform = d3ZoomTransform(this._gMap.node())
+        const [mx, my] = d3Pointer(event)
         const { k: tk, x: tx, y: ty } = transform
 
         const x = (mx - tx) / tk
@@ -446,9 +446,9 @@ class NAMap {
         this.zoomAndPan(x, y, 1)
     }
 
-    _setZoomLevelAndData(): void {
-        if (d3Selection.event.transform.k !== this._currentScale) {
-            this._currentScale = d3Selection.event.transform.k
+    _setZoomLevelAndData(transform: ZoomTransform): void {
+        if (transform.k !== this._currentScale) {
+            this._currentScale = transform.k
             if (this._currentScale > this._PBZoneZoomThreshold) {
                 if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone"
@@ -472,36 +472,38 @@ class NAMap {
     /**
      * Top left coordinates of current viewport
      */
-    _getLowerBound(zoomTransform: d3Zoom.ZoomTransform): Bound {
+    _getLowerBound(zoomTransform: ZoomTransform): Bound {
         return zoomTransform.invert([this.coord.min, this.coord.min])
     }
 
     /**
      * Bottom right coordinates of current viewport
      */
-    _getUpperBound(zoomTransform: d3Zoom.ZoomTransform): Bound {
+    _getUpperBound(zoomTransform: ZoomTransform): Bound {
         return zoomTransform.invert([this.width, this.height])
     }
 
-    _getZoomTransform(): d3Zoom.ZoomTransform {
+    _getZoomTransform(transform: ZoomTransform): ZoomTransform {
         this._currentTranslate = {
-            x: Math.floor(d3Selection.event.transform.x),
-            y: Math.floor(d3Selection.event.transform.y),
-        } as d3Zoom.ZoomTransform
+            x: Math.floor(transform.x),
+            y: Math.floor(transform.y),
+        } as ZoomTransform
 
         /**
          * Current transform
          */
-        return d3Zoom.zoomIdentity
+        return d3ZoomIdentity
             .translate(this._currentTranslate.x, this._currentTranslate.y)
-            .scale(roundToThousands(d3Selection.event.transform.k))
+            .scale(roundToThousands(transform.k))
     }
 
     /**
      * Zoom svg groups
      */
-    _naZoomed(): void {
-        const zoomTransform = this._getZoomTransform()
+    _naZoomed(event: Event): void {
+        const transform = event.transform as ZoomTransform
+
+        const zoomTransform = this._getZoomTransform(transform)
         /**
          * Top left coordinates of current viewport
          */
@@ -517,11 +519,11 @@ class NAMap {
         this.showTrades.setBounds(lowerBound, upperBound)
 
         this._displayMap(zoomTransform)
-        this._grid.transform()
+        this._grid.transform(event)
         this.showTrades.transform(zoomTransform)
         this._mainG.attr("transform", zoomTransform.toString())
 
-        this._setZoomLevelAndData()
+        this._setZoomLevelAndData(transform)
     }
 
     _checkF11Coord(): void {
@@ -549,7 +551,7 @@ class NAMap {
     }
 
     resize(): void {
-        const zoomTransform = d3Zoom.zoomIdentity
+        const zoomTransform = d3ZoomIdentity
             .translate(this._currentTranslate.x, this._currentTranslate.y)
             .scale(this._currentScale)
 
@@ -605,7 +607,7 @@ class NAMap {
     }
 
     zoomAndPan(x: number, y: number, scale: number): void {
-        const transform = d3Zoom.zoomIdentity
+        const transform = d3ZoomIdentity
             .scale(scale)
             .translate(Math.round(-x + this.width / 2 / scale), Math.round(-y + this.height / 2 / scale))
 

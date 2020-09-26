@@ -12,8 +12,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import { ascending as d3Ascending, max as d3Max, min as d3Min } from "d3-array"
-import { nest as d3Nest } from "d3-collection"
+import { group as d3Group, max as d3Max, min as d3Min } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
@@ -43,6 +42,7 @@ import { getOrdinal } from "../../../common/common-math"
 import { sortBy } from "../../../common/common-node"
 import { copyToClipboard } from "../../util"
 
+import JQuery from "jquery"
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
 import { WoodColumnType } from "../../../common/types"
@@ -61,7 +61,7 @@ interface SelectedData {
 }
 
 interface ShipSelectMap {
-    key: string
+    key: number
     values: ShipSelectData[]
 }
 
@@ -769,11 +769,10 @@ export class CompareShips {
      * Setup ship data (group by class)
      */
     _setupShipData(): void {
-        this._shipSelectData = d3Nest<ShipSelectData>()
-            .key((ship) => String(ship.class))
-            .sortKeys(d3Ascending)
-            .entries(
-                this._shipData
+        this._shipSelectData = [...d3Group(this._shipData, (ship) => ship.class)]
+            .map(([key, value]) => ({
+                key,
+                values: value
                     .map(
                         (ship) =>
                             ({
@@ -784,8 +783,9 @@ export class CompareShips {
                                 guns: ship.guns.total,
                             } as ShipSelectData)
                     )
-                    .sort(sortBy(["name"]))
-            )
+                    .sort(sortBy(["name"])),
+            }))
+            .sort(sortBy(["key"]))
     }
 
     /**
@@ -1012,21 +1012,21 @@ export class CompareShips {
      * @returns HTML formatted option
      */
     _getUpgradesOptions(moduleType: string, shipClass: number): string {
-        // Nest module data by sub type (e.g. "Gunnery")
-        const modules = d3Nest<[number, ModuleEntity]>()
-            .key((module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))
-            .sortKeys(d3Ascending)
-            .sortValues((a, b) => a[1].name.localeCompare(b[1].name))
-            .entries(
-                [...this._moduleProperties].filter(
-                    (module) =>
-                        module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
-                        (module[1].moduleLevel === "U" ||
-                            module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
-                )
-            )
+        const moduleDataForShipClass = [...this._moduleProperties].filter(
+            (module) =>
+                module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
+                (module[1].moduleLevel === "U" || module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
+        )
 
-        let options
+        // Group module data by sub type (e.g. "Gunnery")
+        const modules = [...d3Group(moduleDataForShipClass, (module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))]
+            .map(([key, value]) => ({
+                key,
+                values: value.sort((a, b) => a[1].name.localeCompare(b[1].name)),
+            }))
+            .sort(sortBy(["key"]))
+
+        let options: string
         const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
         if (modules.length > 1) {
             // Get options with sub types as optgroups
@@ -1035,13 +1035,9 @@ export class CompareShips {
                     (group) =>
                         `<optgroup label="${group.key}" data-max-options="${
                             moduleTypeWithSingleOption.has(moduleType.replace(/[\sA-Za-z]+\s–\s/, "")) ? 1 : 5
-                        }">${
-                            group.values
-                                .map(
-                                    (module: [number, ModuleEntity]) => `<option value="${module[0]}">${module[1].name}`
-                                )
-                                .join("</option>") as string
-                        }`
+                        }">${group.values
+                            .map((module: [number, ModuleEntity]) => `<option value="${module[0]}">${module[1].name}`)
+                            .join("</option>")}`
                 )
                 .join("</optgroup>")
         } else {
@@ -1049,13 +1045,9 @@ export class CompareShips {
             options = modules
                 .map(
                     (group) =>
-                        `${
-                            group.values
-                                .map(
-                                    (module: [number, ModuleEntity]) => `<option value="${module[0]}">${module[1].name}`
-                                )
-                                .join("</option>") as string
-                        }`
+                        `${group.values
+                            .map((module: [number, ModuleEntity]) => `<option value="${module[0]}">${module[1].name}`)
+                            .join("</option>")}`
                 )
                 .join("")
         }
