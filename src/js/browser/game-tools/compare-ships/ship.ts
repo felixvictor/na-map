@@ -207,9 +207,8 @@ export class Ship {
 
         text += displayFirstColumn("Resistance")
         text += Ship.displaySecondBlock()
-        text += displayColumn("fireResistance", "Fire %", 4)
-        text += displayColumn("leakResistance", "Leak %", 4)
-        text += displayColumn("splinterResistance", "Splinter %", 4)
+        text += displayColumn("leakResistance", "Leak %")
+        text += displayColumn("splinterResistance", "Splinter %")
         text += "</div></div></div>"
 
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>')

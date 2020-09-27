@@ -380,7 +380,6 @@ export class ShipBase extends Ship {
             carroBroadside: formatInt(this.shipData.guns.broadside.carronades),
             deceleration: formatFloat(this.shipData.ship.deceleration),
             decks: pluralise(this.shipData.guns.decks, "deck"),
-            fireResistance: formatSignInt(this.shipData.resistance!.fire * 100),
             firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
             frontArmor: `${formatInt(this.shipData.bow.armour)}</br><span class="badge badge-white">${formatInt(
                 this.shipData.bow.thickness

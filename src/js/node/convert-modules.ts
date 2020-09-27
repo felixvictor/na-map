@@ -118,7 +118,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE SHIP_TURNING_SPEED", "Turn speed"],
         ["REPAIR_ARMOR REPAIR_PERCENT", "Repair amount"],
         ["SAIL MAST_THICKNESS", "Mast thickness"],
-        ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["STRUCTURE FIRE_INCREASE_RATE", ""],
         ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
 
@@ -153,8 +153,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE BOARDING_DEFENSE_BONUS", "Melee defense"],
         ["NONE CREW_TRANSFER_SPEED", "Crew transfer speed"],
         ["NONE DECK_GUNS_ACCURACY_BONUS", "Boarding cannons accuracy"],
-        ["NONE FIRE_DECREASE_RATE", "Fire resistance"],
-        ["NONE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["NONE FIRE_DECREASE_RATE", ""],
+        ["NONE FIRE_INCREASE_RATE", ""],
         ["NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Cannon side traverse"],
         ["NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow"],
         ["NONE GRENADES_BONUS", "Grenades"],
@@ -248,12 +248,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ])
 
-    const flipAmountForModule = new Set<ModifierName>([
-        "Fire resistance",
-        "Leak resistance",
-        "Turn acceleration",
-        "Rudder speed",
-    ])
+    const flipAmountForModule = new Set<ModifierName>(["Leak resistance", "Turn acceleration", "Rudder speed"])
     const notPercentage = new Set<ModifierName>(["Crew with muskets", "Melee attack", "Melee defense", "Morale"])
 
     /**
