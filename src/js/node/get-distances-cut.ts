@@ -16,7 +16,7 @@ import { default as PNG } from "pngjs"
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
 
@@ -35,7 +35,7 @@ class Port {
     portIds: number[] = []
 
     constructor() {
-        this.#fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
+        this.#fileName = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`)
 
         xz("unxz", `${this.#fileName}.xz`)
         this.apiPorts = readJson(this.#fileName)

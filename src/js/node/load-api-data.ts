@@ -16,7 +16,7 @@ import { baseAPIFilename, serverStartDate as serverDate } from "../common/common
 import { apiBaseFiles } from "../common/common-var"
 import { saveJsonAsync, xzAsync } from "../common/common-file"
 import { sortBy } from "../common/common-node"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
@@ -91,7 +91,7 @@ const getAPIDataAndSave = async (serverName: string, apiBaseFile: string, outfil
 const loadData = async (baseAPIFilename: string): Promise<boolean> => {
     const deletePromise = []
     const getPromise = []
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`)
 

@@ -21,7 +21,7 @@ import { commonPaths, serverStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
 import { flagValidity, portBattleCooldown } from "../common/common-var"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 
@@ -34,7 +34,7 @@ const accessToken = process.argv[4]
 const accessTokenSecret = process.argv[5]
 const runType = process.argv[6] ?? "full"
 
-const portFilename = path.resolve(commonPaths.dirGenServer, `${serverNames[0]}-pb.json`)
+const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`)
 let ports: PortBattlePerServer[] = []
 let Twitter: Twit
 let tweets: string[] = []

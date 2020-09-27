@@ -8,8 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+export const serverIds = ["eu1", "eu2"] as const
+export type ServerId = typeof serverIds[number]
+
 export interface Server {
-    id: string
+    id: ServerId
     name: string
     type: string
 }
@@ -18,8 +21,6 @@ export const servers = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" },
 ]
-
-export const serverNames = servers.map((server: Server) => server.id)
 
 /* testbed
    server_base_name="clean"

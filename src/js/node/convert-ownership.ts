@@ -24,15 +24,21 @@ import { capitalToCounty, nations, NationShortName } from "../common/common"
 import { commonPaths } from "../common/common-dir"
 import { saveJsonAsync } from "../common/common-file"
 import { cleanName, sortBy } from "../common/common-node"
-import { serverNames } from "../common/servers"
+import { ServerId, serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
 import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json"
 
 const fileExtension = ".json.xz"
-const ports = new Map() as Map<string, Port>
-const numPortsDates: Array<OwnershipNation<number>> = []
-const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
+
+type ServerIdList<T> = {
+    [K in ServerId]: T
+}
+const ports = {} as ServerIdList<Map<string, Port>>
+const numPortsDates = {} as ServerIdList<Array<OwnershipNation<number>>>
+let serverId: ServerId
+const fileBaseNameRegex = {} as ServerIdList<RegExp>
+const fileNames = {} as ServerIdList<string[]>
 
 interface Port {
     name: string
@@ -101,10 +107,11 @@ const getDate = (date: string): string => dayjs(date).format("YYYY-MM-YY")
 
 /**
  * Parse data and construct ports Map
+ * @param serverId - Server id
  * @param portData - Port data
  * @param date - current date
  */
-function parseData(portData: APIPort[], date: string): void {
+function parseData(serverId: ServerId, portData: APIPort[], date: string): void {
     // console.log("**** new date", date);
 
     const numPorts = {} as NationList<number>
@@ -130,7 +137,7 @@ function parseData(portData: APIPort[], date: string): void {
          * Set initial data
          */
         const initData = (): void => {
-            ports.set(port.Id, {
+            ports[serverId].set(port.Id, {
                 name: cleanName(port.Name),
                 region: port.Location,
                 county: capitalToCounty.get(port.CountyCapitalName) ?? "",
@@ -143,7 +150,7 @@ function parseData(portData: APIPort[], date: string): void {
          * @returns nation short name
          */
         const getPreviousNation = (): NationShortName | "" => {
-            const portData = ports.get(port.Id)
+            const portData = ports[serverId].get(port.Id)
             if (portData) {
                 const index = portData.data.length - 1 ?? 0
                 return portData.data[index].val as NationShortName
@@ -157,10 +164,10 @@ function parseData(portData: APIPort[], date: string): void {
          */
         const setNewNation = (): void => {
             // console.log("setNewNation -> ", ports.get(port.Id));
-            const portData = ports.get(port.Id)
+            const portData = ports[serverId].get(port.Id)
             if (portData) {
                 portData.data.push(getObject())
-                ports.set(port.Id, portData)
+                ports[serverId].set(port.Id, portData)
             }
         }
 
@@ -168,11 +175,11 @@ function parseData(portData: APIPort[], date: string): void {
          * Change end date for current nation
          */
         const setNewEndDate = (): void => {
-            const portData = ports.get(port.Id)
+            const portData = ports[serverId].get(port.Id)
             if (portData) {
                 // console.log("setNewEndDate -> ", ports.get(port.Id), values);
                 portData.data[portData.data.length - 1].timeRange[1] = getDate(date)
-                ports.set(port.Id, portData)
+                ports[serverId].set(port.Id, portData)
             }
         }
 
@@ -180,7 +187,7 @@ function parseData(portData: APIPort[], date: string): void {
         if (port.Nation !== 9) {
             const currentNation = nations[port.Nation].short
             numPorts[currentNation] = Number(numPorts[currentNation]) + 1
-            if (ports.get(port.Id)) {
+            if (ports[serverId].get(port.Id)) {
                 // console.log("ports.get(port.Id)");
                 const oldNation = getPreviousNation()
                 if (currentNation === oldNation) {
@@ -202,16 +209,17 @@ function parseData(portData: APIPort[], date: string): void {
         .forEach((nation) => {
             numPortsDate[nation.short] = numPorts[nation.short]
         })
-    numPortsDates.push(numPortsDate)
-    // console.log("**** 138 -->", ports.get("138"));
+    numPortsDates[serverId].push(numPortsDate)
+    // console.log("**** 138 -->", [serverId], ports[serverId].get("138"));
 }
 
 /**
  * Process all files
+ * @param serverId - Server id
  * @param fileNames - File names
  * @returns Resolved promise
  */
-const processFiles = async (fileNames: string[]): Promise<unknown> => {
+const processFiles = async (serverId: ServerId, fileNames: string[]): Promise<unknown> => {
     // eslint-disable-next-line unicorn/no-reduce
     return fileNames.reduce(
         async (sequence, fileName) =>
@@ -220,8 +228,8 @@ const processFiles = async (fileNames: string[]): Promise<unknown> => {
                 .then((compressedContent) => decompress(compressedContent))
                 .then((decompressedContent) => {
                     if (decompressedContent) {
-                        const currentDate = (fileBaseNameRegex.exec(path.basename(fileName)) ?? [])[1]
-                        parseData(JSON.parse(decompressedContent.toString()), currentDate)
+                        const currentDate = (fileBaseNameRegex[serverId].exec(path.basename(fileName)) ?? [])[1]
+                        parseData(serverId, JSON.parse(decompressedContent.toString()), currentDate)
                     }
                 })
                 .catch((error) => {
@@ -232,21 +240,12 @@ const processFiles = async (fileNames: string[]): Promise<unknown> => {
 }
 
 /**
- * Check if file should be ignored
- * @param fileName - File name
- * @param stats - Stat
- * @returns True if file should be ignored
- */
-const ignoreFileName = (fileName: string, stats: Stats): boolean => {
-    return !stats.isDirectory() && fileBaseNameRegex.exec(path.basename(fileName)) === null
-}
-
-/**
  * Write out result
+ * @param serverId - Server id
  */
-const writeResult = async (): Promise<void> => {
+const writeResult = async (serverId: ServerId): Promise<void> => {
     const groups = (d3Group<Port, string>(
-        [...ports.values()],
+        [...ports[serverId].values()],
         (d) => d.region,
         // @ts-expect-error
         (d) => d.county
@@ -281,24 +280,44 @@ const writeResult = async (): Promise<void> => {
         )
         .sort(sortBy(["region"]))
 
-    await saveJsonAsync(commonPaths.fileOwnership, grouped)
-    await saveJsonAsync(commonPaths.fileNation, numPortsDates)
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-ownership.json`), grouped)
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-nation.json`), numPortsDates[serverId])
 }
 
 /**
  * Retrieve port data for nation/clan ownership
+ * @param serverId - Server id
  */
-const convertOwnership = async (): Promise<void> => {
+const convertOwnership = async (serverId: ServerId): Promise<void> => {
+    /**
+     * Check if file should be ignored
+     * @param fileName - File name
+     * @param stats - Stat
+     * @returns True if file should be ignored
+     */
+    const ignoreFileName = (fileName: string, stats: Stats): boolean => {
+        return !stats.isDirectory() && fileBaseNameRegex[serverId].exec(path.basename(fileName)) === null
+    }
+
+    ports[serverId] = new Map()
+    numPortsDates[serverId] = []
+
     try {
-        const fileNames = await readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
-        sortFileNames(fileNames)
-        await processFiles(fileNames)
-        await writeResult()
+        fileNames[serverId] = await readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
+        sortFileNames(fileNames[serverId])
+        await processFiles(serverId, fileNames[serverId])
+        await writeResult(serverId)
     } catch (error: unknown) {
         throw new Error(error as string)
     }
 }
 
-export const convertOwnershipData = (): void => {
-    void convertOwnership()
+export const convertOwnershipData = async (): Promise<unknown[]> => {
+    const results = []
+    for (serverId of serverIds) {
+        fileBaseNameRegex[serverId] = new RegExp(`${serverId}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
+        results.push(convertOwnership(serverId))
+    }
+
+    return Promise.all(results)
 }

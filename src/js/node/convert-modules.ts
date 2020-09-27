@@ -17,7 +17,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { capitalizeFirstLetter, woodType } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
 import {
@@ -547,7 +547,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
 }
 
 export const convertModules = (): void => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
 
     void convertModulesAndWoodData()
 }
