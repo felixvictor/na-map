@@ -493,6 +493,7 @@ export interface ShipData extends ObjectIndexer<any> {
     bow: ShipHealth
     class: number
     crew: ShipCrew
+    cannon?: ShipGunnery
     guns: ShipGuns
     holdSize: number
     id: number
@@ -526,6 +527,19 @@ interface ShipBoarding {
     morale?: number
     musketsAccuracy?: number
     musketsCrew?: number
+}
+interface ShipGunnery {
+    dispersion: ShipGunneryDispersion
+    reload: number
+    traverse: ShipGunneryTraverse
+}
+interface ShipGunneryDispersion {
+    horizontal: number
+    vertical: number
+}
+interface ShipGunneryTraverse {
+    upDown: number
+    side: number
 }
 interface ShipGuns {
     total: number
