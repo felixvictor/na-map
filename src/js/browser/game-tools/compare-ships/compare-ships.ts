@@ -392,6 +392,15 @@ export class CompareShips {
 
     _setupData(): void {
         this._moduleAndWoodChanges = new Map<ModifierName, Property>([
+            [
+                "Cannon horizontal dispersion",
+                { properties: ["cannon.dispersion.horizontal"], isBaseValueAbsolute: true },
+            ],
+            ["Cannon vertical dispersion", { properties: ["cannon.dispersion.vertical"], isBaseValueAbsolute: true }],
+            ["Cannon reload time", { properties: ["cannon.reload"], isBaseValueAbsolute: true }],
+            ["Cannon side traverse", { properties: ["cannon.traverse.side"], isBaseValueAbsolute: true }],
+            ["Cannon up/down traverse", { properties: ["cannon.traverse.upDown"], isBaseValueAbsolute: true }],
+
             ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
             ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
             ["Preparation", { properties: ["boarding.prepPerRound"], isBaseValueAbsolute: true }],
@@ -1177,6 +1186,17 @@ export class CompareShips {
             musketsCrew: 30,
             prepInitial: shipDataDefault.boarding.prepInitial,
             prepPerRound: shipDataDefault.boarding.prepPerRound,
+        }
+        shipDataDefault.cannon = {
+            dispersion: {
+                horizontal: 0,
+                vertical: 0,
+            },
+            reload: 0,
+            traverse: {
+                upDown: 0,
+                side: 0,
+            },
         }
 
         let shipDataUpdated = shipDataDefault
