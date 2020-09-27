@@ -30,6 +30,9 @@ import { APIPort } from "./api-port"
 import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json"
 
 const fileExtension = ".json.xz"
+const ports = new Map() as Map<string, Port>
+const numPortsDates: Array<OwnershipNation<number>> = []
+const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
 
 interface Port {
     name: string
@@ -97,208 +100,205 @@ const sortFileNames = (fileNames: string[]): string[] => {
 const getDate = (date: string): string => dayjs(date).format("YYYY-MM-YY")
 
 /**
- * Retrieve port data for nation/clan ownership
+ * Parse data and construct ports Map
+ * @param portData - Port data
+ * @param date - current date
  */
-const convertOwnership = (): void => {
-    const ports = new Map() as Map<string, Port>
-    const numPortsDates: Array<OwnershipNation<number>> = []
-    const fileBaseNameRegex = new RegExp(`${serverNames[0]}-Ports-(20\\d{2}-\\d{2}-\\d{2})${fileExtension}`)
+function parseData(portData: APIPort[], date: string): void {
+    // console.log("**** new date", date);
 
-    /**
-     * Parse data and construct ports Map
-     * @param portData - Port data
-     * @param date - current date
-     */
-    function parseData(portData: APIPort[], date: string): void {
-        // console.log("**** new date", date);
+    const numPorts = {} as NationList<number>
+    nations
+        .filter((nation) => nation.id !== 9)
+        .forEach((nation) => {
+            numPorts[nation.short] = 0
+        })
 
-        const numPorts = {} as NationList<number>
-        nations
-            .filter((nation) => nation.id !== 9)
-            .forEach((nation) => {
-                numPorts[nation.short] = 0
-            })
-
-        for (const port of portData) {
-            /**
-             * Get data object
-             */
-            const getObject = (): Segment => {
-                const dateF = getDate(date)
-                return {
-                    timeRange: [dateF, dateF],
-                    val: nations[port.Nation].short,
-                }
-            }
-
-            /**
-             * Set initial data
-             */
-            const initData = (): void => {
-                ports.set(port.Id, {
-                    name: cleanName(port.Name),
-                    region: port.Location,
-                    county: capitalToCounty.get(port.CountyCapitalName) ?? "",
-                    data: [getObject()],
-                })
-            }
-
-            /**
-             * Get previous nation short name
-             * @returns nation short name
-             */
-            const getPreviousNation = (): NationShortName | "" => {
-                const portData = ports.get(port.Id)
-                if (portData) {
-                    const index = portData.data.length - 1 ?? 0
-                    return portData.data[index].val as NationShortName
-                }
-
-                return ""
-            }
-
-            /**
-             * Add new nation entry
-             */
-            const setNewNation = (): void => {
-                // console.log("setNewNation -> ", ports.get(port.Id));
-                const portData = ports.get(port.Id)
-                if (portData) {
-                    portData.data.push(getObject())
-                    ports.set(port.Id, portData)
-                }
-            }
-
-            /**
-             * Change end date for current nation
-             */
-            const setNewEndDate = (): void => {
-                const portData = ports.get(port.Id)
-                if (portData) {
-                    // console.log("setNewEndDate -> ", ports.get(port.Id), values);
-                    portData.data[portData.data.length - 1].timeRange[1] = getDate(date)
-                    ports.set(port.Id, portData)
-                }
-            }
-
-            // Exclude free towns
-            if (port.Nation !== 9) {
-                const currentNation = nations[port.Nation].short
-                numPorts[currentNation] = Number(numPorts[currentNation]) + 1
-                if (ports.get(port.Id)) {
-                    // console.log("ports.get(port.Id)");
-                    const oldNation = getPreviousNation()
-                    if (currentNation === oldNation) {
-                        setNewEndDate()
-                    } else {
-                        setNewNation()
-                    }
-                } else {
-                    // console.log("!ports.get(port.Id)");
-                    initData()
-                }
+    for (const port of portData) {
+        /**
+         * Get data object
+         */
+        const getObject = (): Segment => {
+            const dateF = getDate(date)
+            return {
+                timeRange: [dateF, dateF],
+                val: nations[port.Nation].short,
             }
         }
 
-        const numPortsDate = {} as OwnershipNation<number>
-        numPortsDate.date = date
-        nations
-            .filter((nation) => nation.id !== 9)
-            .forEach((nation) => {
-                numPortsDate[nation.short] = numPorts[nation.short]
+        /**
+         * Set initial data
+         */
+        const initData = (): void => {
+            ports.set(port.Id, {
+                name: cleanName(port.Name),
+                region: port.Location,
+                county: capitalToCounty.get(port.CountyCapitalName) ?? "",
+                data: [getObject()],
             })
-        numPortsDates.push(numPortsDate)
-        // console.log("**** 138 -->", ports.get("138"));
+        }
+
+        /**
+         * Get previous nation short name
+         * @returns nation short name
+         */
+        const getPreviousNation = (): NationShortName | "" => {
+            const portData = ports.get(port.Id)
+            if (portData) {
+                const index = portData.data.length - 1 ?? 0
+                return portData.data[index].val as NationShortName
+            }
+
+            return ""
+        }
+
+        /**
+         * Add new nation entry
+         */
+        const setNewNation = (): void => {
+            // console.log("setNewNation -> ", ports.get(port.Id));
+            const portData = ports.get(port.Id)
+            if (portData) {
+                portData.data.push(getObject())
+                ports.set(port.Id, portData)
+            }
+        }
+
+        /**
+         * Change end date for current nation
+         */
+        const setNewEndDate = (): void => {
+            const portData = ports.get(port.Id)
+            if (portData) {
+                // console.log("setNewEndDate -> ", ports.get(port.Id), values);
+                portData.data[portData.data.length - 1].timeRange[1] = getDate(date)
+                ports.set(port.Id, portData)
+            }
+        }
+
+        // Exclude free towns
+        if (port.Nation !== 9) {
+            const currentNation = nations[port.Nation].short
+            numPorts[currentNation] = Number(numPorts[currentNation]) + 1
+            if (ports.get(port.Id)) {
+                // console.log("ports.get(port.Id)");
+                const oldNation = getPreviousNation()
+                if (currentNation === oldNation) {
+                    setNewEndDate()
+                } else {
+                    setNewNation()
+                }
+            } else {
+                // console.log("!ports.get(port.Id)");
+                initData()
+            }
+        }
     }
 
-    /**
-     * Process all files
-     * @param fileNames - File names
-     * @returns Resolved promise
-     */
-    const processFiles = async (fileNames: string[]): Promise<unknown> => {
-        // eslint-disable-next-line unicorn/no-reduce
-        return fileNames.reduce(
-            async (sequence, fileName) =>
-                sequence
-                    .then(async () => readFileContent(fileName))
-                    .then((compressedContent) => decompress(compressedContent))
-                    .then((decompressedContent) => {
-                        if (decompressedContent) {
-                            const currentDate = (fileBaseNameRegex.exec(path.basename(fileName)) ?? [])[1]
-                            parseData(JSON.parse(decompressedContent.toString()), currentDate)
-                        }
-                    })
-                    .catch((error) => {
-                        throw new Error(error)
-                    }),
-            Promise.resolve()
-        )
-    }
-
-    /**
-     * Check if file should be ignored
-     * @param fileName - File name
-     * @param stats - Stat
-     * @returns True if file should be ignored
-     */
-    const ignoreFileName = (fileName: string, stats: Stats): boolean => {
-        return !stats.isDirectory() && fileBaseNameRegex.exec(path.basename(fileName)) === null
-    }
-
-    /**
-     * Write out result
-     */
-    const writeResult = async (): Promise<void> => {
-        const groups = (d3Group<Port, string>(
-            [...ports.values()],
-            (d) => d.region,
-            // @ts-expect-error
-            (d) => d.county
-        ) as unknown) as RegionGroup
-
-        // Convert to data structure needed for timelines-chart
-        // region
-        // -- group (counties)
-        //    -- label (ports)
-        const grouped = [...groups]
-            .map(
-                ([regionKey, regionValue]) =>
-                    ({
-                        region: regionKey,
-                        data: [...regionValue]
-                            .map(
-                                ([countyKey, countyValue]) =>
-                                    ({
-                                        group: countyKey,
-                                        data: countyValue
-                                            .map((port) => {
-                                                return {
-                                                    label: port.name,
-                                                    data: port.data,
-                                                } as Line
-                                            })
-                                            .sort(sortBy(["label"])),
-                                    } as Group)
-                            )
-                            .sort(sortBy(["group"])),
-                    } as Ownership)
-            )
-            .sort(sortBy(["region"]))
-
-        await saveJsonAsync(commonPaths.fileOwnership, grouped)
-        await saveJsonAsync(commonPaths.fileNation, numPortsDates)
-    }
-
-    readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
-        .then((fileNames) => sortFileNames(fileNames))
-        .then(async (fileNames) => processFiles(fileNames))
-        .then(async () => writeResult())
-        .catch((error) => {
-            throw new Error(error)
+    const numPortsDate = {} as OwnershipNation<number>
+    numPortsDate.date = date
+    nations
+        .filter((nation) => nation.id !== 9)
+        .forEach((nation) => {
+            numPortsDate[nation.short] = numPorts[nation.short]
         })
+    numPortsDates.push(numPortsDate)
+    // console.log("**** 138 -->", ports.get("138"));
+}
+
+/**
+ * Process all files
+ * @param fileNames - File names
+ * @returns Resolved promise
+ */
+const processFiles = async (fileNames: string[]): Promise<unknown> => {
+    // eslint-disable-next-line unicorn/no-reduce
+    return fileNames.reduce(
+        async (sequence, fileName) =>
+            sequence
+                .then(async () => readFileContent(fileName))
+                .then((compressedContent) => decompress(compressedContent))
+                .then((decompressedContent) => {
+                    if (decompressedContent) {
+                        const currentDate = (fileBaseNameRegex.exec(path.basename(fileName)) ?? [])[1]
+                        parseData(JSON.parse(decompressedContent.toString()), currentDate)
+                    }
+                })
+                .catch((error) => {
+                    throw new Error(error)
+                }),
+        Promise.resolve()
+    )
+}
+
+/**
+ * Check if file should be ignored
+ * @param fileName - File name
+ * @param stats - Stat
+ * @returns True if file should be ignored
+ */
+const ignoreFileName = (fileName: string, stats: Stats): boolean => {
+    return !stats.isDirectory() && fileBaseNameRegex.exec(path.basename(fileName)) === null
+}
+
+/**
+ * Write out result
+ */
+const writeResult = async (): Promise<void> => {
+    const groups = (d3Group<Port, string>(
+        [...ports.values()],
+        (d) => d.region,
+        // @ts-expect-error
+        (d) => d.county
+    ) as unknown) as RegionGroup
+
+    // Convert to data structure needed for timelines-chart
+    // region
+    // -- group (counties)
+    //    -- label (ports)
+    const grouped = [...groups]
+        .map(
+            ([regionKey, regionValue]) =>
+                ({
+                    region: regionKey,
+                    data: [...regionValue]
+                        .map(
+                            ([countyKey, countyValue]) =>
+                                ({
+                                    group: countyKey,
+                                    data: countyValue
+                                        .map((port) => {
+                                            return {
+                                                label: port.name,
+                                                data: port.data,
+                                            } as Line
+                                        })
+                                        .sort(sortBy(["label"])),
+                                } as Group)
+                        )
+                        .sort(sortBy(["group"])),
+                } as Ownership)
+        )
+        .sort(sortBy(["region"]))
+
+    await saveJsonAsync(commonPaths.fileOwnership, grouped)
+    await saveJsonAsync(commonPaths.fileNation, numPortsDates)
+}
+
+/**
+ * Retrieve port data for nation/clan ownership
+ */
+const convertOwnership = async (): Promise<void> => {
+    try {
+        const fileNames = await readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
+        sortFileNames(fileNames)
+        await processFiles(fileNames)
+        await writeResult()
+    } catch (error: unknown) {
+        throw new Error(error as string)
+    }
 }
 
 export const convertOwnershipData = (): void => {
-    convertOwnership()
+    void convertOwnership()
 }
