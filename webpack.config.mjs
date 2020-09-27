@@ -50,7 +50,7 @@ const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 const { TARGET, QUIET } = process.env
 const isQuiet = Boolean(QUIET)
 const targetUrl = TARGET ? `https://${TARGET}.netlify.app/` : `http://localhost/na/`
-const publicPath = TARGET ? "/" : `http://localhost/na/`
+const publicPath = TARGET || !isProduction ? "/" : `http://localhost/na/`
 
 const libraryName = PACKAGE.name
 const descriptionLong =
