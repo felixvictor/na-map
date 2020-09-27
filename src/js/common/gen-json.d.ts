@@ -590,7 +590,6 @@ interface ShipRepairTime {
     default?: number
 }
 interface ShipResistance {
-    fire: number
     leaks: number
     splinter: number
 }
