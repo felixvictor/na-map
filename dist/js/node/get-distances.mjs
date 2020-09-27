@@ -16,13 +16,13 @@ import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { convertCoordX, convertCoordY } from "../common/common-math";
 import { simpleNumberSort } from "../common/common-node";
 import { distanceMapSize, mapSize } from "../common/common-var";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 class Port {
     constructor() {
         this.apiPorts = [];
         this.numPorts = 0;
         this.portIds = [];
-        this.#fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`);
+        this.#fileName = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`);
         xz("unxz", `${this.#fileName}.xz`);
         this.apiPorts = readJson(this.#fileName);
         xz("xz", this.#fileName);

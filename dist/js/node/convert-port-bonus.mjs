@@ -13,7 +13,7 @@ import { default as csvParser } from "csv-parser";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 let apiPorts = [];
 let portNames = {};
 const readCSV = () => {
@@ -51,7 +51,7 @@ const convert = async (csvData) => {
         .sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.filePortBonus, ports);
 };
-const apiPortJson = `${serverNames[0]}-Ports-${serverDate}.json`;
+const apiPortJson = `${serverIds[0]}-Ports-${serverDate}.json`;
 const fileNameJson = path.resolve(baseAPIFilename, `${apiPortJson}`);
 xz("unxz", `${fileNameJson}.xz`);
 apiPorts = readJson(path.resolve(baseAPIFilename, apiPortJson));

@@ -16,7 +16,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node";
 import { serverTwitterNames } from "../common/common-var";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 const minProfit = 30000;
 const frontlinePorts = 2;
 let apiItems;
@@ -249,7 +249,7 @@ const setAndSaveFrontlines = async (serverName) => {
     });
 };
 export const convertServerPortData = () => {
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`));
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`));
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`));

@@ -14,7 +14,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file";
 import { roundToThousands, speedConstA, speedConstB } from "../common/common-math";
 import { cleanName, sortBy } from "../common/common-node";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 import { isEmpty } from "../common/common";
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
@@ -452,7 +452,7 @@ const convertShips = async () => {
     await saveJsonAsync(commonPaths.fileShip, ships);
 };
 export const convertShipData = async () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`));
     cannons = readJson(commonPaths.fileCannon);
     await convertShips();
     await convertShipBlueprints();

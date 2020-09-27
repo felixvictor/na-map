@@ -12,7 +12,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { getOrdinal } from "../common/common-math";
 import { cleanName, sortBy } from "../common/common-node";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 let apiItems;
 const secondsPerHour = 3600;
 const getLootName = (classId, isMission) => {
@@ -76,7 +76,7 @@ const convertLoot = async () => {
     await saveJsonAsync(commonPaths.fileLoot, data);
 };
 export const convertLootData = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`));
     void convertLoot();
 };
 //# sourceMappingURL=convert-loot.js.map
