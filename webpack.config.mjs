@@ -50,6 +50,7 @@ const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 const { TARGET, QUIET } = process.env
 const isQuiet = Boolean(QUIET)
 const targetUrl = TARGET ? `https://${TARGET}.netlify.app/` : `http://localhost/na/`
+const publicPath = TARGET ? "/" : `http://localhost/na/`
 
 const libraryName = PACKAGE.name
 const descriptionLong =
@@ -315,9 +316,10 @@ const config = {
 
     output: {
         chunkFilename: isProduction ? "[name].[contenthash].js" : "[name].js",
+        crossOriginLoading: "anonymous",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
-        crossOriginLoading: "anonymous",
+        publicPath,
     },
 
     plugins: [
