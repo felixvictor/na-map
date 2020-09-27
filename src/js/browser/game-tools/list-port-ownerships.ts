@@ -44,6 +44,7 @@ import { HtmlString } from "../../common/interface"
  *
  */
 export default class ListPortOwnerships {
+    #serverId!: string
     private readonly _baseName: string
     private readonly _baseId: HtmlString
     private readonly _buttonId: HtmlString
@@ -56,7 +57,8 @@ export default class ListPortOwnerships {
     private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
 
-    constructor() {
+    constructor(serverId: string) {
+        this.#serverId = serverId
         this._baseName = "Port ownership"
         this._baseId = "ownership-list"
         this._buttonId = `button-${this._baseId}`
@@ -83,12 +85,15 @@ export default class ListPortOwnerships {
     }
 
     async _loadAndSetupData(): Promise<void> {
+        const dataDirectory = "data"
+
         try {
-            this._nationData = (await import(/* webpackChunkName: "data-nations" */ "Lib/gen-generic/nations.json"))
-                .default as Array<OwnershipNation<number>>
-            this._ownershipData = (
-                await import(/* webpackChunkName: "data-ownership" */ "Lib/gen-generic/ownership.json")
-            ).default as Ownership[]
+            this._nationData = (await (await fetch(`${dataDirectory}/${this.#serverId}-nation.json`)).json()) as Array<
+                OwnershipNation<number>
+            >
+            this._ownershipData = (await (
+                await fetch(`${dataDirectory}/${this.#serverId}-ownership.json`)
+            ).json()) as Ownership[]
         } catch (error: unknown) {
             putImportError(error as string)
         }

@@ -15,7 +15,7 @@ import { promisify } from "util"
 
 import { apiBaseFiles } from "./common-var"
 import { baseAPIFilename, serverStartDate } from "./common-dir"
-import { serverNames } from "./servers"
+import { serverIds } from "./servers"
 // @ts-expect-error
 import { ErrnoException } from "node/globals"
 
@@ -84,7 +84,7 @@ export const xz = (command: string, fileName: string): void => {
 const loopApiFiles = (command: string): void => {
     const ext = command === "xz" ? "json" : "json.xz"
 
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverStartDate}.${ext}`)
             xz(command, fileName)

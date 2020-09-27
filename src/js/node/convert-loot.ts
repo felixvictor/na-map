@@ -14,7 +14,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { getOrdinal } from "../common/common-math"
 import { cleanName, sortBy } from "../common/common-node"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import {
     APIItemGeneric,
@@ -122,7 +122,7 @@ const convertLoot = async (): Promise<void> => {
 }
 
 export const convertLootData = (): void => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
 
     void convertLoot()
 }

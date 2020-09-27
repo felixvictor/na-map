@@ -23,7 +23,7 @@ import {
     Point,
     rotationAngleInDegrees,
 } from "../common/common-math"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson, PbZone, PortBasic } from "../common/gen-json"
@@ -271,7 +271,7 @@ const getEquidistantPorts = async (): Promise<void> => {
 */
 
 export const convertGenericPortData = (): void => {
-    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`))
+    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`))
 
     apiPortPos = new Map(
         apiPorts.map((apiPort) => [
