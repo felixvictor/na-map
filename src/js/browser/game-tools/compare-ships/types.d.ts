@@ -19,7 +19,6 @@ export interface ShipDisplayData {
     carroWeight: string
     deceleration: string
     decks: string
-    fireResistance: string
     frontArmor: string
     guns: string
     gunsBack: number | string

@@ -446,12 +446,6 @@ export class ShipComparison extends Ship {
                 2
             )}`,
             decks: pluralise(this.shipCompareData.guns.decks, "deck"),
-            fireResistance: `${formatSignInt(this.shipCompareData.resistance!.fire * 100)}\u00A0${getDiff(
-                this.shipCompareData.resistance!.fire,
-                this._shipBaseData.resistance!.fire,
-                2,
-                true
-            )}`,
             firezoneHorizontalWidth: `${this.shipCompareData.ship.firezoneHorizontalWidth}\u00A0${getDiff(
                 this.shipCompareData.ship.firezoneHorizontalWidth,
                 this._shipBaseData.ship.firezoneHorizontalWidth

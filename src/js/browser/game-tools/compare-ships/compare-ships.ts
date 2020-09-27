@@ -417,7 +417,6 @@ export class CompareShips {
             ["Carronade crew", { properties: ["crew.carronades"], isBaseValueAbsolute: true }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
             ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
-            ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
             ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
@@ -1189,7 +1188,6 @@ export class CompareShips {
         }
         shipDataUpdated.repairTime = { sides: repairTime, default: repairTime } as ShipRepairTime
         shipDataUpdated.resistance = {
-            fire: 0,
             leaks: 0,
             splinter: 0,
         }
