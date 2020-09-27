@@ -14,7 +14,7 @@ import { baseAPIFilename, serverStartDate as serverDate } from "../common/common
 import { apiBaseFiles } from "../common/common-var";
 import { saveJsonAsync, xzAsync } from "../common/common-file";
 import { sortBy } from "../common/common-node";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 const sourceBaseUrl = "https://storage.googleapis.com/";
 const sourceBaseDir = "nacleanopenworldprodshards";
 const serverBaseName = "cleanopenworldprod";
@@ -56,7 +56,7 @@ const getAPIDataAndSave = async (serverName, apiBaseFile, outfileName) => {
 const loadData = async (baseAPIFilename) => {
     const deletePromise = [];
     const getPromise = [];
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`);
             deletePromise.push(deleteAPIFiles(outfileName));
