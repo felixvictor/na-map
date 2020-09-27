@@ -58,7 +58,7 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     void new ListModules()
     void new ListPortBattles(serverId)
     void new ListPortBonus(serverId)
-    void new ListPortOwnerships()
+    void new ListPortOwnerships(serverId)
     void new ListRecipes(serverId)
     void new ListShips()
     void new ListShipBlueprints()

@@ -20,7 +20,7 @@ import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"
 import { serverTwitterNames } from "../common/common-var"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
@@ -377,7 +377,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 }
 
 export const convertServerPortData = (): void => {
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         apiItems = readJson(path.resolve(baseAPIFilename, `${serverName}-ItemTemplates-${serverDate}.json`))
         apiPorts = readJson(path.resolve(baseAPIFilename, `${serverName}-Ports-${serverDate}.json`))
         apiShops = readJson(path.resolve(baseAPIFilename, `${serverName}-Shops-${serverDate}.json`))

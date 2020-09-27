@@ -16,7 +16,7 @@ const { group: d3Group } = d3Array
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
-import { serverNames } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
 import { Recipe, RecipeEntity, RecipeGroup } from "../common/gen-json"
@@ -158,7 +158,7 @@ const convertRecipes = async (): Promise<void> => {
 }
 
 export const convertRecipeData = (): void => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
 
     void convertRecipes()
 }
