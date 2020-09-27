@@ -14,7 +14,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { capitalizeFirstLetter, woodType } from "../common/common";
 import { cleanName, sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { serverNames } from "../common/servers";
+import { serverIds } from "../common/servers";
 let apiItems;
 const notUsedExceptionalWoodIds = new Set([
     2358,
@@ -447,7 +447,7 @@ export const convertModulesAndWoodData = async () => {
     await saveJsonAsync(commonPaths.fileWood, woods);
 };
 export const convertModules = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`));
     void convertModulesAndWoodData();
 };
 //# sourceMappingURL=convert-modules.js.map

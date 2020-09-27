@@ -13,7 +13,7 @@ import path from "path";
 import { promisify } from "util";
 import { apiBaseFiles } from "./common-var";
 import { baseAPIFilename, serverStartDate } from "./common-dir";
-import { serverNames } from "./servers";
+import { serverIds } from "./servers";
 const execP = promisify(exec);
 export const fileExists = (fileName) => fs.existsSync(fileName);
 export const makeDirAsync = async (dir) => {
@@ -56,7 +56,7 @@ export const xz = (command, fileName) => {
 };
 const loopApiFiles = (command) => {
     const ext = command === "xz" ? "json" : "json.xz";
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverStartDate}.${ext}`);
             xz(command, fileName);
