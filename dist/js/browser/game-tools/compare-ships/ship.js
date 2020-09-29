@@ -134,9 +134,8 @@ export class Ship {
         text += "</div></div></div>";
         text += displayFirstColumn("Resistance");
         text += Ship.displaySecondBlock();
-        text += displayColumn("fireResistance", "Fire %", 4);
-        text += displayColumn("leakResistance", "Leak %", 4);
-        text += displayColumn("splinterResistance", "Splinter %", 4);
+        text += displayColumn("leakResistance", "Leak %");
+        text += displayColumn("splinterResistance", "Splinter %");
         text += "</div></div></div>";
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>');
         text += Ship.displaySecondBlock();
@@ -184,7 +183,7 @@ export class Ship {
         data.fill(1, 0);
         const pie = d3Pie().sort(null).value(1)(data);
         const arc = d3Arc()
-            .outerRadius(this._shipCompare.radiusSpeedScale(12))
+            .outerRadius(this._shipCompare.radiusSpeedScale(12) ?? 0)
             .innerRadius(this._shipCompare.innerRadius);
         this._mainG
             .append("g")
@@ -197,7 +196,7 @@ export class Ship {
             .attr("class", "speed-circle")
             .selectAll("circle")
             .data(this.ticksSpeed)
-            .join((enter) => enter.append("circle").attr("r", (d) => this._shipCompare.radiusSpeedScale(d)));
+            .join((enter) => enter.append("circle").attr("r", (d) => this._shipCompare.radiusSpeedScale(d) ?? 0));
     }
 }
 //# sourceMappingURL=ship.js.map

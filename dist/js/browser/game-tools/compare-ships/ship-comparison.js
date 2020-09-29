@@ -41,7 +41,7 @@ export class ShipComparison extends Ship {
         return heading;
     }
     _getSpeed(rotate) {
-        return formatFloat(this._speedScale(Math.abs(rotate)));
+        return formatFloat(this._speedScale(Math.abs(rotate)) ?? 0);
     }
     _getHeadingInCompass(rotate) {
         return degreesToCompass(rotate);
@@ -87,7 +87,7 @@ export class ShipComparison extends Ship {
     _setupShipOutline() {
         this._shipRotate = 0;
         const { shipMass } = this.shipCompareData;
-        const heightShip = this._shipCompare.shipMassScale(shipMass);
+        const heightShip = this._shipCompare.shipMassScale(shipMass) ?? 0;
         const widthShip = heightShip;
         const circleSize = 20;
         const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize;
@@ -148,7 +148,7 @@ export class ShipComparison extends Ship {
         const curve = d3CurveCatmullRomClosed;
         const line = d3LineRadial()
             .angle((d, i) => i * segmentRadians)
-            .radius((d) => this._shipCompare.radiusSpeedScale(d.data))
+            .radius((d) => this._shipCompare.radiusSpeedScale(d.data) ?? 0)
             .curve(curve);
         const circleSize = 20;
         const svgHeight = this._shipCompare.svgHeight / 2 - circleSize;
@@ -183,9 +183,9 @@ export class ShipComparison extends Ship {
             enter
                 .append("circle")
                 .attr("r", 5)
-                .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusSpeedScale(d.data))
-                .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
-                .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
+                .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -(this._shipCompare.radiusSpeedScale(d.data) ?? 0))
+                .attr("cx", (d, i) => Math.sin(i * segmentRadians) * (this._shipCompare.radiusSpeedScale(d.data) ?? 0))
+                .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? 0)
                 .append("title")
                 .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`);
         })
@@ -245,7 +245,6 @@ export class ShipComparison extends Ship {
             turnAcceleration: `${formatFloat(this.shipCompareData.ship.turnAcceleration)}\u00A0${getDiff(this.shipCompareData.ship.turnAcceleration, this._shipBaseData.ship.turnAcceleration, 2)}`,
             turnSpeed: `${formatFloat(this.shipCompareData.ship.turnSpeed, 3)}\u00A0${getDiff(this.shipCompareData.ship.turnSpeed, this._shipBaseData.ship.turnSpeed, 2)}`,
             decks: pluralise(this.shipCompareData.guns.decks, "deck"),
-            fireResistance: `${formatSignInt(this.shipCompareData.resistance.fire * 100)}\u00A0${getDiff(this.shipCompareData.resistance.fire, this._shipBaseData.resistance.fire, 2, true)}`,
             firezoneHorizontalWidth: `${this.shipCompareData.ship.firezoneHorizontalWidth}\u00A0${getDiff(this.shipCompareData.ship.firezoneHorizontalWidth, this._shipBaseData.ship.firezoneHorizontalWidth)}`,
             frontArmor: `${formatInt(this.shipCompareData.bow.armour)}\u00A0${getDiff(this.shipCompareData.bow.armour, this._shipBaseData.bow.armour)}</br><span class="badge badge-white">${formatInt(this.shipCompareData.bow.thickness)}</span>${getDiff(this.shipCompareData.bow.thickness, this._shipBaseData.bow.thickness)}`,
             guns: `${this.shipCompareData.guns.total}\u00A0${getDiff(this.shipCompareData.guns.total, this._shipBaseData.guns.total)}`,
