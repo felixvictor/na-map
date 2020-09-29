@@ -11,11 +11,11 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
+import "../../../scss/roundslider.scss"
 import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
@@ -45,7 +45,7 @@ export default class PredictWind {
     private readonly _sliderId: HtmlString
     private readonly _timeGroupId: HtmlString
     private readonly _timeInputId: HtmlString
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     constructor() {
         this._height = 300
         this._width = 260

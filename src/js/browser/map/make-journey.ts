@@ -352,6 +352,7 @@ export default class MakeJourney {
     }
 
     _getSpeedAtDegrees(degrees: number): number {
+        // @ts-expect-error
         return Math.max(this._speedScale(degrees), this._minOWSpeed)
     }
 
