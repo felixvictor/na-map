@@ -264,7 +264,7 @@ const MiniCssExtractPluginOpt = {
     esModule: true,
 }
 
-const whitelistPatternsChildren = [
+const PurgecssSafelist = [
     /active/,
     /bootstrap-select/,
     /bs-/,
@@ -283,7 +283,8 @@ const whitelistPatternsChildren = [
     /tooltip/,
 ]
 const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]
-const whitelist = portBonusType.map((bonus) => `icon-${bonus}`)
+// noinspection JSCheckFunctionSignatures
+PurgecssSafelist.push(...portBonusType.map((bonus) => `icon-${bonus}`))
 
 const config = {
     devServer: {
@@ -332,8 +333,7 @@ const config = {
             orderWarning: true,
         }),
         new PurgecssPlugin({
-            whitelistPatternsChildren,
-            whitelist,
+            safelist: PurgecssSafelist,
             paths: glob.sync(`${dirSrc}/**/*`, { nodir: true }),
         }),
         new webpack.DefinePlugin({
