@@ -387,7 +387,7 @@ export const colourRamp = (
     console.log(min, max, steps, step)
     if (context) {
         for (let currentStep = min; currentStep < max; currentStep += step) {
-            context.fillStyle = colourScale(currentStep)
+            context.fillStyle = colourScale(currentStep) ?? "#000"
             context.fillRect(x, 0, stepWidth, height)
             x += stepWidth
         }
