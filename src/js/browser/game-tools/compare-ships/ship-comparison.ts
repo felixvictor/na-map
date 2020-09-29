@@ -89,7 +89,7 @@ export class ShipComparison extends Ship {
     }
 
     _getSpeed(rotate: number): string {
-        return formatFloat(this._speedScale(Math.abs(rotate)))
+        return formatFloat(this._speedScale(Math.abs(rotate)) ?? 0)
     }
 
     _getHeadingInCompass(rotate: number): string {
@@ -151,7 +151,7 @@ export class ShipComparison extends Ship {
     _setupShipOutline(): void {
         this._shipRotate = 0
         const { shipMass } = this.shipCompareData
-        const heightShip = this._shipCompare.shipMassScale(shipMass)
+        const heightShip = this._shipCompare.shipMassScale(shipMass) ?? 0
         const widthShip = heightShip
         const circleSize = 20
         const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize
@@ -231,7 +231,7 @@ export class ShipComparison extends Ship {
         const curve = d3CurveCatmullRomClosed
         const line = d3LineRadial<PieArcDatum<number>>()
             .angle((d, i) => i * segmentRadians)
-            .radius((d) => this._shipCompare.radiusSpeedScale(d.data))
+            .radius((d) => this._shipCompare.radiusSpeedScale(d.data) ?? 0)
             .curve(curve)
 
         // Profile shape
@@ -283,9 +283,15 @@ export class ShipComparison extends Ship {
                 enter
                     .append("circle")
                     .attr("r", 5)
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusSpeedScale(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
-                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
+                    .attr(
+                        "cy",
+                        (d, i) => Math.cos(i * segmentRadians) * -(this._shipCompare.radiusSpeedScale(d.data) ?? 0)
+                    )
+                    .attr(
+                        "cx",
+                        (d, i) => Math.sin(i * segmentRadians) * (this._shipCompare.radiusSpeedScale(d.data) ?? 0)
+                    )
+                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? 0)
                     .append("title")
                     .text(
                         (d, i) =>
