@@ -50,7 +50,6 @@ export class ShipBase extends Ship {
     private _shipRotate!: number
     private _speedText!: Selection<SVGTextElement, DragData, HTMLElement, unknown>
     private _drag!: DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | SubjectPosition>
-    private readonly _gShip!: Selection<SVGGElement, DragData, HTMLElement, unknown>
 
     /**
      * @param id - Ship id
@@ -75,8 +74,8 @@ export class ShipBase extends Ship {
     _setBackground(): void {
         // Arc for text
         const speedArc = d3Arc<number>()
-            .outerRadius((d) => this._shipCompare.radiusSpeedScale(d) + 2)
-            .innerRadius((d) => this._shipCompare.radiusSpeedScale(d) + 1)
+            .outerRadius((d) => (this._shipCompare.radiusSpeedScale(d) ?? 0) + 2)
+            .innerRadius((d) => (this._shipCompare.radiusSpeedScale(d) ?? 0) + 1)
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2)
 
@@ -119,7 +118,7 @@ export class ShipBase extends Ship {
     }
 
     _getSpeed(rotate: number): string {
-        return formatFloat(this._speedScale(Math.abs(rotate)))
+        return formatFloat(this._speedScale(Math.abs(rotate)) ?? 0)
     }
 
     _getHeadingInCompass(rotate: number): string {
@@ -194,7 +193,7 @@ export class ShipBase extends Ship {
     _setupShipOutline(): void {
         this._shipRotate = 0
         const { shipMass } = this.shipData
-        const heightShip = this._shipCompare.shipMassScale(shipMass)
+        const heightShip = this._shipCompare.shipMassScale(shipMass) ?? 0
         // noinspection JSSuspiciousNameCombination
         const widthShip = heightShip
         const circleSize = 20
@@ -268,7 +267,7 @@ export class ShipBase extends Ship {
         const curve = d3CurveCatmullRomClosed
         const line = d3LineRadial<PieArcDatum<number>>()
             .angle((d, i) => i * segmentRadians)
-            .radius((d) => this._shipCompare.radiusSpeedScale(d.data))
+            .radius((d) => this._shipCompare.radiusSpeedScale(d.data) ?? 0)
             .curve(curve)
 
         // Profile shape
@@ -329,10 +328,16 @@ export class ShipBase extends Ship {
                 enter
                     .append("circle")
                     .attr("r", 5)
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusSpeedScale(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
-                    .attr("fill", (d) => this._shipCompare.colorScale(d.data))
-                    .attr("fill", (d) => this._shipCompare.colorScale(d.data))
+                    .attr(
+                        "cy",
+                        (d, i) => Math.cos(i * segmentRadians) * -(this._shipCompare.radiusSpeedScale(d.data) ?? 0)
+                    )
+                    .attr(
+                        "cx",
+                        (d, i) => Math.sin(i * segmentRadians) * (this._shipCompare.radiusSpeedScale(d.data) ?? 0)
+                    )
+                    .attr("fill", (d) => this._shipCompare.colorScale(d.data) ?? 0)
+                    .attr("fill", (d) => this._shipCompare.colorScale(d.data) ?? 0)
                     .append("title")
                     .text((d) => `${Math.round(d.data * 10) / 10} knots`)
             )

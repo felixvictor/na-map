@@ -621,7 +621,7 @@ export default class ShowTrades {
                     .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
                     .text((d) => `${formatInt(d.quantity)} ${d.good}`)
             )
-            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0) / 1.5}px`)
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0)! / 1.5}px`)
     }
 
     get listType(): string {
