@@ -275,7 +275,7 @@ export class Ship {
         const pie = d3Pie().sort(null).value(1)(data)
 
         const arc = d3Arc<number, number>()
-            .outerRadius(this._shipCompare.radiusSpeedScale(12))
+            .outerRadius(this._shipCompare.radiusSpeedScale(12) ?? 0)
             .innerRadius(this._shipCompare.innerRadius)
 
         // Add compass arcs
@@ -293,6 +293,6 @@ export class Ship {
             .attr("class", "speed-circle")
             .selectAll("circle")
             .data(this.ticksSpeed)
-            .join((enter) => enter.append("circle").attr("r", (d) => this._shipCompare.radiusSpeedScale(d)))
+            .join((enter) => enter.append("circle").attr("r", (d) => this._shipCompare.radiusSpeedScale(d) ?? 0))
     }
 }
