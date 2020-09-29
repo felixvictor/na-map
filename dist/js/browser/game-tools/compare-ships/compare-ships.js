@@ -231,6 +231,14 @@ export class CompareShips {
     }
     _setupData() {
         this._moduleAndWoodChanges = new Map([
+            [
+                "Cannon horizontal dispersion",
+                { properties: ["cannon.dispersion.horizontal"], isBaseValueAbsolute: true },
+            ],
+            ["Cannon vertical dispersion", { properties: ["cannon.dispersion.vertical"], isBaseValueAbsolute: true }],
+            ["Cannon reload time", { properties: ["cannon.reload"], isBaseValueAbsolute: true }],
+            ["Cannon side traverse", { properties: ["cannon.traverse.side"], isBaseValueAbsolute: true }],
+            ["Cannon up/down traverse", { properties: ["cannon.traverse.upDown"], isBaseValueAbsolute: true }],
             ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
             ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
             ["Preparation", { properties: ["boarding.prepPerRound"], isBaseValueAbsolute: true }],
@@ -255,7 +263,6 @@ export class CompareShips {
             ["Carronade crew", { properties: ["crew.carronades"], isBaseValueAbsolute: true }],
             ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
             ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
-            ["Fire resistance", { properties: ["resistance.fire"], isBaseValueAbsolute: false }],
             ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
             ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
             ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
@@ -816,6 +823,17 @@ export class CompareShips {
             prepInitial: shipDataDefault.boarding.prepInitial,
             prepPerRound: shipDataDefault.boarding.prepPerRound,
         };
+        shipDataDefault.cannon = {
+            dispersion: {
+                horizontal: 0,
+                vertical: 0,
+            },
+            reload: 0,
+            traverse: {
+                upDown: 0,
+                side: 0,
+            },
+        };
         let shipDataUpdated = shipDataDefault;
         shipDataUpdated.repairAmount = {
             armour: hullRepairsPercent,
@@ -825,7 +843,6 @@ export class CompareShips {
         };
         shipDataUpdated.repairTime = { sides: repairTime, default: repairTime };
         shipDataUpdated.resistance = {
-            fire: 0,
             leaks: 0,
             splinter: 0,
         };
