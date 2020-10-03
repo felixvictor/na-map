@@ -229,7 +229,7 @@ export default class PredictWind {
     }
 
     _printCompass(predictedWindDegrees: number): void {
-        const line = d3Line<[number, number]>()
+        const line = d3Line()
         const radius = Math.min(this._height / 1.4, this._width / 1.4) / 2
         const xCompass = this._width / 2
         const yCompass = this._height / 2.8
