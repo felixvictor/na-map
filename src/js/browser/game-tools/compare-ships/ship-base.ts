@@ -8,6 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import {
     arc as d3Arc,
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
@@ -15,8 +16,7 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
-import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { drag as d3Drag, DragBehavior, DragContainerElement, SubjectPosition } from "d3-drag"
+import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
 import { isEmpty } from "../../../common/common"
 
 import { pluralise, segmentRadians } from "../../../common/common-browser"
@@ -136,16 +136,11 @@ export class ShipBase extends Ship {
     _setupDrag(): void {
         const steps = this.shipData.speedDegrees.length
         const degreesPerStep = 360 / steps
-        // eslint-disable-next-line unicorn/no-null
-        const domain = new Array(steps + 1).fill(null).map((e, i) => i * degreesPerStep)
+        const domain = new Array(steps + 1).map((e, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipData.speedDegrees, this.shipData.speedDegrees[0]])
             .clamp(true)
-
-        const dragStart = (event: Event, d: DragData): void => {
-            d.this.classed("drag-active", true)
-        }
 
         const dragged = (event: Event, d: DragData): void => {
             const update = (): void => {
@@ -164,8 +159,7 @@ export class ShipBase extends Ship {
                     .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate))
             }
 
-            // @ts-expect-error
-            const { x: xMouse, y: yMouse } = event
+            const { x: xMouse, y: yMouse } = event as MouseEvent
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
                 d.correctionValueDegrees
@@ -176,18 +170,10 @@ export class ShipBase extends Ship {
             }
         }
 
-        const dragEnd = (event: Event, d: DragData): void => {
-            d.this.classed("drag-active", false)
-        }
-
-        this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>()
-            // @ts-expect-error
-            .on("start", (event: Event, d: DragData): void => dragStart(event, d))
-            // @ts-expect-error
-            .on("drag", (event: Event, d: DragData): void => dragged(event, d))
-            // @ts-expect-error
-            .on("end", (event: Event, d: DragData): void => dragEnd(event, d))
-            .container(() => this._mainG.node() as DragContainerElement)
+        this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>().on(
+            "drag",
+            (event: Event, d: DragData): void => dragged(event, d)
+        )
     }
 
     _setupShipOutline(): void {
@@ -233,8 +219,7 @@ export class ShipBase extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            // @ts-expect-error
-            .call(this._drag)
+            .call(this._drag as DragBehavior<SVGCircleElement, DragData, DragData | SubjectPosition>)
 
         const compassText = gShip
             .append("text")
@@ -298,8 +283,7 @@ export class ShipBase extends Ship {
 
             .attr("class", "wind-profile-arrow")
             .attr("marker-end", "url(#wind-profile-arrow-head)")
-            // @ts-expect-error
-            .call(this._drag)
+            .call(this._drag as DragBehavior<SVGPathElement, DragData, DragData | SubjectPosition>)
 
         gWindProfile
             .append("circle")
@@ -314,8 +298,10 @@ export class ShipBase extends Ship {
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate))
 
-        // @ts-expect-error
-        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
+        gWindProfile
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase) as string)
 
         // Speed marker
         gWindProfile
