@@ -51,10 +51,10 @@ export class ShipComparison extends Ship {
     private _maxSpeedDiff!: number
     private _shipRotate!: number
     private _speedText!: Selection<SVGTextElement, DragData, HTMLElement, unknown>
-    private _drag!: DragBehavior<SVGCircleElement | SVGPathElement, Event, DragData | SubjectPosition>
+    private _drag!: DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | SubjectPosition>
     private _windProfile!: DragData
     private _gWindProfile!: Selection<SVGGElement, unknown, HTMLElement, unknown>
-    private _arcsComp!: Array<PieArcDatum<number | { valueOf: () => number }>>
+    private _arcsComp!: Array<PieArcDatum<number>>
 
     constructor(compareId: string, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
         super(compareId, shipCompare)
@@ -111,10 +111,6 @@ export class ShipComparison extends Ship {
             .range([...this.shipCompareData.speedDegrees, this.shipCompareData.speedDegrees[0]])
             .clamp(true)
 
-        const dragStart = (event: Event, d: DragData): void => {
-            d.this.classed("drag-active", true)
-        }
-
         const dragged = (event: Event, d: DragData): void => {
             const update = (): void => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`)
@@ -125,8 +121,7 @@ export class ShipComparison extends Ship {
                 this._updateSpeedText()
             }
 
-            // @ts-expect-error
-            const { x: xMouse, y: yMouse } = event
+            const { x: xMouse, y: yMouse } = event as MouseEvent
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
                 d.correctionValueDegrees
@@ -134,17 +129,8 @@ export class ShipComparison extends Ship {
             update()
         }
 
-        const dragEnd = (event: Event, d: DragData): void => {
-            d.this.classed("drag-active", false)
-        }
-
-        this._drag = d3Drag<SVGCircleElement | SVGPathElement, Event, DragData>()
-            // @ts-expect-error
-            .on("start", (event: Event, d: DragData): void => dragStart(event, d))
-            // @ts-expect-error
+        this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>()
             .on("drag", (event: Event, d: DragData): void => dragged(event, d))
-            // @ts-expect-error
-            .on("end", (event: Event, d: DragData): void => dragEnd(event, d))
             .container(() => this._mainG.node() as DragContainerElement)
     }
 
@@ -190,8 +176,7 @@ export class ShipComparison extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            // @ts-expect-error
-            .call(this._drag)
+            .call(this._drag as DragBehavior<SVGCircleElement, DragData, DragData | SubjectPosition>)
 
         const compassText = gShip
             .append("text")
@@ -219,8 +204,8 @@ export class ShipComparison extends Ship {
         // eslint-disable-next-line unicorn/no-null
         const pie = d3Pie().sort(null).value(1)
 
-        const arcsBase = pie(this._shipBaseData.speedDegrees)
-        this._arcsComp = pie(this.shipCompareData.speedDegrees)
+        const arcsBase = pie(this._shipBaseData.speedDegrees) as Array<PieArcDatum<number>>
+        this._arcsComp = pie(this.shipCompareData.speedDegrees) as Array<PieArcDatum<number>>
 
         this._speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) =>
             roundToThousands(speedShipCompare - this._shipBaseData.speedDegrees[i])
@@ -253,12 +238,16 @@ export class ShipComparison extends Ship {
             .attr("transform", `rotate(${this._windProfile.initRotate})`)
 
         // Base profile shape
-        // @ts-expect-error
-        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
+        this._gWindProfile
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase) as string)
 
         // Comp profile lines
-        // @ts-expect-error
-        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp))
+        this._gWindProfile
+            .append("path")
+            .attr("class", "comp-profile")
+            .attr("d", line(this._arcsComp) as string)
     }
 
     updateWindProfileRotation(): void {
@@ -278,7 +267,6 @@ export class ShipComparison extends Ship {
             .attr("data-ui-component", "speed-markers")
             .selectAll("circle")
             .data(this._arcsComp)
-            // @ts-expect-error
             .join((enter) => {
                 enter
                     .append("circle")
@@ -293,17 +281,14 @@ export class ShipComparison extends Ship {
                     )
                     .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? 0)
                     .append("title")
-                    .text(
-                        (d, i) =>
-                            `${Math.round((d.data as number) * 10) / 10} (${formatSignFloat(
-                                this._speedDiff[i],
-                                1
-                            )}) knots`
-                    )
+                    .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`)
+                return enter
             })
             .select("circle")
-            // @ts-expect-error
-            .attr("fill", (_d: number, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
+            .attr(
+                "fill",
+                (_d: unknown, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) as string
+            )
 
         // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
     }
