@@ -181,10 +181,6 @@ export default class ShowTrades {
         return "</div>"
     }
 
-    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | ArrayLike<SVGPathElement>): void {
-        $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
-    }
-
     static _showElem(elem: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         elem.classed("d-none", false)
     }
@@ -515,25 +511,6 @@ export default class ShowTrades {
         return h
     }
 
-    _showDetails(d: Trade, i: number, nodes: SVGPathElement[] | ArrayLike<SVGPathElement>): void {
-        const trade = d3Select(nodes[i])
-        const title = this._getTradeFullData(d)
-
-        $(trade.node() as JQuery.PlainObject)
-            .tooltip({
-                html: true,
-                placement: "auto",
-                template:
-                    '<div class="tooltip" role="tooltip">' +
-                    '<div class="tooltip-block tooltip-inner tooltip-small">' +
-                    "</div></div>",
-                title,
-                trigger: "manual",
-                sanitize: false,
-            })
-            .tooltip("show")
-    }
-
     _getSiblingLinks(sourceId: number, targetId: number): number[] {
         return this._linkDataFiltered
             .filter(
@@ -556,6 +533,29 @@ export default class ShowTrades {
      * {@link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0}
      */
     _updateGraph(): void {
+        const showDetails = (self: SVGElement, event: Event, d: Trade): void => {
+            const trade = d3Select(self)
+            const title = this._getTradeFullData(d)
+
+            $(trade.node() as JQuery.PlainObject)
+                .tooltip({
+                    html: true,
+                    placement: "auto",
+                    template:
+                        '<div class="tooltip" role="tooltip">' +
+                        '<div class="tooltip-block tooltip-inner tooltip-small">' +
+                        "</div></div>",
+                    title,
+                    trigger: "manual",
+                    sanitize: false,
+                })
+                .tooltip("show")
+        }
+
+        const hideDetails = (self: SVGPathElement): void => {
+            $(d3Select(self).node() as JQuery.PlainObject).tooltip("dispose")
+        }
+
         const arcPath = (leftHand: boolean, d: Trade): string => {
             const source = { x: this._getXCoord(d.source.id), y: this._getYCoord(d.source.id) }
             const target = { x: this._getXCoord(d.target.id), y: this._getYCoord(d.target.id) }
@@ -601,11 +601,15 @@ export default class ShowTrades {
                         this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : ""
                     )
                     .attr("id", (d) => ShowTrades._getId(d))
-                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-                    .on("mouseleave", ShowTrades._hideDetails)
+                    .on("click", function (event: Event, d: Trade) {
+                        showDetails(this, event, d)
+                    })
+                    .on("mouseleave", function () {
+                        hideDetails(this)
+                    })
             )
             .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
-            .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0)}px`)
+            .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0) as number}px`)
 
         this._labelG.attr("font-size", `${fontSize}px`)
 
