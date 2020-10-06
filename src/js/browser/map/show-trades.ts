@@ -16,7 +16,6 @@ import "bootstrap-select/js/bootstrap-select"
 import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
-import * as d3Zoom from "d3-zoom"
 
 import { nations, NationShortName, putImportError } from "../../common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
@@ -24,6 +23,7 @@ import { defaultFontSize, roundToThousands } from "../../common/common-math"
 
 import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "../../common/gen-json"
+import { ZoomTransform } from "d3-zoom"
 import { Bound, HtmlString } from "../../common/interface"
 
 import Cookie from "../util/cookie"
@@ -623,9 +623,9 @@ export default class ShowTrades {
                     .append("textPath")
                     .attr("startOffset", "15%")
                     .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
-                    .text((d) => `${formatInt(d.quantity)} ${d.good}`)
+                    .text((d) => `${formatInt(d.quantity)} ${this._tradeItem.get(d.good)!}`)
             )
-            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0)! / 1.5}px`)
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0)! / 1.8}px`)
     }
 
     get listType(): string {
@@ -681,7 +681,7 @@ export default class ShowTrades {
     _updateTradeList(): void {
         let highlightLink: Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
-        const highlightOn = (d: Trade): void => {
+        const highlightOn = (_event: Event, d: Trade): void => {
             highlightLink = d3Select<SVGPathElement, unknown>(`path#${ShowTrades._getId(d)}`).attr("class", "highlight")
             highlightLink.dispatch("click")
         }
@@ -791,7 +791,7 @@ export default class ShowTrades {
         this._upperBound = upperBound
     }
 
-    transform(transform: d3Zoom.ZoomTransform): void {
+    transform(transform: ZoomTransform): void {
         this._scale = transform.k
         this.update()
     }
