@@ -11,7 +11,7 @@ import webpack from "webpack"
 
 import sass from "node-sass"
 import { default as parseCss } from "css"
-// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+// import BundleAnalyzerPlugin from "webpack-bundle-analyzer"
 import CleanWebpackPlugin from "clean-webpack-plugin"
 import CopyPlugin from "copy-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
@@ -557,7 +557,7 @@ if (isQuiet) {
 /*
 if (isProduction && !isQuiet) {
     config.plugins.push(
-        new BundleAnalyzerPlugin({
+        new BundleAnalyzerPlugin.BundleAnalyzerPlugin({
             analyzerMode: "static",
             generateStatsFile: true,
             logLevel: "warn",
