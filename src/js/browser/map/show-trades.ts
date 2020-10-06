@@ -15,7 +15,7 @@ import "bootstrap/js/dist/tooltip"
 import "bootstrap-select/js/bootstrap-select"
 import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
-import { ArrayLike, select as d3Select, Selection } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import * as d3Zoom from "d3-zoom"
 
 import { nations, NationShortName, putImportError } from "../../common/common"
