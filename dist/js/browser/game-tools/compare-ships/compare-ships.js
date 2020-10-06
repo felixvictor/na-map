@@ -330,7 +330,7 @@ export class CompareShips {
                     cap: { amount: 1, isPercentage: true },
                 },
             ],
-            ["Max speed", { properties: ["speed.max"], cap: { amount: 17, isPercentage: false } }],
+            ["Max speed", { properties: ["speed.max"], cap: { amount: 18, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
         ]);
         const theoreticalMinSpeed = (d3Min(this._shipData, (ship) => ship.speed.min) ?? 0) * 1.2;
