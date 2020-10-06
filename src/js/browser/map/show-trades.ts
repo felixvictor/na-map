@@ -460,7 +460,7 @@ export default class ShowTrades {
                     this._nodeData.get(trade.target.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.target.id)}`)
-        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
+        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}`) + ShowTrades._addDes("sail distance")
 
         return h
     }
@@ -505,7 +505,7 @@ export default class ShowTrades {
                     this._nodeData.get(trade.target.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.source.id)}`)
-        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
+        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}`) + ShowTrades._addDes("sail distance")
         h += ShowTrades._endBlock()
 
         return h
