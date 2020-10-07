@@ -33,7 +33,6 @@ export default class ShipList {
     readonly #buttonId: HtmlString
     readonly #modalId: HtmlString
     #shipListData = {} as ShipListData[]
-    #mainDiv!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #rows = {} as Selection<HTMLTableRowElement, ShipListData, HTMLTableSectionElement, unknown>
     #sortAscending = true
     #sortIndex = 0
@@ -139,8 +138,7 @@ export default class ShipList {
             .attr("class", "thead-group")
             .selectAll("th")
             .data([...header.group])
-            .enter()
-            .append("th")
+            .join("th")
             .classed("border-bottom-0", (d) => d[0].startsWith("dummy"))
             .classed("text-center", true)
             .attr("colspan", (d) => d[1])
@@ -149,13 +147,13 @@ export default class ShipList {
         head.append("tr")
             .selectAll("th")
             .data([...header.element])
-            .enter()
-            .append("th")
+            .join("th")
+            .datum((d, i) => ({ data: d, index: i }))
             .classed("border-top-0", true)
             .classed("text-right", (d, i) => i !== 1)
-            .text((d) => d)
-            .on("click", (d, i) => {
-                this._sortRows(i)
+            .text((d) => d.data)
+            .on("click", (_event, d) => {
+                this._sortRows(d.index)
             })
 
         this.#table.append("tbody")
