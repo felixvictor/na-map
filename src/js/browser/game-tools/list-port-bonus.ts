@@ -156,15 +156,14 @@ export default class ListPortBonus {
             .append("tr")
             .selectAll("th")
             .data(["Port", "Nation", ...portBonusType, "Port points", "Points invested"])
-
-            .enter()
-            .append("th")
+            .join("th")
+            .datum((d, i) => ({ data: d, index: i }))
             .classed("text-right", (d, i) => i > 1)
             .attr("role", "columnheader")
             .style("width", (d, i) => (i > 2 ? "3rem" : ""))
-            .text((d) => capitalizeFirstLetter(d))
-            .on("click", (d, i) => {
-                this._sortRows(i)
+            .text((d) => capitalizeFirstLetter(d.data))
+            .on("click", (_event, d) => {
+                this._sortRows(d.index)
             })
         this.#table.append("tbody")
     }
