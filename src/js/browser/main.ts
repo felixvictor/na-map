@@ -9,7 +9,7 @@
 
 import { initAnalytics, registerPage } from "./analytics"
 import { putImportError } from "../common/common"
-import { servers, Server } from "../common/servers"
+import { serverIds } from "../common/servers"
 
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
@@ -38,7 +38,7 @@ const baseId = "server-name"
 /**
  * Possible values for server names (first is default value)
  */
-const radioButtonValues = servers.map((server: Server) => server.id)
+const radioButtonValues = serverIds
 
 /**
  * Server name cookie
