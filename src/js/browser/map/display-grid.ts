@@ -15,7 +15,7 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { formatF11 } from "../../common/common-format"
 import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
 
-import { ZoomTransform } from "d3-zoom"
+import { D3ZoomEvent, ZoomTransform } from "d3-zoom"
 import { ZoomLevel } from "../../common/interface"
 
 import { NAMap } from "./na-map"
@@ -285,10 +285,10 @@ export default class DisplayGrid {
     /**
      * Set axis transform
      */
-    transform(event: Event): void {
+    transform(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
         if (this.#isShown) {
             this.testForInitialisation()
-            this._displayAxis(event.transform as ZoomTransform)
+            this._displayAxis(event.transform)
         }
     }
 
