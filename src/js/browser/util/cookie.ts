@@ -24,7 +24,7 @@ export default class Cookie {
     // Cookie name
     readonly #name: string
     // Possible cookie values
-    readonly #values: string[]
+    readonly #values: readonly string[]
     // Default cookie value
     readonly #default: string
 
@@ -34,7 +34,7 @@ export default class Cookie {
         expire = yearInDays,
     }: {
         id: string
-        values?: string[]
+        values?: readonly string[]
         expire?: number | Date
     }) {
         this.#baseId = baseId
