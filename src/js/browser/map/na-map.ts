@@ -19,6 +19,7 @@ import {
     zoomTransform as d3ZoomTransform,
     ZoomBehavior,
     ZoomTransform,
+    D3ZoomEvent,
 } from "d3-zoom"
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 
@@ -29,7 +30,7 @@ import { mapSize } from "../../common/common-var"
 
 import { displayClan } from "../util"
 
-import { Bound, MinMaxCoord, SVGGDatum, ZoomLevel } from "../../common/interface"
+import { Bound, MinMaxCoord, ZoomLevel } from "../../common/interface"
 import Cookie from "../util/cookie"
 
 import RadioButton from "../util/radio-button"
@@ -68,8 +69,8 @@ class NAMap {
     private _currentScale = 0
     private _currentTranslate!: ZoomTransform
     private _doubleClickAction: string
-    private _gMap!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    private _mainG!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    private _gMap!: Selection<SVGGElement, Event, HTMLElement, unknown>
+    private _mainG!: Selection<SVGGElement, Event, HTMLElement, unknown>
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
     private _pbZone!: DisplayPbZones
@@ -305,7 +306,7 @@ class NAMap {
 
     _setupSvg(): void {
         this._zoom = d3Zoom<SVGSVGElement, Event>()
-            .wheelDelta((event: Event) => -this._wheelDelta * Math.sign(event.deltaY))
+            .wheelDelta((event: Event) => -this._wheelDelta * Math.sign((event as WheelEvent).deltaY))
             .translateExtent([
                 [
                     this.coord.min - this.yGridBackgroundWidth * this.minScale,
@@ -314,7 +315,7 @@ class NAMap {
                 [this.coord.max, this.coord.max],
             ])
             .scaleExtent([this.minScale, this._maxScale])
-            .on("zoom", (event: Event) => this._naZoomed(event))
+            .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => this._naZoomed(event))
 
         this._svg = d3Select<SVGSVGElement, Event>("#na-map")
             .append<SVGSVGElement>("svg")
@@ -429,9 +430,9 @@ class NAMap {
         $(`#${modalId}`).modal("show")
     }
 
-    _doDoubleClickAction(event: MouseEvent): void {
-        const transform = d3ZoomTransform(this._gMap.node())
-        const [mx, my] = d3Pointer(event)
+    _doDoubleClickAction(event: Event): void {
+        const transform = d3ZoomTransform(this._gMap.node()!)
+        const [mx, my] = d3Pointer(event as MouseEvent)
         const { k: tk, x: tx, y: ty } = transform
 
         const x = (mx - tx) / tk
@@ -500,8 +501,8 @@ class NAMap {
     /**
      * Zoom svg groups
      */
-    _naZoomed(event: Event): void {
-        const transform = event.transform as ZoomTransform
+    _naZoomed(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
+        const { transform } = event
 
         const zoomTransform = this._getZoomTransform(transform)
         /**
