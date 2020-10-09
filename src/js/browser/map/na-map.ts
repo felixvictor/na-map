@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -26,14 +25,14 @@ import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selectio
 import { registerEvent } from "../analytics"
 import { appDescription, appTitle, appVersion, insertBaseModal } from "../../common/common-browser"
 import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
+import { mapSize } from "../../common/common-var"
 
 import { displayClan } from "../util"
 
 import { Bound, MinMaxCoord, SVGGDatum, ZoomLevel } from "../../common/interface"
-
 import Cookie from "../util/cookie"
-import RadioButton from "../util/radio-button"
 
+import RadioButton from "../util/radio-button"
 import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
@@ -41,7 +40,7 @@ import SelectPorts from "./select-ports"
 import ShowF11 from "./show-f11"
 import ShowTrades from "./show-trades"
 import MakeJourney from "./make-journey"
-import { mapSize } from "../../common/common-var"
+import TrilateratePosition from "./get-position"
 
 interface Tile {
     z: number
@@ -258,6 +257,7 @@ class NAMap {
 
         this._init()
         this._journey = new MakeJourney(this.rem)
+        void new TrilateratePosition(this._ports)
 
         /*
         Marks.forEach(mark => {
