@@ -21,7 +21,8 @@ import {
 } from "../common/common-math"
 
 import JQuery from "jquery"
-import { BaseType, Selection } from "d3-selection"
+import { Selection } from "d3-selection"
+import { Segment } from "./map/make-journey"
 
 /**
  * Display formatted compass
@@ -152,7 +153,7 @@ export const printCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, unknown, HTMLElement, unknown>
+    element: Selection<SVGGElement, Segment, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
@@ -232,7 +233,7 @@ export const printSmallCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, unknown, HTMLElement, unknown>
+    element: Selection<SVGGElement, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
