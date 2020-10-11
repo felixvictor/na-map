@@ -462,7 +462,7 @@ const config = {
                         options: cssOpt,
                     },
                     {
-                        loader:"postcss-loader",
+                        loader: "postcss-loader",
                         options: postcssOpt,
                     },
                 ],
@@ -483,7 +483,7 @@ const config = {
                 include: dirFlags,
                 use: [
                     {
-                        loader:"svg-url-loader",
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -497,7 +497,7 @@ const config = {
                         },
                     },
                     {
-                        loader:"string-replace-loader",
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
                             replace: `fill="${primary700}" fill-opacity="0.3"/>`,
@@ -538,7 +538,7 @@ const config = {
                         },
                     },
                     {
-                        loader:"string-replace-loader",
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="$darkYellow"',
                             replace: `fill="${colourYellowDark}"`,
@@ -573,7 +573,6 @@ if (isProduction) {
     config.optimization.minimize = true
     config.optimization.minimizer = [
         new TerserPlugin({
-            cache: true, // does not work with webpack 5
             parallel: true,
             terserOptions: {
                 ecma: 2020,
