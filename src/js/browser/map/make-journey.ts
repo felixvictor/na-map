@@ -351,7 +351,7 @@ export default class MakeJourney {
     }
 
     _getSpeedAtDegrees(degrees: number): number {
-        return Math.max(this._speedScale(degrees) as number, this._minOWSpeed)
+        return Math.max(this._speedScale(degrees), this._minOWSpeed)
     }
 
     _calculateDistanceForSection(degreesCourse: number, degreesCurrentWind: number): number {
