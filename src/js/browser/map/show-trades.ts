@@ -609,7 +609,7 @@ export default class ShowTrades {
                     })
             )
             .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
-            .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0) as number}px`)
+            .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0)}px`)
 
         this._labelG.attr("font-size", `${fontSize}px`)
 
