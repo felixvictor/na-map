@@ -287,7 +287,7 @@ export class CompareShips {
     }
 
     _cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this.woodCompare.enableSelects(newColumnId as WoodColumnType)
+        this.woodCompare.enableSelects(newColumnId)
 
         if (this._selectWood$[currentColumnId].frame.val() !== "") {
             for (const type of woodType) {
