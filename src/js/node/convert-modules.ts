@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 
 import d3Array from "d3-array"
 const { group: d3Group } = d3Array
@@ -17,7 +17,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { capitalizeFirstLetter, woodType } from "../common/common"
 import { cleanName, sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { serverNames } from "../common/common-var"
+import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
 import {
@@ -118,7 +118,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE SHIP_TURNING_SPEED", "Turn speed"],
         ["REPAIR_ARMOR REPAIR_PERCENT", "Repair amount"],
         ["SAIL MAST_THICKNESS", "Mast thickness"],
-        ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["STRUCTURE FIRE_INCREASE_RATE", ""],
         ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
 
@@ -153,8 +153,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE BOARDING_DEFENSE_BONUS", "Melee defense"],
         ["NONE CREW_TRANSFER_SPEED", "Crew transfer speed"],
         ["NONE DECK_GUNS_ACCURACY_BONUS", "Boarding cannons accuracy"],
-        ["NONE FIRE_DECREASE_RATE", "Fire resistance"],
-        ["NONE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["NONE FIRE_DECREASE_RATE", ""],
+        ["NONE FIRE_INCREASE_RATE", ""],
         ["NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Cannon side traverse"],
         ["NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow"],
         ["NONE GRENADES_BONUS", "Grenades"],
@@ -248,12 +248,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ])
 
-    const flipAmountForModule = new Set<ModifierName>([
-        "Fire resistance",
-        "Leak resistance",
-        "Turn acceleration",
-        "Rudder speed",
-    ])
+    const flipAmountForModule = new Set<ModifierName>(["Leak resistance", "Turn acceleration", "Rudder speed"])
     const notPercentage = new Set<ModifierName>(["Crew with muskets", "Melee attack", "Melee defense", "Morale"])
 
     /**
@@ -330,7 +325,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
 
             return modifiers.get(apiModifierName) !== ""
-        }).map((modifier) => {
+        }).flatMap((modifier) => {
             const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
             const modifierName = modifiers.get(apiModifierName) ?? ""
 
@@ -360,6 +355,22 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             // Some modifiers are wrongly indicated as a percentage
             if (notPercentage.has(modifierName)) {
                 isPercentage = false
+            }
+
+            // Special case dispersion: split entry up in horizontal and vertical
+            if (modifierName === "Cannon horizontal/vertical dispersion") {
+                return [
+                    {
+                        modifier: "Cannon horizontal dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                    {
+                        modifier: "Cannon vertical dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                ]
             }
 
             return {
@@ -547,7 +558,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
 }
 
 export const convertModules = (): void => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
 
     void convertModulesAndWoodData()
 }

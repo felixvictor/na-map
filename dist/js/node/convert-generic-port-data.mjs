@@ -7,14 +7,14 @@
  * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import polylabel from "polylabel";
 import { capitalToCounty } from "../common/common";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, sortBy } from "../common/common-node";
 import { convertCoordX, convertCoordY, degreesHalfCircle, rotationAngleInDegrees, } from "../common/common-math";
-import { serverNames } from "../common/common-var";
+import { serverIds } from "../common/servers";
 let apiPorts = [];
 let apiPortPos = new Map();
 const counties = new Map();
@@ -177,7 +177,7 @@ const setAndSaveCountyRegionData = async () => {
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/county-labels.json`, geoJsonCounties);
 };
 export const convertGenericPortData = () => {
-    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`));
+    apiPorts = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`));
     apiPortPos = new Map(apiPorts.map((apiPort) => [
         Number(apiPort.Id),
         {

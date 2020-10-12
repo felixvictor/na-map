@@ -82,8 +82,8 @@ export default class ListWoods {
         try {
             this._woodDataDefault = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
                 .default as WoodData
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -154,13 +154,13 @@ export default class ListWoods {
             .append("tr")
             .selectAll("th")
             .data(["Wood", ...this._modifiers[type]])
-            .enter()
-            .append("th")
+            .join("th")
+            .datum((d, i) => ({ data: d, index: i }))
             .classed("text-right", (d, i) => i !== 0)
             .attr("role", "columnheader")
-            .text((d) => d)
-            .on("click", (d, i) => {
-                this._sortRows(type, i)
+            .text((d) => d.data)
+            .on("click", (_event, d) => {
+                this._sortRows(type, d.index)
             })
         this._tables[type].append("tbody")
     }

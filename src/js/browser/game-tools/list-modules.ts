@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -23,7 +22,8 @@ import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
 import { chunkify } from "../util"
 
-import { Module } from "../../common/gen-json"
+import JQuery from "jquery"
+import { Module, ModuleEntity } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
 
 export default class ListModules {
@@ -45,8 +45,8 @@ export default class ListModules {
         try {
             this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
                 .default as Module[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -135,28 +135,29 @@ export default class ListModules {
          */
         const getRate = (moduleLevel: string): string => (moduleLevel === "U" ? "" : `${rates.get(moduleLevel) ?? ""}`)
 
+        /**
+         * Test if current module and module at index position has same properties
+         * @returns True if same
+         */
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const hasSameProperties = (module: ModuleEntity, nextModule: ModuleEntity | undefined): boolean =>
+            nextModule !== undefined &&
+            module.name === nextModule.name &&
+            JSON.stringify(module.properties) === JSON.stringify(nextModule.properties)
+
         let rate = ""
         const rows = [] as HtmlString[]
         for (const type of this._moduleData) {
             if (type[0] === moduleType) {
+                // eslint-disable-next-line @typescript-eslint/no-loop-func
                 type[1].sort(sortBy(["name"])).forEach((module, i) => {
-                    /**
-                     * Test if current module and module at index position has same properties
-                     * @param index - Position
-                     * @returns True if same
-                     */
-                    const hasSameProperties = (index: number): boolean =>
-                        index < type[1].length &&
-                        module.name === type[1][index].name &&
-                        JSON.stringify(module.properties) === JSON.stringify(type[1][index].properties)
-
                     rate = getRate(module.moduleLevel)
-                    if (hasSameProperties(i + 1)) {
+                    if (hasSameProperties(module, type[1][i + 1])) {
                         type[1][i + 1].hasSamePropertiesAsPrevious = true
                         rate += `<br>${getRate(type[1][i + 1].moduleLevel)}`
                     }
 
-                    if (hasSameProperties(i + 2)) {
+                    if (hasSameProperties(module, type[1][i + 2])) {
                         type[1][i + 2].hasSamePropertiesAsPrevious = true
                         rate = ""
                     }

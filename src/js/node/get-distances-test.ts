@@ -8,13 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 import { default as Immutable } from "immutable"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { serverNames } from "../common/common-var"
+import { serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
 
@@ -33,7 +33,7 @@ class Port {
     portIds: number[] = []
 
     constructor() {
-        this.#fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`)
+        this.#fileName = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`)
 
         xz("unxz", `${this.#fileName}.xz`)
         this.apiPorts = readJson(this.#fileName)
@@ -348,7 +348,7 @@ class PixelMap {
             console.timeEnd("findPath")
 
             await saveJsonAsync(this.#distancesFile, this.#distances)
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Map distance error:", error)
         }
     }

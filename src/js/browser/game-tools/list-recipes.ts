@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -22,13 +21,11 @@ import { formatInt, formatSignPercent } from "../../common/common-format"
 import { getCurrencyAmount } from "../../common/common-game-tools"
 import { getOrdinal } from "../../common/common-math"
 import { sortBy } from "../../common/common-node"
+import { servers } from "../../common/servers"
 
-import { Server } from "../../common/servers"
+import JQuery from "jquery"
 import { Module, RecipeEntity, RecipeGroup } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers: Server[] = require("../../common/servers")
 
 const replacer = (match: string, p1: number, p2: number): string =>
     `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`
@@ -63,8 +60,8 @@ export default class ListRecipes {
             this._recipes = new Map<number, RecipeEntity>(
                 this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))
             )
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -132,7 +129,7 @@ export default class ListRecipes {
                 liveSearchPlaceholder: "Search ...",
                 title: "Select item",
                 virtualScroll: true,
-            } as BootstrapSelectOptions)
+            })
     }
 
     _initModal(): void {

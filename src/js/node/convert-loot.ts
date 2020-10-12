@@ -8,13 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { getOrdinal } from "../common/common-math"
 import { cleanName, sortBy } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { serverIds } from "../common/servers"
 
 import {
     APIItemGeneric,
@@ -122,7 +122,7 @@ const convertLoot = async (): Promise<void> => {
 }
 
 export const convertLootData = (): void => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
 
     void convertLoot()
 }

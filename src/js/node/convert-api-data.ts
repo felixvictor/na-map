@@ -34,7 +34,7 @@ const convertApiData = async (): Promise<void> => {
     await convertRepairData()
     convertServerPortData()
     if (runType.endsWith("server")) {
-        convertOwnershipData()
+        void (await convertOwnershipData())
     }
 
     await convertShipData()

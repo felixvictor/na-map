@@ -9,25 +9,26 @@
  */
 
 import { max as d3Max, min as d3Min } from "d3-array"
-import * as d3Drag from "d3-drag"
+import { drag as d3Drag, DragBehavior, DragContainerElement, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { event as d3Event, Selection } from "d3-selection"
 import {
     curveCatmullRomClosed as d3CurveCatmullRomClosed,
     pie as d3Pie,
     PieArcDatum,
     lineRadial as d3LineRadial,
 } from "d3-shape"
-
 import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "../../../common/common-format"
+
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math"
 import { rotationAngleInDegrees } from "../../util"
 import { default as shipIcon } from "Icons/icon-ship.svg"
 
+import { Selection } from "d3-selection"
+
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
 
-import { pluralise, segmentRadians } from "../../../common/common-browser"
+import { colourWhite, pluralise, segmentRadians } from "../../../common/common-browser"
 import {
     hullRepairsVolume,
     repairsSetSize,
@@ -50,10 +51,10 @@ export class ShipComparison extends Ship {
     private _maxSpeedDiff!: number
     private _shipRotate!: number
     private _speedText!: Selection<SVGTextElement, DragData, HTMLElement, unknown>
-    private _drag!: d3Drag.DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | d3Drag.SubjectPosition>
+    private _drag!: DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | SubjectPosition>
     private _windProfile!: DragData
     private _gWindProfile!: Selection<SVGGElement, unknown, HTMLElement, unknown>
-    private _arcsComp!: Array<PieArcDatum<number | { valueOf: () => number }>>
+    private _arcsComp!: Array<PieArcDatum<number>>
 
     constructor(compareId: string, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
         super(compareId, shipCompare)
@@ -88,7 +89,7 @@ export class ShipComparison extends Ship {
     }
 
     _getSpeed(rotate: number): string {
-        return formatFloat(this._speedScale(Math.abs(rotate)))
+        return formatFloat(this._speedScale(Math.abs(rotate)) ?? 0)
     }
 
     _getHeadingInCompass(rotate: number): string {
@@ -104,18 +105,13 @@ export class ShipComparison extends Ship {
     _setupDrag(): void {
         const steps = this.shipCompareData.speedDegrees.length
         const degreesPerStep = 360 / steps
-        const domain = new Array(steps + 1).fill(0).map((e, i) => i * degreesPerStep)
+        const domain = [...new Array(steps + 1)].map((_, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipCompareData.speedDegrees, this.shipCompareData.speedDegrees[0]])
             .clamp(true)
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragStart = (d: DragData): void => {
-            d.this.classed("drag-active", true)
-        }
-
-        const dragged = (d: DragData): void => {
+        const dragged = (event: Event, d: DragData): void => {
             const update = (): void => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`)
                 d.compassText
@@ -125,7 +121,7 @@ export class ShipComparison extends Ship {
                 this._updateSpeedText()
             }
 
-            const { x: xMouse, y: yMouse } = d3Event
+            const { x: xMouse, y: yMouse } = event as MouseEvent
             d.rotate = this._getHeadingInDegrees(
                 rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }),
                 d.correctionValueDegrees
@@ -133,23 +129,15 @@ export class ShipComparison extends Ship {
             update()
         }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const dragEnd = (d: DragData): void => {
-            d.this.classed("drag-active", false)
-        }
-
-        this._drag = d3Drag
-            .drag<SVGCircleElement | SVGPathElement, DragData>()
-            .on("start", dragStart)
-            .on("drag", dragged)
-            .on("end", dragEnd)
-            .container(() => this._mainG.node() as d3Drag.DragContainerElement)
+        this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>()
+            .on("drag", (event: Event, d: DragData): void => dragged(event, d))
+            .container(() => this._mainG.node() as DragContainerElement)
     }
 
     _setupShipOutline(): void {
         this._shipRotate = 0
         const { shipMass } = this.shipCompareData
-        const heightShip = this._shipCompare.shipMassScale(shipMass)
+        const heightShip = this._shipCompare.shipMassScale(shipMass) ?? 0
         const widthShip = heightShip
         const circleSize = 20
         const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize
@@ -188,8 +176,7 @@ export class ShipComparison extends Ship {
             .attr("cx", (d) => d.compassTextX)
             .attr("cy", (d) => d.compassTextY)
             .attr("r", circleSize)
-            // @ts-expect-error
-            .call(this._drag)
+            .call(this._drag as DragBehavior<SVGCircleElement, DragData, DragData | SubjectPosition>)
 
         const compassText = gShip
             .append("text")
@@ -217,8 +204,8 @@ export class ShipComparison extends Ship {
         // eslint-disable-next-line unicorn/no-null
         const pie = d3Pie().sort(null).value(1)
 
-        const arcsBase = pie(this._shipBaseData.speedDegrees)
-        this._arcsComp = pie(this.shipCompareData.speedDegrees)
+        const arcsBase = pie(this._shipBaseData.speedDegrees) as Array<PieArcDatum<number>>
+        this._arcsComp = pie(this.shipCompareData.speedDegrees) as Array<PieArcDatum<number>>
 
         this._speedDiff = this.shipCompareData.speedDegrees.map((speedShipCompare, i) =>
             roundToThousands(speedShipCompare - this._shipBaseData.speedDegrees[i])
@@ -229,7 +216,7 @@ export class ShipComparison extends Ship {
         const curve = d3CurveCatmullRomClosed
         const line = d3LineRadial<PieArcDatum<number>>()
             .angle((d, i) => i * segmentRadians)
-            .radius((d) => this._shipCompare.radiusSpeedScale(d.data))
+            .radius((d) => this._shipCompare.radiusSpeedScale(d.data) ?? 0)
             .curve(curve)
 
         // Profile shape
@@ -251,12 +238,16 @@ export class ShipComparison extends Ship {
             .attr("transform", `rotate(${this._windProfile.initRotate})`)
 
         // Base profile shape
-        // @ts-expect-error
-        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
+        this._gWindProfile
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase) as string)
 
         // Comp profile lines
-        // @ts-expect-error
-        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp))
+        this._gWindProfile
+            .append("path")
+            .attr("class", "comp-profile")
+            .attr("d", line(this._arcsComp) as string)
     }
 
     updateWindProfileRotation(): void {
@@ -271,31 +262,31 @@ export class ShipComparison extends Ship {
         this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff)
 
         this._gWindProfile
-            // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
             .selectAll("circle")
             .data(this._arcsComp)
-            // @ts-expect-error
-            .join((enter) => {
+            .join((enter) =>
                 enter
                     .append("circle")
                     .attr("r", 5)
-                    .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusSpeedScale(d.data))
-                    .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
-                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
-                    .append("title")
-                    .text(
-                        (d, i) =>
-                            `${Math.round((d.data as number) * 10) / 10} (${formatSignFloat(
-                                this._speedDiff[i],
-                                1
-                            )}) knots`
+                    .attr(
+                        "cy",
+                        (d, i) => Math.cos(i * segmentRadians) * -(this._shipCompare.radiusSpeedScale(d.data) ?? 0)
                     )
-            })
+                    .attr(
+                        "cx",
+                        (d, i) => Math.sin(i * segmentRadians) * (this._shipCompare.radiusSpeedScale(d.data) ?? 0)
+                    )
+                    .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? 0)
+                    .append("title")
+                    .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`)
+            )
             .select("circle")
-            // @ts-expect-error
-            .attr("fill", (_d: number, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]))
+            .attr(
+                "fill",
+                (_d: unknown, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? colourWhite
+            )
 
         // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);
     }
@@ -398,6 +389,36 @@ export class ShipComparison extends Ship {
                 this._shipBaseData.boarding.cannonsAccuracy! * 100
             )}`,
 
+            // Gunnery
+            reload: `${formatSignInt(this.shipCompareData.gunnery!.reload * 100)}\u00A0${getDiff(
+                this._shipBaseData.gunnery!.reload * 100,
+                this.shipCompareData.gunnery!.reload * 100
+            )}`,
+            penetration: `${formatSignInt(this.shipCompareData.gunnery!.penetration * 100)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.penetration * 100,
+                this._shipBaseData.gunnery!.penetration * 100
+            )}`,
+            dispersionHorizontal: `${formatSignInt(
+                this.shipCompareData.gunnery!.dispersionHorizontal * 100
+            )}\u00A0${getDiff(
+                this._shipBaseData.gunnery!.dispersionHorizontal * 100,
+                this.shipCompareData.gunnery!.dispersionHorizontal * 100
+            )}`,
+            dispersionVertical: `${formatSignInt(
+                this.shipCompareData.gunnery!.dispersionVertical * 100
+            )}\u00A0${getDiff(
+                this._shipBaseData.gunnery!.dispersionVertical * 100,
+                this.shipCompareData.gunnery!.dispersionVertical * 100
+            )}`,
+            traverseUpDown: `${formatSignInt(this.shipCompareData.gunnery!.traverseUpDown * 100)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.traverseUpDown * 100,
+                this._shipBaseData.gunnery!.traverseUpDown * 100
+            )}`,
+            traverseSide: `${formatSignInt(this.shipCompareData.gunnery!.traverseSide * 100)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.traverseSide * 100,
+                this._shipBaseData.gunnery!.traverseSide * 100
+            )}`,
+
             acceleration: `${formatFloat(this.shipCompareData.ship.acceleration)}\u00A0${getDiff(
                 this.shipCompareData.ship.acceleration,
                 this._shipBaseData.ship.acceleration,
@@ -444,12 +465,6 @@ export class ShipComparison extends Ship {
                 2
             )}`,
             decks: pluralise(this.shipCompareData.guns.decks, "deck"),
-            fireResistance: `${formatSignInt(this.shipCompareData.resistance!.fire * 100)}\u00A0${getDiff(
-                this.shipCompareData.resistance!.fire,
-                this._shipBaseData.resistance!.fire,
-                2,
-                true
-            )}`,
             firezoneHorizontalWidth: `${this.shipCompareData.ship.firezoneHorizontalWidth}\u00A0${getDiff(
                 this.shipCompareData.ship.firezoneHorizontalWidth,
                 this._shipBaseData.ship.firezoneHorizontalWidth

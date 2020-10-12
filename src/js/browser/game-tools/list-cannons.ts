@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tab"
 import "bootstrap/js/dist/modal"
@@ -79,8 +77,8 @@ export default class ListCannons {
             const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "Lib/gen-generic/cannons.json"))
                 .default as Cannon
             this._setupData(cannonData)
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -229,14 +227,12 @@ export default class ListCannons {
     ): void {
         this._sortAscending[type] = true
         this._tables[type] = tabContent.append("table").attr("class", "table table-sm small na-table")
-        const head = this._tables[type]
-        head.append("thead")
-            .append("tr")
+        const head = this._tables[type].append("thead")
+        head.append("tr")
             .attr("class", "thead-group")
             .selectAll("th")
             .data([...this._header.group])
-            .enter()
-            .append("th")
+            .join("th")
             .classed("border-bottom-0", (d, i) => i === 0)
             .classed("text-center", (d, i) => i !== 0)
             .attr("colspan", (d) => `${d[1]}`)
@@ -245,13 +241,13 @@ export default class ListCannons {
         head.append("tr")
             .selectAll("th")
             .data([...this._header.element])
-            .enter()
-            .append("th")
+            .join("th")
+            .datum((d, i) => ({ data: d, index: i }))
             .classed("border-top-0", (d, i) => i === 0)
             .classed("text-right", (d, i) => i !== 0)
-            .text((d) => d)
-            .on("click", (d, i) => {
-                this._sortRows(type, i)
+            .text((d) => d.data)
+            .on("click", (_event, d) => {
+                this._sortRows(type, d.index)
             })
         this._tables[type].append("tbody")
     }
