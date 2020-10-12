@@ -227,9 +227,8 @@ export default class ListCannons {
     ): void {
         this._sortAscending[type] = true
         this._tables[type] = tabContent.append("table").attr("class", "table table-sm small na-table")
-        const head = this._tables[type]
-        head.append("thead")
-            .append("tr")
+        const head = this._tables[type].append("thead")
+        head.append("tr")
             .attr("class", "thead-group")
             .selectAll("th")
             .data([...this._header.group])
