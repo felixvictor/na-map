@@ -363,6 +363,7 @@ export class ShipBase extends Ship {
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
 
         const ship = {
+            // Boarding
             attack: formatSignFloat(this.shipData.boarding.attack!, 2),
             cannonsAccuracy: formatSignInt(this.shipData.boarding.cannonsAccuracy! * 100),
             defense: formatSignFloat(this.shipData.boarding.defense!, 2),
@@ -372,6 +373,13 @@ export class ShipBase extends Ship {
             musketsCrew: formatInt((this.shipData.boarding.musketsCrew! / 100) * this.shipData.crew.max),
             prepPerRound: formatInt(this.shipData.boarding.prepPerRound),
             prepInitial: formatInt(this.shipData.boarding.prepInitial),
+
+            // Gunnery
+            reload: formatInt(this.shipData.gunnery!.reload),
+            dispersionHorizontal: formatInt(this.shipData.gunnery!.dispersion.horizontal),
+            dispersionVertical: formatInt(this.shipData.gunnery!.dispersion.vertical),
+            traverseUpDown: formatInt(this.shipData.gunnery!.traverse.upDown),
+            traverseSide: formatInt(this.shipData.gunnery!.traverse.side),
 
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
