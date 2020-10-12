@@ -28,7 +28,7 @@ import { Selection } from "d3-selection"
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
 
-import { pluralise, segmentRadians } from "../../../common/common-browser"
+import { colourWhite, pluralise, segmentRadians } from "../../../common/common-browser"
 import {
     hullRepairsVolume,
     repairsSetSize,
@@ -262,12 +262,11 @@ export class ShipComparison extends Ship {
         this._setColourScale(this._minSpeedDiff, this._maxSpeedDiff)
 
         this._gWindProfile
-            // .insert("g", "g.compass-arc")
             .append("g")
             .attr("data-ui-component", "speed-markers")
             .selectAll("circle")
             .data(this._arcsComp)
-            .join((enter) => {
+            .join((enter) =>
                 enter
                     .append("circle")
                     .attr("r", 5)
@@ -282,12 +281,11 @@ export class ShipComparison extends Ship {
                     .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? 0)
                     .append("title")
                     .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`)
-                return enter
-            })
+            )
             .select("circle")
             .attr(
                 "fill",
-                (_d: unknown, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) as string
+                (_d: unknown, i: number) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? colourWhite
             )
 
         // colourRamp(d3Select(this._select), this._shipCompare.colourScaleSpeedDiff, this._speedDiff.length);

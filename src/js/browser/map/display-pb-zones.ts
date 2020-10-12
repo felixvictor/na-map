@@ -208,22 +208,20 @@ export default class DisplayPbZones {
                     // Shooting ranges
                     g.selectAll<SVGPathElement, Point[]>("path.tower-range")
                         .data((d) => d.towers)
-                        .join((enter) => {
-                            const path = enter
+                        .join((enter) =>
+                            enter
                                 .append("path")
                                 .attr("class", "tower-range")
                                 .attr("d", (d) => drawSvgCircle(d[0], d[1], towerRangeRadius))
-                            return path
-                        })
+                        )
                     g.selectAll<SVGPathElement, Point[]>("path.fort-range")
                         .data((d) => d.forts)
-                        .join((enter) => {
-                            const path = enter
+                        .join((enter) =>
+                            enter
                                 .append("path")
                                 .attr("class", "fort-range")
                                 .attr("d", (d) => drawSvgCircle(d[0], d[1], fortRangeRadius))
-                            return path
-                        })
+                        )
 
                     // Forts
                     g.append("path")
