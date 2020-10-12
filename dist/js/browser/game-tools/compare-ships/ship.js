@@ -120,6 +120,15 @@ export class Ship {
         text += displayColumn("cannonCrew", "Cannon", 4);
         text += displayColumn("carroCrew", "Carronades", 4);
         text += "</div></div></div>";
+        text += displayFirstColumn("Gunnery");
+        text += Ship.displaySecondBlock();
+        text += displayColumn("reload", "Reload %", 4);
+        text += displayColumn("dispersionHorizontal", "Horizontal dispersion %", 4);
+        text += displayColumn("dispersionVertical", "Vertical dispersion %", 4);
+        text += displayColumn("penetration", "Ball penetration %", 4);
+        text += displayColumn("traverseUpDown", "Up/down traverse %", 4);
+        text += displayColumn("traverseSide", "Side traverse %", 4);
+        text += "</div></div></div>";
         text += displayFirstColumn("Boarding");
         text += Ship.displaySecondBlock();
         text += displayColumn("morale", "Morale", 4);

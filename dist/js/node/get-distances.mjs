@@ -40,6 +40,7 @@ class Map {
         this.#distances = [];
         this.#distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json");
         this.#map = {};
+        this.#map2 = {};
         this.#port = {};
         this.#completedPorts = new Set();
         this.#LAND = 0;
@@ -59,6 +60,7 @@ class Map {
     #distances;
     #distancesFile;
     #map;
+    #map2;
     #mapHeight;
     #mapScale;
     #mapWidth;
@@ -89,9 +91,7 @@ class Map {
         console.log(this.#mapHeight, this.#mapWidth);
     }
     mapInit() {
-        this.#map = new Array(this.#mapWidth * this.#mapHeight)
-            .fill(0)
-            .map((_e, index) => (this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND));
+        this.#map = [...new Array(this.#mapWidth * this.#mapHeight)].map((_, index) => this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND);
     }
     setPorts() {
         this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {

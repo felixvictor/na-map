@@ -273,7 +273,7 @@ export const convertModulesAndWoodData = async () => {
                 return true;
             }
             return modifiers.get(apiModifierName) !== "";
-        }).map((modifier) => {
+        }).flatMap((modifier) => {
             const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
             const modifierName = modifiers.get(apiModifierName) ?? "";
             let amount = modifier.Percentage;
@@ -298,6 +298,20 @@ export const convertModulesAndWoodData = async () => {
             }
             if (notPercentage.has(modifierName)) {
                 isPercentage = false;
+            }
+            if (modifierName === "Cannon horizontal/vertical dispersion") {
+                return [
+                    {
+                        modifier: "Cannon horizontal dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                    {
+                        modifier: "Cannon vertical dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                ];
             }
             return {
                 modifier: modifierName,
