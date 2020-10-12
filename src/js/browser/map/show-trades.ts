@@ -15,8 +15,7 @@ import "bootstrap/js/dist/tooltip"
 import "bootstrap-select/js/bootstrap-select"
 import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
-import { ArrayLike, select as d3Select, Selection } from "d3-selection"
-import * as d3Zoom from "d3-zoom"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { nations, NationShortName, putImportError } from "../../common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
@@ -24,6 +23,7 @@ import { defaultFontSize, roundToThousands } from "../../common/common-math"
 
 import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "../../common/gen-json"
+import { ZoomTransform } from "d3-zoom"
 import { Bound, HtmlString } from "../../common/interface"
 
 import Cookie from "../util/cookie"
@@ -179,10 +179,6 @@ export default class ShowTrades {
 
     static _endBlock(): HtmlString {
         return "</div>"
-    }
-
-    static _hideDetails(d: Trade, i: number, nodes: SVGPathElement[] | ArrayLike<SVGPathElement>): void {
-        $(d3Select(nodes[i]).node() as JQuery.PlainObject).tooltip("dispose")
     }
 
     static _showElem(elem: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
@@ -464,7 +460,7 @@ export default class ShowTrades {
                     this._nodeData.get(trade.target.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.target.id)}`)
-        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
+        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}`) + ShowTrades._addDes("sail distance")
 
         return h
     }
@@ -509,29 +505,10 @@ export default class ShowTrades {
                     this._nodeData.get(trade.target.id)!.nation
                 }</span>`
             ) + ShowTrades._addDes(`to ${this._getDepth(trade.source.id)}`)
-        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}\u2009k`) + ShowTrades._addDes("distance")
+        h += ShowTrades._addInfo(`${formatSiInt(trade.distance)}`) + ShowTrades._addDes("sail distance")
         h += ShowTrades._endBlock()
 
         return h
-    }
-
-    _showDetails(d: Trade, i: number, nodes: SVGPathElement[] | ArrayLike<SVGPathElement>): void {
-        const trade = d3Select(nodes[i])
-        const title = this._getTradeFullData(d)
-
-        $(trade.node() as JQuery.PlainObject)
-            .tooltip({
-                html: true,
-                placement: "auto",
-                template:
-                    '<div class="tooltip" role="tooltip">' +
-                    '<div class="tooltip-block tooltip-inner tooltip-small">' +
-                    "</div></div>",
-                title,
-                trigger: "manual",
-                sanitize: false,
-            })
-            .tooltip("show")
     }
 
     _getSiblingLinks(sourceId: number, targetId: number): number[] {
@@ -556,6 +533,29 @@ export default class ShowTrades {
      * {@link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0}
      */
     _updateGraph(): void {
+        const showDetails = (self: SVGElement, event: Event, d: Trade): void => {
+            const trade = d3Select(self)
+            const title = this._getTradeFullData(d)
+
+            $(trade.node() as JQuery.PlainObject)
+                .tooltip({
+                    html: true,
+                    placement: "auto",
+                    template:
+                        '<div class="tooltip" role="tooltip">' +
+                        '<div class="tooltip-block tooltip-inner tooltip-small">' +
+                        "</div></div>",
+                    title,
+                    trigger: "manual",
+                    sanitize: false,
+                })
+                .tooltip("show")
+        }
+
+        const hideDetails = (self: SVGPathElement): void => {
+            $(d3Select(self).node() as JQuery.PlainObject).tooltip("dispose")
+        }
+
         const arcPath = (leftHand: boolean, d: Trade): string => {
             const source = { x: this._getXCoord(d.source.id), y: this._getYCoord(d.source.id) }
             const target = { x: this._getXCoord(d.target.id), y: this._getYCoord(d.target.id) }
@@ -601,8 +601,12 @@ export default class ShowTrades {
                         this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : ""
                     )
                     .attr("id", (d) => ShowTrades._getId(d))
-                    .on("click", (d, i, nodes) => this._showDetails(d, i, nodes))
-                    .on("mouseleave", ShowTrades._hideDetails)
+                    .on("click", function (event: Event, d: Trade) {
+                        showDetails(this, event, d)
+                    })
+                    .on("mouseleave", function () {
+                        hideDetails(this)
+                    })
             )
             .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))
             .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0)}px`)
@@ -619,9 +623,9 @@ export default class ShowTrades {
                     .append("textPath")
                     .attr("startOffset", "15%")
                     .attr("xlink:href", (d) => `#${ShowTrades._getId(d)}`)
-                    .text((d) => `${formatInt(d.quantity)} ${d.good}`)
+                    .text((d) => `${formatInt(d.quantity)} ${this._tradeItem.get(d.good)!}`)
             )
-            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0)! / 1.5}px`)
+            .attr("dy", (d) => `-${linkWidthScale(d.profit ?? 0)! / 1.8}px`)
     }
 
     get listType(): string {
@@ -677,7 +681,7 @@ export default class ShowTrades {
     _updateTradeList(): void {
         let highlightLink: Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
-        const highlightOn = (d: Trade): void => {
+        const highlightOn = (_event: Event, d: Trade): void => {
             highlightLink = d3Select<SVGPathElement, unknown>(`path#${ShowTrades._getId(d)}`).attr("class", "highlight")
             highlightLink.dispatch("click")
         }
@@ -787,7 +791,7 @@ export default class ShowTrades {
         this._upperBound = upperBound
     }
 
-    transform(transform: d3Zoom.ZoomTransform): void {
+    transform(transform: ZoomTransform): void {
         this._scale = transform.k
         this.update()
     }
