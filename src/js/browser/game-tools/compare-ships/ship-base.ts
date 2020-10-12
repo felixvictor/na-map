@@ -136,7 +136,7 @@ export class ShipBase extends Ship {
     _setupDrag(): void {
         const steps = this.shipData.speedDegrees.length
         const degreesPerStep = 360 / steps
-        const domain = new Array(steps + 1).map((e, i) => i * degreesPerStep)
+        const domain = [...new Array(steps + 1)].map((_, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipData.speedDegrees, this.shipData.speedDegrees[0]])

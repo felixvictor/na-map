@@ -57,6 +57,7 @@ class Map {
     #distances: Distance[] = []
     #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
     #map: GridMap = {} as GridMap
+    #map2: GridMap = {} as GridMap
     #mapHeight!: number
     #mapScale!: number
     #mapWidth!: number
@@ -111,9 +112,9 @@ class Map {
         /**
          * Convert png to map (black -\> spotLand, white -\> spotWater)
          */
-        this.#map = new Array(this.#mapWidth * this.#mapHeight)
-            .fill(0)
-            .map((_e, index: number) => (this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND))
+        this.#map = [...new Array(this.#mapWidth * this.#mapHeight)].map((_, index) =>
+            this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND
+        )
     }
 
     /*
