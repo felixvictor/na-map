@@ -79,7 +79,7 @@ export class ShipBase extends Ship {
     _setupDrag() {
         const steps = this.shipData.speedDegrees.length;
         const degreesPerStep = 360 / steps;
-        const domain = new Array(steps + 1).map((e, i) => i * degreesPerStep);
+        const domain = [...new Array(steps + 1)].map((_, i) => i * degreesPerStep);
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipData.speedDegrees, this.shipData.speedDegrees[0]])
@@ -239,6 +239,12 @@ export class ShipBase extends Ship {
             musketsCrew: formatInt((this.shipData.boarding.musketsCrew / 100) * this.shipData.crew.max),
             prepPerRound: formatInt(this.shipData.boarding.prepPerRound),
             prepInitial: formatInt(this.shipData.boarding.prepInitial),
+            reload: formatSignInt(this.shipData.gunnery.reload * 100),
+            penetration: formatSignInt(this.shipData.gunnery.penetration * 100),
+            dispersionHorizontal: formatSignInt(this.shipData.gunnery.dispersionHorizontal * 100),
+            dispersionVertical: formatSignInt(this.shipData.gunnery.dispersionVertical * 100),
+            traverseUpDown: formatSignInt(this.shipData.gunnery.traverseUpDown * 100),
+            traverseSide: formatSignInt(this.shipData.gunnery.traverseSide * 100),
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatInt(this.shipData.stern.armour)}</br><span class="badge badge-white">${formatInt(this.shipData.stern.thickness)}</span>`,

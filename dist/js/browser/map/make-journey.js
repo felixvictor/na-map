@@ -221,7 +221,7 @@ export default class MakeJourney {
         this._compass.remove();
     }
     _getSpeedAtDegrees(degrees) {
-        return Math.max(this._speedScale(degrees), this._minOWSpeed);
+        return Math.max(this._speedScale(degrees) ?? 0, this._minOWSpeed);
     }
     _calculateDistanceForSection(degreesCourse, degreesCurrentWind) {
         const degreesForSpeedCalc = (degreesFullCircle - degreesCourse + degreesCurrentWind) % degreesFullCircle;
