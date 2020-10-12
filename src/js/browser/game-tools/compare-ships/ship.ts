@@ -194,11 +194,12 @@ export class Ship {
 
         text += displayFirstColumn("Gunnery")
         text += Ship.displaySecondBlock()
-        text += displayColumn("reload", "Reload", 4)
-        text += displayColumn("dispersionHorizontal", "Horizontal dispersion", 4)
-        text += displayColumn("dispersionVertical", "Vertical dispersion", 4)
-        text += displayColumn("traverseUpDown", "Up/down traverse", 4)
-        text += displayColumn("traverseSide", "Side traverse", 4)
+        text += displayColumn("reload", "Reload %", 4)
+        text += displayColumn("dispersionHorizontal", "Horizontal dispersion %", 4)
+        text += displayColumn("dispersionVertical", "Vertical dispersion %", 4)
+        text += displayColumn("penetration", "Ball penetration %", 4)
+        text += displayColumn("traverseUpDown", "Up/down traverse %", 4)
+        text += displayColumn("traverseSide", "Side traverse %", 4)
         text += "</div></div></div>"
 
         text += displayFirstColumn("Boarding")

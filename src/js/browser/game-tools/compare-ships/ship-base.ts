@@ -347,7 +347,7 @@ export class ShipBase extends Ship {
             (this.shipData.sails.armour * this.shipData.repairAmount!.sails) / rigRepairsVolume
         )
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
-
+console.log("this.shipData.gunnery", this.shipData.gunnery)
         const ship = {
             // Boarding
             attack: formatSignFloat(this.shipData.boarding.attack!, 2),
@@ -361,11 +361,12 @@ export class ShipBase extends Ship {
             prepInitial: formatInt(this.shipData.boarding.prepInitial),
 
             // Gunnery
-            reload: formatInt(this.shipData.gunnery!.reload),
-            dispersionHorizontal: formatInt(this.shipData.gunnery!.dispersion.horizontal),
-            dispersionVertical: formatInt(this.shipData.gunnery!.dispersion.vertical),
-            traverseUpDown: formatInt(this.shipData.gunnery!.traverse.upDown),
-            traverseSide: formatInt(this.shipData.gunnery!.traverse.side),
+            reload: formatSignInt(this.shipData.gunnery!.reload * 100),
+            penetration: formatSignInt(this.shipData.gunnery!.penetration * 100),
+            dispersionHorizontal: formatSignInt(this.shipData.gunnery!.dispersionHorizontal * 100),
+            dispersionVertical: formatSignInt(this.shipData.gunnery!.dispersionVertical * 100),
+            traverseUpDown: formatSignInt(this.shipData.gunnery!.traverseUpDown * 100),
+            traverseSide: formatSignInt(this.shipData.gunnery!.traverseSide * 100),
 
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
