@@ -343,7 +343,6 @@ export default class MakeJourney {
             .attr("y", y)
 
         this._compassG = this._compass.append("g")
-        // @ts-expect-error
         printCompassRose({ element: this._compassG, radius: this._compassRadius })
     }
 
@@ -352,7 +351,6 @@ export default class MakeJourney {
     }
 
     _getSpeedAtDegrees(degrees: number): number {
-        // @ts-expect-error
         return Math.max(this._speedScale(degrees), this._minOWSpeed)
     }
 

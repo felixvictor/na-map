@@ -59,9 +59,6 @@ export class ShipComparison extends Ship {
             .domain(domain)
             .range([...this.shipCompareData.speedDegrees, this.shipCompareData.speedDegrees[0]])
             .clamp(true);
-        const dragStart = (event, d) => {
-            d.this.classed("drag-active", true);
-        };
         const dragged = (event, d) => {
             const update = () => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`);
@@ -75,13 +72,8 @@ export class ShipComparison extends Ship {
             d.rotate = this._getHeadingInDegrees(rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }), d.correctionValueDegrees);
             update();
         };
-        const dragEnd = (event, d) => {
-            d.this.classed("drag-active", false);
-        };
         this._drag = d3Drag()
-            .on("start", (event, d) => dragStart(event, d))
             .on("drag", (event, d) => dragged(event, d))
-            .on("end", (event, d) => dragEnd(event, d))
             .container(() => this._mainG.node());
     }
     _setupShipOutline() {
@@ -165,8 +157,14 @@ export class ShipComparison extends Ship {
             .append("g")
             .attr("class", "wind-profile")
             .attr("transform", `rotate(${this._windProfile.initRotate})`);
-        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase));
-        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp));
+        this._gWindProfile
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase));
+        this._gWindProfile
+            .append("path")
+            .attr("class", "comp-profile")
+            .attr("d", line(this._arcsComp));
     }
     updateWindProfileRotation() {
         this._gWindProfile.attr("transform", `rotate(${this._shipCompare.windProfileRotate})`);
@@ -188,6 +186,7 @@ export class ShipComparison extends Ship {
                 .attr("fill", (d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]) ?? 0)
                 .append("title")
                 .text((d, i) => `${Math.round(d.data * 10) / 10} (${formatSignFloat(this._speedDiff[i], 1)}) knots`);
+            return enter;
         })
             .select("circle")
             .attr("fill", (_d, i) => this._shipCompare.colourScaleSpeedDiff(this._speedDiff[i]));

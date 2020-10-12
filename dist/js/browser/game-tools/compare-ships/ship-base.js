@@ -7,8 +7,8 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
+import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
 import { drag as d3Drag } from "d3-drag";
 import { isEmpty } from "../../../common/common";
 import { pluralise, segmentRadians } from "../../../common/common-browser";
@@ -79,14 +79,11 @@ export class ShipBase extends Ship {
     _setupDrag() {
         const steps = this.shipData.speedDegrees.length;
         const degreesPerStep = 360 / steps;
-        const domain = new Array(steps + 1).fill(null).map((e, i) => i * degreesPerStep);
+        const domain = new Array(steps + 1).map((e, i) => i * degreesPerStep);
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipData.speedDegrees, this.shipData.speedDegrees[0]])
             .clamp(true);
-        const dragStart = (event, d) => {
-            d.this.classed("drag-active", true);
-        };
         const dragged = (event, d) => {
             const update = () => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`);
@@ -110,14 +107,7 @@ export class ShipBase extends Ship {
                 this._updateCompareWindProfiles();
             }
         };
-        const dragEnd = (event, d) => {
-            d.this.classed("drag-active", false);
-        };
-        this._drag = d3Drag()
-            .on("start", (event, d) => dragStart(event, d))
-            .on("drag", (event, d) => dragged(event, d))
-            .on("end", (event, d) => dragEnd(event, d))
-            .container(() => this._mainG.node());
+        this._drag = d3Drag().on("drag", (event, d) => dragged(event, d));
     }
     _setupShipOutline() {
         this._shipRotate = 0;
@@ -212,7 +202,10 @@ export class ShipBase extends Ship {
             .attr("y", (d) => d.compassTextY)
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate));
-        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase));
+        gWindProfile
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase));
         gWindProfile
             .append("g")
             .attr("data-ui-component", "speed-markers")

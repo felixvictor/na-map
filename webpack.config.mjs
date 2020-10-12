@@ -11,7 +11,7 @@ import webpack from "webpack"
 
 import sass from "node-sass"
 import { default as parseCss } from "css"
-// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+// import BundleAnalyzerPlugin from "webpack-bundle-analyzer"
 import CleanWebpackPlugin from "clean-webpack-plugin"
 import CopyPlugin from "copy-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
@@ -462,7 +462,7 @@ const config = {
                         options: cssOpt,
                     },
                     {
-                        loader:"postcss-loader",
+                        loader: "postcss-loader",
                         options: postcssOpt,
                     },
                 ],
@@ -483,7 +483,7 @@ const config = {
                 include: dirFlags,
                 use: [
                     {
-                        loader:"svg-url-loader",
+                        loader: "svg-url-loader",
                         options: {
                             limit: 1000,
                             name: "[name].[ext]",
@@ -497,7 +497,7 @@ const config = {
                         },
                     },
                     {
-                        loader:"string-replace-loader",
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="#fff" fill-opacity="0"/>',
                             replace: `fill="${primary700}" fill-opacity="0.3"/>`,
@@ -538,7 +538,7 @@ const config = {
                         },
                     },
                     {
-                        loader:"string-replace-loader",
+                        loader: "string-replace-loader",
                         options: {
                             search: 'fill="$darkYellow"',
                             replace: `fill="${colourYellowDark}"`,
@@ -557,7 +557,7 @@ if (isQuiet) {
 /*
 if (isProduction && !isQuiet) {
     config.plugins.push(
-        new BundleAnalyzerPlugin({
+        new BundleAnalyzerPlugin.BundleAnalyzerPlugin({
             analyzerMode: "static",
             generateStatsFile: true,
             logLevel: "warn",
@@ -573,7 +573,6 @@ if (isProduction) {
     config.optimization.minimize = true
     config.optimization.minimizer = [
         new TerserPlugin({
-            cache: true, // does not work with webpack 5
             parallel: true,
             terserOptions: {
                 ecma: 2020,
