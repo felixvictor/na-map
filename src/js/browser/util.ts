@@ -161,7 +161,7 @@ export const printCompassRose = ({
     // noinspection MagicNumberJS
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 3
-    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep))
+    const data = [...new Array(steps)].map((_, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -240,7 +240,7 @@ export const printSmallCompassRose = ({
     const degreesPerStep = degreesFullCircle / steps
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 1.5
-    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep))
+    const data = [...new Array(steps)].map((_, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
