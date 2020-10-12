@@ -529,9 +529,12 @@ interface ShipBoarding {
     musketsCrew?: number
 }
 interface ShipGunnery {
-    dispersion: ShipGunneryDispersion
+    dispersionHorizontal: number
+    dispersionVertical: number
+    penetration: number
     reload: number
-    traverse: ShipGunneryTraverse
+    traverseUpDown: number
+    traverseSide: number
 }
 interface ShipGunneryDispersion {
     horizontal: number

@@ -19,11 +19,12 @@ export interface ShipDisplayData {
     carroWeight: string
     deceleration: string
     decks: string
+    dispersionHorizontal: string
+    dispersionVertical: string
     frontArmor: string
     guns: string
     gunsBack: number | string
     gunsFront: number | string
-    turnSpeed: string
     holdSize: string
     hullRepairAmount: string
     hullRepairsNeeded: string
@@ -38,6 +39,8 @@ export interface ShipDisplayData {
     maxWeight: string
     minCrew: string
     minSpeed?: string
+    penetration: string
+    reload: string
     repairTime: string
     rigRepairAmount: string
     rigRepairsNeeded: string
@@ -50,7 +53,10 @@ export interface ShipDisplayData {
     splinterResistance: string
     sternRepair?: string
     structure: string
+    traverseSide: string
+    traverseUpDown: string
     turnAcceleration: string
+    turnSpeed: string
     upgradeXP: string
     waterlineHeight: string
 }

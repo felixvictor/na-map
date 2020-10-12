@@ -394,12 +394,13 @@ export class CompareShips {
         this._moduleAndWoodChanges = new Map<ModifierName, Property>([
             [
                 "Cannon horizontal dispersion",
-                { properties: ["gunnery.dispersion.horizontal"], isBaseValueAbsolute: true },
+                { properties: ["gunnery.dispersionHorizontal"], isBaseValueAbsolute: true },
             ],
-            ["Cannon vertical dispersion", { properties: ["gunnery.dispersion.vertical"], isBaseValueAbsolute: true }],
+            ["Cannon vertical dispersion", { properties: ["gunnery.dispersionVertical"], isBaseValueAbsolute: true }],
             ["Cannon reload time", { properties: ["gunnery.reload"], isBaseValueAbsolute: true }],
-            ["Cannon side traverse", { properties: ["gunnery.traverse.side"], isBaseValueAbsolute: true }],
-            ["Cannon up/down traverse", { properties: ["gunnery.traverse.upDown"], isBaseValueAbsolute: true }],
+            ["Cannon ball penetration", { properties: ["gunnery.penetration"], isBaseValueAbsolute: true }],
+            ["Cannon side traverse", { properties: ["gunnery.traverseSide"], isBaseValueAbsolute: true }],
+            ["Cannon up/down traverse", { properties: ["gunnery.traverseUpDown"], isBaseValueAbsolute: true }],
 
             ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
             ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
@@ -1201,17 +1202,13 @@ export class CompareShips {
             splinter: 0,
         }
         shipDataUpdated.gunnery = {
-            dispersion: {
-                horizontal: 0,
-                vertical: 0,
-            },
+            dispersionHorizontal: 0,
+            dispersionVertical: 0,
+            penetration: 0,
             reload: 0,
-            traverse: {
-                upDown: 0,
-                side: 0,
-            },
+            traverseUpDown: 0,
+            traverseSide: 0,
         }
-        console.log(shipDataUpdated)
         shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId)
 
         return shipDataUpdated

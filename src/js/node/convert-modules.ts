@@ -325,7 +325,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
 
             return modifiers.get(apiModifierName) !== ""
-        }).map((modifier) => {
+        }).flatMap((modifier) => {
             const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
             const modifierName = modifiers.get(apiModifierName) ?? ""
 
@@ -355,6 +355,22 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             // Some modifiers are wrongly indicated as a percentage
             if (notPercentage.has(modifierName)) {
                 isPercentage = false
+            }
+
+            // Special case dispersion: split entry up in horizontal and vertical
+            if (modifierName === "Cannon horizontal/vertical dispersion") {
+                return [
+                    {
+                        modifier: "Cannon horizontal dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                    {
+                        modifier: "Cannon vertical dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                ]
             }
 
             return {

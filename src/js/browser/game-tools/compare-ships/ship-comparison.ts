@@ -390,25 +390,33 @@ export class ShipComparison extends Ship {
             )}`,
 
             // Gunnery
-            reload: `${formatInt(this.shipCompareData.gunnery!.reload)}\u00A0${getDiff(
-                this.shipCompareData.gunnery!.reload,
-                this._shipBaseData.gunnery!.reload
+            reload: `${formatSignInt(this.shipCompareData.gunnery!.reload * 100)}\u00A0${getDiff(
+                this._shipBaseData.gunnery!.reload * 100,
+                this.shipCompareData.gunnery!.reload * 100
             )}`,
-            dispersionHorizontal: `${formatInt(this.shipCompareData.gunnery!.dispersion.horizontal)}\u00A0${getDiff(
-                this.shipCompareData.gunnery!.dispersion.horizontal,
-                this._shipBaseData.gunnery!.dispersion.horizontal
+            penetration: `${formatSignInt(this.shipCompareData.gunnery!.penetration * 100)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.penetration * 100,
+                this._shipBaseData.gunnery!.penetration * 100
             )}`,
-            dispersionVertical: `${formatInt(this.shipCompareData.gunnery!.dispersion.vertical)}\u00A0${getDiff(
-                this.shipCompareData.gunnery!.dispersion.vertical,
-                this._shipBaseData.gunnery!.dispersion.vertical
+            dispersionHorizontal: `${formatSignInt(
+                this.shipCompareData.gunnery!.dispersionHorizontal * 100
+            )}\u00A0${getDiff(
+                this._shipBaseData.gunnery!.dispersionHorizontal * 100,
+                this.shipCompareData.gunnery!.dispersionHorizontal * 100
             )}`,
-            traverseUpDown: `${formatInt(this.shipCompareData.gunnery!.traverse.upDown)}\u00A0${getDiff(
-                this.shipCompareData.gunnery!.traverse.upDown,
-                this._shipBaseData.gunnery!.traverse.upDown
+            dispersionVertical: `${formatSignInt(
+                this.shipCompareData.gunnery!.dispersionVertical * 100
+            )}\u00A0${getDiff(
+                this._shipBaseData.gunnery!.dispersionVertical * 100,
+                this.shipCompareData.gunnery!.dispersionVertical * 100
             )}`,
-            traverseSide: `${formatInt(this.shipCompareData.gunnery!.traverse.side)}\u00A0${getDiff(
-                this.shipCompareData.gunnery!.traverse.side,
-                this._shipBaseData.gunnery!.traverse.side
+            traverseUpDown: `${formatSignInt(this.shipCompareData.gunnery!.traverseUpDown * 100)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.traverseUpDown * 100,
+                this._shipBaseData.gunnery!.traverseUpDown * 100
+            )}`,
+            traverseSide: `${formatSignInt(this.shipCompareData.gunnery!.traverseSide * 100)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.traverseSide * 100,
+                this._shipBaseData.gunnery!.traverseSide * 100
             )}`,
 
             acceleration: `${formatFloat(this.shipCompareData.ship.acceleration)}\u00A0${getDiff(
