@@ -493,7 +493,7 @@ export interface ShipData extends ObjectIndexer<any> {
     bow: ShipHealth
     class: number
     crew: ShipCrew
-    cannon?: ShipGunnery
+    gunnery?: ShipGunnery
     guns: ShipGuns
     holdSize: number
     id: number

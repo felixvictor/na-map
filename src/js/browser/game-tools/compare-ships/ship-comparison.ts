@@ -406,6 +406,28 @@ export class ShipComparison extends Ship {
                 this._shipBaseData.boarding.cannonsAccuracy! * 100
             )}`,
 
+            // Gunnery
+            reload: `${formatInt(this.shipCompareData.gunnery!.reload)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.reload,
+                this._shipBaseData.gunnery!.reload
+            )}`,
+            dispersionHorizontal: `${formatInt(this.shipCompareData.gunnery!.dispersion.horizontal)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.dispersion.horizontal,
+                this._shipBaseData.gunnery!.dispersion.horizontal
+            )}`,
+            dispersionVertical: `${formatInt(this.shipCompareData.gunnery!.dispersion.vertical)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.dispersion.vertical,
+                this._shipBaseData.gunnery!.dispersion.vertical
+            )}`,
+            traverseUpDown: `${formatInt(this.shipCompareData.gunnery!.traverse.upDown)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.traverse.upDown,
+                this._shipBaseData.gunnery!.traverse.upDown
+            )}`,
+            traverseSide: `${formatInt(this.shipCompareData.gunnery!.traverse.side)}\u00A0${getDiff(
+                this.shipCompareData.gunnery!.traverse.side,
+                this._shipBaseData.gunnery!.traverse.side
+            )}`,
+
             acceleration: `${formatFloat(this.shipCompareData.ship.acceleration)}\u00A0${getDiff(
                 this.shipCompareData.ship.acceleration,
                 this._shipBaseData.ship.acceleration,
