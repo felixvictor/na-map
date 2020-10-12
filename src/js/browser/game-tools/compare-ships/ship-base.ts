@@ -347,7 +347,7 @@ export class ShipBase extends Ship {
             (this.shipData.sails.armour * this.shipData.repairAmount!.sails) / rigRepairsVolume
         )
         const rumRepairsNeeded = Math.round(this.shipData.crew.max * rumRepairsFactor)
-console.log("this.shipData.gunnery", this.shipData.gunnery)
+
         const ship = {
             // Boarding
             attack: formatSignFloat(this.shipData.boarding.attack!, 2),
