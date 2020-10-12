@@ -13,8 +13,11 @@ import { default as fs, promises as pfs } from "fs"
 import path from "path"
 import { promisify } from "util"
 
-import { apiBaseFiles, serverNames } from "./common-var"
+import { apiBaseFiles } from "./common-var"
 import { baseAPIFilename, serverStartDate } from "./common-dir"
+import { serverIds } from "./servers"
+// @ts-expect-error
+import { ErrnoException } from "node/globals"
 
 const execP = promisify(exec)
 
@@ -36,12 +39,14 @@ export const saveJsonAsync = async (fileName: string, data: object): Promise<voi
 export const saveTextFile = (fileName: string, data: string): void =>
     fs.writeFileSync(fileName, data, { encoding: "utf8" })
 
+const isNodeError = (error: Error): error is ErrnoException => error instanceof Error
+
 export const readTextFile = (fileName: string): string => {
     let data = ""
     try {
         data = fs.readFileSync(fileName, { encoding: "utf8" })
-    } catch (error) {
-        if (error.code === "ENOENT") {
+    } catch (error: unknown) {
+        if (isNodeError(error as Error) && (error as ErrnoException).code === "ENOENT") {
             console.error("File", fileName, "not found")
         } else {
             throw error
@@ -79,7 +84,7 @@ export const xz = (command: string, fileName: string): void => {
 const loopApiFiles = (command: string): void => {
     const ext = command === "xz" ? "json" : "json.xz"
 
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverStartDate}.${ext}`)
             xz(command, fileName)

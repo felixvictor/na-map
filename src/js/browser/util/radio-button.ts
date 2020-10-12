@@ -15,11 +15,11 @@ export default class RadioButton {
     // Radio button name
     readonly #name: string
     // Radio button ids
-    readonly #ids: string[]
+    readonly #ids: readonly string[]
     // Default checked radio button id
     readonly #default: string
 
-    constructor(name: string, ids: string[]) {
+    constructor(name: string, ids: readonly string[]) {
         this.#name = name.replace(/ /g, "")
         this.#ids = ids
         ;[this.#default] = ids

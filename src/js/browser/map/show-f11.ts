@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import { select as d3Select } from "d3-selection"
@@ -19,6 +18,7 @@ import { insertBaseModal } from "../../common/common-browser"
 import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math"
 import { copyF11ToClipboard } from "../util"
 
+import JQuery from "jquery"
 import { BaseModalPure, HtmlString, MinMaxCoord } from "../../common/interface"
 
 import { NAMap } from "./na-map"

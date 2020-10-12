@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as path from "path"
+import path from "path"
 import convert, { ElementCompact } from "xml-js"
 
 import { commonPaths } from "../common/common-dir"

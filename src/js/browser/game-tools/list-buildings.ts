@@ -49,8 +49,8 @@ export default class ListBuildings {
             this._buildingData = (
                 await import(/* webpackChunkName: "data-buildings" */ "Lib/gen-generic/buildings.json")
             ).default as Building[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

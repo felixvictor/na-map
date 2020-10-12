@@ -9,9 +9,7 @@
 
 import { initAnalytics, registerPage } from "./analytics"
 import { putImportError } from "../common/common"
-import { Server } from "../common/servers"
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers: Server[] = require("../common/servers")
+import { serverIds } from "../common/servers"
 
 import Cookie from "./util/cookie"
 import RadioButton from "./util/radio-button"
@@ -40,7 +38,7 @@ const baseId = "server-name"
 /**
  * Possible values for server names (first is default value)
  */
-const radioButtonValues = servers.map((server: Server) => server.id)
+const radioButtonValues = serverIds
 
 /**
  * Server name cookie
@@ -114,8 +112,8 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
         window.addEventListener("resize", () => {
             map.resize()
         })
-    } catch (error) {
-        putImportError(error)
+    } catch (error: unknown) {
+        putImportError(error as string)
     }
 }
 
@@ -128,8 +126,8 @@ const loadGameTools = async (serverId: string, searchParams: URLSearchParams): P
     try {
         const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
         gameTools.init(serverId, searchParams)
-    } catch (error) {
-        putImportError(error)
+    } catch (error: unknown) {
+        putImportError(error as string)
     }
 }
 
@@ -140,8 +138,8 @@ const loadMapTools = async (): Promise<void> => {
     try {
         const mapTools = await import(/* webpackChunkName: "map-tools" */ "./map-tools")
         mapTools.init()
-    } catch (error) {
-        putImportError(error)
+    } catch (error: unknown) {
+        putImportError(error as string)
     }
 }
 

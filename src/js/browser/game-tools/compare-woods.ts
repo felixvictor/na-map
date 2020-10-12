@@ -8,14 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select/js/bootstrap-select"
 import { min as d3Min, max as d3Max } from "d3-array"
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { insertBaseModal } from "../../common/common-browser"
@@ -23,17 +21,10 @@ import { formatFloat, formatPercent, formatSignFloat } from "../../common/common
 import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { simpleStringSort, sortBy } from "../../common/common-node"
 
+import JQuery from "jquery"
 import { WoodData, WoodTrimOrFrame } from "../../common/gen-json"
-import { ArrayIndex, HtmlString, Index, NestedIndex } from "../../common/interface"
+import { HtmlString, Index, NestedIndex } from "../../common/interface"
 import { WoodColumnType } from "../../common/types"
-import * as d3Selection from "d3-selection"
-
-type ColumnArray<T> = {
-    [K in WoodColumnType]: T[]
-}
-type ColumnNestedArray<T> = {
-    [K1 in WoodColumnType]: ArrayIndex<T>
-}
 
 interface MinMax {
     min: number
@@ -71,7 +62,7 @@ class Wood {
     readonly select: HtmlString
     protected readonly _woodCompare: CompareWoods
     private readonly _id: WoodColumnType
-    private readonly _g: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private readonly _g: Selection<SVGGElement, unknown, HTMLElement, unknown>
 
     constructor(compareId: WoodColumnType, woodCompare: CompareWoods) {
         this._id = compareId
@@ -427,8 +418,8 @@ export default class CompareWoods {
             this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
                 .default as WoodData
             this._setupData()
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 

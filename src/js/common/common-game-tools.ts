@@ -88,14 +88,10 @@ export const getBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }:
             <div class="modal-dialog ${size}" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 id="title-${id}" class="modal-title">
-                            ${title}
-                        </h5>
+                        <h5 id="title-${id}" class="modal-title">${title}</h5>
                     </div>
                     <div class="modal-body">${body()}</div>
-                    <div class="modal-footer">
-                        ${footer()}
-                    </div>
+                    <div class="modal-footer">${footer()}</div>
                 </div>
             </div>
         </div>

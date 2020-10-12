@@ -7,13 +7,13 @@
  * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import d3Array from "d3-array";
 const { group: d3Group } = d3Array;
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
-import { serverNames } from "../common/common-var";
+import { serverIds } from "../common/servers";
 let apiItems;
 const groups = new Map([
     ["AdmiralityShips", "Admirality permits"],
@@ -112,7 +112,7 @@ const convertRecipes = async () => {
     await saveJsonAsync(commonPaths.fileRecipe, data);
 };
 export const convertRecipeData = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`));
     void convertRecipes();
 };
 //# sourceMappingURL=convert-recipes.js.map

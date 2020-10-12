@@ -93,8 +93,8 @@ export default class ListPortBattles {
                         ],
                     }
                 })
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -135,13 +135,12 @@ export default class ListPortBattles {
             .append("tr")
             .selectAll("th")
             .data(["Time", "Port", "Attacker", "Defender"])
-
-            .enter()
-            .append("th")
+            .join("th")
+            .datum((d, i) => ({ data: d, index: i }))
             .attr("role", "columnheader")
-            .text((d) => d)
-            .on("click", (d, i) => {
-                this._sortRows(i)
+            .text((d) => d.data)
+            .on("click", (_event, d) => {
+                this._sortRows(d.index)
             })
         this.#table.append("tbody")
     }

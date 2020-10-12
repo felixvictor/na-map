@@ -7,14 +7,14 @@
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import d3Array from "d3-array";
 const { group: d3Group } = d3Array;
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { capitalizeFirstLetter, woodType } from "../common/common";
 import { cleanName, sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { serverNames } from "../common/common-var";
+import { serverIds } from "../common/servers";
 let apiItems;
 const notUsedExceptionalWoodIds = new Set([
     2358,
@@ -88,7 +88,7 @@ export const convertModulesAndWoodData = async () => {
         ["NONE SHIP_TURNING_SPEED", "Turn speed"],
         ["REPAIR_ARMOR REPAIR_PERCENT", "Repair amount"],
         ["SAIL MAST_THICKNESS", "Mast thickness"],
-        ["STRUCTURE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["STRUCTURE FIRE_INCREASE_RATE", ""],
         ["STRUCTURE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["STRUCTURE SHIP_STRUCTURE_LEAKS_PER_SECOND", "Leak resistance"],
         ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Repair time"],
@@ -121,8 +121,8 @@ export const convertModulesAndWoodData = async () => {
         ["NONE BOARDING_DEFENSE_BONUS", "Melee defense"],
         ["NONE CREW_TRANSFER_SPEED", "Crew transfer speed"],
         ["NONE DECK_GUNS_ACCURACY_BONUS", "Boarding cannons accuracy"],
-        ["NONE FIRE_DECREASE_RATE", "Fire resistance"],
-        ["NONE FIRE_INCREASE_RATE", "Fire resistance"],
+        ["NONE FIRE_DECREASE_RATE", ""],
+        ["NONE FIRE_INCREASE_RATE", ""],
         ["NONE FIREZONE_MAX_HORIZONTAL_ANGLE", "Cannon side traverse"],
         ["NONE GLOBAL_SIDEBOARD_WATER_FLOW", "Sideboard water flow"],
         ["NONE GRENADES_BONUS", "Grenades"],
@@ -215,12 +215,7 @@ export const convertModulesAndWoodData = async () => {
         ["WATER_PUMP MODULE_BASE_HP", "Water pump hit points"],
         ["WATER_PUMP REPAIR_MODULE_TIME", ""],
     ]);
-    const flipAmountForModule = new Set([
-        "Fire resistance",
-        "Leak resistance",
-        "Turn acceleration",
-        "Rudder speed",
-    ]);
+    const flipAmountForModule = new Set(["Leak resistance", "Turn acceleration", "Rudder speed"]);
     const notPercentage = new Set(["Crew with muskets", "Melee attack", "Melee defense", "Morale"]);
     const setWood = (module) => {
         const wood = {};
@@ -278,7 +273,7 @@ export const convertModulesAndWoodData = async () => {
                 return true;
             }
             return modifiers.get(apiModifierName) !== "";
-        }).map((modifier) => {
+        }).flatMap((modifier) => {
             const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
             const modifierName = modifiers.get(apiModifierName) ?? "";
             let amount = modifier.Percentage;
@@ -303,6 +298,20 @@ export const convertModulesAndWoodData = async () => {
             }
             if (notPercentage.has(modifierName)) {
                 isPercentage = false;
+            }
+            if (modifierName === "Cannon horizontal/vertical dispersion") {
+                return [
+                    {
+                        modifier: "Cannon horizontal dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                    {
+                        modifier: "Cannon vertical dispersion",
+                        amount,
+                        isPercentage,
+                    },
+                ];
             }
             return {
                 modifier: modifierName,
@@ -447,7 +456,7 @@ export const convertModulesAndWoodData = async () => {
     await saveJsonAsync(commonPaths.fileWood, woods);
 };
 export const convertModules = () => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`));
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`));
     void convertModulesAndWoodData();
 };
 //# sourceMappingURL=convert-modules.js.map

@@ -8,20 +8,21 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as fs from "fs";
-import * as path from "path";
+import path from "path";
 import { default as Immutable } from "immutable";
 import { default as PNG } from "pngjs";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { convertCoordX, convertCoordY } from "../common/common-math";
 import { simpleNumberSort } from "../common/common-node";
-import { distanceMapSize, mapSize, serverNames } from "../common/common-var";
+import { distanceMapSize, mapSize } from "../common/common-var";
+import { serverIds } from "../common/servers";
 class Port {
     constructor() {
         this.apiPorts = [];
         this.numPorts = 0;
         this.portIds = [];
-        this.#fileName = path.resolve(baseAPIFilename, `${serverNames[0]}-Ports-${serverDate}.json`);
+        this.#fileName = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`);
         xz("unxz", `${this.#fileName}.xz`);
         this.apiPorts = readJson(this.#fileName);
         xz("xz", this.#fileName);
@@ -39,6 +40,7 @@ class Map {
         this.#distances = [];
         this.#distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json");
         this.#map = {};
+        this.#map2 = {};
         this.#port = {};
         this.#completedPorts = new Set();
         this.#LAND = 0;
@@ -58,6 +60,7 @@ class Map {
     #distances;
     #distancesFile;
     #map;
+    #map2;
     #mapHeight;
     #mapScale;
     #mapWidth;
@@ -88,9 +91,7 @@ class Map {
         console.log(this.#mapHeight, this.#mapWidth);
     }
     mapInit() {
-        this.#map = new Array(this.#mapWidth * this.#mapHeight)
-            .fill(0)
-            .map((_e, index) => (this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND));
+        this.#map = [...new Array(this.#mapWidth * this.#mapHeight)].map((_, index) => this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND);
     }
     setPorts() {
         this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {

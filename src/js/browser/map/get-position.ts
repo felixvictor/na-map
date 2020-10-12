@@ -4,11 +4,9 @@
  * @file      Get position.
  * @module    get-position
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-
-/// <reference types="bootstrap" />
 
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
@@ -24,9 +22,10 @@ import { copyF11ToClipboard } from "../util"
 import { trilaterate, Vector } from "../util/transliterate"
 import Toast from "../util/toast"
 
+import JQuery from "jquery"
 import { HtmlString } from "../../common/interface"
 
-import DisplayPorts from "../map/display-ports"
+import DisplayPorts from "./display-ports"
 
 /**
  * Get position
@@ -80,7 +79,7 @@ export default class TrilateratePosition {
     }
 
     _injectModal(): void {
-        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-sm", buttonText: "Go" })
+        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-md", buttonText: "Go" })
 
         const body = d3Select(`#${this.#modalId} .modal-body`)
         body.append("div").attr("class", "alert alert-primary").attr("role", "alert").text("Use in-game trader tool.")
@@ -141,7 +140,7 @@ export default class TrilateratePosition {
                     liveSearchPlaceholder: "Search ...",
                     title: "Select port",
                     virtualScroll: true,
-                } as BootstrapSelectOptions)
+                })
             }
         }
     }

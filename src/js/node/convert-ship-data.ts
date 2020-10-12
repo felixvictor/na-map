@@ -9,7 +9,7 @@
  */
 
 import * as fs from "fs"
-import * as path from "path"
+import path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
@@ -17,7 +17,7 @@ import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file"
 import { roundToThousands, speedConstA, speedConstB } from "../common/common-math"
 import { cleanName, sortBy } from "../common/common-node"
-import { serverNames } from "../common/common-var"
+import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIShip, APIShipBlueprint, Limit, Specs } from "./api-item"
 import { Cannon, ShipBlueprint, ShipData, ShipGunDeck, ShipGuns } from "../common/gen-json"
@@ -668,7 +668,7 @@ const convertShips = async (): Promise<void> => {
 }
 
 export const convertShipData = async (): Promise<void> => {
-    apiItems = readJson(path.resolve(baseAPIFilename, `${serverNames[0]}-ItemTemplates-${serverDate}.json`))
+    apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
     cannons = readJson(commonPaths.fileCannon)
     await convertShips()
     await convertShipBlueprints()
