@@ -394,12 +394,12 @@ export class CompareShips {
         this._moduleAndWoodChanges = new Map<ModifierName, Property>([
             [
                 "Cannon horizontal dispersion",
-                { properties: ["cannon.dispersion.horizontal"], isBaseValueAbsolute: true },
+                { properties: ["gunnery.dispersion.horizontal"], isBaseValueAbsolute: true },
             ],
-            ["Cannon vertical dispersion", { properties: ["cannon.dispersion.vertical"], isBaseValueAbsolute: true }],
-            ["Cannon reload time", { properties: ["cannon.reload"], isBaseValueAbsolute: true }],
-            ["Cannon side traverse", { properties: ["cannon.traverse.side"], isBaseValueAbsolute: true }],
-            ["Cannon up/down traverse", { properties: ["cannon.traverse.upDown"], isBaseValueAbsolute: true }],
+            ["Cannon vertical dispersion", { properties: ["gunnery.dispersion.vertical"], isBaseValueAbsolute: true }],
+            ["Cannon reload time", { properties: ["gunnery.reload"], isBaseValueAbsolute: true }],
+            ["Cannon side traverse", { properties: ["gunnery.traverse.side"], isBaseValueAbsolute: true }],
+            ["Cannon up/down traverse", { properties: ["gunnery.traverse.upDown"], isBaseValueAbsolute: true }],
 
             ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
             ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
@@ -1187,17 +1187,6 @@ export class CompareShips {
             prepInitial: shipDataDefault.boarding.prepInitial,
             prepPerRound: shipDataDefault.boarding.prepPerRound,
         }
-        shipDataDefault.cannon = {
-            dispersion: {
-                horizontal: 0,
-                vertical: 0,
-            },
-            reload: 0,
-            traverse: {
-                upDown: 0,
-                side: 0,
-            },
-        }
 
         let shipDataUpdated = shipDataDefault
         shipDataUpdated.repairAmount = {
@@ -1211,7 +1200,18 @@ export class CompareShips {
             leaks: 0,
             splinter: 0,
         }
-
+        shipDataUpdated.gunnery = {
+            dispersion: {
+                horizontal: 0,
+                vertical: 0,
+            },
+            reload: 0,
+            traverse: {
+                upDown: 0,
+                side: 0,
+            },
+        }
+        console.log(shipDataUpdated)
         shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId)
 
         return shipDataUpdated
