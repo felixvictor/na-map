@@ -287,7 +287,7 @@ export class CompareShips {
     }
 
     _cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this.woodCompare.enableSelects(newColumnId as WoodColumnType)
+        this.woodCompare.enableSelects(newColumnId)
 
         if (this._selectWood$[currentColumnId].frame.val() !== "") {
             for (const type of woodType) {
@@ -496,7 +496,7 @@ export class CompareShips {
                     cap: { amount: 1, isPercentage: true },
                 },
             ],
-            ["Max speed", { properties: ["speed.max"], cap: { amount: 17, isPercentage: false } }],
+            ["Max speed", { properties: ["speed.max"], cap: { amount: 18, isPercentage: false } }],
             ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
         ])
 
