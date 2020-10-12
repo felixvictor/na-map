@@ -48,7 +48,8 @@
         "prod": "                 webpack --env.production --mode=production --colors --config webpack.config.cjs -r esm",
         "prod-quiet": "QUIET=true webpack --env.production --mode=production          --config webpack.config.cjs -r esm",
         "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.cjs -r esm",
-        "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.cjs -r esm"
+        "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.cjs -r esm",
+        "size": "find public/ -iname '*.js' -not -iname 'data-*.js' -exec du -bc {} + | sort -k 2 | sed 's|public/||'"
     },
     "browserslist": [
         ">= 1%",
