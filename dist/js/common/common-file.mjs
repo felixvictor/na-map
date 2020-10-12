@@ -11,8 +11,9 @@ import { exec, execSync } from "child_process";
 import { default as fs, promises as pfs } from "fs";
 import path from "path";
 import { promisify } from "util";
-import { apiBaseFiles, serverNames } from "./common-var";
+import { apiBaseFiles } from "./common-var";
 import { baseAPIFilename, serverStartDate } from "./common-dir";
+import { serverIds } from "./servers";
 const execP = promisify(exec);
 export const fileExists = (fileName) => fs.existsSync(fileName);
 export const makeDirAsync = async (dir) => {
@@ -23,13 +24,14 @@ export const saveJsonAsync = async (fileName, data) => {
     await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" });
 };
 export const saveTextFile = (fileName, data) => fs.writeFileSync(fileName, data, { encoding: "utf8" });
+const isNodeError = (error) => error instanceof Error;
 export const readTextFile = (fileName) => {
     let data = "";
     try {
         data = fs.readFileSync(fileName, { encoding: "utf8" });
     }
     catch (error) {
-        if (error.code === "ENOENT") {
+        if (isNodeError(error) && error.code === "ENOENT") {
             console.error("File", fileName, "not found");
         }
         else {
@@ -54,7 +56,7 @@ export const xz = (command, fileName) => {
 };
 const loopApiFiles = (command) => {
     const ext = command === "xz" ? "json" : "json.xz";
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverStartDate}.${ext}`);
             xz(command, fileName);

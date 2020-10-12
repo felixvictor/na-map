@@ -9,14 +9,15 @@
  */
 
 import { Axis, axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-axis"
-import { event as d3Event, select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
-import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
 import { formatF11 } from "../../common/common-format"
+import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
 
+import { D3ZoomEvent, ZoomTransform } from "d3-zoom"
 import { ZoomLevel } from "../../common/interface"
+
 import { NAMap } from "./na-map"
 
 /**
@@ -38,10 +39,10 @@ export default class DisplayGrid {
     #xAxis!: Axis<number>
     #yAxis!: Axis<number>
     #zoomLevel!: ZoomLevel
-    #gMainXAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
-    #gMainYAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
-    #gXAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
-    #gYAxis!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gMainXAxis!: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gMainYAxis!: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gXAxis!: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gYAxis!: Selection<SVGGElement, unknown, HTMLElement, unknown>
 
     constructor(map: NAMap) {
         this.#map = map
@@ -147,7 +148,7 @@ export default class DisplayGrid {
         this.#gYAxis = this.#gMainYAxis.append("g")
 
         // Initialise both axis first
-        this._displayAxis()
+        this._displayAxis(undefined)
         // Set default values
         this._setupXAxis()
         this._setupYAxis()
@@ -210,29 +211,27 @@ export default class DisplayGrid {
     /**
      * Display axis
      */
-    _displayAxis(): void {
-        const tk = d3Event ? d3Event.transform.k : 1
+    _displayAxis(transform: ZoomTransform | undefined): void {
+        const tk = transform ? transform.k : 1
         const fontSize = roundToThousands(this.#defaultFontSize / tk)
         const strokeWidth = roundToThousands(1 / tk)
 
-        const tx = d3Event ? d3Event.transform.y : 0
+        const tx = transform ? transform.y : 0
         const dx = tx / tk < this.#width ? tx / tk : 0
         const paddingX = -this.#maxCoord - dx
 
-        const ty = d3Event ? d3Event.transform.x : 0
+        const ty = transform ? transform.x : 0
         const dy = ty / tk < this.#height ? ty / tk : 0
         const paddingY = -this.#maxCoord - dy
 
         this.#gXAxis
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
-            // @ts-expect-error
             .call(this.#xAxis.tickPadding(paddingX))
 
         this.#gYAxis
             .attr("font-size", fontSize)
             .attr("stroke-width", strokeWidth)
-            // @ts-expect-error
             .call(this.#yAxis.tickPadding(paddingY))
     }
 
@@ -286,10 +285,10 @@ export default class DisplayGrid {
     /**
      * Set axis transform
      */
-    transform(): void {
+    transform(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
         if (this.#isShown) {
             this.testForInitialisation()
-            this._displayAxis()
+            this._displayAxis(event.transform)
         }
     }
 

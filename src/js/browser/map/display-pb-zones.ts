@@ -11,17 +11,16 @@
 import { select as d3Select, Selection } from "d3-selection"
 
 import { putImportError } from "../../common/common"
+import { servers } from "../../common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
+
 import DisplayPorts from "./display-ports"
 
 import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "../../common/gen-json"
 import { Bound } from "../../common/interface"
-import { Server } from "../../common/servers"
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const servers: Server[] = require("../../common/servers")
+import { Point } from "../../common/common-math"
 
 export default class DisplayPbZones {
     showPB: string
@@ -110,8 +109,8 @@ export default class DisplayPbZones {
             this._pbZonesDefault = (
                 await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json")
             ).default as PbZone[]
-        } catch (error) {
-            putImportError(error)
+        } catch (error: unknown) {
+            putImportError(error as string)
         }
     }
 
@@ -195,6 +194,10 @@ export default class DisplayPbZones {
                 }
             )
 
+        const fortRangeRadius = 10
+        const towerRangeRadius = 8
+        const fortSize = 3
+        const towerSize = 1.5
         this._g
             .selectAll<SVGGElement, PbZoneDefence>("g.defence")
             .data(this._defencesFiltered, (d) => String(d.id))
@@ -202,10 +205,28 @@ export default class DisplayPbZones {
                 (enter): Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
                     const g = enter.append("g").attr("class", "defence")
 
+                    // Shooting ranges
+                    g.selectAll<SVGPathElement, Point[]>("path.tower-range")
+                        .data((d) => d.towers)
+                        .join((enter) =>
+                            enter
+                                .append("path")
+                                .attr("class", "tower-range")
+                                .attr("d", (d) => drawSvgCircle(d[0], d[1], towerRangeRadius))
+                        )
+                    g.selectAll<SVGPathElement, Point[]>("path.fort-range")
+                        .data((d) => d.forts)
+                        .join((enter) =>
+                            enter
+                                .append("path")
+                                .attr("class", "fort-range")
+                                .attr("d", (d) => drawSvgCircle(d[0], d[1], fortRangeRadius))
+                        )
+
                     // Forts
                     g.append("path")
                         .attr("class", "fort")
-                        .attr("d", (d) => d.forts.map((fort) => drawSvgRect(fort[0], fort[1], 3)).join(""))
+                        .attr("d", (d) => d.forts.map((fort) => drawSvgRect(fort[0], fort[1], fortSize)).join(""))
                     g.append("text")
                         .attr("class", "pb-text pb-fort-text")
                         .attr("x", (d) => d.forts.map((fort) => fort[0]).join(","))
@@ -215,12 +236,15 @@ export default class DisplayPbZones {
                     // Towers
                     g.append("path")
                         .attr("class", "tower")
-                        .attr("d", (d) => d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], 1.5)).join(""))
+                        .attr("d", (d) =>
+                            d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], towerSize)).join("")
+                        )
                     g.append("text")
                         .attr("class", "pb-text pb-tower-text")
                         .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
                         .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
                         .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""))
+
                     return g
                 }
             )

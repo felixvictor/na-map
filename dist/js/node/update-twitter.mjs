@@ -7,7 +7,7 @@
  * @copyright 2017, 2018, 2019, 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import * as path from "path";
+import path from "path";
 import Twit from "twit";
 import filterXSS from "xss";
 import dayjs from "dayjs";
@@ -17,7 +17,8 @@ import { findNationByName, findNationByNationShortName } from "../common/common"
 import { commonPaths, serverStartDateTime } from "../common/common-dir";
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file";
 import { cleanName, simpleStringSort } from "../common/common-node";
-import { flagValidity, portBattleCooldown, serverNames } from "../common/common-var";
+import { flagValidity, portBattleCooldown } from "../common/common-var";
+import { serverIds } from "../common/servers";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 const consumerKey = process.argv[2];
@@ -25,7 +26,7 @@ const consumerSecret = process.argv[3];
 const accessToken = process.argv[4];
 const accessTokenSecret = process.argv[5];
 const runType = process.argv[6] ?? "full";
-const portFilename = path.resolve(commonPaths.dirGenServer, `${serverNames[0]}-pb.json`);
+const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`);
 let ports = [];
 let Twitter;
 let tweets = [];

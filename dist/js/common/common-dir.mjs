@@ -37,8 +37,6 @@ export const commonPaths = {
     fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
     fileLoot: path.resolve(dirGenGeneric, "loot.json"),
     fileModules: path.resolve(dirGenGeneric, "modules.json"),
-    fileNation: path.resolve(dirGenGeneric, "nations.json"),
-    fileOwnership: path.resolve(dirGenGeneric, "ownership.json"),
     filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
     filePort: path.resolve(dirGenGeneric, "ports.json"),
     filePrices: path.resolve(dirGenGeneric, "prices.json"),

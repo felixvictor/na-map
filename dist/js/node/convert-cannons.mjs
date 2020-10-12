@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as fs from "fs";
-import * as path from "path";
+import path from "path";
 import convert from "xml-js";
 import { commonPaths } from "../common/common-dir";
 import { readTextFile, saveJsonAsync } from "../common/common-file";

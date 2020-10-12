@@ -9,13 +9,15 @@
  */
 
 import * as fs from "fs"
-import * as path from "path"
+import path from "path"
 import { default as nodeFetch } from "node-fetch"
 
 import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir"
-import { apiBaseFiles, serverNames } from "../common/common-var"
+import { apiBaseFiles } from "../common/common-var"
 import { saveJsonAsync, xzAsync } from "../common/common-file"
 import { sortBy } from "../common/common-node"
+import { serverIds } from "../common/servers"
+
 import { APIItemGeneric } from "./api-item"
 import { APIPort } from "./api-port"
 import { APIShop } from "./api-shop"
@@ -60,8 +62,8 @@ const readNAJson = async (url: URL): Promise<Error | APIType[]> => {
         }
 
         return new Error(`Cannot load ${url.href}: ${response.statusText}`)
-    } catch (error) {
-        throw new Error(error)
+    } catch (error: unknown) {
+        throw new Error(error as string)
     }
 }
 
@@ -89,7 +91,7 @@ const getAPIDataAndSave = async (serverName: string, apiBaseFile: string, outfil
 const loadData = async (baseAPIFilename: string): Promise<boolean> => {
     const deletePromise = []
     const getPromise = []
-    for (const serverName of serverNames) {
+    for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`)
 

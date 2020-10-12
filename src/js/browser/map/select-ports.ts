@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/dropdown"
 
@@ -170,8 +169,8 @@ export default class SelectPorts {
                 )
 
                 this._dataLoaded = true
-            } catch (error) {
-                putImportError(error)
+            } catch (error: unknown) {
+                putImportError(error as string)
             }
         }
     }
@@ -320,7 +319,7 @@ export default class SelectPorts {
                 liveSearchPlaceholder: "Search ...",
                 title: "Show good availability",
                 virtualScroll: true,
-            } as BootstrapSelectOptions)
+            })
         }
 
         if (show) {
@@ -350,7 +349,7 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
-        } as BootstrapSelectOptions)
+        })
 
         this._frontlineDefendingNationSelector?.insertAdjacentHTML("beforeend", options)
         this._frontlineDefendingNationSelector?.classList.add("selectpicker")
@@ -358,7 +357,7 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
-        } as BootstrapSelectOptions)
+        })
     }
 
     _setupNationSelect(): void {
@@ -370,7 +369,7 @@ export default class SelectPorts {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
-        } as BootstrapSelectOptions)
+        })
     }
 
     _setupClanSelect(): void {
@@ -400,7 +399,7 @@ export default class SelectPorts {
                 dropupAuto: false,
                 liveSearch: false,
                 virtualScroll: true,
-            } as BootstrapSelectOptions)
+            })
         }
     }
 
@@ -420,10 +419,17 @@ export default class SelectPorts {
     }
 
     _setTradeRelations(tradePort: PortWithTrades): void {
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getBuyPrice = (itemId: number): number => this._ports.tradeItem.get(itemId)?.price ?? 0
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getDistanceFactor = (itemId: number): number => this._ports.tradeItem.get(itemId)?.distanceFactor ?? 0
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getPortTax = (portId: number): number =>
             this._ports.portDataDefault.find((port) => port.id === portId)?.portTax ?? 0
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getCoordinates = (portId: number): Coordinate => {
             const port = this._ports.portDataDefault.find((port) => port.id === portId)
             return { x: port?.coordinates[0] ?? 0, y: port?.coordinates[1] ?? 0 }

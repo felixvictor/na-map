@@ -8,16 +8,15 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
+import "../../../scss/roundslider.scss"
+import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
 import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
@@ -29,6 +28,7 @@ import { HtmlString } from "../../common/interface"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
+
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
@@ -45,7 +45,7 @@ export default class PredictWind {
     private readonly _sliderId: HtmlString
     private readonly _timeGroupId: HtmlString
     private readonly _timeInputId: HtmlString
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     constructor() {
         this._height = 300
         this._width = 260
@@ -229,7 +229,7 @@ export default class PredictWind {
     }
 
     _printCompass(predictedWindDegrees: number): void {
-        const line = d3Line<[number, number]>()
+        const line = d3Line()
         const radius = Math.min(this._height / 1.4, this._width / 1.4) / 2
         const xCompass = this._width / 2
         const yCompass = this._height / 2.8

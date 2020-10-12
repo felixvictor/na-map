@@ -8,10 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="jquery" />
-
 import { scaleBand as d3ScaleBand, ScaleLinear } from "d3-scale"
-import { BaseType, Selection } from "d3-selection"
 
 import { numberSegments } from "../common/common-browser"
 import {
@@ -22,6 +19,10 @@ import {
     degreesToCompass,
     radiansToDegrees,
 } from "../common/common-math"
+
+import JQuery from "jquery"
+import { Selection } from "d3-selection"
+import { Segment } from "./map/make-journey"
 
 /**
  * Display formatted compass
@@ -152,7 +153,7 @@ export const printCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, unknown, HTMLElement, unknown>
+    element: Selection<SVGGElement, Segment, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
@@ -160,7 +161,7 @@ export const printCompassRose = ({
     // noinspection MagicNumberJS
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 3
-    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep))
+    const data = [...new Array(steps)].map((_, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -232,14 +233,14 @@ export const printSmallCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<BaseType, unknown, HTMLElement, unknown>
+    element: Selection<SVGGElement, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
     const degreesPerStep = degreesFullCircle / steps
     const innerRadius = Math.round(radius * 0.8)
     const strokeWidth = 1.5
-    const data = new Array(steps).fill(undefined).map((_e, i) => degreesToCompass(i * degreesPerStep))
+    const data = [...new Array(steps)].map((_, i) => degreesToCompass(i * degreesPerStep))
     const xScale = d3ScaleBand()
         .range([0 - degreesPerStep / 2, degreesFullCircle - degreesPerStep / 2])
         .domain(data)
@@ -299,7 +300,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
 
         try {
             return document.execCommand("copy")
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Copy to clipboard failed.", error)
             return false
         } finally {
@@ -387,7 +388,7 @@ export const colourRamp = (
     console.log(min, max, steps, step)
     if (context) {
         for (let currentStep = min; currentStep < max; currentStep += step) {
-            context.fillStyle = colourScale(currentStep)
+            context.fillStyle = colourScale(currentStep) ?? "#000"
             context.fillRect(x, 0, stepWidth, height)
             x += stepWidth
         }

@@ -7,10 +7,9 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
-import { event as d3Event } from "d3-selection";
-import * as d3Drag from "d3-drag";
+import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
+import { drag as d3Drag } from "d3-drag";
 import { isEmpty } from "../../../common/common";
 import { pluralise, segmentRadians } from "../../../common/common-browser";
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format";
@@ -31,8 +30,8 @@ export class ShipBase extends Ship {
     }
     _setBackground() {
         const speedArc = d3Arc()
-            .outerRadius((d) => this._shipCompare.radiusSpeedScale(d) + 2)
-            .innerRadius((d) => this._shipCompare.radiusSpeedScale(d) + 1)
+            .outerRadius((d) => (this._shipCompare.radiusSpeedScale(d) ?? 0) + 2)
+            .innerRadius((d) => (this._shipCompare.radiusSpeedScale(d) ?? 0) + 1)
             .startAngle(-Math.PI / 2)
             .endAngle(Math.PI / 2);
         this._mainG
@@ -64,7 +63,7 @@ export class ShipBase extends Ship {
         return heading;
     }
     _getSpeed(rotate) {
-        return formatFloat(this._speedScale(Math.abs(rotate)));
+        return formatFloat(this._speedScale(Math.abs(rotate)) ?? 0);
     }
     _getHeadingInCompass(rotate) {
         return degreesToCompass(rotate);
@@ -80,15 +79,12 @@ export class ShipBase extends Ship {
     _setupDrag() {
         const steps = this.shipData.speedDegrees.length;
         const degreesPerStep = 360 / steps;
-        const domain = new Array(steps + 1).fill(null).map((e, i) => i * degreesPerStep);
+        const domain = [...new Array(steps + 1)].map((_, i) => i * degreesPerStep);
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipData.speedDegrees, this.shipData.speedDegrees[0]])
             .clamp(true);
-        const dragStart = (d) => {
-            d.this.classed("drag-active", true);
-        };
-        const dragged = (d) => {
+        const dragged = (event, d) => {
             const update = () => {
                 d.this.attr("transform", (d) => `rotate(${d.rotate})`);
                 d.compassText
@@ -104,27 +100,19 @@ export class ShipBase extends Ship {
                     .attr("transform", `rotate(${-this._shipRotate})`)
                     .text(this._getSpeed(this._shipCompare.windProfileRotate - this._shipRotate));
             };
-            const { x: xMouse, y: yMouse } = d3Event;
+            const { x: xMouse, y: yMouse } = event;
             d.rotate = this._getHeadingInDegrees(rotationAngleInDegrees({ x: d.initX, y: d.initY }, { x: xMouse, y: yMouse }), d.correctionValueDegrees);
             update();
             if (d.type === "windProfile") {
                 this._updateCompareWindProfiles();
             }
         };
-        const dragEnd = (d) => {
-            d.this.classed("drag-active", false);
-        };
-        this._drag = d3Drag
-            .drag()
-            .on("start", dragStart)
-            .on("drag", dragged)
-            .on("end", dragEnd)
-            .container(() => this._mainG.node());
+        this._drag = d3Drag().on("drag", (event, d) => dragged(event, d));
     }
     _setupShipOutline() {
         this._shipRotate = 0;
         const { shipMass } = this.shipData;
-        const heightShip = this._shipCompare.shipMassScale(shipMass);
+        const heightShip = this._shipCompare.shipMassScale(shipMass) ?? 0;
         const widthShip = heightShip;
         const circleSize = 20;
         const svgHeight = this._shipCompare.svgHeight / 2 - 2 * circleSize;
@@ -181,7 +169,7 @@ export class ShipBase extends Ship {
         const curve = d3CurveCatmullRomClosed;
         const line = d3LineRadial()
             .angle((d, i) => i * segmentRadians)
-            .radius((d) => this._shipCompare.radiusSpeedScale(d.data))
+            .radius((d) => this._shipCompare.radiusSpeedScale(d.data) ?? 0)
             .curve(curve);
         this._shipCompare.windProfileRotate = 0;
         const circleSize = 20;
@@ -214,7 +202,10 @@ export class ShipBase extends Ship {
             .attr("y", (d) => d.compassTextY)
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate));
-        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase));
+        gWindProfile
+            .append("path")
+            .attr("class", "base-profile")
+            .attr("d", line(arcsBase));
         gWindProfile
             .append("g")
             .attr("data-ui-component", "speed-markers")
@@ -223,10 +214,10 @@ export class ShipBase extends Ship {
             .join((enter) => enter
             .append("circle")
             .attr("r", 5)
-            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -this._shipCompare.radiusSpeedScale(d.data))
-            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * this._shipCompare.radiusSpeedScale(d.data))
-            .attr("fill", (d) => this._shipCompare.colorScale(d.data))
-            .attr("fill", (d) => this._shipCompare.colorScale(d.data))
+            .attr("cy", (d, i) => Math.cos(i * segmentRadians) * -(this._shipCompare.radiusSpeedScale(d.data) ?? 0))
+            .attr("cx", (d, i) => Math.sin(i * segmentRadians) * (this._shipCompare.radiusSpeedScale(d.data) ?? 0))
+            .attr("fill", (d) => this._shipCompare.colorScale(d.data) ?? 0)
+            .attr("fill", (d) => this._shipCompare.colorScale(d.data) ?? 0)
             .append("title")
             .text((d) => `${Math.round(d.data * 10) / 10} knots`));
         datum.this = gWindProfile;
@@ -248,6 +239,12 @@ export class ShipBase extends Ship {
             musketsCrew: formatInt((this.shipData.boarding.musketsCrew / 100) * this.shipData.crew.max),
             prepPerRound: formatInt(this.shipData.boarding.prepPerRound),
             prepInitial: formatInt(this.shipData.boarding.prepInitial),
+            reload: formatSignInt(this.shipData.gunnery.reload * 100),
+            penetration: formatSignInt(this.shipData.gunnery.penetration * 100),
+            dispersionHorizontal: formatSignInt(this.shipData.gunnery.dispersionHorizontal * 100),
+            dispersionVertical: formatSignInt(this.shipData.gunnery.dispersionVertical * 100),
+            traverseUpDown: formatSignInt(this.shipData.gunnery.traverseUpDown * 100),
+            traverseSide: formatSignInt(this.shipData.gunnery.traverseSide * 100),
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatInt(this.shipData.stern.armour)}</br><span class="badge badge-white">${formatInt(this.shipData.stern.thickness)}</span>`,
@@ -258,7 +255,6 @@ export class ShipBase extends Ship {
             carroBroadside: formatInt(this.shipData.guns.broadside.carronades),
             deceleration: formatFloat(this.shipData.ship.deceleration),
             decks: pluralise(this.shipData.guns.decks, "deck"),
-            fireResistance: formatSignInt(this.shipData.resistance.fire * 100),
             firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
             frontArmor: `${formatInt(this.shipData.bow.armour)}</br><span class="badge badge-white">${formatInt(this.shipData.bow.thickness)}</span>`,
             guns: String(this.shipData.guns.total),

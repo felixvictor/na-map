@@ -8,15 +8,22 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+export const serverIds = ["eu1", "eu2"] as const
+export type ServerId = typeof serverIds[number]
+
 export interface Server {
-    id: string
+    id: ServerId
     name: string
     type: string
 }
 
-const servers = [
+export const servers = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" },
 ]
 
-module.exports = servers
+/* testbed
+   server_base_name="clean"
+   source_base_url="http://storage.googleapis.com/nacleandevshards/"
+   server_names=(dev)
+*/

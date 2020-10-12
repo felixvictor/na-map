@@ -22,8 +22,8 @@ import {
     NationShortNameAlternative,
     PeneDistance,
     WoodFamily,
-    WoodType
-} from "./common";
+    WoodType,
+} from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType, PortBonus } from "./types"
 
@@ -493,6 +493,7 @@ export interface ShipData extends ObjectIndexer<any> {
     bow: ShipHealth
     class: number
     crew: ShipCrew
+    gunnery?: ShipGunnery
     guns: ShipGuns
     holdSize: number
     id: number
@@ -526,6 +527,22 @@ interface ShipBoarding {
     morale?: number
     musketsAccuracy?: number
     musketsCrew?: number
+}
+interface ShipGunnery {
+    dispersionHorizontal: number
+    dispersionVertical: number
+    penetration: number
+    reload: number
+    traverseUpDown: number
+    traverseSide: number
+}
+interface ShipGunneryDispersion {
+    horizontal: number
+    vertical: number
+}
+interface ShipGunneryTraverse {
+    upDown: number
+    side: number
 }
 interface ShipGuns {
     total: number
@@ -590,7 +607,6 @@ interface ShipRepairTime {
     default?: number
 }
 interface ShipResistance {
-    fire: number
     leaks: number
     splinter: number
 }

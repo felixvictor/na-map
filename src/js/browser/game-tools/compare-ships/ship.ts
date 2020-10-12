@@ -10,9 +10,10 @@
 
 import { select as d3Select } from "d3-selection"
 import { arc as d3Arc, pie as d3Pie } from "d3-shape"
-import * as d3Selection from "d3-selection"
 
 import { numberSegments } from "../../../common/common-browser"
+
+import { Selection } from "d3-selection"
 
 import { CompareShips } from "./compare-ships"
 import { ShipDisplayData } from "./types"
@@ -25,10 +26,10 @@ export class Ship {
     // Class instance of the ship to be compared to
     readonly _shipCompare: CompareShips
     readonly select!: HtmlString
-    _mainG!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    _mainG!: Selection<SVGGElement, unknown, HTMLElement, unknown>
     // Column id
     private readonly _id: string
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     constructor(id: string, shipCompare: CompareShips) {
         this._id = id
         this._shipCompare = shipCompare
@@ -191,6 +192,16 @@ export class Ship {
         text += displayColumn("carroCrew", "Carronades", 4)
         text += "</div></div></div>"
 
+        text += displayFirstColumn("Gunnery")
+        text += Ship.displaySecondBlock()
+        text += displayColumn("reload", "Reload %", 4)
+        text += displayColumn("dispersionHorizontal", "Horizontal dispersion %", 4)
+        text += displayColumn("dispersionVertical", "Vertical dispersion %", 4)
+        text += displayColumn("penetration", "Ball penetration %", 4)
+        text += displayColumn("traverseUpDown", "Up/down traverse %", 4)
+        text += displayColumn("traverseSide", "Side traverse %", 4)
+        text += "</div></div></div>"
+
         text += displayFirstColumn("Boarding")
         text += Ship.displaySecondBlock()
         text += displayColumn("morale", "Morale", 4)
@@ -206,9 +217,8 @@ export class Ship {
 
         text += displayFirstColumn("Resistance")
         text += Ship.displaySecondBlock()
-        text += displayColumn("fireResistance", "Fire %", 4)
-        text += displayColumn("leakResistance", "Leak %", 4)
-        text += displayColumn("splinterResistance", "Splinter %", 4)
+        text += displayColumn("leakResistance", "Leak %")
+        text += displayColumn("splinterResistance", "Splinter %")
         text += "</div></div></div>"
 
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>')
@@ -275,7 +285,7 @@ export class Ship {
         const pie = d3Pie().sort(null).value(1)(data)
 
         const arc = d3Arc<number, number>()
-            .outerRadius(this._shipCompare.radiusSpeedScale(12))
+            .outerRadius(this._shipCompare.radiusSpeedScale(12) ?? 0)
             .innerRadius(this._shipCompare.innerRadius)
 
         // Add compass arcs
@@ -293,6 +303,6 @@ export class Ship {
             .attr("class", "speed-circle")
             .selectAll("circle")
             .data(this.ticksSpeed)
-            .join((enter) => enter.append("circle").attr("r", (d) => this._shipCompare.radiusSpeedScale(d)))
+            .join((enter) => enter.append("circle").attr("r", (d) => this._shipCompare.radiusSpeedScale(d) ?? 0))
     }
 }
