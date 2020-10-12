@@ -1334,10 +1334,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@netlify/build@^4.0.1":
-  version "4.8.4"
-  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-4.8.4.tgz#842c510d5338343d3b908ffeaaef4feb99a0d377"
-  integrity sha512-fNjcOySj/gk5IETaByS/cmhGruproal/JX/xTMYHUvwoZeBfr14EbZlx57uVXD35PJz0MfuoPEgbETRLGI+KSg==
+"@netlify/build@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-5.0.0.tgz#89f82f0c38d39c46c737dbdd348b4720e20aed73"
+  integrity sha512-WwW/v5hutnrVAyP9wwGHSW2WLQc6Nj9dBHAkRRJV6aBeWVQ+RUdVR/gv/It2DGvjhMeCXVL45f/EafrFEmewPw==
   dependencies:
     "@bugsnag/js" "^7.0.0"
     "@netlify/cache-utils" "^1.0.3"
@@ -2023,10 +2023,10 @@
   resolved "https://registry.yarnpkg.com/@types/d3-path/-/d3-path-1.0.9.tgz#73526b150d14cd96e701597cbf346cfd1fd4a58c"
   integrity sha512-NaIeSIBiFgSC6IGUBjZWcscUJEq7vpVu7KthHN8eieTV9d9MqkSOZLH4chq1PmcKy06PNe3axLeKmRIyxJ+PZQ==
 
-"@types/d3-scale@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@types/d3-scale/-/d3-scale-2.2.0.tgz#e5987a2857365823eb26ed5eb21bc566c4dcf1c0"
-  integrity sha512-oQFanN0/PiR2oySHfj+zAAkK1/p4LD32Nt1TMVmzk+bYHk7vgIg/iTXQWitp1cIkDw4LMdcgvO63wL+mNs47YA==
+"@types/d3-scale@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@types/d3-scale/-/d3-scale-3.1.0.tgz#175bb029d0083c04a3fe5645815e0a230d95951c"
+  integrity sha512-6dXLb03fKXGQueAV50DSsYojBd2w1cSgBHNV2VQa5ScxhQqUy6yEtlukdbV8qyTORA9KLHHSu7hCNUQquYg5GQ==
   dependencies:
     "@types/d3-time" "*"
 
@@ -7687,15 +7687,6 @@ fs-extra@^7.0.0, fs-extra@^7.0.1:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
-fs-extra@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-8.1.0.tgz#49d43c45a88cd9677668cb7be1b46efdb8d2e1c0"
-  integrity sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==
-  dependencies:
-    graceful-fs "^4.2.0"
-    jsonfile "^4.0.0"
-    universalify "^0.1.0"
-
 fs-extra@^9.0.0, fs-extra@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.0.1.tgz#910da0062437ba4c39fedd863f1675ccfefcb9fc"
@@ -11701,12 +11692,12 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-netlify-cli@2.65.1:
-  version "2.65.1"
-  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-2.65.1.tgz#77d891e13a6b294907b808b80d33c15a40e9a601"
-  integrity sha512-JdcOuoz6LCNmw9BgDqFgOsQrKP1F4TeUNgX3h81DxKr7apJeXJxZwXJfR8l+5BM9zn3l907DYO2zQ46hh8WQlg==
+netlify-cli@2.65.5:
+  version "2.65.5"
+  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-2.65.5.tgz#b9ba7bd3d6fbd6113d5d5d99ad3f9c01a4ce7624"
+  integrity sha512-tW0EPmMZfdZ26DFDNbHbpqjYmmGxw8tR8TBsVsI7EqQS+QsvcVBNzgQeQGKLBd53Tp4pDPg481dHknb0c/XL9Q==
   dependencies:
-    "@netlify/build" "^4.0.1"
+    "@netlify/build" "^5.0.0"
     "@netlify/config" "^2.0.9"
     "@netlify/zip-it-and-ship-it" "^1.3.9"
     "@oclif/command" "^1.5.18"
@@ -11734,6 +11725,7 @@ netlify-cli@2.65.1:
     cookie "^0.4.0"
     copy-template-dir "^1.4.0"
     debug "^4.1.1"
+    del "^5.1.0"
     dot-prop "^5.1.0"
     dotenv "^8.2.0"
     envinfo "^7.3.1"
@@ -11742,7 +11734,6 @@ netlify-cli@2.65.1:
     express-logging "^1.1.1"
     filter-obj "^2.0.1"
     find-up "^4.1.0"
-    fs-extra "^8.1.0"
     fuzzy "^0.1.3"
     get-port "^5.1.0"
     gh-release-fetch "^1.0.3"
