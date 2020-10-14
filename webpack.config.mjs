@@ -307,11 +307,9 @@ const config = {
 
     // https://blog.logrocket.com/guide-performance-optimization-webpack/
     optimization: {
-        moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
             chunks: "all",
-            enforceSizeThreshold: 50000,
         },
     },
 
@@ -397,6 +395,8 @@ const config = {
             enabled: isProduction,
         }),
     ],
+
+    target: "browserslist",
 
     stats: {
         // Add chunk information (setting this to `false` allows for a less verbose output)
