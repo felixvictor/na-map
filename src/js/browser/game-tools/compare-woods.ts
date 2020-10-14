@@ -415,7 +415,7 @@ export default class CompareWoods {
 
     async _loadAndSetupData(): Promise<void> {
         try {
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
+            this._woodData = (await import("Lib/gen-generic/woods.json"))
                 .default as WoodData
             this._setupData()
         } catch (error: unknown) {

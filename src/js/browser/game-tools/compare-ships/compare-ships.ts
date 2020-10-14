@@ -519,9 +519,9 @@ export class CompareShips {
     async _loadAndSetupData(): Promise<void> {
         try {
             this._moduleDataDefault = (
-                await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json")
+                await import("Lib/gen-generic/modules.json")
             ).default as Module[]
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json"))
+            this._shipData = (await import("Lib/gen-generic/ships.json"))
                 .default as ShipData[]
             this._setupData()
             if (this._baseId !== "ship-journey") {
@@ -664,7 +664,7 @@ export class CompareShips {
 
         this._setMakeImageSpinner()
 
-        const html2canvas = await import(/* webpackChunkName: "html2canvas" */ "html2canvas")
+        const html2canvas = await import("html2canvas")
         const element = document.querySelector<HTMLElement>(
             `#${this._modalId} .modal-dialog .modal-content .modal-body`
         )

@@ -306,7 +306,7 @@ export default class ListPortOwnerships {
      * @param data - Data
      */
     async _injectChart(data: Group[]): Promise<void> {
-        const TimelinesChart = await import(/* webpackChunkName: "timelines-chart" */ "timelines-chart")
+        const TimelinesChart = await import("timelines-chart")
 
         TimelinesChart.default()
             // @ts-expect-error
