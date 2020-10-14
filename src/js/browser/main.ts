@@ -105,7 +105,7 @@ const setupListener = (): void => {
  */
 const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
+        const Map = await import("./map/na-map")
         const map = new Map.NAMap(serverId, searchParams)
         await map.MapInit()
 
@@ -124,7 +124,7 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
  */
 const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
     try {
-        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
+        const gameTools = await import("./game-tools")
         gameTools.init(serverId, searchParams)
     } catch (error: unknown) {
         putImportError(error as string)
@@ -136,7 +136,7 @@ const loadGameTools = async (serverId: string, searchParams: URLSearchParams): P
  */
 const loadMapTools = async (): Promise<void> => {
     try {
-        const mapTools = await import(/* webpackChunkName: "map-tools" */ "./map-tools")
+        const mapTools = await import("./map-tools")
         mapTools.init()
     } catch (error: unknown) {
         putImportError(error as string)

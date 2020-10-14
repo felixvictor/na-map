@@ -81,9 +81,9 @@ export default class ListShipBlueprints {
     async _loadAndSetupData(): Promise<void> {
         try {
             this._blueprintData = (
-                await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/ship-blueprints.json")
+                await import("Lib/gen-generic/ship-blueprints.json")
             ).default as ShipBlueprint[]
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
+            this._woodData = (await import("Lib/gen-generic/woods.json"))
                 .default as WoodData
 
             /**
@@ -91,7 +91,7 @@ export default class ListShipBlueprints {
              * - key: resource name
              * - values: extractionCost
              */
-            const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/prices.json"))
+            const costs = (await import("Lib/gen-generic/prices.json"))
                 .default as Price
             this._extractionCosts = new Map<string, StandardCost>(
                 costs.standard.map((cost) => [cost.name, { reales: cost.reales, labour: cost?.labour ?? 0 }])

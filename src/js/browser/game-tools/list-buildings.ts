@@ -47,7 +47,7 @@ export default class ListBuildings {
     async _loadAndSetupData(): Promise<void> {
         try {
             this._buildingData = (
-                await import(/* webpackChunkName: "data-buildings" */ "Lib/gen-generic/buildings.json")
+                await import("Lib/gen-generic/buildings.json")
             ).default as Building[]
         } catch (error: unknown) {
             putImportError(error as string)
