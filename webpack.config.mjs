@@ -126,7 +126,7 @@ const babelOpt = {
 }
 
 const cssOpt = {
-    sourceMap: true,
+    sourceMap: !isProduction,
 }
 
 const htmlMinifyOpt = {

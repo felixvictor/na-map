@@ -1,11 +1,10 @@
-const postcssCleanOpt = {
-    level: { 1: { specialComments: 0 }, 2: {} },
+const cssnanoOpt = {
+    preset: ["default", { discardComments: { removeAll: true } }],
 }
 
 module.exports = (api) => ({
     plugins: {
-        "postcss-import": true,
         autoprefixer: true,
-        "postcss-clean": api.mode === "production" ? postcssCleanOpt : false,
+        cssnano: api.mode === "production" ? cssnanoOpt : false,
     },
 })
