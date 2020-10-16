@@ -194,7 +194,13 @@ export class ShipComparison extends Ship {
 
         datum.this = gShip
         datum.compassText = compassText
-        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`)
+        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate - 90})`)
+        gShip
+            .transition()
+            .duration(1000)
+            .delay(500)
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            .attr("transform", (d) => `rotate(${d.initRotate})`)
     }
 
     /**
