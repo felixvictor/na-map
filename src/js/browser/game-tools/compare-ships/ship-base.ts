@@ -8,6 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { drag as d3Drag, DragBehavior, DragContainerElement, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import {
     arc as d3Arc,
@@ -16,9 +17,9 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
-import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
-import { isEmpty } from "../../../common/common"
+import { Transition, transition as d3Transition } from "d3-transition"
 
+import { isEmpty } from "../../../common/common"
 import { pluralise, segmentRadians } from "../../../common/common-browser"
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format"
 import { degreesToCompass, getOrdinal } from "../../../common/common-math"
@@ -170,10 +171,9 @@ export class ShipBase extends Ship {
             }
         }
 
-        this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>().on(
-            "drag",
-            (event: Event, d: DragData): void => dragged(event, d)
-        )
+        this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>()
+            .on("drag", (event: Event, d: DragData): void => dragged(event, d))
+            .container(() => this._mainG.node() as DragContainerElement)
     }
 
     _setupShipOutline(): void {
@@ -237,7 +237,13 @@ export class ShipBase extends Ship {
 
         datum.this = gShip
         datum.compassText = compassText
-        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`)
+        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate - 90})`)
+        gShip
+            .transition()
+            .duration(1000)
+            .delay(500)
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            .attr("transform", (d) => `rotate(${d.initRotate})`)
     }
 
     /**
@@ -330,7 +336,13 @@ export class ShipBase extends Ship {
 
         datum.this = gWindProfile
         datum.compassText = compassText
-        gWindProfile.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`)
+        gWindProfile.datum(datum).attr("transform", (d) => `rotate(${d.initRotate + 90})`)
+        gWindProfile
+            .transition()
+            .duration(1000)
+            .delay(500)
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            .attr("transform", (d) => `rotate(${d.initRotate})`)
 
         // colourRamp(d3Select(this._select), this.shipCompareData.colorScale, this._shipData.speedDegrees.length);
     }
