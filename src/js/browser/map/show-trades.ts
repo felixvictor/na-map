@@ -366,7 +366,7 @@ export default class ShowTrades {
         const dataDirectory = "data"
 
         try {
-            const portData = (await import("Lib/gen-generic/ports.json"))
+            const portData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
             const pbData = (await (
                 await fetch(`${dataDirectory}/${this._serverName}-pb.json`)

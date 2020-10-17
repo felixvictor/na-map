@@ -159,7 +159,7 @@ export default class SelectPorts {
                 ).json()) as FrontlinesPerServer
 
                 const distances = (
-                    await import(`Lib/gen-generic/distances.json`)
+                    await import(/* webpackChunkName: "data-distances" */ `Lib/gen-generic/distances.json`)
                 ).default as Distance[]
                 this._distances = new Map(
                     distances.map(([fromPortId, toPortId, distance]) => [
