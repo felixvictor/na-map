@@ -107,7 +107,7 @@ export default class DisplayPbZones {
     async _loadData(): Promise<void> {
         try {
             this._pbZonesDefault = (
-                await import("Lib/gen-generic/pb-zones.json")
+                await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json")
             ).default as PbZone[]
         } catch (error: unknown) {
             putImportError(error as string)

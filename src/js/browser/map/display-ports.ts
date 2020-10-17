@@ -292,7 +292,7 @@ export default class DisplayPorts {
         }
 
         try {
-            readData.ports = (await import("Lib/gen-generic/ports.json"))
+            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
                 .default as PortBasic[]
             const tradeItems = (await (
                 await fetch(`${dataDirectory}/${this.#serverName}-items.json`)
