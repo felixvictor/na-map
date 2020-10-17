@@ -368,7 +368,7 @@ const config = {
         }),
     ],
 
-    target: "browserslist",
+    // target: "browserslist", // webpack 5
 
     stats: {
         // Add chunk information (setting this to `false` allows for a less verbose output)
