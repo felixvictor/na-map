@@ -1,11 +1,37 @@
-const postcssCleanOpt = {
-    level: { 1: { specialComments: 0 }, 2: {} },
+const cssnanoOpt = {
+    preset: ["default", { discardComments: { removeAll: true } }],
+}
+
+const purgecssSafelistDeep = [
+    /active/,
+    /bootstrap-select/,
+    /bs-/,
+    /btn/,
+    /collaps/,
+    /col-4/,
+    /disabled/,
+    /dropdown-backdrop/,
+    /fade/,
+    /focus/,
+    /list-unstyled/,
+    /modal/,
+    /^rs-/,
+    /show/,
+    /slide/,
+    /tooltip/,
+]
+const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]
+const purgecssSafelistStandard = portBonusType.map((bonus) => `icon-${bonus}`)
+
+const purgecssOpt = {
+    safelist: { standard: purgecssSafelistStandard, deep: purgecssSafelistDeep },
+    content: ["./src/**/*.{ejs,ts}"],
 }
 
 module.exports = (api) => ({
     plugins: {
-        "postcss-import": true,
+        "@fullhuman/postcss-purgecss": purgecssOpt,
         autoprefixer: true,
-        "postcss-clean": api.mode === "production" ? postcssCleanOpt : false,
+        cssnano: api.mode === "production" ? cssnanoOpt : false,
     },
 })
