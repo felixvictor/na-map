@@ -2,7 +2,6 @@
  * webpack.config
  */
 
-import glob from "glob"
 import path from "path"
 import process from "process"
 import { fileURLToPath } from "url"
@@ -18,7 +17,6 @@ import FaviconsPlugin from "favicons-webpack-plugin"
 import HtmlPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import PreloadWebpackPlugin from "preload-webpack-plugin"
-import PurgecssPlugin from "purgecss-webpack-plugin"
 import SitemapPlugin from "sitemap-webpack-plugin"
 import SriPlugin from "webpack-subresource-integrity"
 import TerserPlugin from "terser-webpack-plugin"
@@ -126,7 +124,7 @@ const babelOpt = {
 }
 
 const cssOpt = {
-    sourceMap: true,
+    sourceMap: !isProduction,
 }
 
 const htmlMinifyOpt = {
@@ -264,28 +262,6 @@ const MiniCssExtractPluginOpt = {
     esModule: true,
 }
 
-const purgecssSafelistDeep = [
-    /active/,
-    /bootstrap-select/,
-    /bs-/,
-    /btn/,
-    /collaps/,
-    /col-4/,
-    /disabled/,
-    /dropdown-backdrop/,
-    /fade/,
-    /focus/,
-    /list-unstyled/,
-    /modal/,
-    /^rs-/,
-    /show/,
-    /slide/,
-    /tooltip/,
-]
-const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]
-// noinspection JSCheckFunctionSignatures
-const purgecssSafelistStandard = portBonusType.map((bonus) => `icon-${bonus}`)
-
 const config = {
     devServer: {
         contentBase: dirOutput,
@@ -307,11 +283,9 @@ const config = {
 
     // https://blog.logrocket.com/guide-performance-optimization-webpack/
     optimization: {
-        moduleIds: "hashed",
         runtimeChunk: "single",
         splitChunks: {
             chunks: "all",
-            enforceSizeThreshold: 50000,
         },
     },
 
@@ -331,10 +305,6 @@ const config = {
             chunkFilename: isProduction ? "[name].[contenthash].css" : "[name].css",
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
             orderWarning: true,
-        }),
-        new PurgecssPlugin({
-            safelist: { standard: purgecssSafelistStandard, deep: purgecssSafelistDeep },
-            paths: glob.sync(`${dirSrc}/**/*`, { nodir: true }),
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
@@ -397,6 +367,8 @@ const config = {
             enabled: isProduction,
         }),
     ],
+
+    // target: "browserslist", // webpack 5
 
     stats: {
         // Add chunk information (setting this to `false` allows for a less verbose output)
