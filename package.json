@@ -203,7 +203,7 @@
         "webpack-cli": "^3",
         "webpack-dev-server": "^3.11.0",
         "webpack-mode": "^1.0.2",
-        "webpack-subresource-integrity": "1.4",
+        "webpack-subresource-integrity": "1.5",
         "xml-js": "^1.6.11",
         "xss": "^1.0.8",
         "yarn-deduplicate": "^3.0.0"
