@@ -233,12 +233,7 @@ export default class ShowTrades {
             actionsBox: true,
             selectedTextFormat: "count > 1",
             countSelectedText(amount: number) {
-                let text = ""
-                if (amount === nations.length) {
-                    text = "All"
-                } else {
-                    text = String(amount)
-                }
+                const text = amount === nations.length ? "All" : String(amount)
 
                 return `${text} nations selected`
             },

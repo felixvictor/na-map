@@ -31,8 +31,9 @@ import { Segment } from "./map/make-journey"
  * @returns HTML formatted compass
  */
 export const displayCompass = (wind: string, svg = false): string => {
-    let compass
+    let compass: string
 
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (Number.isNaN(Number(wind))) {
         compass = wind
     } else {
@@ -70,8 +71,9 @@ export const displayCompassAndDegrees = (wind: number | string, svg = false): st
  */
 export const getUserWind = (sliderId: string): number => {
     const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"))
-    let windDegrees
+    let windDegrees: number
 
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (Number.isNaN(Number(currentUserWind))) {
         windDegrees = compassToDegrees(currentUserWind)
     } else {

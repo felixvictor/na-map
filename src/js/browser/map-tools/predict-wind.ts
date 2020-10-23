@@ -205,6 +205,7 @@ export default class PredictWind {
         const predictMinutes = Number.parseInt(match![2], 10)
 
         // Set current wind in correctionValueDegrees
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (Number.isNaN(Number(currentUserWind))) {
             currentWindDegrees = compassToDegrees(String(currentUserWind))
         } else {

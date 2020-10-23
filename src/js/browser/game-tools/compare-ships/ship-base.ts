@@ -17,7 +17,6 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
-import { Transition, transition as d3Transition } from "d3-transition"
 
 import { isEmpty } from "../../../common/common"
 import { pluralise, segmentRadians } from "../../../common/common-browser"
@@ -242,7 +241,6 @@ export class ShipBase extends Ship {
             .transition()
             .duration(1000)
             .delay(500)
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             .attr("transform", (d) => `rotate(${d.initRotate})`)
     }
 
@@ -341,7 +339,6 @@ export class ShipBase extends Ship {
             .transition()
             .duration(1000)
             .delay(500)
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             .attr("transform", (d) => `rotate(${d.initRotate})`)
 
         // colourRamp(d3Select(this._select), this.shipCompareData.colorScale, this._shipData.speedDegrees.length);

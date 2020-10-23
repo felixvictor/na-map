@@ -22,21 +22,13 @@ export interface MinMaxCoord {
     max: number
 }
 
-export type ArrayIndex<T> = T[] & {
-    [index: string]: T[]
-}
+export type ArrayIndex<T> = T[] & Record<string, T[]>
 
-export type NestedArrayIndex<T> = {
-    [index: string]: ArrayIndex<T>
-}
+export type NestedArrayIndex<T> = Record<string, ArrayIndex<T>>
 
-export interface Index<T> {
-    [index: string]: T
-}
+export type Index = Record<string, T>
 
-export interface NestedIndex<T> {
-    [index: string]: Index<T>
-}
+export type NestedIndex = Record<string, Index>
 
 export type HtmlResult = VNode<unknown> | Array<VNode<unknown>>
 
