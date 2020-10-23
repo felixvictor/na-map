@@ -7,9 +7,9 @@
  * @copyright 2020
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
-import { drag as d3Drag } from "d3-drag";
 import { isEmpty } from "../../../common/common";
 import { pluralise, segmentRadians } from "../../../common/common-browser";
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format";
@@ -107,7 +107,9 @@ export class ShipBase extends Ship {
                 this._updateCompareWindProfiles();
             }
         };
-        this._drag = d3Drag().on("drag", (event, d) => dragged(event, d));
+        this._drag = d3Drag()
+            .on("drag", (event, d) => dragged(event, d))
+            .container(() => this._mainG.node());
     }
     _setupShipOutline() {
         this._shipRotate = 0;
@@ -161,7 +163,12 @@ export class ShipBase extends Ship {
             .text((d) => this._getSpeed(d.initRotate));
         datum.this = gShip;
         datum.compassText = compassText;
-        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`);
+        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate - 90})`);
+        gShip
+            .transition()
+            .duration(1000)
+            .delay(500)
+            .attr("transform", (d) => `rotate(${d.initRotate})`);
     }
     _drawWindProfile() {
         const pie = d3Pie().sort(null).value(1);
@@ -222,7 +229,12 @@ export class ShipBase extends Ship {
             .text((d) => `${Math.round(d.data * 10) / 10} knots`));
         datum.this = gWindProfile;
         datum.compassText = compassText;
-        gWindProfile.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`);
+        gWindProfile.datum(datum).attr("transform", (d) => `rotate(${d.initRotate + 90})`);
+        gWindProfile
+            .transition()
+            .duration(1000)
+            .delay(500)
+            .attr("transform", (d) => `rotate(${d.initRotate})`);
     }
     _printText() {
         const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.guns);

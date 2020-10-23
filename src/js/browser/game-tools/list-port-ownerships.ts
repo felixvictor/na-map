@@ -21,8 +21,7 @@ import {
     scaleOrdinal as d3ScaleOrdinal,
     scaleTime as d3ScaleTime,
 } from "d3-scale"
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import {
     Area,
     area as d3Area,
@@ -53,9 +52,9 @@ export default class ListPortOwnerships {
     // noinspection JSMismatchedCollectionQueryUpdate
     private _nationData: Array<OwnershipNation<number>> = {} as Array<OwnershipNation<number>>
     private readonly _colourScale: ScaleOrdinal<string, string>
-    private _mainDiv!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _mainDiv!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _div!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
 
     constructor(serverId: string) {
         this.#serverId = serverId
@@ -219,7 +218,7 @@ export default class ListPortOwnerships {
          * Set x axis
          * @param g - g element
          */
-        const setXAxis = (g: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>): void => {
+        const setXAxis = (g: Selection<SVGGElement, unknown, HTMLElement, unknown>): void => {
             const xTimeScale = d3ScaleTime<number, Date>()
                 .domain(d3Extent(nationData, (d) => new Date(d.date)) as [Date, Date])
                 .range([margin.left, width - margin.right])
@@ -238,7 +237,7 @@ export default class ListPortOwnerships {
          * Get area
          */
         const getArea = (): Area<NationArea> => {
-            const xScale = d3ScaleLinear<number, Date>()
+            const xScale = d3ScaleLinear<number, number>()
                 .domain(d3Extent(nationData, (d) => new Date(d.date)) as [Date, Date])
                 .range([margin.left, width - margin.right])
             const yScale = d3ScaleLinear<number, number>()
@@ -249,10 +248,9 @@ export default class ListPortOwnerships {
                 .range([height - margin.bottom, 0])
 
             const area = d3Area<NationArea>()
-                // @ts-expect-error
-                .x((d: NationArea): Date => xScale(new Date(d.data.date)))
-                .y0((d: NationArea) => yScale(d[0]))
-                .y1((d: NationArea) => yScale(d[1]))
+                .x((d: NationArea): number => xScale(new Date(d.data.date)) ?? 0)
+                .y0((d: NationArea) => yScale(d[0]) ?? 0)
+                .y1((d: NationArea) => yScale(d[1]) ?? 0)
                 .curve(d3CurveBasis)
 
             return area

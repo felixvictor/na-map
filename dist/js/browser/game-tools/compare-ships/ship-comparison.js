@@ -128,7 +128,12 @@ export class ShipComparison extends Ship {
             .text((d) => this._getSpeed(this._shipCompare.windProfileRotate - d.initRotate));
         datum.this = gShip;
         datum.compassText = compassText;
-        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate})`);
+        gShip.datum(datum).attr("transform", (d) => `rotate(${d.initRotate - 90})`);
+        gShip
+            .transition()
+            .duration(1000)
+            .delay(500)
+            .attr("transform", (d) => `rotate(${d.initRotate})`);
     }
     _drawDifferenceProfile() {
         const pie = d3Pie().sort(null).value(1);
@@ -229,12 +234,12 @@ export class ShipComparison extends Ship {
             musketsCrew: `${formatInt((this.shipCompareData.boarding.musketsCrew / 100) * this.shipCompareData.crew.max)}\u00A0${getDiff((this.shipCompareData.boarding.musketsCrew / 100) * this.shipCompareData.crew.max, (this._shipBaseData.boarding.musketsCrew / 100) * this._shipBaseData.crew.max)}`,
             prepInitial: `${formatInt(this.shipCompareData.boarding.prepInitial)}\u00A0${getDiff(this.shipCompareData.boarding.prepInitial, this._shipBaseData.boarding.prepInitial)}`,
             cannonsAccuracy: `${formatSignInt(this.shipCompareData.boarding.cannonsAccuracy * 100)}\u00A0${getDiff(this.shipCompareData.boarding.cannonsAccuracy * 100, this._shipBaseData.boarding.cannonsAccuracy * 100)}`,
-            reload: `${formatSignInt(this.shipCompareData.gunnery.reload * 100)}\u00A0${getDiff(this._shipBaseData.gunnery.reload * 100, this.shipCompareData.gunnery.reload * 100)}`,
-            penetration: `${formatSignInt(this.shipCompareData.gunnery.penetration * 100)}\u00A0${getDiff(this.shipCompareData.gunnery.penetration * 100, this._shipBaseData.gunnery.penetration * 100)}`,
-            dispersionHorizontal: `${formatSignInt(this.shipCompareData.gunnery.dispersionHorizontal * 100)}\u00A0${getDiff(this._shipBaseData.gunnery.dispersionHorizontal * 100, this.shipCompareData.gunnery.dispersionHorizontal * 100)}`,
-            dispersionVertical: `${formatSignInt(this.shipCompareData.gunnery.dispersionVertical * 100)}\u00A0${getDiff(this._shipBaseData.gunnery.dispersionVertical * 100, this.shipCompareData.gunnery.dispersionVertical * 100)}`,
-            traverseUpDown: `${formatSignInt(this.shipCompareData.gunnery.traverseUpDown * 100)}\u00A0${getDiff(this.shipCompareData.gunnery.traverseUpDown * 100, this._shipBaseData.gunnery.traverseUpDown * 100)}`,
-            traverseSide: `${formatSignInt(this.shipCompareData.gunnery.traverseSide * 100)}\u00A0${getDiff(this.shipCompareData.gunnery.traverseSide * 100, this._shipBaseData.gunnery.traverseSide * 100)}`,
+            reload: `${formatSignInt(this.shipCompareData.gunnery.reload * 100)}\u00A0${getDiff(this._shipBaseData.gunnery.reload, this.shipCompareData.gunnery.reload, 3, true)}`,
+            penetration: `${formatSignInt(this.shipCompareData.gunnery.penetration * 100)}\u00A0${getDiff(this.shipCompareData.gunnery.penetration, this._shipBaseData.gunnery.penetration, 3, true)}`,
+            dispersionHorizontal: `${formatSignInt(this.shipCompareData.gunnery.dispersionHorizontal * 100)}\u00A0${getDiff(this._shipBaseData.gunnery.dispersionHorizontal, this.shipCompareData.gunnery.dispersionHorizontal, 3, true)}`,
+            dispersionVertical: `${formatSignInt(this.shipCompareData.gunnery.dispersionVertical * 100)}\u00A0${getDiff(this._shipBaseData.gunnery.dispersionVertical, this.shipCompareData.gunnery.dispersionVertical, 3, true)}`,
+            traverseUpDown: `${formatSignInt(this.shipCompareData.gunnery.traverseUpDown * 100)}\u00A0${getDiff(this.shipCompareData.gunnery.traverseUpDown, this._shipBaseData.gunnery.traverseUpDown, 3, true)}`,
+            traverseSide: `${formatSignInt(this.shipCompareData.gunnery.traverseSide * 100)}\u00A0${getDiff(this.shipCompareData.gunnery.traverseSide, this._shipBaseData.gunnery.traverseSide, 3, true)}`,
             acceleration: `${formatFloat(this.shipCompareData.ship.acceleration)}\u00A0${getDiff(this.shipCompareData.ship.acceleration, this._shipBaseData.ship.acceleration, 2)}`,
             additionalRow: `${this.shipCompareData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
             backArmor: `${formatInt(this.shipCompareData.stern.armour)}\u00A0${getDiff(this.shipCompareData.stern.armour, this._shipBaseData.stern.armour)}</br><span class="badge badge-white">${formatInt(this.shipCompareData.stern.thickness)}</span>${getDiff(this.shipCompareData.stern.thickness, this._shipBaseData.stern.thickness)}`,
