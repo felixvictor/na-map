@@ -26,9 +26,9 @@ export type ArrayIndex<T> = T[] & Record<string, T[]>
 
 export type NestedArrayIndex<T> = Record<string, ArrayIndex<T>>
 
-export type Index = Record<string, T>
+export type Index<T> = Record<string, T>
 
-export type NestedIndex = Record<string, Index>
+export type NestedIndex<T> = Record<string, Index<T>>
 
 export type HtmlResult = VNode<unknown> | Array<VNode<unknown>>
 
