@@ -142,6 +142,7 @@ const getTweetsSinceRefresh = async (): Promise<void> => {
  * Get partial data since maintenance or later based on refresh id
  */
 const getTweetsPartial = async (): Promise<void> => {
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (refresh === refreshDefault) {
         await getTweetsSinceMaintenance()
     } else {
@@ -164,6 +165,7 @@ const getTweets = async (): Promise<void> => {
         strictSSL: true, // optional - requires SSL certificates to be valid.
     })
 
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (runType.startsWith("full")) {
         await getTweetsFull()
     } else {

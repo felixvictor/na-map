@@ -12,8 +12,7 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import "bootstrap/js/dist/tooltip"
 
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 
 import "round-slider/src/roundslider"
@@ -38,7 +37,7 @@ import Cookie from "../util/cookie"
 
 export default class WindRose {
     private readonly _line: Line<[number, number]>
-    private _windPath: d3Selection.Selection<SVGPathElement, unknown, HTMLElement, unknown> | undefined = undefined
+    private _windPath: Selection<SVGPathElement, unknown, HTMLElement, unknown> | undefined = undefined
     private readonly _windArrowWidth: number
     private readonly _intervalSeconds: number
     private readonly _baseName: string
@@ -58,8 +57,8 @@ export default class WindRose {
     private _compassRadius!: number
     private _length!: number
     private _intervalId!: number
-    private _svg!: d3Selection.Selection<SVGSVGElement, unknown, HTMLElement, unknown>
-    private _div!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    private _div!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor() {
         this._line = d3Line()

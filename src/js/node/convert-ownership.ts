@@ -9,7 +9,6 @@
  */
 
 import * as fs from "fs"
-import { Stats } from "fs"
 import path from "path"
 
 import d3Array from "d3-array"
@@ -295,7 +294,7 @@ const convertOwnership = async (serverId: ServerId): Promise<void> => {
      * @param stats - Stat
      * @returns True if file should be ignored
      */
-    const ignoreFileName = (fileName: string, stats: Stats): boolean => {
+    const ignoreFileName = (fileName: string, stats: fs.Stats): boolean => {
         return !stats.isDirectory() && fileBaseNameRegex[serverId].exec(path.basename(fileName)) === null
     }
 

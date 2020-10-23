@@ -225,6 +225,7 @@ export class CompareShips {
 
     static _setSelect(select$: JQuery, ids: number | number[]): void {
         let value: string | string[]
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (Array.isArray(ids)) {
             value = ids.map<string>((id: number | string) => String(id))
         } else {
@@ -1037,6 +1038,7 @@ export class CompareShips {
 
         let options: string
         const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (modules.length > 1) {
             // Get options with sub types as optgroups
             options = modules
