@@ -1,0 +1,39 @@
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Map tools main file.
+ * @module    map-tools/index
+ * @author    iB aka Felix Victor
+ * @copyright 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Predict wind.
+ * @module    map-tools/predict-wind
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Show wind rose continuously.
+ * @module    map-tools/wind-rose
+ * @author    iB aka Felix Victor
+ * @copyright 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Utility functions.
+ * @module    util
+ * @author    iB aka Felix Victor
+ * @copyright 2017, 2018, 2019, 2020
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
