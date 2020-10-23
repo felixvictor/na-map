@@ -199,7 +199,6 @@ export class ShipComparison extends Ship {
             .transition()
             .duration(1000)
             .delay(500)
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             .attr("transform", (d) => `rotate(${d.initRotate})`)
     }
 

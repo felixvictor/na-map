@@ -146,6 +146,7 @@ const convertRecipes = async (): Promise<void> => {
             return {
                 group,
                 recipes: recipes.map((recipe) => {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { craftGroup, ...recipeCleaned } = recipe
                     return recipeCleaned
                 }),
