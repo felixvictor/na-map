@@ -112,7 +112,7 @@ export class CompareShips {
     innerRadius!: number
     outerRadius!: number
     radiusSpeedScale!: ScaleLinear<number, number>
-    selectedShips!: Index<ShipBase | ShipComparison>
+    selectedShips!: Index
     singleShipData!: ShipData
     shipMassScale!: ScaleLinear<number, number>
     svgHeight!: number
@@ -132,11 +132,11 @@ export class CompareShips {
     private _moduleTypes!: Set<ModuleType>
     private _selectedUpgradeIdsList: ColumnArray<number> = {} as ColumnArray<number>
     private _selectedUpgradeIdsPerType: ColumnNestedArray<number> = {} as ColumnNestedArray<number>
-    private _selectModule$: NestedIndex<JQuery<HTMLSelectElement>> = {}
-    private _selectShip$: Index<JQuery<HTMLSelectElement>> = {}
-    private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
+    private _selectModule$: NestedIndex = {}
+    private _selectShip$: Index = {}
+    private _selectWood$: NestedIndex = {}
     private _shipData!: ShipData[]
-    private _shipIds: Index<number> = {}
+    private _shipIds: Index = {}
     private _shipSelectData!: ShipSelectMap[]
     private readonly _baseId: string
     private readonly _baseName: string
@@ -1312,7 +1312,6 @@ export class CompareShips {
 
                 // Add modifier amount for both frame and trim
                 for (const type of woodType) {
-                    // @ts-expect-error
                     for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
                         if (this._moduleAndWoodChanges.has(property.modifier)) {
                             this._setModifier(property)
@@ -1499,7 +1498,6 @@ export class CompareShips {
         this._selectedUpgradeIdsPerType[compareId] = {} as ArrayIndex<number>
 
         for (const type of this._moduleTypes) {
-            // @ts-expect-error
             this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val()
             if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
                 // Multiple selects

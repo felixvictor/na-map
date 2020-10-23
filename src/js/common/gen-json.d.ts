@@ -74,7 +74,7 @@ export interface BuildingWithResult {
  */
 
 // https://stackoverflow.com/a/54319112
-export type ObjectIndexer = Record<string, T>
+export type ObjectIndexer<T> = Record<string, T>
 type Cannon = {
     [K in CannonType]: CannonEntity[]
 }
@@ -86,22 +86,22 @@ export interface CannonEntity {
     penetration: CannonPenetration
 }
 export type CannonElementIndex = CannonValue | undefined
-export interface CannonDamage extends ObjectIndexer {
+export interface CannonDamage extends ObjectIndexer<CannonElementIndex> {
     basic: CannonValue
     "reload time": CannonValue
     splinter: CannonValue
     "per second": CannonValue
     penetration?: CannonValue
 }
-export interface CannonTraverse extends ObjectIndexer {
+export interface CannonTraverse extends ObjectIndexer<CannonElementIndex> {
     up: CannonValue
     down: CannonValue
 }
-export interface CannonDispersion extends ObjectIndexer {
+export interface CannonDispersion extends ObjectIndexer<CannonElementIndex> {
     horizontal: CannonValue
     vertical: CannonValue
 }
-export interface CannonGeneric extends ObjectIndexer {
+export interface CannonGeneric extends ObjectIndexer<CannonElementIndex> {
     weight: CannonValue
     crew: CannonValue
 }
@@ -485,7 +485,8 @@ interface ShipBlueprintShip {
  * ships.json
  */
 
-export interface ShipData extends ObjectIndexer {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ShipData extends ObjectIndexer<any> {
     battleRating: number
     boarding: ShipBoarding
     bow: ShipHealth
@@ -641,7 +642,7 @@ interface WoodTrimOrFrame {
     name: string
     family: WoodFamily
 }
-interface WoodProperty extends ObjectIndexer {
+interface WoodProperty extends ObjectIndexer<boolean | number | string> {
     modifier: string
     amount: number
     isPercentage: boolean
@@ -669,7 +670,7 @@ export interface Geometry {
  * repairs.json
  */
 
-export interface Repair extends ObjectIndexer {
+export interface Repair extends ObjectIndexer<RepairAmount> {
     armorRepair: RepairAmount
     sailRepair: RepairAmount
     crewRepair: RepairAmount
