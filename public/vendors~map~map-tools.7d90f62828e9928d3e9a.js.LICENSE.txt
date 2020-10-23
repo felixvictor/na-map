@@ -1,4 +1,0 @@
-/*!
- * roundSlider v1.6.1 | (c) 2015-2020, Soundar
- * MIT license | http://roundsliderui.com/licence.html
- */
