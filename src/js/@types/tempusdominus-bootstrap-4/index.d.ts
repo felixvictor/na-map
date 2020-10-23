@@ -79,7 +79,7 @@ interface DatetimepickerOption {
     inline?: boolean
     keepInvalid?: boolean
     keepOpen?: boolean
-    keyBinds?: { [key: string]: (widget: boolean | JQuery) => void }
+    keyBinds?: Record<string, (widget: boolean | JQuery) => void>
     locale?: string
     maxDate?: boolean | Dayjs | Date | string
     minDate?: boolean | Dayjs | Date | string
