@@ -8,12 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { arc as d3Arc, pie as d3Pie } from "d3-shape"
 
 import { numberSegments } from "../../../common/common-browser"
-
-import { Selection } from "d3-selection"
 
 import { CompareShips } from "./compare-ships"
 import { ShipDisplayData } from "./types"
@@ -51,6 +49,7 @@ export class Ship {
      */
     static pd(gunsPerDeck: ShipGunDeck): HtmlString {
         let s = `<span class="badge badge-white">${gunsPerDeck.maxCannonLb}\u202F/\u202F`
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (gunsPerDeck.maxCarroLb) {
             s += `${gunsPerDeck.maxCarroLb}`
         } else {

@@ -22,9 +22,7 @@ type Index = number
 type PixelDistance = number
 type SpotType = number
 
-interface GridMap extends Array<SpotType> {
-    [index: number]: SpotType // type (spotLand, spotWater, port id)
-}
+type GridMap = Record<number, SpotType>
 
 class Port {
     apiPorts: APIPort[] = []

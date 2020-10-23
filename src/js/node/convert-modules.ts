@@ -426,11 +426,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 : ""
         }
 
-        if (permanentType === "Default") {
-            permanentType = ""
-        } else {
-            permanentType = `\u202F\u25CB\u202F${permanentType}`
-        }
+        permanentType = permanentType === "Default" ? "" : `\u202F\u25CB\u202F${permanentType}`
 
         return `${type}${sortingGroup}${permanentType}`
     }
@@ -535,6 +531,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 }
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
             modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule)
         }
