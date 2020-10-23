@@ -265,5 +265,25 @@
         <Value>20</Value>
       </Value>
     </Pair>
+    <Pair>
+      <Key>FIRE_DECREASE_RATE</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <EffectCurve>
+          <Value>
+            <Time>0</Time>
+            <Value>0</Value>
+            <TangentIn>1</TangentIn>
+            <TangentOut>1</TangentOut>
+          </Value>
+          <Value>
+            <Time>1</Time>
+            <Value>1</Value>
+            <TangentIn>1</TangentIn>
+            <TangentOut>1</TangentOut>
+          </Value>
+        </EffectCurve>
+        <Value>0.07</Value>
+      </Value>
+    </Pair>
   </Attributes>
 </ModuleTemplate>

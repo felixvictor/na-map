@@ -74,9 +74,7 @@ export interface BuildingWithResult {
  */
 
 // https://stackoverflow.com/a/54319112
-export interface ObjectIndexer<T> {
-    [index: string]: T
-}
+export type ObjectIndexer<T> = Record<string, T>
 type Cannon = {
     [K in CannonType]: CannonEntity[]
 }
@@ -296,6 +294,7 @@ type PortIntersection =
     | Point
     | Array<string | InventoryEntity | TradeGoodProfit>
     | PortBonus
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
 }
