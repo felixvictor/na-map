@@ -356,12 +356,7 @@ export const convertModulesAndWoodData = async () => {
                 ? `\u202F\u2013\u202F${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
                 : "";
         }
-        if (permanentType === "Default") {
-            permanentType = "";
-        }
-        else {
-            permanentType = `\u202F\u25CB\u202F${permanentType}`;
-        }
+        permanentType = permanentType === "Default" ? "" : `\u202F\u25CB\u202F${permanentType}`;
         return `${type}${sortingGroup}${permanentType}`;
     };
     const apiModules = apiItems
