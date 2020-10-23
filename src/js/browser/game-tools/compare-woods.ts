@@ -340,7 +340,7 @@ class WoodComparison extends Wood {
 
 export default class CompareWoods {
     readonly baseFunction: string
-    instances = {} as Index
+    instances = {} as Index<WoodBase | WoodComparison>
     readonly minMaxProperty: Map<string, MinMax> = new Map()
     propertyNames!: Set<string>
     private readonly _baseName: string
@@ -354,7 +354,7 @@ export default class CompareWoods {
     private _frameSelectData!: WoodTrimOrFrame[]
     private _trimSelectData!: WoodTrimOrFrame[]
     private _options: WoodTypeList<HtmlString> = {} as WoodTypeList<HtmlString>
-    private _woodIdsSelected = {} as NestedIndex
+    private _woodIdsSelected = {} as NestedIndex<number>
 
     constructor(baseFunction: string) {
         this.baseFunction = baseFunction
