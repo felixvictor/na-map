@@ -10,7 +10,7 @@
 
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { formatF11 } from "../../common/common-format"
@@ -22,7 +22,6 @@ import JQuery from "jquery"
 import { BaseModalPure, HtmlString, MinMaxCoord } from "../../common/interface"
 
 import { NAMap } from "./na-map"
-import * as d3Selection from "d3-selection"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -47,7 +46,7 @@ export default class ShowF11 {
     private readonly _copyButtonId: HtmlString
     private readonly _submitButtonId: HtmlString
     private _modal$!: JQuery
-    private _g!: d3Selection.Selection<SVGGElement, unknown, HTMLElement, unknown>
+    private _g!: Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _formSel!: HTMLFormElement
     private _xInputSel!: HTMLInputElement | null
     private _zInputSel!: HTMLInputElement | null
@@ -261,8 +260,8 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11Y))
-        const F11XDim = F11XText.node()?.getBBox()
-        const F11YDim = F11YText.node()?.getBBox()
+        const F11XDim = F11XText.node()?.getBBox() as DOMRect
+        const F11YDim = F11YText.node()?.getBBox() as DOMRect
 
         const timeStamp = dayjs().utc()
         const timeStampLocal = dayjs()
@@ -278,13 +277,12 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`)
-        const timeStampDim = timeStampText.node()?.getBBox()
-        const timeStampLocalDim = timeStampLocalText.node()?.getBBox()
+        const timeStampDim = timeStampText.node()?.getBBox() as DOMRect
+        const timeStampLocalDim = timeStampLocalText.node()?.getBBox() as DOMRect
 
         const coordHeight = F11XDim && F11YDim ? Math.round(F11XDim.height + F11YDim.height) * 1.2 : 0
         const coordWidth = F11XDim && F11YDim ? Math.round(Math.max(F11XDim.width, F11YDim.width) + 5) : 0
-        const timeHeight =
-            timeStampDim && timeStampLocalDim ? Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2 : 0
+        const timeHeight = Math.round(timeStampDim?.height + timeStampLocalDim?.height) * 1.2
         const timeWidth =
             timeStampDim && timeStampLocalDim
                 ? Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5)

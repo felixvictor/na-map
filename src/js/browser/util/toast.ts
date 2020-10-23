@@ -11,8 +11,7 @@
 /// <reference types="bootstrap" />
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/toast"
-import { select as d3Select } from "d3-selection"
-import * as d3Selection from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { iconSmallSrc } from "../../common/common-browser"
 
@@ -25,9 +24,9 @@ export default class Toast {
     // Toast text
     readonly #text: string
     // Toast instance
-    #toast!: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #toast!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     // Main div
-    #mainDiv: d3Selection.Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #mainDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor(
         // Toast title

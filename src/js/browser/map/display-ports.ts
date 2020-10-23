@@ -233,7 +233,6 @@ export default class DisplayPorts {
      * @param r - webpack require.context
      * @returns Images
      */
-    // eslint-disable-next-line no-undef
     static _importAll(r: __WebpackModuleApi.RequireContext): NationListAlternative<string> {
         const images = {} as NationListAlternative<string>
         r.keys().forEach((item) => {
@@ -617,7 +616,6 @@ export default class DisplayPorts {
 
     _setupFlags(): void {
         this.#nationIcons = DisplayPorts._importAll(
-            // eslint-disable-next-line no-undef
             (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
         )
 
@@ -1098,20 +1096,20 @@ export default class DisplayPorts {
             data = this.#portDataFiltered.filter((d) => d.capturable)
             this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScaleTax(d.taxIncome)
-            r = (d): number => this.#portRadius(d.taxIncome)
+            fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
+            r = (d): number => this.#portRadius(d.taxIncome) ?? 0
         } else if (this.showRadius === "net") {
             data = this.#portDataFiltered.filter((d) => d.capturable)
             this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScaleNet(d.netIncome)
-            r = (d): number => this.#portRadius(Math.abs(d.netIncome))
+            fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
+            r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
         } else if (this.showRadius === "points") {
             data = this.#portDataFiltered.filter((d) => d.capturable)
             this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
             cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScalePoints(d.portPoints)
-            r = (d): number => this.#portRadius(d.portPoints)
+            fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
+            r = (d): number => this.#portRadius(d.portPoints) ?? 0
         } else if (this.showRadius === "position") {
             cssClass = (): string => "bubble here"
             r = (d): number => d.distance
@@ -1121,8 +1119,8 @@ export default class DisplayPorts {
             this.#attackRadius.range([rMin, rMax / 1.5])
             cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
             fill = (d): string =>
-                d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0)
-            r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0))
+                d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
+            r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
         } else if (this.circleType === "currentGood") {
             cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
             r = (): number => rMax / 2

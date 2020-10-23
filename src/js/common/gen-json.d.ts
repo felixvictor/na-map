@@ -74,9 +74,7 @@ export interface BuildingWithResult {
  */
 
 // https://stackoverflow.com/a/54319112
-export interface ObjectIndexer<T> {
-    [index: string]: T
-}
+export type ObjectIndexer = Record<string, T>
 type Cannon = {
     [K in CannonType]: CannonEntity[]
 }
@@ -88,22 +86,22 @@ export interface CannonEntity {
     penetration: CannonPenetration
 }
 export type CannonElementIndex = CannonValue | undefined
-export interface CannonDamage extends ObjectIndexer<CannonElementIndex> {
+export interface CannonDamage extends ObjectIndexer {
     basic: CannonValue
     "reload time": CannonValue
     splinter: CannonValue
     "per second": CannonValue
     penetration?: CannonValue
 }
-export interface CannonTraverse extends ObjectIndexer<CannonElementIndex> {
+export interface CannonTraverse extends ObjectIndexer {
     up: CannonValue
     down: CannonValue
 }
-export interface CannonDispersion extends ObjectIndexer<CannonElementIndex> {
+export interface CannonDispersion extends ObjectIndexer {
     horizontal: CannonValue
     vertical: CannonValue
 }
-export interface CannonGeneric extends ObjectIndexer<CannonElementIndex> {
+export interface CannonGeneric extends ObjectIndexer {
     weight: CannonValue
     crew: CannonValue
 }
@@ -296,6 +294,7 @@ type PortIntersection =
     | Point
     | Array<string | InventoryEntity | TradeGoodProfit>
     | PortBonus
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
 }
@@ -486,8 +485,7 @@ interface ShipBlueprintShip {
  * ships.json
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ShipData extends ObjectIndexer<any> {
+export interface ShipData extends ObjectIndexer {
     battleRating: number
     boarding: ShipBoarding
     bow: ShipHealth
@@ -643,7 +641,7 @@ interface WoodTrimOrFrame {
     name: string
     family: WoodFamily
 }
-interface WoodProperty extends ObjectIndexer<boolean | number | string> {
+interface WoodProperty extends ObjectIndexer {
     modifier: string
     amount: number
     isPercentage: boolean
@@ -671,7 +669,7 @@ export interface Geometry {
  * repairs.json
  */
 
-export interface Repair extends ObjectIndexer<RepairAmount> {
+export interface Repair extends ObjectIndexer {
     armorRepair: RepairAmount
     sailRepair: RepairAmount
     crewRepair: RepairAmount
