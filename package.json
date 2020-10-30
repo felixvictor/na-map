@@ -45,12 +45,12 @@
         "pre-build:tiles:1:pre": "cp /mnt/na-map.tif src/images/map.tif && rm -rf src/images/map/",
         "pre-build:tiles:2:build": "yarn node --experimental-specifier-resolution=node dist/js/node/make-tiles.mjs src/images/map.tif",
         "pre-build:tiles:3:post": "rm src/images/map.tif",
-        "prod": "                 webpack --env.production --mode=production --colors --config webpack.config.cjs -r esm",
-        "prod-quiet": "QUIET=true webpack --env.production --mode=production          --config webpack.config.cjs -r esm",
+        "prod": "                 webpack --config webpack.config.js --mode=production --color",
+        "prod-quiet": "QUIET=true webpack --config webpack.config.js --mode=production --color",
         "size": "find public/ -iname '*.js' -not -iname 'data-*.js' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
         "size-js": "find public/ -iname '*.js' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
-        "start": "webpack-dev-server --env.production=0 --open --mode=development --colors --config webpack.config.cjs -r esm",
-        "watch": "webpack --env.production=0 --mode=development --watch --colors --config webpack.config.cjs -r esm"
+        "start": "webpack serve --config webpack.config.js --mode=development --color --open='google-chrome'",
+        "watch": "webpack       --config webpack.config.js --mode=development --color --watch"
     },
     "browserslist": [
         ">= 1%",
@@ -145,7 +145,7 @@
         "core-js": "^3.6.5",
         "css": "^3.0.0",
         "css-loader": "^5.0.0",
-        "cssnano": "^4.1.10",
+        "css-minimizer-webpack-plugin": "^1.1.5",
         "csv-parser": "^2.3.3",
         "denque": "^1.4.1",
         "diff2html-cli": "^5.1.6",
@@ -161,7 +161,7 @@
         "favicons-webpack-plugin": "^5.0.0-alpha.3",
         "file-loader": "^6.2.0",
         "git": "^0.1.5",
-        "html-webpack-plugin": "^4.5.0",
+        "html-webpack-plugin": "^5.0.0-alpha.7",
         "image-webpack-loader": "^7.0.1",
         "immutable": "^4.0.0-rc.12",
         "imports-loader": "^1.1.0",
@@ -202,7 +202,6 @@
         "webpack-cli": "^4.1.0",
         "webpack-dev-server": "^3.11.0",
         "webpack-mode": "^1.0.2",
-        "webpack-subresource-integrity": "^1.5.1",
         "xml-js": "^1.6.11",
         "xss": "^1.0.8",
         "yarn-deduplicate": "^3.1.0"
