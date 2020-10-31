@@ -17,6 +17,7 @@ export interface Server {
     type: string
 }
 
+// If changed check also webpack.config
 export const servers = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" },
