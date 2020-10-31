@@ -15,6 +15,7 @@ const parseCss = require("css")
 const PreloadWebpackPlugin = require("preload-webpack-plugin")
 const sass = require("node-sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
+// const SriPlugin = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
 const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
@@ -278,7 +279,6 @@ const config = {
         extensions: [".ts", ".js", ".json"],
     },
 
-    // https://blog.logrocket.com/guide-performance-optimization-webpack/
     optimization: {
         runtimeChunk: "single",
         splitChunks: {
@@ -287,7 +287,6 @@ const config = {
     },
 
     output: {
-        chunkFilename: isProduction ? "[name].[contenthash].js" : "[name].js",
         crossOriginLoading: "anonymous",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
@@ -299,7 +298,6 @@ const config = {
             verbose: false,
         }),
         new MiniCssExtractPlugin({
-            chunkFilename: isProduction ? "[name].[contenthash].css" : "[name].css",
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
             orderWarning: true,
         }),
@@ -341,6 +339,7 @@ const config = {
             ],
         }),
         new HtmlPlugin(htmlOpt),
+        new FaviconsPlugin(faviconsOpt),
         new PreloadWebpackPlugin({
             rel: "preload",
             include: "allAssets",
@@ -358,7 +357,12 @@ const config = {
             },
         }),
         new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
-        new FaviconsPlugin(faviconsOpt),
+        /*
+        new SriPlugin({
+            hashFuncNames: ["sha384"],
+            enabled: isProduction,
+        }),
+        */
     ],
 
     target: "browserslist",
@@ -537,7 +541,7 @@ if (isProduction) {
     config.optimization.minimize = true
     config.optimization.minimizer = [
         new CssMinimizerPlugin({
-            sourceMap: true,
+            sourceMap: false,
             minify: async (data) => {
                 const csso = require("csso")
 
