@@ -49,7 +49,7 @@
         "prod-quiet": "QUIET=true webpack --config webpack.config.js --mode=production --color",
         "size": "find public/ -iname '*.js' -not -iname 'data-*.js' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
         "size-js": "find public/ -iname '*.js' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
-        "start": "webpack serve --config webpack.config.js --mode=development --color --open='google-chrome'",
+        "start": "webpack serve --config webpack.config.js --mode=development --color",
         "watch": "webpack       --config webpack.config.js --mode=development --color --watch"
     },
     "browserslist": [

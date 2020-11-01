@@ -264,6 +264,8 @@ const config = {
     devServer: {
         contentBase: dirOutput,
         disableHostCheck: true,
+        hot: true,
+        open: true,
     },
 
     devtool: false,
@@ -365,7 +367,7 @@ const config = {
         */
     ],
 
-    target: "browserslist",
+    target: isProduction ? "browserslist" : "web",
 
     stats: {
         // Add chunk information (setting this to `false` allows for a less verbose output)
