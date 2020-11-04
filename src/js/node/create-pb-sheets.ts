@@ -12,7 +12,7 @@ import path from "path"
 
 import css, { Declaration, Rule } from "css"
 import Excel from "exceljs"
-import sass from "node-sass"
+import sass from "sass"
 
 import { range } from "../common/common"
 import { commonPaths, serverStartDate } from "../common/common-dir"
