@@ -301,7 +301,6 @@ const config = {
         }),
         new MiniCssExtractPlugin({
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
-            orderWarning: true,
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
