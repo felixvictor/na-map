@@ -15209,7 +15209,7 @@ timed-out@^4.0.0, timed-out@^4.0.1:
 
 "timelines-chart@https://github.com/felixvictor/timelines-chart#d3-v6":
   version "2.10.0"
-  resolved "https://github.com/felixvictor/timelines-chart#b22baef34e91e97fc0e3f9112f023ff02fbc21fe"
+  resolved "https://github.com/felixvictor/timelines-chart#57a121f131d464eedbd011f993b573aed1c546cd"
   dependencies:
     d3-array "^2.8.0"
     d3-axis "^2.0.0"
