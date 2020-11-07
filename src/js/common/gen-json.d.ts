@@ -13,6 +13,7 @@
 import { ModifiersEntity } from "../node/api-item"
 import { Point } from "./common-math"
 import { ValuesType } from "utility-types"
+import { Group } from "timelines-chart"
 
 import {
     CannonFamily,
@@ -218,24 +219,6 @@ export interface Ownership {
     region: string
     data: Group[]
 }
-
-export interface Group {
-    group: string
-    data: Line[]
-}
-
-export interface Line {
-    label: string
-    data: Segment[]
-}
-
-export interface Segment {
-    timeRange: [TS, TS]
-    val: Val
-}
-
-type TS = Date | number | string
-type Val = number | string // qualitative vs quantitative
 
 /****************************
  * pb-zones.json
