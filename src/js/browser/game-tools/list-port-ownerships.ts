@@ -36,8 +36,9 @@ import { colourList, insertBaseModal } from "../../common/common-browser"
 import { getContrastColour } from "../../common/common-game-tools"
 
 import JQuery from "jquery"
-import { Group, Ownership, OwnershipNation } from "../../common/gen-json"
+import { Ownership, OwnershipNation } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
+import { Group } from "timelines-chart"
 
 /**
  *
@@ -307,7 +308,6 @@ export default class ListPortOwnerships {
         const TimelinesChart = await import(/* webpackChunkName: "timelines-chart" */ "timelines-chart")
 
         TimelinesChart.default()
-            // @ts-expect-error
             .data(data)
             .enableAnimations(false)
             .timeFormat("%-d %B %Y")

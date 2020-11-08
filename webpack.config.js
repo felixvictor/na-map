@@ -2,51 +2,49 @@
  * webpack.config
  */
 
-import path from "path"
-import process from "process"
-import { fileURLToPath } from "url"
+const path = require("path")
+const webpack = require("webpack")
 
-import webpack from "webpack"
+// const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
+const CopyPlugin = require("copy-webpack-plugin")
+const FaviconsPlugin = require("favicons-webpack-plugin")
+const HtmlPlugin = require("html-webpack-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
+const parseCss = require("css")
+const PreloadWebpackPlugin = require("preload-webpack-plugin")
+const sass = require("sass")
+const SitemapPlugin = require("sitemap-webpack-plugin").default
+// const SriPlugin = require("webpack-subresource-integrity")
+const TerserPlugin = require("terser-webpack-plugin")
+const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
-import sass from "node-sass"
-import { default as parseCss } from "css"
-// import BundleAnalyzerPlugin from "webpack-bundle-analyzer"
-import CleanWebpackPlugin from "clean-webpack-plugin"
-import CopyPlugin from "copy-webpack-plugin"
-import FaviconsPlugin from "favicons-webpack-plugin"
-import HtmlPlugin from "html-webpack-plugin"
-import MiniCssExtractPlugin from "mini-css-extract-plugin"
-import PreloadWebpackPlugin from "preload-webpack-plugin"
-import SitemapPlugin from "sitemap-webpack-plugin"
-import SriPlugin from "webpack-subresource-integrity"
-import TerserPlugin from "terser-webpack-plugin"
-
-import { servers } from "./dist/js/common/servers"
-import PACKAGE from "./package.json"
-import repairs from "./src/lib/gen-generic/repairs.json"
-import WebpackMode from "webpack-mode"
-const { isProduction } = WebpackMode
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
+const dirLib = path.resolve(dirSrc, "lib")
 
 const dirFlags = path.resolve(dirSrc, "images", "flags")
 const dirFonts = path.resolve(dirSrc, "fonts")
 const dirIcons = path.resolve(dirSrc, "icons")
 const dirJsSrc = path.resolve(dirSrc, "js")
-const dirLib = path.resolve(dirSrc, "lib")
 const dirMap = path.resolve(dirSrc, "images", "map")
-const dirScssSrc = path.resolve(dirSrc, "scss")
 const dirPrefixIcons = path.join("images", "icons")
 
 const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
 const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
-// Environment
+// Variables
+const PACKAGE = require("./package.json")
+const repairs = require(`${dirLib}/gen-generic/repairs.json`)
+const { isProduction } = require("webpack-mode")
+const servers = [
+    { id: "eu1", name: "War", type: "PVP" },
+    { id: "eu2", name: "Peace", type: "PVE" },
+]
 const { TARGET, QUIET } = process.env
 const isQuiet = Boolean(QUIET)
+
 const targetUrl = TARGET ? `https://${TARGET}.netlify.app/` : `http://localhost/na/`
 const publicPath = TARGET || !isProduction ? "/" : `http://localhost/na/`
 
@@ -266,6 +264,8 @@ const config = {
     devServer: {
         contentBase: dirOutput,
         disableHostCheck: true,
+        hot: true,
+        open: true,
     },
 
     devtool: false,
@@ -281,7 +281,6 @@ const config = {
         extensions: [".ts", ".js", ".json"],
     },
 
-    // https://blog.logrocket.com/guide-performance-optimization-webpack/
     optimization: {
         runtimeChunk: "single",
         splitChunks: {
@@ -290,7 +289,6 @@ const config = {
     },
 
     output: {
-        chunkFilename: isProduction ? "[name].[contenthash].js" : "[name].js",
         crossOriginLoading: "anonymous",
         filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
@@ -298,13 +296,11 @@ const config = {
     },
 
     plugins: [
-        new CleanWebpackPlugin.CleanWebpackPlugin({
+        new CleanWebpackPlugin({
             verbose: false,
         }),
         new MiniCssExtractPlugin({
-            chunkFilename: isProduction ? "[name].[contenthash].css" : "[name].css",
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
-            orderWarning: true,
         }),
         new webpack.DefinePlugin({
             CPRIMARY300: JSON.stringify(primary300),
@@ -344,6 +340,7 @@ const config = {
             ],
         }),
         new HtmlPlugin(htmlOpt),
+        new FaviconsPlugin(faviconsOpt),
         new PreloadWebpackPlugin({
             rel: "preload",
             include: "allAssets",
@@ -360,15 +357,16 @@ const config = {
                 return "script"
             },
         }),
-        new SitemapPlugin.default(targetUrl, sitemapPaths, { skipGzip: false }),
-        new FaviconsPlugin(faviconsOpt),
+        new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
+        /*
         new SriPlugin({
             hashFuncNames: ["sha384"],
             enabled: isProduction,
         }),
+        */
     ],
 
-    // target: "browserslist", // webpack 5
+    target: isProduction ? "browserslist" : "web",
 
     stats: {
         // Add chunk information (setting this to `false` allows for a less verbose output)
@@ -395,7 +393,6 @@ const config = {
             },
             {
                 test: /\.scss$/,
-                include: dirScssSrc,
                 use: [
                     {
                         loader: MiniCssExtractPlugin.loader,
@@ -544,6 +541,23 @@ if (isProduction && !isQuiet) {
 if (isProduction) {
     config.optimization.minimize = true
     config.optimization.minimizer = [
+        new CssMinimizerPlugin({
+            sourceMap: false,
+            minify: async (data) => {
+                const csso = require("csso")
+
+                const [[filename, input]] = Object.entries(data)
+                const minifiedCss = csso.minify(input, {
+                    comments: false,
+                    filename,
+                    sourceMap: false,
+                })
+
+                return {
+                    css: minifiedCss.css,
+                }
+            },
+        }),
         new TerserPlugin({
             parallel: true,
             terserOptions: {
@@ -564,4 +578,4 @@ if (isProduction) {
     config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
-export default () => config
+module.exports = () => config

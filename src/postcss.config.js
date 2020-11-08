@@ -1,7 +1,3 @@
-const cssnanoOpt = {
-    preset: ["default", { discardComments: { removeAll: true } }],
-}
-
 const purgecssSafelistDeep = [
     /active/,
     /bootstrap-select/,
@@ -24,14 +20,14 @@ const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]
 const purgecssSafelistStandard = portBonusType.map((bonus) => `icon-${bonus}`)
 
 const purgecssOpt = {
-    safelist: { standard: purgecssSafelistStandard, deep: purgecssSafelistDeep },
     content: ["./src/**/*.{ejs,ts}"],
+    safelist: { standard: purgecssSafelistStandard, deep: purgecssSafelistDeep },
+    variables: true,
 }
 
-module.exports = (api) => ({
+module.exports = () => ({
     plugins: {
         "@fullhuman/postcss-purgecss": purgecssOpt,
         autoprefixer: true,
-        cssnano: api.mode === "production" ? cssnanoOpt : false,
     },
 })

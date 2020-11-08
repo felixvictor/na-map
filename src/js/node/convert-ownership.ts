@@ -26,7 +26,8 @@ import { cleanName, sortBy } from "../common/common-node"
 import { ServerId, serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
-import { Group, Line, NationList, Ownership, OwnershipNation, Segment } from "../common/gen-json"
+import { NationList, Ownership, OwnershipNation } from "../common/gen-json"
+import { Group, Line, Segment } from "timelines-chart"
 
 const fileExtension = ".json.xz"
 
@@ -102,7 +103,7 @@ const sortFileNames = (fileNames: string[]): string[] => {
     })
 }
 
-const getDate = (date: string): string => dayjs(date).format("YYYY-MM-YY")
+const getDate = (date: string): number => new Date(date).getTime()
 
 /**
  * Parse data and construct ports Map
