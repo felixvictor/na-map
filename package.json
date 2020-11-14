@@ -94,7 +94,7 @@
         "js-cookie": "^2.2.1",
         "preact": "^10.5.7",
         "round-slider": "^1.6.1",
-        "timelines-chart": "https://github.com/felixvictor/timelines-chart#d3-v6"
+        "timelines-chart": "2.11.1"
     },
     "devDependencies": {
         "@babel/cli": "^7.12.1",
