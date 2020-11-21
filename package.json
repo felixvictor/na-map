@@ -37,7 +37,7 @@
         "pre-build:distances-cut": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-cut.mjs",
         "pre-build:distances-test": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-test.mjs",
         "pre-build:modules": "run-s 'pre-build:modules:**'",
-        "pre-build:modules:1:get": "cp -u /mnt/Modules.zip build/ && unzip -Iutf-8 -L -u build/Modules.zip -d build/",
+        "pre-build:modules:1:get": "cp -u /mnt/Modules.zip build/ && unzip -L -u build/Modules.zip -d build/",
         "pre-build:modules:2:correct:dir": "rm -rf build/Modules/; mv build/modules build/Modules",
         "pre-build:modules:3:correct:enc": "cd build/Modules/; for FILE in *.xml; do dos2unix -m -q \"${FILE}\"; done",
         "pre-build:modules:4:correct:names": "cd build/Modules/; mv \"traders brig hull.xml\" \"trader brig hull.xml\"; mv \"agamemnon deck armor .xml\" \"agamemnon deck armor.xml\"",
