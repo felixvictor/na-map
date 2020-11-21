@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.0.3](///compare/v12.0.2...v12.0.3) (2020-11-21)
+
+
+### Bug Fixes
+
+* **patch:** ship data changes as of 21 November 2020 a6d779e
+* **script:** unpack -I removed 10b6c85
+
 ### [12.0.2](///compare/v12.0.1...v12.0.2) (2020-11-21)
 
 
