@@ -13,8 +13,8 @@ import path from "path"
 import { default as csvParser } from "csv-parser"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
-import { sortBy } from "../common/common-node"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
+import { cleanName, sortBy } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
@@ -52,7 +52,7 @@ const convert = async (csvData: CSVData[]) => {
         .map((csvPort) => {
             const port = {} as PortBonusJson
             port.id = portNames.get(csvPort.Port) ?? 0
-            port.name = csvPort.Port
+            port.name = cleanName(csvPort.Port)
 
             port.portBonus = {} as PortBonus
             ;["Bonus1", "Bonus2", "Bonus3", "Bonus4", "Bonus5"]
