@@ -61,16 +61,6 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare ships index file.
- * @module    game-tools/compare-ships
- * @author    iB aka Felix Victor
- * @copyright 2020
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
  * @file      Compare ships ship file.
  * @module    game-tools/compare-ships/ship
  * @author    iB aka Felix Victor
