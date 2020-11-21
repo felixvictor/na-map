@@ -45,11 +45,24 @@ const obsoleteBuildings = new Set([
     "Tobacco Plantation",
 ])
 
+const itemIsUsed = new Set([
+    1525, // Labor Contract
+    1939, // Extra Labor Contracts Blueprint
+    2336, // Labor Contract
+    2460, // Additional Outpost Permit Blueprint
+    2461, // Additional dock permit Blueprint
+    2480, // Admiraal de Ruyter Permit Blueprint
+])
+
 let apiItems: APIItemGeneric[]
 
 const getItemsCrafted = (buildingId: number): BuildingResult[] =>
     apiItems
-        .filter((item) => !item.NotUsed && item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
+        .filter(
+            (item) =>
+                (!item.NotUsed || itemIsUsed.has(item.Id)) &&
+                item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId
+        )
         .map((recipe) => ({
             id: recipe.Id,
             name: cleanName(recipe.Name).replace(" Blueprint", ""),

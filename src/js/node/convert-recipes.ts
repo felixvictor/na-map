@@ -30,7 +30,7 @@ interface Ingredient {
 let apiItems: APIItemGeneric[]
 
 // noinspection SpellCheckingInspection
-const groups = new Map([
+const craftGroups = new Map([
     ["AdmiralityShips", "Admirality permits"],
     ["AdmiraltyBooks", "Admirality books"],
     ["AdmiraltyModules", "Admirality modules"],
@@ -49,6 +49,9 @@ const itemIsUsed = new Set([
     1525, // Labor Contract
     1939, // Extra Labor Contracts Blueprint
     2336, // Labor Contract
+    2460, // Additional Outpost Permit Blueprint
+    2461, // Additional dock permit Blueprint
+    2480, // Admiraal de Ruyter Permit Blueprint
 ])
 
 const convertRecipes = async (): Promise<void> => {
@@ -110,7 +113,9 @@ const convertRecipes = async (): Promise<void> => {
                     name: itemNames.get(resultReference.Template),
                     amount: resultReference.Amount,
                 },
-                craftGroup: groups.has(apiRecipe.CraftGroup) ? groups.get(apiRecipe.CraftGroup) : apiRecipe.CraftGroup,
+                craftGroup: craftGroups.has(apiRecipe.CraftGroup)
+                    ? craftGroups.get(apiRecipe.CraftGroup)
+                    : apiRecipe.CraftGroup,
                 serverType: apiRecipe.ServerType,
             } as RecipeEntity
             // if result exists
