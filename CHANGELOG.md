@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.0.2](///compare/v12.0.1...v12.0.2) (2020-11-21)
+
+
+### Bug Fixes
+
+* **common:** Proper currency format 9c01d21
+* **convert:** deRuyter permit can be crafted (November 2020 patch) 12a04c1
+* **convert-port-bonus:** port name clean-up 3d33b64
+* **convert-ship-data:** deRuyter can be crafted (November 2020 patch) 370a4b1
+* **port-bonus:** October 2020 data ddeaf06
+
 ### [12.0.1](///compare/v12.0.0...v12.0.1) (2020-11-14)
 
 ## [12.0.0](///compare/v11.0.0...v12.0.0) (2020-11-14)
