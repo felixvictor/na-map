@@ -20,6 +20,37 @@ const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
 const plankingRatio = 0.2134;
 const crewSpaceRatio = 0.025;
+const shipsWith36lb = new Set([
+    2229,
+    2235,
+    2318,
+]);
+const shipsNotUsed = new Set([
+    1535,
+    1536,
+    2223,
+    2338,
+    2339,
+    2343,
+    2352,
+    2454,
+]);
+const blueprintsNotUsed = new Set([
+    665,
+    746,
+    1558,
+    1718,
+    1719,
+    1720,
+    1721,
+    2031,
+    2213,
+    2228,
+    2236,
+    2239,
+    2381,
+    2382,
+]);
 const shipNames = new Map([
     ["agamemnon", { id: 694, master: [] }],
     ["basiccutter", { id: 413, master: ["cutter"] }],
@@ -194,21 +225,6 @@ const convertGenericShipData = () => {
         .map((cannon) => {
         return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }];
     }));
-    const shipsWith36lb = new Set([
-        2229,
-        2235,
-        2318,
-    ]);
-    const shipsNotUsed = new Set([
-        1535,
-        1536,
-        2223,
-        2338,
-        2339,
-        2343,
-        2352,
-        2454,
-    ]);
     return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)).map((apiShip) => {
         const guns = {
             total: 0,
@@ -393,23 +409,6 @@ const convertAddShipData = (ships) => {
 };
 const convertShipBlueprints = async () => {
     const itemNames = getItemNames();
-    const blueprintsNotUsed = new Set([
-        665,
-        746,
-        1558,
-        1718,
-        1719,
-        1720,
-        1721,
-        2031,
-        2213,
-        2228,
-        2236,
-        2239,
-        2320,
-        2381,
-        2382,
-    ]);
     const apiBlueprints = apiItems.filter((apiItem) => apiItem.ItemType === "RecipeShip" && !blueprintsNotUsed.has(apiItem.Id));
     const shipBlueprints = apiBlueprints
         .map((apiBlueprint) => {

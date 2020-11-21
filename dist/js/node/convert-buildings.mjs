@@ -28,9 +28,18 @@ const obsoleteBuildings = new Set([
     "Sulphur Mine",
     "Tobacco Plantation",
 ]);
+const itemIsUsed = new Set([
+    1525,
+    1939,
+    2336,
+    2460,
+    2461,
+    2480,
+]);
 let apiItems;
 const getItemsCrafted = (buildingId) => apiItems
-    .filter((item) => !item.NotUsed && item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
+    .filter((item) => (!item.NotUsed || itemIsUsed.has(item.Id)) &&
+    item.BuildingRequirements?.[0]?.BuildingTemplate === buildingId)
     .map((recipe) => ({
     id: recipe.Id,
     name: cleanName(recipe.Name).replace(" Blueprint", ""),

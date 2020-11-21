@@ -15,7 +15,7 @@ import { readJson, saveJsonAsync } from "../common/common-file";
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
 import { serverIds } from "../common/servers";
 let apiItems;
-const groups = new Map([
+const craftGroups = new Map([
     ["AdmiralityShips", "Admirality permits"],
     ["AdmiraltyBooks", "Admirality books"],
     ["AdmiraltyModules", "Admirality modules"],
@@ -33,6 +33,9 @@ const itemIsUsed = new Set([
     1525,
     1939,
     2336,
+    2460,
+    2461,
+    2480,
 ]);
 const convertRecipes = async () => {
     const data = {};
@@ -72,7 +75,9 @@ const convertRecipes = async () => {
                 name: itemNames.get(resultReference.Template),
                 amount: resultReference.Amount,
             },
-            craftGroup: groups.has(apiRecipe.CraftGroup) ? groups.get(apiRecipe.CraftGroup) : apiRecipe.CraftGroup,
+            craftGroup: craftGroups.has(apiRecipe.CraftGroup)
+                ? craftGroups.get(apiRecipe.CraftGroup)
+                : apiRecipe.CraftGroup,
             serverType: apiRecipe.ServerType,
         };
         if (recipe.result.name) {
