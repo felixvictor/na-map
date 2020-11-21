@@ -14,10 +14,13 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
 
 import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
+import { hierarchy as d3Hierarchy, HierarchyNode, stratify as d3Stratify } from "d3-hierarchy"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
+import { line as d3Line } from "d3-shape"
+import { voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 import htm from "htm"
 import { h, render } from "preact"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
@@ -28,7 +31,13 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { capitalizeFirstLetter, nations, NationShortName, putImportError } from "../../common/common"
+import {
+    capitalizeFirstLetter,
+    findNationByNationShortName,
+    nations,
+    NationShortName,
+    putImportError,
+} from "../../common/common"
 import { colourGreenDark, colourList, colourRedDark, colourWhite, primary300 } from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "../../common/common-format"
 import {
@@ -161,6 +170,7 @@ export default class DisplayPorts {
     #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gVoronoi!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound!: Bound
     #maxNetIncome!: number
     #maxPortPoints!: number
@@ -381,6 +391,7 @@ export default class DisplayPorts {
         this.#gIcon = this.#gPort.append<SVGGElement>("g").attr("class", "port")
         this.#gText = this.#gPort.append<SVGGElement>("g").attr("class", "port-names")
         this.#gPZ = this.#gPort.append<SVGGElement>("g").attr("class", "pz")
+        this.#gVoronoi = this.#gPort.append<SVGGElement>("g").attr("class", "voronoi")
     }
 
     _setupCounties(): void {
@@ -1040,6 +1051,121 @@ export default class DisplayPorts {
                     .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize)
+
+        const cellLiner = d3Line()
+            .x((d) => d[0])
+            .y((d) => d[1])
+
+        /*
+        const simulation = voronoiMapSimulation(data)
+            .weight((d: PortWithTrades) => d.netIncome)
+            .clip([
+                [this.#lowerBound[0], this.#lowerBound[0]],
+                [this.#lowerBound[0], this.#upperBound[0]],
+                [this.#upperBound[1], this.#upperBound[0]],
+                [this.#upperBound[1], this.#lowerBound[1]],
+            ])
+            .stop()
+
+        let state = simulation.state()
+
+        while (!state.ended) {
+            simulation.tick()
+            state = simulation.state()
+        }
+
+        const { polygons } = state
+
+        const cellLiner = d3Line()
+            .x((d) => d[0])
+            .y((d) => d[1])
+
+        this.#gVoronoi
+            .selectAll("path")
+            .data(polygons)
+            .enter()
+            .append("path")
+            .attr("d", (d) => `${cellLiner(d)}z`)
+        // .style("fill", (d) => fillScale(d.site.originalObject))
+
+ */
+
+        /*
+        const weightedVoronoi = d3WeightedVoronoi()
+            .x((d) => d.coordinates[0])
+            .y((d) => d.coordinates[1])
+            .weight((d: PortWithTrades) => d.netIncome)
+            .clip([
+                [this.#lowerBound[0], this.#lowerBound[0]],
+                [this.#lowerBound[0], this.#upperBound[0]],
+                [this.#upperBound[1], this.#upperBound[0]],
+                [this.#upperBound[1], this.#lowerBound[1]],
+            ])
+
+        const cells = weightedVoronoi(data)
+        this.#gVoronoi
+            .selectAll("path")
+            .data(cells)
+            .enter()
+            .append("path")
+            .attr("d", (d) => `${cellLiner(d)}z`)
+
+         */
+
+        type PortHierarchyId = string | undefined
+        interface PortHierarchy {
+            id: PortHierarchyId
+            netIncome: number
+            parentId: PortHierarchyId
+        }
+        const flatData: PortHierarchy[] = [
+            // Port leaves
+            ...this.#portDataFiltered
+                .filter((port) => port.netIncome !== 0)
+                .map((port) => ({
+                    id: port.name,
+                    netIncome: port.netIncome,
+                    parentId: findNationByNationShortName(port.nation)?.name,
+                })),
+            // Nation nodes
+            ...nations.map((nation) => ({
+                id: nation.name,
+                netIncome: 0,
+                parentId: "World",
+            })),
+            // Root node
+            { id: "World", netIncome: 0, parentId: undefined },
+        ]
+
+        console.log("flatData", flatData)
+        const nestedData = d3Stratify<PortHierarchy>()(flatData)
+        console.log("nestedData", nestedData)
+
+        const tree = d3Hierarchy(nestedData).sum((d: HierarchyNode<PortHierarchy>) => d.data.netIncome)
+        console.log("tree", tree)
+
+        const colourScale = d3ScaleOrdinal<string>().range(colourList)
+        const height = 8192
+        const width = 8192
+        d3VoronoiTreemap().clip([
+            [0, 0],
+            [0, height],
+            [width, height],
+            [width, 0],
+        ])(tree)
+        console.log("tree after", tree)
+        const allNodes = tree.descendants()
+        console.log("allNodes", allNodes)
+        this.#gVoronoi
+            .selectAll("path")
+            .data(allNodes)
+            .enter()
+            .append("path")
+            // @ts-expect-error
+            .attr("d", (d) => `${d3Line()(d.polygon)}z`)
+            .style("fill", (d) => colourScale(d.parent?.data.id))
+            .style("stroke", colourWhite)
+            .style("stroke-width", "5px")
     }
 
     _getTradePortMarker(port: PortWithTrades): string {
