@@ -5834,6 +5834,11 @@ d3-area-label@^1.5.0:
     d3-array "^2.2.0"
     d3-scale "^3.0.0"
 
+d3-array@1.*:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.4.tgz#635ce4d5eea759f6f605863dbcfc30edc737f71f"
+  integrity sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==
+
 d3-array@^2.2.0, d3-array@^2.3.0, d3-array@^2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-2.8.0.tgz#f76e10ad47f1f4f75f33db5fc322eb9ffde5ef23"
@@ -5979,6 +5984,11 @@ d3-shape@^2.0.0:
   resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-2.0.0.tgz#055edb1d170cfe31ab2da8968deee940b56623e6"
   integrity sha512-TO4VLh0/420Y/9dO3+f9abDEFYeCUr2WZRlxJvbp4HPTQcSylXNiL6yZa9FIUvV1yRiFufl1bszTCLDqv9PWNA==
 
+d3-timer@1.*:
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.10.tgz#dfe76b8a91748831b13b6d9c793ffbd508dd9de5"
+  integrity sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==
+
 d3-tip@^0.9.1:
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/d3-tip/-/d3-tip-0.9.1.tgz#84e6d331c4e6650d80c5228a07e41820609ab64b"
@@ -5997,6 +6007,33 @@ d3-transition@2, d3-transition@^2.0.0:
     d3-ease "1 - 2"
     d3-interpolate "1 - 2"
     d3-timer "1 - 2"
+
+d3-voronoi-map@2.*:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/d3-voronoi-map/-/d3-voronoi-map-2.1.0.tgz#b2063aa448dff2e737267d3da5d688496cd083dc"
+  integrity sha512-bio7//n7zy+eD6WxZv6sUBFieY7RtxYHpSv313UGl4YnPmi/h3XrV55IOdRKyaAak6dd8hEEcKqaGAgsiJIO+Q==
+  dependencies:
+    d3-dispatch "1.*"
+    d3-polygon "1.*"
+    d3-timer "1.*"
+    d3-weighted-voronoi "1.*"
+
+d3-voronoi-treemap@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/d3-voronoi-treemap/-/d3-voronoi-treemap-1.1.1.tgz#c6f968bccb6a5a30fa50a7639dfdaecad6c4d72c"
+  integrity sha512-uXziZJV7KgfO6BuUdgMh1dKV3YkBW/FaA/FfxTHHJN1k1sc0e3FxacfKFRTv9+RsSsuNC74ovdL+UNs1HhFJIw==
+  dependencies:
+    d3-array "1.*"
+    d3-polygon "1.*"
+    d3-voronoi-map "2.*"
+
+d3-weighted-voronoi@1.*, d3-weighted-voronoi@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/d3-weighted-voronoi/-/d3-weighted-voronoi-1.1.0.tgz#4214cf040a419086ea39d9fec76a88ab478cd4e6"
+  integrity sha512-SKabTQ5ID9h49AVMZ0+kJm7Bqb8FiAn2Iam6HtU7xXOmyO6jYre89xrmqlax3XTtrHHBX4XLMFWmgyRNhNqFJA==
+  dependencies:
+    d3-array "1.*"
+    d3-polygon "1.*"
 
 d3-zoom@^2.0.0:
   version "2.0.0"
