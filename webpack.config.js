@@ -575,7 +575,6 @@ if (isProduction) {
     ]
 } else {
     config.devtool = "eval-source-map"
-    config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
 module.exports = () => config
