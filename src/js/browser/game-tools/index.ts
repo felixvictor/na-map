@@ -20,11 +20,13 @@ import ListLoot from "./list-loot"
 import ListModules from "./list-modules"
 import ListPortBattles from "./list-pb"
 import ListPortBonus from "./list-port-bonus"
-import ListPortOwnerships from "./list-port-ownerships"
 import ListRecipes from "./list-recipes"
 import ListShips from "./list-ships"
 import ListShipBlueprints from "./list-ship-blueprints"
 import ListWoods from "./list-woods"
+
+import ShowIncomeMap from "./show-income-map"
+import ShowPortOwnerships from "./show-port-ownerships"
 
 import "../../../scss/game-tools.scss"
 
@@ -58,10 +60,12 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
     void new ListModules()
     void new ListPortBattles(serverId)
     void new ListPortBonus(serverId)
-    void new ListPortOwnerships(serverId)
     void new ListRecipes(serverId)
     void new ListShips()
     void new ListShipBlueprints()
+
+    void new ShowIncomeMap(serverId)
+    void new ShowPortOwnerships(serverId)
 }
 
 export { init }
