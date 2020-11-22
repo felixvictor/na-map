@@ -12,32 +12,21 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select/js/bootstrap-select"
-import { extent as d3Extent, max as d3Max, min as d3Min } from "d3-array"
 import { hierarchy as d3Hierarchy, HierarchyNode, stratify as d3Stratify } from "d3-hierarchy"
-import {
-    scaleLinear as d3ScaleLinear,
-    ScaleOrdinal,
-    scaleOrdinal as d3ScaleOrdinal,
-    scaleTime as d3ScaleTime,
-} from "d3-scale"
+import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
-import { line as d3Line } from "d3-shape"
 import { voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 
 import { registerEvent } from "../analytics"
-import {
-    findNationByNationShortName,
-    NationFullName,
-    nations,
-    NationShortName,
-    putImportError,
-} from "../../common/common"
+import { findNationByName, findNationByNationShortName, nations, putImportError } from "../../common/common"
 import { colourList, insertBaseModal } from "../../common/common-browser"
 import { getContrastColour } from "../../common/common-game-tools"
 
-import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
 import { DataSource, HtmlString } from "../../common/interface"
+import { formatSiCurrency } from "../../common/common-format"
+import { simpleStringSort } from "../../common/common-node"
+import { max as d3Max, min as d3Min } from "d3-array"
 
 type PortIncome = PortBasic & PortPerServer & PortBattlePerServer
 interface ReadData {
@@ -49,7 +38,7 @@ interface ReadData {
 type PortHierarchyId = string | undefined
 interface PortHierarchy {
     id: PortHierarchyId
-    netIncome: number
+    value: number
     parentId: PortHierarchyId
 }
 
@@ -57,6 +46,8 @@ interface PortHierarchy {
  *
  */
 export default class ShowIncomeMap {
+    #height = 1000
+    #width = 1000
     #nestedData = {} as HierarchyNode<PortHierarchy>
     #tree = {} as HierarchyNode<HierarchyNode<PortHierarchy>>
     #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
@@ -68,6 +59,7 @@ export default class ShowIncomeMap {
     readonly #buttonId: HtmlString
     readonly #modalId: HtmlString
     readonly #colourScale: ScaleOrdinal<string, string>
+    #fontScale = {} as ScaleLinear<number, number>
 
     constructor(serverId: string) {
         this.#serverId = serverId
@@ -110,30 +102,40 @@ export default class ShowIncomeMap {
             return combinedData
         })
 
+        const minIncome = d3Min(portData, (d) => d.netIncome) ?? 0
+        const maxIncome = d3Max(portData, (d) => d.netIncome) ?? 0
+        this.#fontScale = d3ScaleLinear().domain([minIncome, maxIncome]).range([6, 36]).clamp(true)
+
+        const nationWithoutIncome = new Set(["NT", "FT"])
+        const nationWithIncome = new Set()
+        console.log("nationsWithoutIncome", nationWithoutIncome)
+
         const flatData: PortHierarchy[] = [
             // Port leaves
             ...portData
-                .filter((port) => port.netIncome !== 0)
-                .map((port) => ({
-                    id: port.name,
-                    netIncome: port.netIncome,
-                    parentId: findNationByNationShortName(port.nation)?.name,
-                })),
+                .filter((port) => port.netIncome > 0 && !nationWithoutIncome.has(port.nation))
+                .map((port) => {
+                    nationWithIncome.add(port.nation)
+                    return {
+                        id: port.name,
+                        value: port.netIncome,
+                        parentId: findNationByNationShortName(port.nation)?.name,
+                    }
+                }),
             // Nation nodes
-            ...nations.map((nation) => ({
-                id: nation.name,
-                netIncome: 0,
-                parentId: "World",
-            })),
+            ...nations
+                .filter((nation) => nationWithIncome.has(nation.short))
+                .map((nation) => ({
+                    id: nation.name,
+                    value: 0,
+                    parentId: "World",
+                })),
             // Root node
-            { id: "World", netIncome: 0, parentId: undefined },
+            { id: "World", value: 0, parentId: undefined },
         ]
 
-        console.log("flatData", flatData)
         this.#nestedData = d3Stratify<PortHierarchy>()(flatData)
-        console.log("nestedData", this.#nestedData)
-
-        this.#tree = d3Hierarchy(this.#nestedData).sum((d: HierarchyNode<PortHierarchy>) => d.data.netIncome)
+        this.#tree = d3Hierarchy(this.#nestedData).sum((d: HierarchyNode<PortHierarchy>) => d.data.value)
     }
 
     async _loadData(): Promise<ReadData> {
@@ -194,43 +196,46 @@ export default class ShowIncomeMap {
         const legendHeight = 13
         const interLegend = 4
         const colorWidth = legendHeight * 6
-        const nations = this.#nestedData.children?.reverse() ?? []
+        const legendsMinY = this.#height + 200
+
+        const nations = (this.#nestedData.children ?? []).sort((a, b) =>
+            simpleStringSort(findNationByName(b.id as string)?.sortName, findNationByName(a.id as string)?.sortName)
+        )
 
         const legendContainer = this.#mainG
             .append("g")
-            .classed("legend", true)
-            .attr("transform", `translate(${[0, legendsMinY]})`)
+            .attr("class", "legend")
+            .attr("transform", `translate(0,${legendsMinY})`)
 
         const legends = legendContainer.selectAll(".legend").data(nations).enter()
 
         const legend = legends
             .append("g")
-            .classed("legend", true)
-            .attr("transform", function (d, i) {
-                return `translate(${[0, -i * (legendHeight + interLegend)]})`
+            .attr("class", "legend")
+            .attr("transform", (d, i) => {
+                return `translate(0,-${i * (legendHeight + interLegend)})`
             })
 
         legend
             .append("rect")
-            .classed("legend-color", true)
+            .attr("class", "legend-color")
             .attr("y", -legendHeight)
             .attr("width", colorWidth)
             .attr("height", legendHeight)
-            .style("fill", function (d) {
-                return d.color
+            .style("fill", (d) => {
+                console.log("legend", d, this.#colourScale(d.id as string))
+                return this.#colourScale(d.id as string)
             })
         legend
             .append("text")
-            .classed("tiny", true)
-            .attr("transform", `translate(${[colorWidth + 5, -2]})`)
-            .text(function (d) {
-                return d.name
-            })
+            .attr("class", "tiny")
+            .attr("transform", `translate(${colorWidth + 5},-2)`)
+            .text((d) => `${d.id} (${d.data.value})`)
 
         legendContainer
             .append("text")
-            .attr("transform", `translate(${[0, -nations.length * (legendHeight + interLegend) - 5]})`)
-            .text("Continents")
+            .attr("transform", `translate(0,-${nations.length * (legendHeight + interLegend) - 5})`)
+            .text("Nations")
     }
 
     _drawTreemap(): void {
@@ -238,87 +243,74 @@ export default class ShowIncomeMap {
 
         const cells = this.#mainG
             .append("g")
-            .classed("cells", true)
-            .attr("transform", `translate(${[-treemapRadius, -treemapRadius]})`)
+            .attr("class", "cells")
             .selectAll(".cell")
             .data(leaves)
             .enter()
             .append("path")
-            .classed("cell", true)
-            .attr("d", function (d) {
-                return `M${d.polygon.join(",")}z`
-            })
-            .style("fill", function (d) {
-                return d.parent.data.color
-            })
+            .attr("class", "cell")
+            .attr("d", (d) => `M${d.polygon.join(",")}z`)
+            .style("fill", (d) => this.#colourScale(d.parent?.data.id as string))
 
         const labels = this.#mainG
             .append("g")
-            .classed("labels", true)
-            .attr("transform", `translate(${[-treemapRadius, -treemapRadius]})`)
+            .attr("class", "labels")
             .selectAll(".label")
             .data(leaves)
             .enter()
             .append("g")
-            .classed("label", true)
-            .attr("transform", function (d) {
-                return `translate(${[d.polygon.site.x, d.polygon.site.y]})`
+            .attr("class", "label")
+            .attr("transform", (d) => {
+                return `translate(${d.polygon.site.x},${d.polygon.site.y})`
             })
-            .style("font-size", function (d) {
-                return fontScale(d.data.weight)
+            .style("font-size", (d) => this.#fontScale(d.data.data.value))
+            .style("fill", (d) => {
+                return getContrastColour(this.#colourScale(d.parent?.data.id as string))
             })
 
         labels
             .append("text")
-            .classed("name", true)
-            .html(function (d) {
-                return d.data.weight < 1 ? d.data.code : d.data.name
-            })
+            .attr("class", "name")
+            .text((d) => d.data.data.id as string)
         labels
             .append("text")
-            .classed("value", true)
-            .text(function (d) {
-                return `${d.data.weight}%`
-            })
+            .attr("class", "value")
+            .html((d) => formatSiCurrency(d.data.data.value))
 
         const hoverers = this.#mainG
             .append("g")
-            .classed("hoverers", true)
-            .attr("transform", `translate(${[-treemapRadius, -treemapRadius]})`)
+            .attr("class", "hoverers")
             .selectAll(".hoverer")
             .data(leaves)
             .enter()
             .append("path")
-            .classed("hoverer", true)
-            .attr("d", function (d) {
+            .attr("class", "hoverer")
+            .attr("d", (d) => {
                 return `M${d.polygon.join(",")}z`
             })
 
-        hoverers.append("title").text(function (d) {
-            return `${d.data.name}\n${d.value}%`
-        })
+        hoverers.append("title").html((d) => `${d.data.id}\n${formatSiCurrency(d.data.data.value)}`)
     }
 
-    _drawMap(): void {
+    _initTreemap(): void {
         const body = d3Select(`#${this.#modalId} .modal-body`)
 
         this.#mainDiv = body.append("div").attr("id", `${this.#baseId}`)
-        // const height = ShowIncomeMap.getHeight()
-        const height = 500
-        // const width = this._getWidth()
-        const width = 500
 
-        this.#svg = this.#mainDiv.append("svg").attr("class", "voronoi").attr("width", width).attr("height", height)
-        this.#mainG = this.#svg.append("g").classed("drawingArea", true)
+        this.#svg = this.#mainDiv
+            .append("svg")
+            .attr("class", "voronoi")
+            .attr("width", this.#width)
+            .attr("height", this.#height + 300)
+        this.#mainG = this.#svg.append("g").attr("class", "drawingArea")
 
         d3VoronoiTreemap().clip([
             [0, 0],
-            [0, height],
-            [width, height],
-            [width, 0],
+            [0, this.#height],
+            [this.#width, this.#height],
+            [this.#width, 0],
         ])(this.#tree)
         console.log("tree after", this.#tree)
-        this._drawTreemap()
     }
 
     /**
@@ -327,7 +319,9 @@ export default class ShowIncomeMap {
     _injectModal(): void {
         insertBaseModal({ id: this.#modalId, title: this.#baseName })
 
-        this._drawMap()
+        this._initTreemap()
+        this._drawLegends()
+        this._drawTreemap()
     }
 
     /**
