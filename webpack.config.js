@@ -357,7 +357,7 @@ const config = {
                 return "script"
             },
         }),
-        new SitemapPlugin(targetUrl, sitemapPaths, { skipGzip: false }),
+        new SitemapPlugin({ base: targetUrl, paths: sitemapPaths, options: { skipGzip: false } }),
         /*
         new SriPlugin({
             hashFuncNames: ["sha384"],

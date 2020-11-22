@@ -51,6 +51,39 @@ const plankingRatio = 0.2134
 const crewSpaceRatio = 0.025
 
 // noinspection SpellCheckingInspection
+const shipsWith36lb = new Set([
+    2229, // Redoutable (i)
+    2235, // Implacable
+    2318, // Admiraal de Ruyter
+])
+const shipsNotUsed = new Set([
+    1535, // rookie brig
+    1536, // rookie snow
+    2223, // indiaman rookie
+    2338, // tutorial cerberus
+    2339, // tutorial trader
+    2343, // tutorial brig
+    2352, // Diana (i)
+    2454, // tutorial brig 2
+])
+const blueprintsNotUsed = new Set([
+    665, // Santa Cecilia
+    746, // GunBoat
+    1558, // L'Hermione
+    1718, // Diana
+    1719, // Hercules
+    1720, // Pandora
+    1721, // Le Requin
+    2031, // Rättvisan
+    2213, // Leopard
+    2228, // Redoutable
+    2236, // Yacht
+    2239, // Yacht silver
+    2381, // Diana (i)
+    2382, // Victory1765
+])
+
+// noinspection SpellCheckingInspection
 /**
  * Maps the ship name (lower case for the file name) to the ship id
  */
@@ -281,23 +314,6 @@ const convertGenericShipData = (): ShipData[] => {
                 return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }]
             })
     )
-
-    // noinspection SpellCheckingInspection
-    const shipsWith36lb = new Set([
-        2229, // Redoutable (i)
-        2235, // Implacable
-        2318, // Admiraal de Ruyter
-    ])
-    const shipsNotUsed = new Set([
-        1535, // rookie brig
-        1536, // rookie snow
-        2223, // indiaman rookie
-        2338, // tutorial cerberus
-        2339, // tutorial trader
-        2343, // tutorial brig
-        2352, // Diana (i)
-        2454, // tutorial brig 2
-    ])
 
     return ((apiItems.filter(
         (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
@@ -557,23 +573,7 @@ const convertAddShipData = (ships: ShipData[]): ShipData[] => {
  */
 const convertShipBlueprints = async (): Promise<void> => {
     const itemNames = getItemNames()
-    const blueprintsNotUsed = new Set([
-        665, // Santa Cecilia
-        746, // GunBoat
-        1558, // L'Hermione
-        1718, // Diana
-        1719, // Hercules
-        1720, // Pandora
-        1721, // Le Requin
-        2031, // Rättvisan
-        2213, // Leopard
-        2228, // Redoutable
-        2236, // Yacht
-        2239, // Yacht silver
-        2320, // Admiraal de Ruyter
-        2381, // Diana (i)
-        2382, // Victory1765
-    ])
+
     const apiBlueprints = (apiItems.filter(
         (apiItem) => apiItem.ItemType === "RecipeShip" && !blueprintsNotUsed.has(apiItem.Id)
     ) as unknown) as APIShipBlueprint[]

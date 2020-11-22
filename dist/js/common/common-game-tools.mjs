@@ -12,7 +12,7 @@ import Hashids from "hashids";
 import htm from "htm";
 import { h } from "preact";
 import { colourWhite } from "./common-browser";
-import { formatLocale } from "./common-format";
+import { formatInt, formatLocale } from "./common-format";
 const html = htm.bind(h);
 export const hullRepairsPercent = Number(REPAIR_ARMOR_PERCENT);
 export const hullRepairsVolume = Number(REPAIR_ARMOR_VOLUME);
@@ -60,7 +60,7 @@ export const getBaseModalHTML = ({ id, title, size = "modal-xl", body, footer })
         </div>
     `;
 };
-export const getCurrencyAmount = (amount) => `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`;
+export const getCurrencyAmount = (amount) => `${formatInt(Number(amount))}\u00A0real${Number(amount) > 1 ? "es" : ""}`;
 export const getContrastColour = (colour) => {
     const { r, g, b } = d3Rgb(colour);
     const yiq = (r * 299 + g * 587 + b * 114) / 1000;

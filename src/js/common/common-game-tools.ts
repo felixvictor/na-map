@@ -14,7 +14,7 @@ import htm from "htm"
 import { h } from "preact"
 
 import { colourWhite } from "./common-browser"
-import { formatLocale } from "./common-format"
+import { formatInt, formatLocale } from "./common-format"
 import { BaseModalHtml, HtmlResult, HtmlString } from "./interface"
 
 const html = htm.bind(h)
@@ -102,7 +102,7 @@ export const getBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }:
  * Get formatted currency string
  */
 export const getCurrencyAmount = (amount: number | string): string =>
-    `${amount}\u00A0real${Number(amount) > 1 ? "s" : ""}`
+    `${formatInt(Number(amount))}\u00A0real${Number(amount) > 1 ? "es" : ""}`
 
 export const getContrastColour = (colour: string): string => {
     const { r, g, b } = d3Rgb(colour)

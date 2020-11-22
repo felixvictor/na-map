@@ -11,8 +11,8 @@ import * as fs from "fs";
 import path from "path";
 import { default as csvParser } from "csv-parser";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
-import { sortBy } from "../common/common-node";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
+import { cleanName, sortBy } from "../common/common-node";
 import { serverIds } from "../common/servers";
 let apiPorts = [];
 let portNames = {};
@@ -33,7 +33,7 @@ const convert = async (csvData) => {
         .map((csvPort) => {
         const port = {};
         port.id = portNames.get(csvPort.Port) ?? 0;
-        port.name = csvPort.Port;
+        port.name = cleanName(csvPort.Port);
         port.portBonus = {};
         ["Bonus1", "Bonus2", "Bonus3", "Bonus4", "Bonus5"]
             .filter((bonusEntry) => csvPort[bonusEntry] !== "Empty")
