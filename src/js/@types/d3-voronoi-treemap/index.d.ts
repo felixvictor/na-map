@@ -9,7 +9,8 @@ declare module "d3-voronoi-treemap" {
     }
 
     interface VoronoiTreemapF extends Function {
-        clip: (p: ClippingPolygon) => VoronoiTreemapF
+        clip: (polygon: ClippingPolygon) => VoronoiTreemapF
+        minWeightRatio: (ratio: number) => VoronoiTreemapF
     }
 
     export function voronoiTreemap(): VoronoiTreemapF
