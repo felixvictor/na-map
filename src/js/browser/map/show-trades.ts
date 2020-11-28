@@ -538,7 +538,7 @@ export default class ShowTrades {
                     placement: "auto",
                     template:
                         '<div class="tooltip" role="tooltip">' +
-                        '<div class="tooltip-block tooltip-inner tooltip-small">' +
+                        '<div class="tooltip-block tooltip-inner tooltip-inner-small">' +
                         "</div></div>",
                     title,
                     trigger: "manual",

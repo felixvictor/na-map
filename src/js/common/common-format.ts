@@ -8,51 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { formatLocale as d3FormatLocale } from "d3-format"
+import { formatLocale as d3FormatLocale, FormatLocaleDefinition } from "d3-format"
 import htm from "htm"
 import { h } from "preact"
-import { HtmlResult, HtmlString } from "./interface"
+import { HtmlResult, HtmlString, SVGString } from "./interface"
 
 const html = htm.bind(h)
-
-/**
- * Specification of locale to use when creating a new FormatLocaleObject
- */
-interface FormatLocaleDefinition {
-    /**
-     * The decimal point (e.g., ".")
-     */
-    decimal: string
-    /**
-     * The group separator (e.g., ","). Note that the thousands property is a misnomer, as
-     * the grouping definition allows groups other than thousands.
-     */
-    thousands: string
-    /**
-     * The array of group sizes (e.g., [3]), cycled as needed.
-     */
-    grouping: number[]
-    /**
-     * The currency prefix and suffix (e.g., ["$", ""]).
-     */
-    currency: [string, string]
-    /**
-     * An optional array of ten strings to replace the numerals 0-9.
-     */
-    numerals?: string[]
-    /**
-     * An optional symbol to replace the `percent` suffix; the percent suffix (defaults to "%").
-     */
-    percent?: string
-    /**
-     * optional; the minus sign (defaults to hyphen-minus, "-")
-     */
-    minus?: string
-    /**
-     * optional; the not-a-number value (defaults "NaN")
-     */
-    nan?: string
-}
 
 /**
  * Default format
@@ -139,6 +100,7 @@ export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x
 export const formatPP = (x: number, f = 0): string => formatLocale.format(`,.${f}%`)(x).replace("%", "pp")
 
 const mSpan = '<span class="caps">m</span>'
+const mTSpan = '<tspan class="caps">m</tspan>'
 
 /**
  * Format integer with SI suffix
@@ -171,13 +133,14 @@ export const formatSiIntHtml = (x: number): HtmlResult => {
 /**
  * Format currency with SI suffix
  * @param   x - Integer
+ * @param svg - True when tspan for SVG needed
  * @returns Formatted Integer
  */
-export const formatSiCurrency = (x: number): HtmlString =>
+export const formatSiCurrency = (x: number, svg = false): HtmlString | SVGString =>
     formatLocale
         .format("$,.2s")(x)
         .replace(".0", "")
-        .replace("M", '\u2009<span class="caps">m</span>')
+        .replace("M", `\u2009${svg ? mTSpan : mSpan}`)
         .replace("k", "\u2009k")
 
 /**
@@ -187,6 +150,14 @@ export const formatSiCurrency = (x: number): HtmlString =>
  * @returns Formatted percent value
  */
 export const formatPercent = (x: number, f = 1): string => formatLocale.format(`.${f}%`)(x).replace(".0", "")
+
+/**
+ * Format percent value with SI suffix
+ * @param   x - Percent
+ * @param   s - Significant digits
+ * @returns Formatted percent value
+ */
+export const formatPercentSig = (x: number, s = 1): string => formatLocale.format(`.${s}p`)(x)
 
 /**
  * Format percent value with +/- sign
