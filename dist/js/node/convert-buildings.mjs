@@ -35,6 +35,7 @@ const itemIsUsed = new Set([
     2460,
     2461,
     2480,
+    2482,
 ]);
 let apiItems;
 const getItemsCrafted = (buildingId) => apiItems

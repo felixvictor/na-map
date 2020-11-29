@@ -36,6 +36,7 @@ const itemIsUsed = new Set([
     2460,
     2461,
     2480,
+    2482,
 ]);
 const convertRecipes = async () => {
     const data = {};

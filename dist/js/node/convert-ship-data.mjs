@@ -39,7 +39,6 @@ const blueprintsNotUsed = new Set([
     665,
     746,
     1558,
-    1718,
     1719,
     1720,
     1721,
