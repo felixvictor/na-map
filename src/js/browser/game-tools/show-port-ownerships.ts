@@ -43,7 +43,7 @@ import { Group } from "timelines-chart"
 /**
  *
  */
-export default class ListPortOwnerships {
+export default class ShowPortOwnerships {
     #serverId!: string
     private readonly _baseName: string
     private readonly _baseId: HtmlString
@@ -199,7 +199,7 @@ export default class ListPortOwnerships {
 
         const width = this._getWidth()
         const maxHeight = 1000
-        const height = Math.min(maxHeight, ListPortOwnerships.getHeight())
+        const height = Math.min(maxHeight, ShowPortOwnerships.getHeight())
         const margin = { right: 32, bottom: 32, left: 32 }
 
         const keys = nations.filter((nation) => nation.id !== 9).map((nation) => nation.short)

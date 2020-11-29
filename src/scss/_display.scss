@@ -811,6 +811,25 @@ $wind-profile-colour: $overlay-text-colour;
     min-width: 30rem;
 }
 
-.tooltip-small {
+.tooltip-inner-small {
     min-width: 20rem !important;
+}
+
+.tooltip-inner-smaller {
+    min-width: 10rem !important;
+    p {
+        margin: 0;
+    }
+}
+
+.svg-text {
+    text {
+        pointer-events: none;
+        stroke: none;
+        text-anchor: start;
+        dominant-baseline: mathematical;
+    }
+    .rect-background {
+        opacity: 0.2;
+    }
 }

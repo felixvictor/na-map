@@ -18,6 +18,7 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 // import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
+import { line as d3Line } from "d3-shape"
 import htm from "htm"
 import { h, render } from "preact"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
@@ -28,7 +29,13 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { capitalizeFirstLetter, nations, NationShortName, putImportError } from "../../common/common"
+import {
+    capitalizeFirstLetter,
+    findNationByNationShortName,
+    nations,
+    NationShortName,
+    putImportError,
+} from "../../common/common"
 import { colourGreenDark, colourList, colourRedDark, colourWhite, primary300 } from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "../../common/common-format"
 import {
@@ -161,6 +168,7 @@ export default class DisplayPorts {
     #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gVoronoi!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound!: Bound
     #maxNetIncome!: number
     #maxPortPoints!: number

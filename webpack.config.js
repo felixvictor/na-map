@@ -121,7 +121,7 @@ const babelOpt = {
     ],
 }
 
-const cssOpt = {
+const cssLoaderOpt = {
     sourceMap: !isProduction,
 }
 
@@ -141,14 +141,14 @@ const htmlMinifyOpt = {
     useShortDoctype: true,
 }
 
-const postcssOpt = {
+const postcssLoaderOpt = {
     postcssOptions: {
         config: filePostcssConfig,
     },
     sourceMap: true,
 }
 
-const sassOpt = {
+const sassLoaderOpt = {
     sourceMap: !isProduction,
     sassOptions: {
         outputStyle: "expanded",
@@ -259,6 +259,13 @@ const faviconsOpt = {
 const MiniCssExtractPluginOpt = {
     esModule: true,
 }
+
+const getSvgLoaderOpt = (path) => ({
+    esModule: false,
+    limit: 1000,
+    name: "[name].[ext]",
+    outputPath: path,
+})
 
 const config = {
     devServer: {
@@ -407,15 +414,15 @@ const config = {
                     },
                     {
                         loader: "css-loader",
-                        options: cssOpt,
+                        options: cssLoaderOpt,
                     },
                     {
                         loader: "postcss-loader",
-                        options: postcssOpt,
+                        options: postcssLoaderOpt,
                     },
                     {
                         loader: "sass-loader",
-                        options: sassOpt,
+                        options: sassLoaderOpt,
                     },
                 ],
             },
@@ -428,11 +435,11 @@ const config = {
                     },
                     {
                         loader: "css-loader",
-                        options: cssOpt,
+                        options: cssLoaderOpt,
                     },
                     {
                         loader: "postcss-loader",
-                        options: postcssOpt,
+                        options: postcssLoaderOpt,
                     },
                 ],
             },
@@ -453,11 +460,7 @@ const config = {
                 use: [
                     {
                         loader: "svg-url-loader",
-                        options: {
-                            limit: 1000,
-                            name: "[name].[ext]",
-                            outputPath: "images/flags/",
-                        },
+                        options: getSvgLoaderOpt("images/flags/"),
                     },
                     {
                         loader: "image-webpack-loader",
@@ -487,11 +490,7 @@ const config = {
                 use: [
                     {
                         loader: "svg-url-loader",
-                        options: {
-                            limit: 1000,
-                            name: "[name].[ext]",
-                            outputPath: "icons/",
-                        },
+                        options: getSvgLoaderOpt("icons/"),
                     },
                     {
                         loader: "image-webpack-loader",
@@ -575,7 +574,6 @@ if (isProduction) {
     ]
 } else {
     config.devtool = "eval-source-map"
-    config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
 module.exports = () => config
