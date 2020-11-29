@@ -12,21 +12,19 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import "bootstrap/js/dist/tooltip"
 
-import "bootstrap-select/js/bootstrap-select"
 import { hierarchy as d3Hierarchy, HierarchyNode, stratify as d3Stratify } from "d3-hierarchy"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { Point, voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 
 import { registerEvent } from "../analytics"
-import { findNationByName, findNationByNationShortName, nations, putImportError } from "../../common/common"
+import { findNationByNationShortName, nations, putImportError } from "../../common/common"
 import { colourList, insertBaseModal } from "../../common/common-browser"
 import { getContrastColour } from "../../common/common-game-tools"
 
-import { PortBasic, PortBattlePerServer, PortPerServer, PortWithTrades } from "../../common/gen-json"
+import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
 import { DataSource, HtmlString } from "../../common/interface"
-import { formatPercent, formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
-import { simpleStringSort } from "../../common/common-node"
+import { formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { max as d3Max, min as d3Min } from "d3-array"
 import { Vertex } from "d3-weighted-voronoi"
 import JQuery from "jquery"
@@ -60,8 +58,8 @@ interface PortHierarchy {
  *
  */
 export default class ShowIncomeMap {
-    #height = 1000
-    #width = 1000
+    #height = 0
+    #width = 0
     #nestedData = {} as HierarchyNode<PortHierarchy>
     #tree = {} as TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>
     #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
@@ -103,10 +101,6 @@ export default class ShowIncomeMap {
      * Get width of baseId
      */
     _getWidth(): number {
-        console.log(
-            (this.#mainDiv.node()?.parentNode as HTMLDivElement).getBoundingClientRect(),
-            (this.#mainDiv.node()?.parentNode as HTMLDivElement).offsetWidth
-        )
         return Math.floor((this.#mainDiv.node() as HTMLDivElement).offsetWidth) ?? 0
     }
 
@@ -126,7 +120,6 @@ export default class ShowIncomeMap {
 
         const nationWithoutIncomeData = new Set(["NT", "FT"])
         const nationWithIncome = new Set()
-        console.log("nationsWithoutIncome", nationWithoutIncomeData)
 
         const flatData: PortHierarchy[] = [
             // Port leaves
@@ -213,45 +206,33 @@ export default class ShowIncomeMap {
     }
 
     _drawLegends(): void {
-        const legendHeight = 13
-        const interLegend = 4
-        const colorWidth = legendHeight * 6
-        const legendsMinY = this.#height + 200
+        const legendHeight = 20
+        const colorWidth = legendHeight * 3
 
-        const nations = (this.#tree.children ?? []).sort((a, b) =>
-            simpleStringSort(
-                findNationByName(b.data.id as string)?.sortName,
-                findNationByName(a.data.id as string)?.sortName
-            )
-        )
+        const nations = (this.#tree.children ?? []).sort((a, b) => (b.value as number) - (a.value as number))
 
-        const legendContainer = this.#mainG
-            .append("g")
-            .attr("class", "legend")
-            .attr("transform", `translate(0,${legendsMinY})`)
+        const legendContainer = this.#mainDiv
+            .append("div")
+            .attr("class", "d-flex justify-content-between flex-wrap mb-3")
 
         legendContainer
             .selectAll(".legend")
             .data(nations)
             .join((enter) => {
-                const g = enter
-                    .append("g")
-                    .attr("class", "legend")
-                    .attr("transform", (d, i) => {
-                        return `translate(0,-${i * (legendHeight + interLegend)})`
-                    })
+                const g = enter.append("div")
 
-                g.append("rect")
+                g.append("svg")
+                    .attr("width", colorWidth)
+                    .attr("height", legendHeight)
+                    .append("rect")
                     .attr("class", "legend-color")
-                    .attr("y", -legendHeight)
                     .attr("width", colorWidth)
                     .attr("height", legendHeight)
                     .style("fill", (d) => this.#colourScale(d.data.id as string))
 
-                g.append("text")
-                    .attr("class", "tiny")
-                    .attr("transform", `translate(${colorWidth + 5},-2)`)
-                    .html((d) => `${d.data.id as string} (${formatSiCurrency(d.value as number, true)})`)
+                g.append("div").html(
+                    (d) => `${d.data.id as string}<br />(${formatSiCurrency(d.value as number, true)})`
+                )
 
                 return g
             })
@@ -349,15 +330,14 @@ export default class ShowIncomeMap {
     }
 
     _initTreemap(): void {
-        const body = d3Select(`#${this.#modalId} .modal-body`)
-
-        this.#mainDiv = body.append("div").attr("id", `${this.#baseId}`)
+        this.#height = ShowIncomeMap.getHeight()
+        this.#width = this._getWidth()
 
         this.#svg = this.#mainDiv
             .append("svg")
             .attr("class", "voronoi")
             .attr("width", this.#width)
-            .attr("height", this.#height + 300)
+            .attr("height", this.#height)
         this.#mainG = this.#svg.append("g").attr("class", "drawingArea")
 
         d3VoronoiTreemap()
@@ -376,9 +356,8 @@ export default class ShowIncomeMap {
     _injectModal(): void {
         insertBaseModal({ id: this.#modalId, title: this.#baseName })
 
-        this._initTreemap()
-        this._drawLegends()
-        this._drawTreemap()
+        const body = d3Select(`#${this.#modalId} .modal-body`)
+        this.#mainDiv = body.append("div").attr("id", `${this.#baseId}`)
     }
 
     /**
@@ -392,12 +371,25 @@ export default class ShowIncomeMap {
      * Action when menu item is clicked
      */
     _incomeListSelected(): void {
+        let emptyModal = false
+
         // If the modal has no content yet, insert it
         if (!document.querySelector(`#${this.#modalId}`)) {
+            emptyModal = true
             this._initModal()
         }
 
         // Show modal
-        $(`#${this.#modalId}`).modal("show")
+        $(`#${this.#modalId}`)
+            .on("shown.bs.modal", () => {
+                // Inject chart after modal is shown to calculate modal width
+                if (emptyModal) {
+                    emptyModal = false
+                    this._initTreemap()
+                    this._drawTreemap()
+                    this._drawLegends()
+                }
+            })
+            .modal("show")
     }
 }
