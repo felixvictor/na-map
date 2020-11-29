@@ -32,12 +32,13 @@ export const formatIntTrunc = (x) => formatLocale.format(",d")(x === 0 ? 0 : x -
 export const formatSignInt = (x) => formatLocale.format("+,d")(x).replace("+", "\u002B\u200A");
 export const formatPP = (x, f = 0) => formatLocale.format(`,.${f}%`)(x).replace("%", "pp");
 const mSpan = '<span class="caps">m</span>';
-export const formatSiInt = (x) => formatLocale
+const mTSpan = '<tspan class="caps">m</tspan>';
+export const formatSiInt = (x, svg = false) => formatLocale
     .format(",.2s")(x)
     .replace(".0", "")
     .replace("k", "\u2009k")
     .replace("m", "\u2009m")
-    .replace("M", `\u2009${mSpan}`);
+    .replace("M", `\u2009${svg ? mTSpan : mSpan}`);
 export const formatSiIntHtml = (x) => {
     const string = formatSiInt(x);
     if (string.endsWith(mSpan)) {
@@ -45,11 +46,12 @@ export const formatSiIntHtml = (x) => {
     }
     return html `${string}`;
 };
-export const formatSiCurrency = (x) => formatLocale
+export const formatSiCurrency = (x, svg = false) => formatLocale
     .format("$,.2s")(x)
     .replace(".0", "")
-    .replace("M", '\u2009<span class="caps">m</span>')
+    .replace("M", `\u2009${svg ? mTSpan : mSpan}`)
     .replace("k", "\u2009k");
 export const formatPercent = (x, f = 1) => formatLocale.format(`.${f}%`)(x).replace(".0", "");
+export const formatPercentSig = (x, s = 1) => formatLocale.format(`.${s}p`)(x);
 export const formatSignPercent = (x) => formatLocale.format("+.1%")(x).replace(".0", "").replace("+", "\uFF0B\u200A");
 //# sourceMappingURL=common-format.js.map
