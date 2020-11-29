@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.1.0](///compare/v12.0.3...v12.1.0) (2020-11-29)
+
+
+### Features
+
+* show port net income (in relation to nation and world income) 846a403
+
 ### [12.0.3](///compare/v12.0.2...v12.0.3) (2020-11-21)
 
 
