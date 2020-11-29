@@ -207,21 +207,20 @@ export default class ShowIncomeMap {
 
     _drawLegends(): void {
         const legendHeight = 20
-        const colorWidth = legendHeight * 3
-
         const nations = (this.#tree.children ?? []).sort((a, b) => (b.value as number) - (a.value as number))
+        const nationsPerRow = nations.length / 2
+        const space = 10 * 1.618
+        const colorWidth = Math.floor(this.#width / nationsPerRow) - space
 
-        const legendContainer = this.#mainDiv
-            .append("div")
-            .attr("class", "d-flex justify-content-between flex-wrap mb-3")
+        const legendContainer = this.#mainDiv.append("div").attr("class", "d-flex flex-wrap justify-content-between")
 
         legendContainer
             .selectAll(".legend")
             .data(nations)
             .join((enter) => {
-                const g = enter.append("div")
+                const div = enter.append("div").attr("class", " mt-3")
 
-                g.append("svg")
+                div.append("svg")
                     .attr("width", colorWidth)
                     .attr("height", legendHeight)
                     .append("rect")
@@ -230,11 +229,9 @@ export default class ShowIncomeMap {
                     .attr("height", legendHeight)
                     .style("fill", (d) => this.#colourScale(d.data.id as string))
 
-                g.append("div").html(
-                    (d) => `${d.data.id as string}<br />(${formatSiCurrency(d.value as number, true)})`
-                )
+                div.append("div").html((d) => `${d.data.id as string} (${formatSiInt(d.value as number)})`)
 
-                return g
+                return div
             })
     }
 
