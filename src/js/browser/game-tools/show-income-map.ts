@@ -130,14 +130,14 @@ export default class ShowIncomeMap {
                     return {
                         id: port.name,
                         value: port.netIncome,
-                        parentId: findNationByNationShortName(port.nation)?.name,
+                        parentId: findNationByNationShortName(port.nation)?.sortName,
                     }
                 }),
             // Nation nodes
             ...nations
                 .filter((nation) => nationWithIncome.has(nation.short))
                 .map((nation) => ({
-                    id: nation.name,
+                    id: nation.sortName,
                     value: 0,
                     parentId: "World",
                 })),
@@ -206,30 +206,63 @@ export default class ShowIncomeMap {
     }
 
     _drawLegends(): void {
-        const legendHeight = 20
+        const rowHeight = Math.floor(20 * 1.618)
+        const rowPadding = Math.floor(2 * 1.618)
+        const columnPadding = Math.floor(10 * 1.618)
         const nations = (this.#tree.children ?? []).sort((a, b) => (b.value as number) - (a.value as number))
-        const nationsPerRow = nations.length / 2
-        const space = 10 * 1.618
-        const colorWidth = Math.floor(this.#width / nationsPerRow) - space
 
-        const legendContainer = this.#mainDiv.append("div").attr("class", "d-flex flex-wrap justify-content-between")
+        const minColumnWidth = 190 // Width of "Verenigde Provinciën"
+        const totalWidth = nations.length * (minColumnWidth + columnPadding)
+        const rows = Math.ceil(totalWidth / this.#width)
+        const columnsPerRow = nations.length / rows
+        const columnWidth = Math.floor(this.#width / columnsPerRow - columnPadding)
+
+        const legendContainer = this.#mainDiv
+            .append("div")
+            .attr("class", "d-flex flex-wrap justify-content-between mt-3")
 
         legendContainer
             .selectAll(".legend")
             .data(nations)
             .join((enter) => {
-                const div = enter.append("div").attr("class", " mt-3")
+                const div = enter.append("div").attr("class", "mt-3")
 
-                div.append("svg")
-                    .attr("width", colorWidth)
-                    .attr("height", legendHeight)
-                    .append("rect")
-                    .attr("class", "legend-color")
-                    .attr("width", colorWidth)
-                    .attr("height", legendHeight)
+                const svg = div
+                    .append("svg")
+                    .attr("class", "svg-text")
+                    .attr("width", columnWidth)
+                    .attr("height", rowHeight * 2 + rowPadding)
+
+                svg.append("rect")
+                    .attr("width", columnWidth)
+                    .attr("height", rowHeight)
                     .style("fill", (d) => this.#colourScale(d.data.id as string))
 
-                div.append("div").html((d) => `${d.data.id as string} (${formatSiInt(d.value as number)})`)
+                svg.append("text")
+                    .attr("x", columnPadding)
+                    .attr("y", "25%")
+                    .text((d) => d.data.id as string)
+                    .style("fill", (d) => getContrastColour(this.#colourScale(d.data.id as string)))
+
+                svg.append("rect")
+                    .attr("class", "rect-background")
+                    .attr("y", rowHeight + rowPadding)
+                    .attr("width", columnWidth)
+                    .attr("height", rowHeight)
+                    .style("fill", (d) => this.#colourScale(d.data.id as string))
+
+                svg.append("rect")
+                    .attr("y", rowHeight + rowPadding)
+                    .attr("width", (d) => columnWidth * ((d.value as number) / (d.parent?.value as number)))
+                    .attr("height", rowHeight)
+                    .style("fill", (d) => this.#colourScale(d.data.id as string))
+
+                svg.append("text")
+                    .attr("x", columnWidth - columnPadding)
+                    .attr("y", "75%")
+                    .html((d) => formatSiInt(d.value as number, true))
+                    // .style("fill", (d) => (this.#colourScale(d.data.id as string)))
+                    .style("text-anchor", "end")
 
                 return div
             })
@@ -311,7 +344,6 @@ export default class ShowIncomeMap {
 
         this.#mainG
             .append("g")
-            .attr("class", "hoverers")
             .selectAll(".hoverer")
             .data(leaves)
             .join((enter) =>

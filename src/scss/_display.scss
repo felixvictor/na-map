@@ -821,3 +821,15 @@ $wind-profile-colour: $overlay-text-colour;
         margin: 0;
     }
 }
+
+.svg-text {
+    text {
+        pointer-events: none;
+        stroke: none;
+        text-anchor: start;
+        dominant-baseline: mathematical;
+    }
+    .rect-background {
+        opacity: 0.2;
+    }
+}

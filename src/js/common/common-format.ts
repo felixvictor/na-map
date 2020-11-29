@@ -105,15 +105,16 @@ const mTSpan = '<tspan class="caps">m</tspan>'
 /**
  * Format integer with SI suffix
  * @param   x - Integer
+ * @param svg - True when tspan for SVG needed
  * @returns Formatted Integer
  */
-export const formatSiInt = (x: number): HtmlString =>
+export const formatSiInt = (x: number, svg = false): HtmlString | SVGString =>
     formatLocale
         .format(",.2s")(x)
         .replace(".0", "")
         .replace("k", "\u2009k")
         .replace("m", "\u2009m")
-        .replace("M", `\u2009${mSpan}`)
+        .replace("M", `\u2009${svg ? mTSpan : mSpan}`)
 
 /**
  * Format integer with SI suffix
