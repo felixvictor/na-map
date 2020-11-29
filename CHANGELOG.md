@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.3](///compare/v12.1.2...v12.1.3) (2020-11-29)
+
+
+### Bug Fixes
+
+* **convert:** Diana permit can be crafted (November 2020 patch) eccc15f
+
 ### [12.1.2](///compare/v12.1.1...v12.1.2) (2020-11-29)
 
 
