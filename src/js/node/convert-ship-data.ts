@@ -70,7 +70,6 @@ const blueprintsNotUsed = new Set([
     665, // Santa Cecilia
     746, // GunBoat
     1558, // L'Hermione
-    1718, // Diana
     1719, // Hercules
     1720, // Pandora
     1721, // Le Requin

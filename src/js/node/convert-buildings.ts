@@ -52,6 +52,7 @@ const itemIsUsed = new Set([
     2460, // Additional Outpost Permit Blueprint
     2461, // Additional dock permit Blueprint
     2480, // Admiraal de Ruyter Permit Blueprint
+    2482, // Diana Permit Blueprint
 ])
 
 let apiItems: APIItemGeneric[]
