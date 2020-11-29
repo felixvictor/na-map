@@ -330,7 +330,7 @@ export default class ShowIncomeMap {
                     .append("g")
                     .attr("class", "label")
                     .attr("transform", (d) => `translate(${d.polygon.site.x},${d.polygon.site.y})`)
-                    .style("font-size", (d) => this.#fontScale(d.data.data.value))
+                    .style("font-size", (d) => `${this.#fontScale(d.data.data.value)}px`)
                     .style("fill", (d) => getContrastColour(this.#colourScale(d.parent?.data.id as string)))
             )
         labels
