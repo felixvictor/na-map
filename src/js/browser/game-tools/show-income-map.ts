@@ -24,10 +24,12 @@ import { colourList, insertBaseModal, loadJsonFiles } from "../../common/common-
 import { formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { getContrastColour } from "../../common/common-game-tools"
 
+import { BaseModal } from "./base-modal"
+
 import { Vertex } from "d3-weighted-voronoi"
 import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
-import { DataSource, HtmlString, PortIncome, PortJsonData } from "../../common/interface"
+import { DataSource, PortIncome, PortJsonData } from "../../common/interface"
 
 interface TreeMapPolygon extends Array<Point> {
     0: Point
@@ -50,7 +52,7 @@ interface PortHierarchy {
 /**
  *
  */
-export default class ShowIncomeMap {
+export default class ShowIncomeMap extends BaseModal {
     #height = 0
     #width = 0
     #nestedData = {} as HierarchyNode<PortHierarchy>
@@ -58,20 +60,12 @@ export default class ShowIncomeMap {
     #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #mainG = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
-    readonly #serverId: string
-    readonly #baseName: string
-    readonly #baseId: HtmlString
-    readonly #buttonId: HtmlString
-    readonly #modalId: HtmlString
+
     readonly #colourScale: ScaleOrdinal<string, string>
     #fontScale = {} as ScaleLinear<number, number>
 
     constructor(serverId: string) {
-        this.#serverId = serverId
-        this.#baseName = "Port net income"
-        this.#baseId = "income-list"
-        this.#buttonId = `button-${this.#baseId}`
-        this.#modalId = `modal-${this.#baseId}`
+        super(serverId, "Show port net income")
 
         this.#colourScale = d3ScaleOrdinal<string>().range(colourList)
 
@@ -147,11 +141,11 @@ export default class ShowIncomeMap {
     async _loadData(): Promise<PortJsonData> {
         const dataSources: DataSource[] = [
             {
-                fileName: `${this.#serverId}-ports.json`,
+                fileName: `${this.serverId}-ports.json`,
                 name: "server",
             },
             {
-                fileName: `${this.#serverId}-pb.json`,
+                fileName: `${this.serverId}-pb.json`,
                 name: "pb",
             },
         ]
@@ -175,15 +169,15 @@ export default class ShowIncomeMap {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
+        document.querySelector(`#${this.buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this.#baseName)
+            registerEvent("Tools", this.baseName)
 
-            this._incomeListSelected()
+            this._menuItemSelected()
         })
     }
 
@@ -365,10 +359,10 @@ export default class ShowIncomeMap {
      * Inject modal
      */
     _injectModal(): void {
-        insertBaseModal({ id: this.#modalId, title: this.#baseName })
+        insertBaseModal({ id: this.modalId, title: this.baseName })
 
-        const body = d3Select(`#${this.#modalId} .modal-body`)
-        this.#mainDiv = body.append("div").attr("id", `${this.#baseId}`)
+        const body = d3Select(`#${this.modalId} .modal-body`)
+        this.#mainDiv = body.append("div").attr("id", `${this.baseId}`)
     }
 
     /**
@@ -381,17 +375,17 @@ export default class ShowIncomeMap {
     /**
      * Action when menu item is clicked
      */
-    _incomeListSelected(): void {
+    _menuItemSelected(): void {
         let emptyModal = false
 
         // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this.#modalId}`)) {
+        if (!document.querySelector(`#${this.modalId}`)) {
             emptyModal = true
             this._initModal()
         }
 
         // Show modal
-        $(`#${this.#modalId}`)
+        $(`#${this.modalId}`)
             .on("shown.bs.modal", () => {
                 // Inject chart after modal is shown to calculate modal width
                 if (emptyModal) {
