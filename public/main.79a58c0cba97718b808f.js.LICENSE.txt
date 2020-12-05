@@ -31,16 +31,6 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Common data and functions.
- * @module    src/node/common
- * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
  * @file      Cookie.
  * @module    util/cookie
  * @author    iB aka Felix Victor
