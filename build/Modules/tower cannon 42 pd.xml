@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>228</Value>
+        <Value>251</Value>
       </Value>
     </Pair>
     <Pair>
@@ -331,98 +331,98 @@
         <Value>
           <Time>0</Time>
           <Value>1</Value>
-          <TangentIn>-0.4000002</TangentIn>
-          <TangentOut>-0.4000002</TangentOut>
+          <TangentIn>-0.310000181</TangentIn>
+          <TangentOut>-0.310000181</TangentOut>
         </Value>
         <Value>
           <Time>0.1</Time>
-          <Value>0.96</Value>
-          <TangentIn>-0.4000002</TangentIn>
-          <TangentOut>-0.4000002</TangentOut>
+          <Value>0.969</Value>
+          <TangentIn>-0.310000181</TangentIn>
+          <TangentOut>-0.310000181</TangentOut>
         </Value>
         <Value>
           <Time>0.2</Time>
-          <Value>0.922</Value>
-          <TangentIn>-0.379999876</TangentIn>
-          <TangentOut>-0.379999876</TangentOut>
+          <Value>0.939</Value>
+          <TangentIn>-0.2999997</TangentIn>
+          <TangentOut>-0.2999997</TangentOut>
         </Value>
         <Value>
           <Time>0.3</Time>
-          <Value>0.885</Value>
-          <TangentIn>-0.369999975</TangentIn>
-          <TangentOut>-0.369999975</TangentOut>
+          <Value>0.91</Value>
+          <TangentIn>-0.2899998</TangentIn>
+          <TangentOut>-0.2899998</TangentOut>
         </Value>
         <Value>
           <Time>0.4</Time>
-          <Value>0.849</Value>
-          <TangentIn>-0.360000163</TangentIn>
-          <TangentOut>-0.360000163</TangentOut>
+          <Value>0.882</Value>
+          <TangentIn>-0.28</TangentIn>
+          <TangentOut>-0.28</TangentOut>
         </Value>
         <Value>
           <Time>0.5</Time>
-          <Value>0.815</Value>
-          <TangentIn>-0.339999825</TangentIn>
-          <TangentOut>-0.339999825</TangentOut>
+          <Value>0.855</Value>
+          <TangentIn>-0.27000013</TangentIn>
+          <TangentOut>-0.27000013</TangentOut>
         </Value>
         <Value>
           <Time>0.6</Time>
-          <Value>0.783</Value>
-          <TangentIn>-0.319999963</TangentIn>
-          <TangentOut>-0.319999963</TangentOut>
+          <Value>0.829</Value>
+          <TangentIn>-0.260000169</TangentIn>
+          <TangentOut>-0.260000169</TangentOut>
         </Value>
         <Value>
           <Time>0.7</Time>
-          <Value>0.751</Value>
-          <TangentIn>-0.320000172</TangentIn>
-          <TangentOut>-0.320000172</TangentOut>
+          <Value>0.803</Value>
+          <TangentIn>-0.260000318</TangentIn>
+          <TangentOut>-0.260000318</TangentOut>
         </Value>
         <Value>
           <Time>0.8</Time>
-          <Value>0.721</Value>
-          <TangentIn>-0.299999654</TangentIn>
-          <TangentOut>-0.299999654</TangentOut>
+          <Value>0.779</Value>
+          <TangentIn>-0.239999831</TangentIn>
+          <TangentOut>-0.239999831</TangentOut>
         </Value>
         <Value>
           <Time>0.9</Time>
-          <Value>0.693</Value>
-          <TangentIn>-0.280000061</TangentIn>
-          <TangentOut>-0.280000061</TangentOut>
+          <Value>0.755</Value>
+          <TangentIn>-0.23999998</TangentIn>
+          <TangentOut>-0.23999998</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.665</Value>
-          <TangentIn>-0.2799999</TangentIn>
-          <TangentOut>-0.2799999</TangentOut>
+          <Value>0.731</Value>
+          <TangentIn>-0.239999831</TangentIn>
+          <TangentOut>-0.239999831</TangentOut>
         </Value>
         <Value>
           <Time>1.1</Time>
-          <Value>0.638</Value>
-          <TangentIn>-0.270000041</TangentIn>
-          <TangentOut>-0.270000041</TangentOut>
+          <Value>0.709</Value>
+          <TangentIn>-0.220000088</TangentIn>
+          <TangentOut>-0.220000088</TangentOut>
         </Value>
         <Value>
           <Time>1.2</Time>
-          <Value>0.613</Value>
-          <TangentIn>-0.2500003</TangentIn>
-          <TangentOut>-0.2500003</TangentOut>
+          <Value>0.687</Value>
+          <TangentIn>-0.220000088</TangentIn>
+          <TangentOut>-0.220000088</TangentOut>
         </Value>
         <Value>
           <Time>1.3</Time>
-          <Value>0.588</Value>
-          <TangentIn>-0.25</TangentIn>
-          <TangentOut>-0.25</TangentOut>
+          <Value>0.666</Value>
+          <TangentIn>-0.209999874</TangentIn>
+          <TangentOut>-0.209999874</TangentOut>
         </Value>
         <Value>
           <Time>1.4</Time>
-          <Value>0.565</Value>
-          <TangentIn>-0.229999959</TangentIn>
-          <TangentOut>-0.229999959</TangentOut>
+          <Value>0.645</Value>
+          <TangentIn>-0.210000232</TangentIn>
+          <TangentOut>-0.210000232</TangentOut>
         </Value>
         <Value>
           <Time>1.5</Time>
-          <Value>0.542</Value>
-          <TangentIn>-0.229999959</TangentIn>
-          <TangentOut>-0.229999959</TangentOut>
+          <Value>0.625</Value>
+          <TangentIn>-0.199999765</TangentIn>
+          <TangentOut>-0.199999765</TangentOut>
         </Value>
       </Value>
     </Pair>
