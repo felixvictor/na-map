@@ -269,8 +269,6 @@ const getSvgLoaderOpt = (path) => ({
 
 const config = {
     devServer: {
-        contentBase: dirOutput,
-        disableHostCheck: true,
         hot: true,
         open: true,
     },
