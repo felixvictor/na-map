@@ -16,7 +16,7 @@ import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
 import { capitalizeFirstLetter, findNationByNationShortName, putImportError } from "../../common/common"
-import { insertBaseModal } from "../../common/common-browser"
+import { insertBaseModal, loadJsonFile, loadJsonFiles } from "../../common/common-browser"
 
 import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
@@ -60,20 +60,10 @@ export default class ListPortBonus {
     }
 
     async _loadData(): Promise<void> {
-        const dataDirectory = "data"
-
-        try {
-            this.#portPerServer = (await (
-                await fetch(`${dataDirectory}/${this.#serverId}-ports.json`)
-            ).json()) as PortPerServer[]
-            this.#pbPerServer = (await (
-                await fetch(`${dataDirectory}/${this.#serverId}-pb.json`)
-            ).json()) as PortBattlePerServer[]
-            this.#portBasicData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
-                .default as PortBasic[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this.#portPerServer = await loadJsonFile<PortPerServer[]>(`${this.#serverId}-ports.json`)
+        this.#pbPerServer = await loadJsonFile<PortBattlePerServer[]>(`${this.#serverId}-pb.json`)
+        this.#portBasicData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+            .default as PortBasic[]
     }
 
     _setupData(): void {

@@ -101,29 +101,6 @@ export const uncompressApiData = (): void => {
 }
 
 /**
- * Check fetch status (see {@link https://developers.google.com/web/updates/2015/03/introduction-to-fetch})
- */
-export const checkFetchStatus = async (response: Response): Promise<Record<string, unknown> | Response> => {
-    // noinspection MagicNumberJS
-    if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response)
-    }
-
-    return Promise.reject(new Error(response.statusText))
-}
-
-/**
- * Get json from fetch response
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getJsonFromFetch = async (response: Response): Promise<any> => response.json()
-
-/**
- * Get text from fetch response
- */
-export const getTextFromFetch = async (response: Response): Promise<string> => response.text()
-
-/**
  * Write error to console
  */
 export const putFetchError = (error: string): void => {

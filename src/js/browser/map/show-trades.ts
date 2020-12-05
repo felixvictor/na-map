@@ -29,6 +29,7 @@ import { Bound, HtmlString } from "../../common/interface"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 import SelectPorts from "./select-ports"
+import { loadJsonFile } from "../../common/common-browser"
 
 interface Node {
     name: string
@@ -355,41 +356,24 @@ export default class ShowTrades {
     }
 
     async _loadData(): Promise<void> {
-        /**
-         * Data directory
-         */
-        const dataDirectory = "data"
+        const pbData = await loadJsonFile<PortBattlePerServer[]>(`${this._serverName}-pb.json`)
+        const portData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+            .default as PortBasic[]
+        // Combine port data with port battle data
+        this._portData = portData.map((port) => {
+            const pbPortData = pbData.find((d) => d.id === port.id)
+            return { ...port, ...pbPortData } as PortWithTrades
+        })
 
-        try {
-            const portData = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
-                .default as PortBasic[]
-            const pbData = (await (
-                await fetch(`${dataDirectory}/${this._serverName}-pb.json`)
-            ).json()) as PortBattlePerServer[]
-            this._linkDataDefault = (await (
-                await fetch(`${dataDirectory}/${this._serverName}-trades.json`)
-            ).json()) as Trade[]
-            // Combine port data with port battle data
-            this._portData = portData.map((port) => {
-                const pbPortData = pbData.find((d) => d.id === port.id)
-                return { ...port, ...pbPortData } as PortWithTrades
-            })
-            const tradeItems = (await (
-                await fetch(`${dataDirectory}/${this._serverName}-items.json`)
-            ).json()) as TradeItem[]
-            this._tradeItem = new Map(tradeItems.map((item) => [item.id, item.name]))
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._linkDataDefault = await loadJsonFile<Trade[]>(`${this._serverName}-trades.json`)
+
+        const tradeItems = await loadJsonFile<TradeItem[]>(`${this._serverName}-items.json`)
+        this._tradeItem = new Map(tradeItems.map((item) => [item.id, item.name]))
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            await this._loadData()
-            this._setupData()
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        await this._loadData()
+        this._setupData()
     }
 
     async showOrHide(): Promise<void> {

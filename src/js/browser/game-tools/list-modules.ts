@@ -42,12 +42,8 @@ export default class ListModules {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
-                .default as Module[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+            .default as Module[]
     }
 
     _setupListener(): void {

@@ -48,34 +48,30 @@ export default class ShipList {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            const shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json")).default // @ts-expect-error
-                .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
+        const shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json")).default // @ts-expect-error
+            .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
 
-            this.#shipListData = shipData.map(
-                (ship: ShipData): ShipListData => [
-                    [ship.class, String(ship.class)],
-                    [ship.name, beautifyShipName(ship.name)],
-                    [ship.guns.total, String(ship.guns.total)],
-                    [ship.battleRating, formatInt(ship.battleRating)],
-                    [ship.crew.max, formatInt(ship.crew.max)],
-                    [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed)],
-                    [ship.ship.turnSpeed, formatFloatFixed(ship.ship.turnSpeed)],
-                    [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
-                    [
-                        ship.guns.gunsPerDeck[4].amount,
-                        ship.guns.gunsPerDeck[4].amount ? String(ship.guns.gunsPerDeck[4].amount) : "",
-                    ],
-                    [
-                        ship.guns.gunsPerDeck[5].amount,
-                        ship.guns.gunsPerDeck[5].amount ? String(ship.guns.gunsPerDeck[5].amount) : "",
-                    ],
-                    [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
-                ]
-            )
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this.#shipListData = shipData.map(
+            (ship: ShipData): ShipListData => [
+                [ship.class, String(ship.class)],
+                [ship.name, beautifyShipName(ship.name)],
+                [ship.guns.total, String(ship.guns.total)],
+                [ship.battleRating, formatInt(ship.battleRating)],
+                [ship.crew.max, formatInt(ship.crew.max)],
+                [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed)],
+                [ship.ship.turnSpeed, formatFloatFixed(ship.ship.turnSpeed)],
+                [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
+                [
+                    ship.guns.gunsPerDeck[4].amount,
+                    ship.guns.gunsPerDeck[4].amount ? String(ship.guns.gunsPerDeck[4].amount) : "",
+                ],
+                [
+                    ship.guns.gunsPerDeck[5].amount,
+                    ship.guns.gunsPerDeck[5].amount ? String(ship.guns.gunsPerDeck[5].amount) : "",
+                ],
+                [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
+            ]
+        )
     }
 
     _setupListener(): void {

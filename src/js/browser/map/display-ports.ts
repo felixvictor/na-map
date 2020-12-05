@@ -31,12 +31,18 @@ import utc from "dayjs/plugin/utc.js"
 
 import {
     capitalizeFirstLetter,
-    findNationByNationShortName,
     nations,
     NationShortName,
-    putImportError,
 } from "../../common/common"
-import { colourGreenDark, colourList, colourRedDark, colourWhite, primary300 } from "../../common/common-browser"
+import {
+    colourGreenDark,
+    colourList,
+    colourRedDark,
+    colourWhite,
+    loadJsonFile,
+    loadJsonFiles,
+    primary300,
+} from "../../common/common-browser"
 import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "../../common/common-format"
 import {
     Coordinate,
@@ -62,7 +68,16 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "../../common/gen-json"
-import { Bound, DataSource, DivDatum, HtmlResult, HtmlString, SVGGDatum, ZoomLevel } from "../../common/interface"
+import {
+    Bound,
+    DataSource,
+    DivDatum,
+    HtmlResult,
+    HtmlString,
+    PortJsonData,
+    SVGGDatum,
+    ZoomLevel,
+} from "../../common/interface"
 import { PortBonus, portBonusType } from "../../common/types"
 
 import Cookie from "../util/cookie"
@@ -279,7 +294,6 @@ export default class DisplayPorts {
     }
 
     async _loadData(): Promise<ReadData> {
-        const dataDirectory = "data"
         const dataSources: DataSource[] = [
             {
                 fileName: `${this.#serverName}-ports.json`,
@@ -290,25 +304,14 @@ export default class DisplayPorts {
                 name: "pb",
             },
         ]
+
+        const tradeItems = await loadJsonFile<TradeItem[]>(`${this.#serverName}-items.json`)
+        this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
+
         const readData = {} as ReadData
-
-        const loadEntries = async (dataSources: DataSource[]): Promise<void> => {
-            for await (const dataSource of dataSources) {
-                readData[dataSource.name] = await (await fetch(`${dataDirectory}/${dataSource.fileName}`)).json()
-            }
-        }
-
-        try {
-            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
-                .default as PortBasic[]
-            const tradeItems = (await (
-                await fetch(`${dataDirectory}/${this.#serverName}-items.json`)
-            ).json()) as TradeItem[]
-            this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
-            await loadEntries(dataSources)
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+            .default as PortBasic[]
+        await loadJsonFiles<PortJsonData>(dataSources, readData)
 
         return readData
     }

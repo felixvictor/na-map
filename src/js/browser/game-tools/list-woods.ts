@@ -79,12 +79,8 @@ export default class ListWoods {
     }
 
     async _loadData(): Promise<void> {
-        try {
-            this._woodDataDefault = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
-                .default as WoodData
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._woodDataDefault = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
+            .default as WoodData
     }
 
     _setupData(): void {

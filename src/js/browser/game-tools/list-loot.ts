@@ -74,14 +74,10 @@ export default class ListLoot {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            const sourceData = (await import(/* webpackChunkName: "data-loot" */ "Lib/gen-generic/loot.json"))
-                .default as Loot
-            this.#lootData = sourceData.loot as LootLootEntity[]
-            this.#chestsData = sourceData.chests as LootChestsEntity[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        const sourceData = (await import(/* webpackChunkName: "data-loot" */ "Lib/gen-generic/loot.json"))
+            .default as Loot
+        this.#lootData = sourceData.loot as LootLootEntity[]
+        this.#chestsData = sourceData.chests as LootChestsEntity[]
     }
 
     _setupListener(): void {

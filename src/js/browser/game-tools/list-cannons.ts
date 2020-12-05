@@ -73,13 +73,9 @@ export default class ListCannons {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "Lib/gen-generic/cannons.json"))
-                .default as Cannon
-            this._setupData(cannonData)
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "Lib/gen-generic/cannons.json"))
+            .default as Cannon
+        this._setupData(cannonData)
     }
 
     _getFormattedName(name: string): RowData {

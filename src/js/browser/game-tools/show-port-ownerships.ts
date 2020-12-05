@@ -31,8 +31,8 @@ import {
 } from "d3-shape"
 
 import { registerEvent } from "../analytics"
-import { NationFullName, nations, NationShortName, putImportError } from "../../common/common"
-import { colourList, insertBaseModal } from "../../common/common-browser"
+import { NationFullName, nations, NationShortName } from "../../common/common"
+import { colourList, insertBaseModal, loadJsonFile } from "../../common/common-browser"
 import { getContrastColour } from "../../common/common-game-tools"
 
 import JQuery from "jquery"
@@ -85,18 +85,8 @@ export default class ShowPortOwnerships {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const dataDirectory = "data"
-
-        try {
-            this._nationData = (await (await fetch(`${dataDirectory}/${this.#serverId}-nation.json`)).json()) as Array<
-                OwnershipNation<number>
-            >
-            this._ownershipData = (await (
-                await fetch(`${dataDirectory}/${this.#serverId}-ownership.json`)
-            ).json()) as Ownership[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._nationData = await loadJsonFile<Array<OwnershipNation<number>>>(`${this.#serverId}-nation.json`)
+        this._ownershipData = await loadJsonFile<Ownership[]>(`${this.#serverId}-ownership.json`)
     }
 
     /**

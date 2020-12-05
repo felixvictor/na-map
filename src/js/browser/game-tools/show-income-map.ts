@@ -12,22 +12,22 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 import "bootstrap/js/dist/tooltip"
 
+import { max as d3Max, min as d3Min } from "d3-array"
 import { hierarchy as d3Hierarchy, HierarchyNode, stratify as d3Stratify } from "d3-hierarchy"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { Point, voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 
 import { registerEvent } from "../analytics"
-import { findNationByNationShortName, nations, putImportError } from "../../common/common"
-import { colourList, insertBaseModal } from "../../common/common-browser"
+import { findNationByNationShortName, nations } from "../../common/common"
+import { colourList, insertBaseModal, loadJsonFiles } from "../../common/common-browser"
+import { formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { getContrastColour } from "../../common/common-game-tools"
 
-import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
-import { DataSource, HtmlString } from "../../common/interface"
-import { formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
-import { max as d3Max, min as d3Min } from "d3-array"
 import { Vertex } from "d3-weighted-voronoi"
 import JQuery from "jquery"
+import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
+import { DataSource, HtmlString, PortIncome, PortJsonData } from "../../common/interface"
 
 interface TreeMapPolygon extends Array<Point> {
     0: Point
@@ -40,13 +40,6 @@ interface TreeMapHierarchyNode<T> extends HierarchyNode<T> {
     polygon: TreeMapPolygon
 }
 
-type PortIncome = PortBasic & PortPerServer & PortBattlePerServer
-interface ReadData {
-    [index: string]: PortBasic[] | PortPerServer[] | PortBattlePerServer[]
-    ports: PortBasic[]
-    pb: PortBattlePerServer[]
-    server: PortPerServer[]
-}
 type PortHierarchyId = string | undefined
 interface PortHierarchy {
     id: PortHierarchyId
@@ -104,7 +97,7 @@ export default class ShowIncomeMap {
         return Math.floor((this.#mainDiv.node() as HTMLDivElement).offsetWidth) ?? 0
     }
 
-    _setupData(data: ReadData): void {
+    _setupData(data: PortJsonData): void {
         // Combine port data with port battle data
         const portData = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
@@ -151,8 +144,7 @@ export default class ShowIncomeMap {
         ) as TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>
     }
 
-    async _loadData(): Promise<ReadData> {
-        const dataDirectory = "data"
+    async _loadData(): Promise<PortJsonData> {
         const dataSources: DataSource[] = [
             {
                 fileName: `${this.#serverId}-ports.json`,
@@ -163,21 +155,11 @@ export default class ShowIncomeMap {
                 name: "pb",
             },
         ]
-        const readData = {} as ReadData
+        const readData = {} as PortJsonData
 
-        const loadEntries = async (dataSources: DataSource[]): Promise<void> => {
-            for await (const dataSource of dataSources) {
-                readData[dataSource.name] = await (await fetch(`${dataDirectory}/${dataSource.fileName}`)).json()
-            }
-        }
-
-        try {
-            readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
-                .default as PortBasic[]
-            await loadEntries(dataSources)
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+            .default as PortBasic[]
+        await loadJsonFiles<PortJsonData>(dataSources, readData)
 
         return readData
     }
