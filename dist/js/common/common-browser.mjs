@@ -98,4 +98,24 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
         .attr("data-dismiss", "modal");
 };
 export const pluralise = (number, word) => `${number} ${word + (number === 1 ? "" : "s")}`;
+export const loadJsonFiles = async (dataSources, readData) => {
+    for await (const dataSource of dataSources) {
+        readData[dataSource.name] = await loadJsonFile(dataSource.fileName);
+    }
+};
+class FetchError extends Error {
+    constructor(response) {
+        super(`${response.url} ${response.statusText} (status ${response.status})`);
+        this.name = "Fetch error";
+        this.response = response;
+    }
+}
+const dataDirectory = "data";
+export const loadJsonFile = async (fileName) => {
+    const response = await fetch(`${dataDirectory}/${fileName}`);
+    if (!response.ok) {
+        throw new FetchError(response);
+    }
+    return response.json();
+};
 //# sourceMappingURL=common-browser.js.map

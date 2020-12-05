@@ -13,9 +13,9 @@ import "bootstrap-select/js/bootstrap-select";
 import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
 import { registerEvent } from "../analytics";
+import { woodType } from "../../common/common";
 import { insertBaseModal } from "../../common/common-browser";
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format";
-import { putImportError, woodType } from "../../common/common";
 import { simpleStringSort, sortBy } from "../../common/common-node";
 class Wood {
     constructor(compareId, woodCompare) {
@@ -285,14 +285,9 @@ export default class CompareWoods {
         this._columns.unshift("Base");
     }
     async _loadAndSetupData() {
-        try {
-            this._woodData = (await import("Lib/gen-generic/woods.json"))
-                .default;
-            this._setupData();
-        }
-        catch (error) {
-            putImportError(error);
-        }
+        this._woodData = (await import("Lib/gen-generic/woods.json"))
+            .default;
+        this._setupData();
     }
     _setupListener() {
         let firstClick = true;

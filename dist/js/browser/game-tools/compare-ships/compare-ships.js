@@ -18,7 +18,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 import { registerEvent } from "../../analytics";
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, insertBaseModal, } from "../../../common/common-browser";
-import { isEmpty, putImportError, woodType } from "../../../common/common";
+import { isEmpty, woodType } from "../../../common/common";
 import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format";
 import { hashids, hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShipName, } from "../../../common/common-game-tools";
 import { getOrdinal } from "../../../common/common-math";
@@ -347,18 +347,14 @@ export class CompareShips {
         this.shipMassScale = d3ScaleLinear().domain([minShipMass, maxShipMass]).range([100, 150]);
     }
     async _loadAndSetupData() {
-        try {
-            this._moduleDataDefault = (await import("Lib/gen-generic/modules.json")).default;
-            this._shipData = (await import("Lib/gen-generic/ships.json"))
-                .default;
-            this._setupData();
-            if (this._baseId !== "ship-journey") {
-                this.woodCompare = new CompareWoods(this._woodId);
-                await this.woodCompare.woodInit();
-            }
-        }
-        catch (error) {
-            putImportError(error);
+        this._moduleDataDefault = (await import("Lib/gen-generic/modules.json"))
+            .default;
+        this._shipData = (await import("Lib/gen-generic/ships.json"))
+            .default;
+        this._setupData();
+        if (this._baseId !== "ship-journey") {
+            this.woodCompare = new CompareWoods(this._woodId);
+            await this.woodCompare.woodInit();
         }
     }
     _setupListener() {

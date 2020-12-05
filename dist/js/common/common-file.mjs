@@ -69,14 +69,6 @@ export const compressApiData = () => {
 export const uncompressApiData = () => {
     loopApiFiles("unxz");
 };
-export const checkFetchStatus = async (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return Promise.resolve(response);
-    }
-    return Promise.reject(new Error(response.statusText));
-};
-export const getJsonFromFetch = async (response) => response.json();
-export const getTextFromFetch = async (response) => response.text();
 export const putFetchError = (error) => {
     console.error("Request failed -->", error);
 };
