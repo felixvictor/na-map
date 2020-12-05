@@ -8,7 +8,6 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { putImportError } from "../common/common"
 import { serverIds } from "../common/servers"
 
 import Cookie from "./util/cookie"

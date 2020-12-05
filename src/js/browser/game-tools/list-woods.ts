@@ -14,15 +14,7 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import {
-    capitalizeFirstLetter,
-    putImportError,
-    WoodFamily,
-    woodFamily,
-    woodType,
-    WoodType,
-    WoodTypeList,
-} from "../../common/common"
+import { capitalizeFirstLetter, WoodFamily, woodFamily, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatFloatFixed, formatPP } from "../../common/common-format"
 import { simpleStringSort } from "../../common/common-node"

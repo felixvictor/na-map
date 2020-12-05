@@ -15,7 +15,6 @@ import { h, render } from "preact"
 import htm from "htm"
 
 import { registerEvent } from "../analytics"
-import { putImportError } from "../../common/common"
 import { formatInt } from "../../common/common-format"
 import { getBaseModalHTML } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"

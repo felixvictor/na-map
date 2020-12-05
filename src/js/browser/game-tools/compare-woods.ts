@@ -16,9 +16,9 @@ import { min as d3Min, max as d3Max } from "d3-array"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
+import { woodType, WoodType, WoodTypeList } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatFloat, formatPercent, formatSignFloat } from "../../common/common-format"
-import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
 import { simpleStringSort, sortBy } from "../../common/common-node"
 
 import JQuery from "jquery"

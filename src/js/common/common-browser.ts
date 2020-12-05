@@ -12,8 +12,6 @@ import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
 import { BaseModalPure, DataSource } from "./interface"
-import { putImportError } from "./common"
-import { PortBasic, PortBattlePerServer, PortPerServer } from "./gen-json"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,

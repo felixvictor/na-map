@@ -18,7 +18,6 @@ import "bootstrap-select/js/bootstrap-select"
 
 import { registerEvent } from "../analytics"
 import { insertBaseModal } from "../../common/common-browser"
-import { putImportError } from "../../common/common"
 import { formatInt } from "../../common/common-format"
 import { getCurrencyAmount } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"

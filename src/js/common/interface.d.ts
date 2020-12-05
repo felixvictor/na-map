@@ -9,7 +9,7 @@
  */
 
 import { VNode } from "preact"
-import { PortBasic, PortBattlePerServer, PortPerServer } from "./gen-json";
+import { PortBasic, PortBattlePerServer, PortPerServer } from "./gen-json"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SVGSVGDatum {}

@@ -15,7 +15,6 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { putImportError } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatPP, formatSignInt, formatSignPercent } from "../../common/common-format"
 import { getOrdinal } from "../../common/common-math"

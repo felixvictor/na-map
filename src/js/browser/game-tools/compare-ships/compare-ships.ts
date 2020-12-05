@@ -28,7 +28,7 @@ import {
     colourWhite,
     insertBaseModal,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
+import { isEmpty, WoodType, woodType } from "../../../common/common"
 import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format"
 import {
     hashids,

@@ -346,7 +346,6 @@ interface FlagsEntity {
  */
 
 export interface APIBuilding {
-    [index: string]: ValuesType<APIItemGeneric>
     __type: "MegaChaka.Services.Items.BuildingTemplate, MegaChaka"
     Name: string
     Id: number
@@ -378,12 +377,12 @@ export interface APIBuilding {
     BaseProduction: number
     Levels: LevelsEntity[]
     LaborPrice: number
-    BuildingRequirements: []
-    FullRequirements: []
+    BuildingRequirements: unknown[]
+    FullRequirements: unknown[]
     GoldRequirements: number
-    Results: []
+    Results: unknown[]
     ServerType: string
-    NationAvailability: []
+    NationAvailability: unknown[]
     CraftGroup: string
     RequiresLevel: number
     GivesXP: number
@@ -402,7 +401,6 @@ export interface APIBuilding {
  */
 
 export interface APIRecipe {
-    [index: string]: ValuesType<APIItemGeneric>
     Name: string
     Id: number
     NotUsed: boolean
@@ -433,7 +431,7 @@ export interface APIRecipe {
     GoldRequirements: number
     Results: TemplateEntity[]
     ServerType: string
-    NationAvailability: []
+    NationAvailability: unknown[]
     CraftGroup: string
     RequiresLevel: number
     GivesXP: number
@@ -535,7 +533,7 @@ export interface APITimeBasedConvertibleItem {
     LifetimeSeconds: 10800
     ExtendedLootTable: number[]
     CanBeConverted: "Port"
-    ConvertsTo: []
+    ConvertsTo: unknown[]
     ExtraLootTable: 0
     InitialAmount: 0
     ProductionScale: 0.6
@@ -714,7 +712,7 @@ export interface APIShip {
     Unlocks: Unlocks
     OverrideTotalXpForUpgradeSlots: number
     Skins?: SkinsEntity[]
-    Limitations: []
+    Limitations: unknown[]
     HostilityScore: number
     Limitation1_Value: number
     Limitation2_Value: number
@@ -758,7 +756,7 @@ export interface APIShipBlueprint {
     GoldRequirements: number
     Results: TemplateEntity[]
     ServerType: string
-    NationAvailability: []
+    NationAvailability: unknown[]
     CraftGroup: string
     RequiresLevel: number
     GivesXP: number

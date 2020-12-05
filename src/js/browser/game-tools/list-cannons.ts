@@ -22,7 +22,6 @@ import {
     cannonType,
     CannonTypeList,
     capitalizeFirstLetter,
-    putImportError,
 } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatFloatFixed } from "../../common/common-format"

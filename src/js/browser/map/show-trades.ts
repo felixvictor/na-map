@@ -17,7 +17,7 @@ import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 
-import { nations, NationShortName, putImportError } from "../../common/common"
+import { nations, NationShortName } from "../../common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { defaultFontSize, roundToThousands } from "../../common/common-math"
 

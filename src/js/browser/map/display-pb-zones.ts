@@ -10,7 +10,6 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
-import { putImportError } from "../../common/common"
 import { servers } from "../../common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "../util/cookie"
