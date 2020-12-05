@@ -18,7 +18,6 @@ import "bootstrap-select/js/bootstrap-select"
 
 import { registerEvent } from "../analytics"
 import { insertBaseModal } from "../../common/common-browser"
-import { putImportError } from "../../common/common"
 import { formatInt } from "../../common/common-format"
 import { getCurrencyAmount } from "../../common/common-game-tools"
 import { sortBy } from "../../common/common-node"
@@ -45,13 +44,8 @@ export default class ListBuildings {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            this._buildingData = (
-                await import(/* webpackChunkName: "data-buildings" */ "Lib/gen-generic/buildings.json")
-            ).default as Building[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._buildingData = (await import(/* webpackChunkName: "data-buildings" */ "Lib/gen-generic/buildings.json"))
+            .default as Building[]
     }
 
     _setupListener(): void {

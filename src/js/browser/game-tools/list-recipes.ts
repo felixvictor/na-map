@@ -15,7 +15,6 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { putImportError } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatInt, formatSignPercent } from "../../common/common-format"
 import { getCurrencyAmount } from "../../common/common-game-tools"
@@ -52,17 +51,13 @@ export default class ListRecipes {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
-                .default as Module[]
-            this._recipeData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json"))
-                .default.recipe as RecipeGroup[]
-            this._recipes = new Map<number, RecipeEntity>(
-                this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))
-            )
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+            .default as Module[]
+        this._recipeData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json")).default
+            .recipe as RecipeGroup[]
+        this._recipes = new Map<number, RecipeEntity>(
+            this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))
+        )
     }
 
     _setupListener(): void {

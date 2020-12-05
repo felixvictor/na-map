@@ -24,8 +24,8 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
-import { Nation, nations, NationShortName, putImportError, validNationShortName } from "../../common/common"
-import { initMultiDropdownNavbar } from "../../common/common-browser"
+import { Nation, nations, NationShortName, validNationShortName } from "../../common/common"
+import { initMultiDropdownNavbar, loadJsonFile } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
 import { simpleStringSort, sortBy } from "../../common/common-node"
@@ -151,27 +151,18 @@ export default class SelectPorts {
 
     async _loadData(): Promise<void> {
         if (!this._dataLoaded) {
-            const dataDirectory = "data"
+            this._frontlinesData = await loadJsonFile<FrontlinesPerServer>(`${this._map.serverName}-frontlines.json`)
 
-            try {
-                this._frontlinesData = (await (
-                    await fetch(`${dataDirectory}/${this._map.serverName}-frontlines.json`)
-                ).json()) as FrontlinesPerServer
+            const distances = (await import(/* webpackChunkName: "data-distances" */ `Lib/gen-generic/distances.json`))
+                .default as Distance[]
+            this._distances = new Map(
+                distances.map(([fromPortId, toPortId, distance]) => [
+                    fromPortId * this._numberPorts + toPortId,
+                    distance,
+                ])
+            )
 
-                const distances = (
-                    await import(/* webpackChunkName: "data-distances" */ `Lib/gen-generic/distances.json`)
-                ).default as Distance[]
-                this._distances = new Map(
-                    distances.map(([fromPortId, toPortId, distance]) => [
-                        fromPortId * this._numberPorts + toPortId,
-                        distance,
-                    ])
-                )
-
-                this._dataLoaded = true
-            } catch (error: unknown) {
-                putImportError(error as string)
-            }
+            this._dataLoaded = true
         }
     }
 

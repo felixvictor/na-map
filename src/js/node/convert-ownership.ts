@@ -14,8 +14,6 @@ import path from "path"
 import d3Array from "d3-array"
 const { group: d3Group } = d3Array
 
-import dayjs from "dayjs"
-
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 

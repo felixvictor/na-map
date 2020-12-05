@@ -38,7 +38,7 @@ export interface Building {
     result?: BuildingResult[]
     batch?: BuildingBatch
     levels: BuildingLevelsEntity[]
-    byproduct?: []
+    byproduct?: unknown[]
 }
 export interface BuildingResult {
     id: number
@@ -67,7 +67,7 @@ export interface BuildingWithResult {
     result: BuildingResult[]
     batch?: BuildingBatch
     levels: BuildingLevelsEntity[]
-    byproduct?: []
+    byproduct?: unknown[]
 }
 
 /****************************

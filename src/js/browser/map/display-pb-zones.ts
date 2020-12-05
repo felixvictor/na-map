@@ -10,7 +10,6 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
-import { putImportError } from "../../common/common"
 import { servers } from "../../common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "../util/cookie"
@@ -105,13 +104,8 @@ export default class DisplayPbZones {
     }
 
     async _loadData(): Promise<void> {
-        try {
-            this._pbZonesDefault = (
-                await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json")
-            ).default as PbZone[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._pbZonesDefault = (await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json"))
+            .default as PbZone[]
     }
 
     _setupListener(): void {

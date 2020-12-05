@@ -28,7 +28,7 @@ import {
     colourWhite,
     insertBaseModal,
 } from "../../../common/common-browser"
-import { isEmpty, putImportError, WoodType, woodType } from "../../../common/common"
+import { isEmpty, WoodType, woodType } from "../../../common/common"
 import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format"
 import {
     hashids,
@@ -518,19 +518,14 @@ export class CompareShips {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            this._moduleDataDefault = (
-                await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json")
-            ).default as Module[]
-            this._shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json"))
-                .default as ShipData[]
-            this._setupData()
-            if (this._baseId !== "ship-journey") {
-                this.woodCompare = new CompareWoods(this._woodId)
-                await this.woodCompare.woodInit()
-            }
-        } catch (error: unknown) {
-            putImportError(error as string)
+        this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+            .default as Module[]
+        this._shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json"))
+            .default as ShipData[]
+        this._setupData()
+        if (this._baseId !== "ship-journey") {
+            this.woodCompare = new CompareWoods(this._woodId)
+            await this.woodCompare.woodInit()
         }
     }
 

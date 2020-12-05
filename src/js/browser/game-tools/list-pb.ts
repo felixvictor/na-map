@@ -19,8 +19,8 @@ import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter, findNationByNationShortName, putImportError } from "../../common/common"
-import { insertBaseModal } from "../../common/common-browser"
+import { capitalizeFirstLetter, findNationByNationShortName } from "../../common/common"
+import { insertBaseModal, loadJsonFile } from "../../common/common-browser"
 import { displayClan } from "../util"
 import { PortBattlePerServer } from "../../common/gen-json"
 import { HtmlString } from "../../common/interface"
@@ -64,38 +64,30 @@ export default class ListPortBattles {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const dataDirectory = "data"
+        const data = await loadJsonFile<PortBattlePerServer[]>(`${this.#serverId}-pb3.json`)
+        this.#data = data
+            .filter((port) => port.attackHostility === 1)
+            .map((port) => {
+                const portBattleLT = dayjs.utc(port.portBattle).local()
+                const portBattleST = dayjs.utc(port.portBattle)
+                const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
+                const defenderNation = findNationByNationShortName(port.nation)?.name
+                const defender = port.capturer
+                    ? `${defenderNation ?? ""} (${displayClan(port.capturer)})`
+                    : defenderNation ?? ""
 
-        try {
-            const data = (await (
-                await fetch(`${dataDirectory}/${this.#serverId}-pb.json`)
-            ).json()) as PortBattlePerServer[]
-            this.#data = data
-                .filter((port) => port.attackHostility === 1)
-                .map((port) => {
-                    const portBattleLT = dayjs.utc(port.portBattle).local()
-                    const portBattleST = dayjs.utc(port.portBattle)
-                    const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
-                    const defenderNation = findNationByNationShortName(port.nation)?.name
-                    const defender = port.capturer
-                        ? `${defenderNation ?? ""} (${displayClan(port.capturer)})`
-                        : defenderNation ?? ""
-
-                    return {
-                        sort: port.portBattle ?? "",
-                        data: [
-                            `${capitalizeFirstLetter(portBattleST.fromNow())} at ${portBattleST.format(
-                                "H.mm"
-                            )} ${localTime}`,
-                            port.name,
-                            `${port?.attackerNation ?? ""} (${displayClan(port?.attackerClan ?? "")})`,
-                            defender,
-                        ],
-                    }
-                })
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+                return {
+                    sort: port.portBattle ?? "",
+                    data: [
+                        `${capitalizeFirstLetter(portBattleST.fromNow())} at ${portBattleST.format(
+                            "H.mm"
+                        )} ${localTime}`,
+                        port.name,
+                        `${port?.attackerNation ?? ""} (${displayClan(port?.attackerClan ?? "")})`,
+                        defender,
+                    ],
+                }
+            })
     }
 
     _setupListener(): void {

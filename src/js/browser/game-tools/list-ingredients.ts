@@ -15,7 +15,6 @@ import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { putImportError } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatSignInt, formatSignPercent } from "../../common/common-format"
 import { sortBy } from "../../common/common-node"
@@ -41,14 +40,10 @@ export default class ListIngredients {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
-                .default as Module[]
-            this._ingredientData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json"))
-                .default.ingredient as RecipeIngredientEntity[]
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+            .default as Module[]
+        this._ingredientData = (await import(/* webpackChunkName: "data-recipes" */ "Lib/gen-generic/recipes.json"))
+            .default.ingredient as RecipeIngredientEntity[]
     }
 
     _setupListener(): void {

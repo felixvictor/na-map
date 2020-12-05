@@ -9,6 +9,7 @@
  */
 
 import { VNode } from "preact"
+import { PortBasic, PortBattlePerServer, PortPerServer } from "./gen-json"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface SVGSVGDatum {}
@@ -65,4 +66,11 @@ type Key = string
 export interface HeaderMap {
     group: Map<Key, number>
     element: Set<Key>
+}
+
+type PortIncome = PortBasic & PortPerServer & PortBattlePerServer
+export interface PortJsonData {
+    ports: PortBasic[]
+    pb: PortBattlePerServer[]
+    server: PortPerServer[]
 }

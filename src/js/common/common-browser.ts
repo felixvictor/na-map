@@ -11,7 +11,7 @@
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
-import { BaseModalPure } from "./interface"
+import { BaseModalPure, DataSource } from "./interface"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -147,3 +147,30 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
 }
 
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`
+
+export const loadJsonFiles = async <T>(dataSources: DataSource[], readData: T): Promise<void> => {
+    for await (const dataSource of dataSources) {
+        readData[dataSource.name as keyof T] = await loadJsonFile(dataSource.fileName)
+    }
+}
+
+class FetchError extends Error {
+    private readonly response: Response
+    constructor(response: Response) {
+        super(`${response.url} ${response.statusText} (status ${response.status})`)
+        this.name = "Fetch error"
+        this.response = response
+    }
+}
+
+const dataDirectory = "data"
+
+export const loadJsonFile = async <T>(fileName: string): Promise<T> => {
+    const response = await fetch(`${dataDirectory}/${fileName}`)
+
+    if (!response.ok) {
+        throw new FetchError(response)
+    }
+
+    return response.json()
+}

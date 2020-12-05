@@ -15,7 +15,7 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { putImportError, woodType, WoodType, WoodTypeList } from "../../common/common"
+import { woodType, WoodType, WoodTypeList } from "../../common/common"
 import { insertBaseModal } from "../../common/common-browser"
 import { formatInt } from "../../common/common-format"
 import { sortBy } from "../../common/common-node"
@@ -79,32 +79,28 @@ export default class ListShipBlueprints {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        try {
-            this._blueprintData = (
-                await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/ship-blueprints.json")
-            ).default as ShipBlueprint[]
-            this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
-                .default as WoodData
+        this._blueprintData = (
+            await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/ship-blueprints.json")
+        ).default as ShipBlueprint[]
+        this._woodData = (await import(/* webpackChunkName: "data-woods" */ "Lib/gen-generic/woods.json"))
+            .default as WoodData
 
-            /**
-             * Extraction prices
-             * - key: resource name
-             * - values: extractionCost
-             */
-            const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/prices.json"))
-                .default as Price
-            this._extractionCosts = new Map<string, StandardCost>(
-                costs.standard.map((cost) => [cost.name, { reales: cost.reales, labour: cost?.labour ?? 0 }])
-            )
-            this._craftingCosts = new Map<string, SeasonedCost>(
-                costs.seasoned.map((cost) => [
-                    cost.name,
-                    { reales: cost.reales, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool },
-                ])
-            )
-        } catch (error: unknown) {
-            putImportError(error as string)
-        }
+        /**
+         * Extraction prices
+         * - key: resource name
+         * - values: extractionCost
+         */
+        const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "Lib/gen-generic/prices.json"))
+            .default as Price
+        this._extractionCosts = new Map<string, StandardCost>(
+            costs.standard.map((cost) => [cost.name, { reales: cost.reales, labour: cost?.labour ?? 0 }])
+        )
+        this._craftingCosts = new Map<string, SeasonedCost>(
+            costs.seasoned.map((cost) => [
+                cost.name,
+                { reales: cost.reales, labour: cost.labour, doubloon: cost.doubloon, tool: cost.tool },
+            ])
+        )
     }
 
     _setupListener(): void {

@@ -8,7 +8,6 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { putImportError } from "../common/common"
 import { serverIds } from "../common/servers"
 
 import Cookie from "./util/cookie"
@@ -104,17 +103,13 @@ const setupListener = (): void => {
  * @param searchParams - Query arguments
  */
 const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
-    try {
-        const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
-        const map = new Map.NAMap(serverId, searchParams)
-        await map.MapInit()
+    const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
+    const map = new Map.NAMap(serverId, searchParams)
+    await map.MapInit()
 
-        window.addEventListener("resize", () => {
-            map.resize()
-        })
-    } catch (error: unknown) {
-        putImportError(error as string)
-    }
+    window.addEventListener("resize", () => {
+        map.resize()
+    })
 }
 
 /**
@@ -123,24 +118,16 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
  * @param searchParams - Query arguments
  */
 const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
-    try {
-        const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
-        gameTools.init(serverId, searchParams)
-    } catch (error: unknown) {
-        putImportError(error as string)
-    }
+    const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
+    gameTools.init(serverId, searchParams)
 }
 
 /**
  * Load map tools
  */
 const loadMapTools = async (): Promise<void> => {
-    try {
-        const mapTools = await import(/* webpackChunkName: "map-tools" */ "./map-tools")
-        mapTools.init()
-    } catch (error: unknown) {
-        putImportError(error as string)
-    }
+    const mapTools = await import(/* webpackChunkName: "map-tools" */ "./map-tools")
+    mapTools.init()
 }
 
 const load = async (): Promise<void> => {
