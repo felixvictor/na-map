@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.4](///compare/v12.1.3...v12.1.4) (2020-12-05)
+
+
+### Bug Fixes
+
+* **patch:** 12lb/42lb tower cannons with higher pen 46a3555
+* **show net income:** nation legend improved 6eb4bfa
+
 ### [12.1.3](///compare/v12.1.2...v12.1.3) (2020-11-29)
 
 
