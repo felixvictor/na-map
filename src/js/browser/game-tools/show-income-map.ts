@@ -184,15 +184,14 @@ export default class ShowIncomeMap extends BaseModal {
     _drawLegends(): void {
         const rowHeight = Math.floor(20 * 1.618)
         const rowPadding = Math.floor(2 * 1.618)
-        const columnPadding = Math.floor(10 * 1.618)
+        const columnPadding = Math.floor(5 * 1.618)
         const nations = (this.#tree.children ?? []).sort((a, b) => (b.value as number) - (a.value as number))
 
-        const minColumnWidth = 190 // Width of "Verenigde Provinciën"
-        const totalWidth = nations.length * (minColumnWidth + columnPadding)
+        const minColumnWidth = 160 + columnPadding * 2 // Width of "Verenigde Provinciën" plus padding
+        const totalWidth = nations.length * minColumnWidth - columnPadding * 2
         const rows = Math.ceil(totalWidth / this.#width)
-        const columnsPerRow = nations.length / rows
-        const columnWidth = Math.floor(this.#width / columnsPerRow - columnPadding)
-
+        const columnsPerRow = Math.ceil(nations.length / rows)
+        const columnWidth = Math.ceil(this.#width / columnsPerRow - columnPadding * 2)
         const legendContainer = this.#mainDiv
             .append("div")
             .attr("class", "d-flex flex-wrap justify-content-between mt-3")
@@ -237,7 +236,6 @@ export default class ShowIncomeMap extends BaseModal {
                     .attr("x", columnWidth - columnPadding)
                     .attr("y", "75%")
                     .html((d) => formatSiInt(d.value as number, true))
-                    // .style("fill", (d) => (this.#colourScale(d.data.id as string)))
                     .style("text-anchor", "end")
 
                 return div
