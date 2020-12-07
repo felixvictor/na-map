@@ -64,7 +64,7 @@ export default class ListPortBattles {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const data = await loadJsonFile<PortBattlePerServer[]>(`${this.#serverId}-pb3.json`)
+        const data = await loadJsonFile<PortBattlePerServer[]>(`${this.#serverId}-pb.json`)
         this.#data = data
             .filter((port) => port.attackHostility === 1)
             .map((port) => {
