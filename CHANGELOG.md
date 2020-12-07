@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.1.5](///compare/v12.1.4...v12.1.5) (2020-12-07)
+
+
+### Bug Fixes
+
+* **list-port-battles:** file name fixed ca252af
+
 ### [12.1.4](///compare/v12.1.3...v12.1.4) (2020-12-05)
 
 
