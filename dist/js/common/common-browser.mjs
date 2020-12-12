@@ -118,4 +118,10 @@ export const loadJsonFile = async (fileName) => {
     }
     return response.json();
 };
+export const showCursorWait = () => {
+    document.body.style.cursor = "wait";
+};
+export const showCursorDefault = () => {
+    document.body.style.cursor = "default";
+};
 //# sourceMappingURL=common-browser.js.map
