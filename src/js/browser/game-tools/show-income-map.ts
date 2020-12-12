@@ -29,7 +29,7 @@ import { BaseModal } from "./base-modal"
 import { Vertex } from "d3-weighted-voronoi"
 import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
-import { DataSource, PortIncome, PortJsonData } from "../../common/interface"
+import { DataSource, HtmlString, PortIncome, PortJsonData } from "../../common/interface"
 
 interface TreeMapPolygon extends Array<Point> {
     0: Point
@@ -181,7 +181,7 @@ export default class ShowIncomeMap extends BaseModal {
         })
     }
 
-    _drawLegends(): void {
+    _drawLegend(): void {
         const rowHeight = Math.floor(20 * 1.618)
         const rowPadding = Math.floor(2 * 1.618)
         const columnPadding = Math.floor(5 * 1.618)
@@ -242,8 +242,8 @@ export default class ShowIncomeMap extends BaseModal {
             })
     }
 
-    _showDetails(event: Event, d: TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>): void {
-        const title = `
+    _getTooltipText(d: TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>): HtmlString {
+        return `
             <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex flex-column text-left mt-1 mr-3 p-0">
                 <div><span class="x-large">${d.data.id as string}</span><br />${d.parent?.data.id as string}</div>
@@ -263,7 +263,9 @@ export default class ShowIncomeMap extends BaseModal {
                 </div>
             </div>
             </div>`
+    }
 
+    _showDetails(event: Event, d: TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>): void {
         $(event.currentTarget as JQuery.PlainObject)
             .tooltip("dispose")
             .tooltip({
@@ -272,15 +274,13 @@ export default class ShowIncomeMap extends BaseModal {
                     '<div class="tooltip" role="tooltip">' +
                     '<div class="tooltip-block tooltip-inner tooltip-inner-smaller">' +
                     "</div></div>",
-                title,
+                title: this._getTooltipText(d),
                 sanitize: false,
             })
             .tooltip("show")
     }
 
-    _drawTreemap(): void {
-        const leaves = this.#tree.leaves()
-
+    _drawCells(leaves: Array<TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>>): void {
         this.#mainG
             .append("g")
             .attr("class", "cells")
@@ -293,7 +293,9 @@ export default class ShowIncomeMap extends BaseModal {
                     .attr("d", (d) => `M${d.polygon.join(",")}z`)
                     .style("fill", (d) => this.#colourScale(d.parent?.data.id as string))
             )
+    }
 
+    _drawLabels(leaves: Array<TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>>): void {
         const labels = this.#mainG
             .append("g")
             .attr("class", "labels")
@@ -315,7 +317,9 @@ export default class ShowIncomeMap extends BaseModal {
             .append("text")
             .attr("class", "value")
             .html((d) => formatSiCurrency(d.data.data.value, true))
+    }
 
+    _drawHover(leaves: Array<TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>>): void {
         this.#mainG
             .append("g")
             .selectAll(".hoverer")
@@ -330,6 +334,16 @@ export default class ShowIncomeMap extends BaseModal {
                     .on("mouseover", (event: Event, d) => this._showDetails(event, d))
                     .on("mouseleave", ShowIncomeMap._hideDetails)
             )
+    }
+
+    _drawTreemap(): void {
+        const leaves = this.#tree.leaves()
+
+        this._drawCells(leaves)
+        this._drawLabels(leaves)
+        this._drawHover(leaves)
+
+        this._drawLegend()
     }
 
     _initTreemap(): void {
@@ -390,7 +404,6 @@ export default class ShowIncomeMap extends BaseModal {
                     emptyModal = false
                     this._initTreemap()
                     this._drawTreemap()
-                    this._drawLegends()
                 }
             })
             .modal("show")
