@@ -174,3 +174,11 @@ export const loadJsonFile = async <T>(fileName: string): Promise<T> => {
 
     return response.json()
 }
+
+export const showCursorWait = (): void => {
+    document.body.style.cursor = "wait"
+}
+
+export const showCursorDefault = (): void => {
+    document.body.style.cursor = "default"
+}

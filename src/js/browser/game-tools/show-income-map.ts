@@ -21,7 +21,13 @@ import seedrandom from "seedrandom"
 
 import { registerEvent } from "../analytics"
 import { findNationByNationShortName, nations } from "../../common/common"
-import { colourList, insertBaseModal, loadJsonFiles } from "../../common/common-browser"
+import {
+    colourList,
+    insertBaseModal,
+    loadJsonFiles,
+    showCursorDefault,
+    showCursorWait,
+} from "../../common/common-browser"
 import { formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
 import { getContrastColour } from "../../common/common-game-tools"
 
@@ -398,6 +404,7 @@ export default class ShowIncomeMap extends BaseModal {
             this._initModal()
         }
 
+        showCursorWait()
         // Show modal
         $(`#${this.modalId}`)
             .on("shown.bs.modal", () => {
@@ -407,6 +414,8 @@ export default class ShowIncomeMap extends BaseModal {
                     this._initTreemap()
                     this._drawTreemap()
                 }
+
+                showCursorDefault()
             })
             .modal("show")
     }
