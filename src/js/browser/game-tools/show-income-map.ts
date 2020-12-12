@@ -17,6 +17,7 @@ import { hierarchy as d3Hierarchy, HierarchyNode, stratify as d3Stratify } from 
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { Point, voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
+import seedrandom from "seedrandom"
 
 import { registerEvent } from "../analytics"
 import { findNationByNationShortName, nations } from "../../common/common"
@@ -364,7 +365,8 @@ export default class ShowIncomeMap extends BaseModal {
                 [this.#width, this.#height],
                 [this.#width, 0],
             ])
-            .minWeightRatio(1e-10)(this.#tree)
+            .minWeightRatio(1e-10)
+            .prng(seedrandom(this.baseId))(this.#tree)
     }
 
     /**

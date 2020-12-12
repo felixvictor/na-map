@@ -97,6 +97,7 @@
         "js-cookie": "^2.2.1",
         "preact": "^10.5.7",
         "round-slider": "^1.6.1",
+        "seedrandom": "^3.0.5",
         "timelines-chart": "2.11.1"
     },
     "devDependencies": {
@@ -139,6 +140,7 @@
         "@types/polylabel": "^1.0.5",
         "@types/recursive-readdir": "^2.2.0",
         "@types/sass": "^1.16.0",
+        "@types/seedrandom": "^2.4.28",
         "@types/sharp": "^0.26.1",
         "@types/terser-webpack-plugin": "^5.0.2",
         "@types/twit": "^2.2.25",
