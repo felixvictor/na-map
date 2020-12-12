@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.0](///compare/v12.1.6...v12.2.0) (2020-12-12)
+
+
+### Features
+
+* seeded randomness for show port net income ce8ef58
+* wait cursor for show port net income 13d7540
+
 ### [12.1.6](///compare/v12.1.5...v12.1.6) (2020-12-10)
 
 ### [12.1.5](///compare/v12.1.4...v12.1.5) (2020-12-07)
