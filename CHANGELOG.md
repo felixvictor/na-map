@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.3.0](///compare/v12.2.0...v12.3.0) (2020-12-16)
+
+
+### Features
+
+* **display ports:** port info with trade relations visually improved b74cb12
+
+
+### Bug Fixes
+
+* link to Aquilla's guide updated 23b2df4
+
 ## [12.2.0](///compare/v12.1.6...v12.2.0) (2020-12-12)
 
 
