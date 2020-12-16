@@ -9,7 +9,6 @@
  */
 
 import path from "path"
-import { default as Immutable } from "immutable"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"

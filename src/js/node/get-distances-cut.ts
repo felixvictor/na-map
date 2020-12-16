@@ -10,7 +10,6 @@
 
 import * as fs from "fs"
 import path from "path"
-import { default as Immutable } from "immutable"
 import { default as PNG } from "pngjs"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
