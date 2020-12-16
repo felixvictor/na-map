@@ -126,8 +126,8 @@ interface PortForDisplay {
     dropsNonTrading: string
     tradePort: string
     tradePortId?: number
-    goodsToSellInTradePort: string
-    goodsToBuyInTradePort: string
+    goodsToSellInTradePort: HtmlResult[]
+    goodsToBuyInTradePort: HtmlResult[]
     portBonus?: PortBonus
 }
 
@@ -178,7 +178,6 @@ export default class DisplayPorts {
     #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gVoronoi!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound!: Bound
     #maxNetIncome!: number
     #maxPortPoints!: number
@@ -349,7 +348,9 @@ export default class DisplayPorts {
     }
 
     _setupListener(): void {
-        document.querySelector("#show-radius")?.addEventListener("change", () => this._showRadiusSelected())
+        document.querySelector("#show-radius")?.addEventListener("change", () => {
+            this._showRadiusSelected()
+        })
     }
 
     /**
@@ -787,14 +788,20 @@ export default class DisplayPorts {
                     .sort(simpleStringSort)
                     .join(", ") ?? "",
             tradePort: this._getPortName(this.tradePortId),
-            goodsToSellInTradePort: portProperties.goodsToSellInTradePort
+            goodsToSellInTradePort: html`${portProperties.goodsToSellInTradePort
                 ?.sort(sortByProfit)
-                ?.map((good) => `${good.name} (${formatSiInt(good.profit.profit)})`)
-                .join(", "),
-            goodsToBuyInTradePort: portProperties.goodsToBuyInTradePort
+                ?.map(
+                    (good, index) =>
+                        html`<span style="white-space: nowrap;">${good.name} (${formatSiInt(good.profit.profit)})</span
+                            >${index === portProperties.goodsToSellInTradePort.length - 1 ? html`` : html`, `}`
+                )}`,
+            goodsToBuyInTradePort: html`${portProperties.goodsToBuyInTradePort
                 ?.sort(sortByProfit)
-                ?.map((good) => `${good.name} (${formatSiInt(good.profit.profit)})`)
-                .join(", "),
+                ?.map(
+                    (good, index) =>
+                        html`<span style="white-space: nowrap;">${good.name} (${formatSiInt(good.profit.profit)})</span
+                            >${index === portProperties.goodsToBuyInTradePort.length - 1 ? html`` : html`, `}`
+                )}`,
         } as PortForDisplay
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
@@ -932,21 +939,18 @@ export default class DisplayPorts {
                 ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
                 : html``}
             ${this.showRadius === "tradePorts"
-                ? html`${port.goodsToSellInTradePort.length > 0
-                      ? html`<p class="mb-2">
-                            <span class="caps">Sell in ${port.tradePort}</span> (net profit)—
-                            ${port.goodsToSellInTradePort}
-                        </p>`
-                      : html``}
-                  ${port.goodsToBuyInTradePort.length > 0
-                      ? html`<p class="mb-2">
-                            <span class="caps">Buy in ${port.tradePort}</span> (net profit)—
-                            ${port.goodsToBuyInTradePort}
-                        </p>`
-                      : html``}`
+                ? html`${port.goodsToSellInTradePort?.[0] === undefined
+                      ? html``
+                      : html`<div class="alert alert-success mt-2 mb-2 text-left" role="alert">
+                            <span class="caps">Buy here and sell in ${port.tradePort}</span> (net profit)<br />${port.goodsToSellInTradePort}
+                        </div>`}
+                  ${port.goodsToBuyInTradePort?.[0] === undefined
+                      ? html``
+                      : html`<div class="alert alert-danger mt-2 mb-2 text-left" role="alert">
+                            <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit)<br />${port.goodsToBuyInTradePort}
+                        </div>`}`
                 : html``}
         `
-
         return h
     }
 
@@ -1042,7 +1046,9 @@ export default class DisplayPorts {
                     })
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
-                    .on("click", (event: Event, d: PortWithTrades) => this._showDetails(event, d))
+                    .on("click", (event: Event, d: PortWithTrades) => {
+                        this._showDetails(event, d)
+                    })
                     .on("mouseleave", DisplayPorts._hideDetails)
             )
             .attr("r", circleSize)
