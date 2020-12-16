@@ -10,7 +10,7 @@
 
 import * as fs from "fs"
 import path from "path"
-import { default as Immutable } from "immutable"
+import Deque from "collections/deque"
 import { default as PNG } from "pngjs"
 
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
@@ -27,7 +27,7 @@ type PixelDistance = number
 type SpotType = number
 
 // type (spotLand, spotWater, port id)
-type GridMap = Record<number, SpotType>
+type GridMap = SpotType[]
 
 class Port {
     apiPorts: APIPort[] = []
@@ -55,8 +55,7 @@ class Map {
     #pngData!: Buffer
     #distances: Distance[] = []
     #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
-    #map: GridMap = {} as GridMap
-    #map2: GridMap = {} as GridMap
+    #map: GridMap = [] as GridMap
     #mapHeight!: number
     #mapScale!: number
     #mapWidth!: number
@@ -75,16 +74,16 @@ class Map {
         this.mapInit()
         this.setPorts()
         this.setBorders()
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.getAndSaveDistances()
+        void this.getAndSaveDistances()
     }
 
     setBitFlags(): void {
-        const bitsAvailable = 32
+        const bitsAvailable = 16
         const bitsForPortIds = Number(this.#port.numPorts).toString(2).length + 1
 
         if (bitsForPortIds + 3 > bitsAvailable) {
-            throw new Error("Too few bits")
+            const errorMessage = `Too few bits: available ${bitsAvailable} bits, needed ${bitsForPortIds + 3} bits`
+            throw new Error(errorMessage)
         }
 
         this.#LAND = 1 << bitsForPortIds
@@ -109,9 +108,9 @@ class Map {
 
     mapInit(): void {
         /**
-         * Convert png to map (black -\> spotLand, white -\> spotWater)
+         * Convert png to map (black --\> spot type 'land', white --\> spot type 'water')
          */
-        this.#map = [...new Array(this.#mapWidth * this.#mapHeight)].map((_, index) =>
+        this.#map = [...new Uint16Array(this.#mapWidth * this.#mapHeight)].map((_, index) =>
             this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND
         )
     }
@@ -182,11 +181,10 @@ class Map {
         this.visit(startIndex)
 
         // Queue holds unchecked positions ([index, distance from start port])
-        let queue = Immutable.List<[Index, PixelDistance]>([[startIndex, 0]])
+        const queue = new Deque([[startIndex, 0]])
 
-        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && !queue.isEmpty()) {
-            let [index, pixelDistance]: [Index, PixelDistance] = queue.first()
-            queue = queue.shift()
+        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length !== 0) {
+            let [index, pixelDistance]: [Index, PixelDistance] = queue.shift()
             const spot = this.getPortId(this.getSpot(index))
 
             // Check if port is found
@@ -205,12 +203,13 @@ class Map {
                     // Add not visited non-land neighbour index
                     if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
                         this.visit(neighbourIndex)
-                        queue = queue.push([neighbourIndex, pixelDistance])
+                        queue.push([neighbourIndex, pixelDistance])
                     }
                 }
             }
         }
 
+        // Check for missing ports
         if (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts) {
             const missingPortIds = this.#port.portIds
                 .filter((portId: number) => portId > startPortId && !foundPortIds.has(portId))
@@ -252,7 +251,16 @@ class Map {
 
             console.timeEnd("findPath")
 
-            await saveJsonAsync(this.#distancesFile, this.#distances)
+            await saveJsonAsync(
+                this.#distancesFile,
+                this.#distances.sort((a, b) => {
+                    if (a[0] === b[0]) {
+                        return a[1] - b[1]
+                    }
+
+                    return a[0] - b[0]
+                })
+            )
         } catch (error: unknown) {
             console.error("Map distance error:", error)
         }
