@@ -9,7 +9,7 @@
  */
 import * as fs from "fs";
 import path from "path";
-import { default as Immutable } from "immutable";
+import Deque from "collections/deque";
 import { default as PNG } from "pngjs";
 import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
@@ -39,8 +39,7 @@ class Map {
         this.#mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
         this.#distances = [];
         this.#distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json");
-        this.#map = {};
-        this.#map2 = {};
+        this.#map = [];
         this.#port = {};
         this.#completedPorts = new Set();
         this.#LAND = 0;
@@ -53,14 +52,13 @@ class Map {
         this.mapInit();
         this.setPorts();
         this.setBorders();
-        this.getAndSaveDistances();
+        void this.getAndSaveDistances();
     }
     #mapFileName;
     #pngData;
     #distances;
     #distancesFile;
     #map;
-    #map2;
     #mapHeight;
     #mapScale;
     #mapWidth;
@@ -71,10 +69,11 @@ class Map {
     #VISITED;
     #FLAGS;
     setBitFlags() {
-        const bitsAvailable = 32;
+        const bitsAvailable = 16;
         const bitsForPortIds = Number(this.#port.numPorts).toString(2).length + 1;
         if (bitsForPortIds + 3 > bitsAvailable) {
-            throw new Error("Too few bits");
+            const errorMessage = `Too few bits: available ${bitsAvailable} bits, needed ${bitsForPortIds + 3} bits`;
+            throw new Error(errorMessage);
         }
         this.#LAND = 1 << bitsForPortIds;
         this.#WATER = this.#LAND << 1;
@@ -91,7 +90,7 @@ class Map {
         console.log(this.#mapHeight, this.#mapWidth);
     }
     mapInit() {
-        this.#map = [...new Array(this.#mapWidth * this.#mapHeight)].map((_, index) => this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND);
+        this.#map = [...new Uint16Array(this.#mapWidth * this.#mapHeight)].map((_, index) => this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND);
     }
     setPorts() {
         this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
@@ -133,10 +132,9 @@ class Map {
         const startIndex = this.getIndex(startY, startX);
         this.#completedPorts.add(startPortId);
         this.visit(startIndex);
-        let queue = Immutable.List([[startIndex, 0]]);
-        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && !queue.isEmpty()) {
-            let [index, pixelDistance] = queue.first();
-            queue = queue.shift();
+        const queue = new Deque([[startIndex, 0]]);
+        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length !== 0) {
+            let [index, pixelDistance] = queue.shift();
             const spot = this.getPortId(this.getSpot(index));
             if (spot > startPortId) {
                 this.#distances.push([startPortId, spot, pixelDistance]);
@@ -148,7 +146,7 @@ class Map {
                     const neighbourIndex = index + y + x;
                     if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
                         this.visit(neighbourIndex);
-                        queue = queue.push([neighbourIndex, pixelDistance]);
+                        queue.push([neighbourIndex, pixelDistance]);
                     }
                 }
             }
@@ -176,7 +174,12 @@ class Map {
                 console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
             });
             console.timeEnd("findPath");
-            await saveJsonAsync(this.#distancesFile, this.#distances);
+            await saveJsonAsync(this.#distancesFile, this.#distances.sort((a, b) => {
+                if (a[0] === b[0]) {
+                    return a[1] - b[1];
+                }
+                return a[0] - b[0];
+            }));
         }
         catch (error) {
             console.error("Map distance error:", error);
