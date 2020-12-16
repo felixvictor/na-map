@@ -25,7 +25,7 @@ dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
 import { Nation, nations, NationShortName, validNationShortName } from "../../common/common"
-import { initMultiDropdownNavbar, loadJsonFile } from "../../common/common-browser"
+import { initMultiDropdownNavbar, loadJsonFile, TupleKeyMap } from "../../common/common-browser"
 import { formatInt, formatSiCurrency } from "../../common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
 import { simpleStringSort, sortBy } from "../../common/common-node"
@@ -82,7 +82,7 @@ export default class SelectPorts {
     private readonly _propClanSelector: HTMLSelectElement | null
     private readonly _propNationId: string
     private readonly _propNationSelector: HTMLSelectElement | null
-    private readonly _sellProfit: Map<string, TradeProfit> = new Map()
+    private readonly _sellProfit = new TupleKeyMap<[number, number], TradeProfit>()
 
     constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
         this._ports = ports
@@ -224,15 +224,31 @@ export default class SelectPorts {
             event.preventDefault()
         })
 
-        document.querySelector("#menu-prop-deep")?.addEventListener("click", () => this._depthSelected("deep"))
-        document.querySelector("#menu-prop-shallow")?.addEventListener("click", () => this._depthSelected("shallow"))
-        document.querySelector("#menu-prop-all")?.addEventListener("click", () => this._allSelected())
-        document.querySelector("#menu-prop-non-capturable")?.addEventListener("click", () => this._nonCapSelected())
+        document.querySelector("#menu-prop-deep")?.addEventListener("click", () => {
+            this._depthSelected("deep")
+        })
+        document.querySelector("#menu-prop-shallow")?.addEventListener("click", () => {
+            this._depthSelected("shallow")
+        })
+        document.querySelector("#menu-prop-all")?.addEventListener("click", () => {
+            this._allSelected()
+        })
+        document.querySelector("#menu-prop-non-capturable")?.addEventListener("click", () => {
+            this._nonCapSelected()
+        })
 
-        document.querySelector("#menu-prop-today")?.addEventListener("click", () => this._capturedToday())
-        document.querySelector("#menu-prop-yesterday")?.addEventListener("click", () => this._capturedYesterday())
-        document.querySelector("#menu-prop-this-week")?.addEventListener("click", () => this._capturedThisWeek())
-        document.querySelector("#menu-prop-last-week")?.addEventListener("click", () => this._capturedLastWeek())
+        document.querySelector("#menu-prop-today")?.addEventListener("click", () => {
+            this._capturedToday()
+        })
+        document.querySelector("#menu-prop-yesterday")?.addEventListener("click", () => {
+            this._capturedYesterday()
+        })
+        document.querySelector("#menu-prop-this-week")?.addEventListener("click", () => {
+            this._capturedThisWeek()
+        })
+        document.querySelector("#menu-prop-last-week")?.addEventListener("click", () => {
+            this._capturedLastWeek()
+        })
 
         initMultiDropdownNavbar("selectPortNavbar")
     }
@@ -467,7 +483,7 @@ export default class SelectPorts {
         }
 
         const getProfit = (buyPort: PortWithTrades, sellPort: PortWithTrades, itemId: number): TradeProfit => {
-            const key = String(sellPort.id).padStart(4, "0") + String(itemId).padStart(4, "0")
+            const key = [sellPort.id, itemId] as [number, number]
             if (!this._sellProfit.has(key)) {
                 this._sellProfit.set(key, calculateSellProfit(buyPort, sellPort, itemId))
             }
