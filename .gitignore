@@ -1,15 +1,20 @@
 # Created by .ignore support plugin (hsz.mobi)
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 .idea/
+.netlify
+.pnp.*
+.yarn/*
+/.env
+/.pnp.js
 /build/API/
 /build/Modules.zip
-/doc-sass/
 /doc-js/
+/doc-sass/
 /node_modules/
+/port-distances.json
 /report.html
 /webpack-stats.json
 /yarn-error.log
-/port-distances.json
-/.env
-/.pnp.js
-# Local Netlify folder
-.netlify
