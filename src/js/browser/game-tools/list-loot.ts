@@ -73,7 +73,7 @@ export default class ListLoot {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const sourceData = (await import(/* webpackChunkName: "data-loot" */ "na-map/src/lib/gen-generic/loot.json"))
+        const sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../../lib/gen-generic/loot.json"))
             .default as Loot
         this.#lootData = sourceData.loot as LootLootEntity[]
         this.#chestsData = sourceData.chests as LootChestsEntity[]

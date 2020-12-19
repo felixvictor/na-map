@@ -63,7 +63,7 @@ export default class ListPortBonus {
         this.#portPerServer = await loadJsonFile<PortPerServer[]>(`${this.#serverId}-ports.json`)
         this.#pbPerServer = await loadJsonFile<PortBattlePerServer[]>(`${this.#serverId}-pb.json`)
         this.#portBasicData = (
-            await import(/* webpackChunkName: "data-ports" */ "na-map/src/lib/gen-generic/ports.json")
+            await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json")
         ).default as PortBasic[]
     }
 

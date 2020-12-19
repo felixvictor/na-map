@@ -43,7 +43,7 @@ export default class ListBuildings {
 
     async _loadAndSetupData(): Promise<void> {
         this._buildingData = (
-            await import(/* webpackChunkName: "data-buildings" */ "na-map/src/lib/gen-generic/buildings.json")
+            await import(/* webpackChunkName: "data-buildings" */ "../../../lib/gen-generic/buildings.json")
         ).default as Building[]
     }
 

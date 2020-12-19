@@ -154,7 +154,7 @@ export default class SelectPorts {
             this._frontlinesData = await loadJsonFile<FrontlinesPerServer>(`${this._map.serverName}-frontlines.json`)
 
             const distances = (
-                await import(/* webpackChunkName: "data-distances" */ `na-map/src/lib/gen-generic/distances.json`)
+                await import(/* webpackChunkName: "data-distances" */ "../../../lib/gen-generic/distances.json")
             ).default as Distance[]
             this._distances = new Map(
                 distances.map(([fromPortId, toPortId, distance]) => [

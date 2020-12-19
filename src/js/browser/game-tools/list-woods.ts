@@ -72,7 +72,7 @@ export default class ListWoods {
 
     async _loadData(): Promise<void> {
         this._woodDataDefault = (
-            await import(/* webpackChunkName: "data-woods" */ "na-map/src/lib/gen-generic/woods.json")
+            await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json")
         ).default as WoodData
     }
 

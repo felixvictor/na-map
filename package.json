@@ -16,7 +16,7 @@
         "build:js:1:pre": "rm -rf dist",
         "build:js:2:node": "tsc --project src/js/tsconfig.json",
         "build:js:3:post:mv": "find ./dist/js -name \"*.js\" -type f -regextype posix-egrep -regex \".*/(common|node)/.+\" -exec bash -c 'mv \"$1\" \"${1%.js}\".mjs' - '{}' ';'",
-        "build:load": "yarn node dist/js/node/load-api-data.mjs",
+        "build:load": "yarn node --experimental-specifier-resolution=node dist/js/node/load-api-data.mjs",
         "build:push-prod": "git add --ignore-errors . && (git diff-index --quiet HEAD || git commit -m 'build: update public') && git push --quiet gitlab",
         "clean:src:js": "find ./src/js -name \"*.ts\" -type f -regextype posix-egrep -regex \".*/(browser|common|node)/.+\" -exec bash -c 'for file in \"${1%.ts}\".js \"${1%.ts}\".js.map; do [ -e \"$file\" ] && rm -f \"$file\"; done' - '{}' ';'",
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",

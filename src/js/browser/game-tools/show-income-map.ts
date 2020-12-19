@@ -158,7 +158,7 @@ export default class ShowIncomeMap extends BaseModal {
         ]
         const readData = {} as PortJsonData
 
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "na-map/src/lib/gen-generic/ports.json"))
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<PortJsonData>(dataSources, readData)
 

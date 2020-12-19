@@ -37,7 +37,7 @@ import {
     rigRepairsVolume,
     rumRepairsFactor,
 } from "../../../common/common-game-tools"
-import { default as shipIcon } from "na-map/src/icons/icon-ship.svg"
+import { default as shipIcon } from "../../../../icons/icon-ship.svg"
 
 import { ShipData } from "../../../common/gen-json"
 import { DragData, ShipDisplayData } from "./types"
