@@ -80,9 +80,7 @@ export default class ListShipBlueprints {
 
     async _loadAndSetupData(): Promise<void> {
         this._blueprintData = (
-            await import(
-                /* webpackChunkName: "data-ship-blueprints" */ "../../../lib/gen-generic/ship-blueprints.json"
-            )
+            await import(/* webpackChunkName: "data-ship-blueprints" */ "../../../lib/gen-generic/ship-blueprints.json")
         ).default as ShipBlueprint[]
         this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json"))
             .default as WoodData
