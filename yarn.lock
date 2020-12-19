@@ -14890,6 +14890,7 @@ fsevents@~2.1.2:
     stylelint-config-prettier: ^8.0.2
     stylelint-config-twbs-bootstrap: ^2.1.0
     stylelint-prettier: ^1.1.2
+    stylelint-scss: ^3.18.0
     svg-url-loader: ^7.1.1
     terser-webpack-plugin: ^5.0.3
     timelines-chart: 2.11.1
