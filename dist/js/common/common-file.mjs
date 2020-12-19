@@ -23,7 +23,9 @@ export const saveJsonAsync = async (fileName, data) => {
     await makeDirAsync(path.dirname(fileName));
     await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" });
 };
-export const saveTextFile = (fileName, data) => fs.writeFileSync(fileName, data, { encoding: "utf8" });
+export const saveTextFile = (fileName, data) => {
+    fs.writeFileSync(fileName, data, { encoding: "utf8" });
+};
 const isNodeError = (error) => error instanceof Error;
 export const readTextFile = (fileName) => {
     let data = "";
@@ -35,7 +37,7 @@ export const readTextFile = (fileName) => {
             console.error("File", fileName, "not found");
         }
         else {
-            throw error;
+            putFetchError(error);
         }
     }
     return data;

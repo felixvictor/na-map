@@ -9,7 +9,7 @@
  */
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
-import "bootstrap-select/js/bootstrap-select";
+import "bootstrap-select";
 import { min as d3Min, max as d3Max } from "d3-array";
 import { select as d3Select } from "d3-selection";
 import { registerEvent } from "../analytics";
@@ -33,6 +33,7 @@ class Wood {
 class WoodBase extends Wood {
     constructor(compareId, woodData, woodCompare) {
         super(compareId, woodCompare);
+        this._woodData = {};
         this._woodData = woodData;
         this._printText();
     }
@@ -285,7 +286,7 @@ export default class CompareWoods {
         this._columns.unshift("Base");
     }
     async _loadAndSetupData() {
-        this._woodData = (await import("Lib/gen-generic/woods.json"))
+        this._woodData = (await import("../../../lib/gen-generic/woods.json"))
             .default;
         this._setupData();
     }
@@ -404,7 +405,9 @@ export default class CompareWoods {
     }
     _setupSelectListener(compareId, type, select$) {
         select$
-            .on("change", () => this._woodSelected(compareId, type, select$))
+            .on("change", () => {
+            this._woodSelected(compareId, type, select$);
+        })
             .selectpicker({ title: `Select ${type}` });
     }
     _getWoodData(id) {

@@ -60,7 +60,9 @@ const getTwitterData = async (query, since_id = refresh) => {
         .catch((error) => {
         throw error.stack;
     })
-        .then((result) => addTwitterData(result.data));
+        .then((result) => {
+        addTwitterData(result.data);
+    });
 };
 const getTweetsSince = async (sinceDateTime) => {
     const now = dayjs.utc();

@@ -15,24 +15,9 @@ export const cannonFamilyList = {
     long: ["regular", "navy", "blomefield"],
     carronade: ["regular", "obusiers"],
 };
-export const cannonEntityType = ["damage", "generic", "penetration"];
+export const cannonEntityType = ["name", "family", "damage", "generic", "penetration"];
 export const peneDistance = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500];
-export const nationShortName = [
-    "CN",
-    "DE",
-    "DK",
-    "ES",
-    "FR",
-    "FT",
-    "GB",
-    "NT",
-    "PL",
-    "PR",
-    "RU",
-    "SE",
-    "US",
-    "VP",
-];
+export const nationShortName = ["CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"];
 export const nationShortNameAlternative = [
     "CNa",
     "DEa",

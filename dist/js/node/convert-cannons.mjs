@@ -61,14 +61,16 @@ const getFamily = (name) => {
     return family;
 };
 const addData = (fileData) => {
-    let type = "medium";
-    if (fileData._attributes.Name.includes("Carronade")) {
-        type = "carronade";
-    }
-    else if (fileData._attributes.Name.includes("Long")) {
-        type = "long";
-    }
-    const name = fileData._attributes.Name.replace("Cannon ", "")
+    const getType = () => {
+        if (fileData._attributes.Name.includes("Carronade")) {
+            return "carronade";
+        }
+        if (fileData._attributes.Name.includes("Long")) {
+            return "long";
+        }
+        return "medium";
+    };
+    const getName = () => fileData._attributes.Name.replace("Cannon ", "")
         .replace("Carronade ", "")
         .replace(" pd", "")
         .replace(" Long", "")
@@ -79,10 +81,7 @@ const addData = (fileData) => {
         .replace("Blomfield", "Blomefield")
         .replace(" Gun", "")
         .replace("24 (Edinorog)", "18 (Edinorog)");
-    const cannon = {
-        name,
-        family: getFamily(name),
-    };
+    const cannon = {};
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
             cannon[group] = {};
@@ -110,8 +109,10 @@ const addData = (fileData) => {
     cannon.damage["per second"] = {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
     };
+    cannon.name = getName();
+    cannon.family = getFamily(cannon.name);
     if (cannon.family !== "unicorn") {
-        cannons[type].push(cannon);
+        cannons[getType()].push(cannon);
     }
 };
 export const convertCannons = async () => {

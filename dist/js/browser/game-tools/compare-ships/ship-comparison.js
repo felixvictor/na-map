@@ -14,7 +14,7 @@ import { curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRad
 import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "../../../common/common-format";
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math";
 import { rotationAngleInDegrees } from "../../util";
-import { default as shipIcon } from "Icons/icon-ship.svg";
+import { default as shipIcon } from "../../../../icons/icon-ship.svg";
 import { Ship } from "./ship";
 import { colourWhite, pluralise, segmentRadians } from "../../../common/common-browser";
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, } from "../../../common/common-game-tools";
@@ -73,7 +73,9 @@ export class ShipComparison extends Ship {
             update();
         };
         this._drag = d3Drag()
-            .on("drag", (event, d) => dragged(event, d))
+            .on("drag", (event, d) => {
+            dragged(event, d);
+        })
             .container(() => this._mainG.node());
     }
     _setupShipOutline() {
@@ -162,14 +164,8 @@ export class ShipComparison extends Ship {
             .append("g")
             .attr("class", "wind-profile")
             .attr("transform", `rotate(${this._windProfile.initRotate})`);
-        this._gWindProfile
-            .append("path")
-            .attr("class", "base-profile")
-            .attr("d", line(arcsBase));
-        this._gWindProfile
-            .append("path")
-            .attr("class", "comp-profile")
-            .attr("d", line(this._arcsComp));
+        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase));
+        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp));
     }
     updateWindProfileRotation() {
         this._gWindProfile.attr("transform", `rotate(${this._shipCompare.windProfileRotate})`);

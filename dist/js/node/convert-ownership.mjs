@@ -25,7 +25,7 @@ let serverId;
 const fileBaseNameRegex = {};
 const fileNames = {};
 const decompress = (compressedContent) => {
-    return lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
+    lzma.decompress(compressedContent, {}, (decompressedContent, error) => {
         if (error) {
             throw new Error(error);
         }

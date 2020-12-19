@@ -10,6 +10,7 @@
 import { drag as d3Drag } from "d3-drag";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
 import { arc as d3Arc, curveCatmullRomClosed as d3CurveCatmullRomClosed, pie as d3Pie, lineRadial as d3LineRadial, } from "d3-shape";
+import "d3-transition";
 import { isEmpty } from "../../../common/common";
 import { pluralise, segmentRadians } from "../../../common/common-browser";
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format";
@@ -17,7 +18,7 @@ import { degreesToCompass, getOrdinal } from "../../../common/common-math";
 import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util";
 import { Ship } from "./ship";
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor, } from "../../../common/common-game-tools";
-import { default as shipIcon } from "Icons/icon-ship.svg";
+import { default as shipIcon } from "../../../../icons/icon-ship.svg";
 export class ShipBase extends Ship {
     constructor(id, shipData, shipCompare) {
         super(id, shipCompare);
@@ -108,7 +109,9 @@ export class ShipBase extends Ship {
             }
         };
         this._drag = d3Drag()
-            .on("drag", (event, d) => dragged(event, d))
+            .on("drag", (event, d) => {
+            dragged(event, d);
+        })
             .container(() => this._mainG.node());
     }
     _setupShipOutline() {
@@ -209,10 +212,7 @@ export class ShipBase extends Ship {
             .attr("y", (d) => d.compassTextY)
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate));
-        gWindProfile
-            .append("path")
-            .attr("class", "base-profile")
-            .attr("d", line(arcsBase));
+        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase));
         gWindProfile
             .append("g")
             .attr("data-ui-component", "speed-markers")

@@ -9,6 +9,7 @@
  */
 import "bootstrap/js/dist/util";
 import "bootstrap/js/dist/modal";
+import "bootstrap-select";
 import { group as d3Group, max as d3Max, min as d3Min } from "d3-array";
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate";
 import { scaleLinear as d3ScaleLinear } from "d3-scale";
@@ -347,9 +348,8 @@ export class CompareShips {
         this.shipMassScale = d3ScaleLinear().domain([minShipMass, maxShipMass]).range([100, 150]);
     }
     async _loadAndSetupData() {
-        this._moduleDataDefault = (await import("Lib/gen-generic/modules.json"))
-            .default;
-        this._shipData = (await import("Lib/gen-generic/ships.json"))
+        this._moduleDataDefault = (await import("../../../../lib/gen-generic/modules.json")).default;
+        this._shipData = (await import("../../../../lib/gen-generic/ships.json"))
             .default;
         this._setupData();
         if (this._baseId !== "ship-journey") {

@@ -137,10 +137,12 @@ export default class MakeJourney {
         this._journeySelected();
     }
     _setupListener() {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => this._navbarClick());
-        document
-            .querySelector(`#${this._deleteLastLegButtonId}`)
-            ?.addEventListener("mouseup", () => this._deleteLastLeg());
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => {
+            this._navbarClick();
+        });
+        document.querySelector(`#${this._deleteLastLegButtonId}`)?.addEventListener("mouseup", () => {
+            this._deleteLastLeg();
+        });
     }
     _setupWindInput() {
         const _getTooltipPos = $.fn.roundSlider.prototype._getTooltipPos;

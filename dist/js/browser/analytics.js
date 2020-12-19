@@ -28,7 +28,7 @@ export const registerPage = (title) => {
     });
 };
 export const initAnalytics = () => {
-    ga.l = Number(new Date());
+    ga.l = Date.now();
     ga("create", GA_TRACKING_ID, "auto");
     ga("set", "anonymizeIp", true);
     ga("set", "transport", "beacon");
