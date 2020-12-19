@@ -129,34 +129,35 @@ const getFamily = (name: string): string => {
  * @param fileData - File data per cannon
  */
 const addData = (fileData: XmlGeneric): void => {
-    let type: CannonType = "medium"
+    const getType = (): CannonType => {
+        if (fileData._attributes.Name.includes("Carronade")) {
+            return "carronade"
+        }
 
-    if (fileData._attributes.Name.includes("Carronade")) {
-        type = "carronade"
-    } else if (fileData._attributes.Name.includes("Long")) {
-        type = "long"
+        if (fileData._attributes.Name.includes("Long")) {
+            return "long"
+        }
+
+        return "medium"
     }
 
-    const name = fileData._attributes.Name.replace("Cannon ", "")
-        .replace("Carronade ", "")
-        .replace(" pd", "")
-        .replace(" Long", "")
-        .replace("Salvaged ", "")
-        .replace("0.5 E", "E")
-        .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
-        .replace(/^Tower (\d+)$/g, "$1 (Tower)")
-        .replace("Blomfield", "Blomefield")
-        .replace(" Gun", "")
-        // Edinorog are 18lb now
-        .replace("24 (Edinorog)", "18 (Edinorog)")
+    const getName = (): string =>
+        fileData._attributes.Name.replace("Cannon ", "")
+            .replace("Carronade ", "")
+            .replace(" pd", "")
+            .replace(" Long", "")
+            .replace("Salvaged ", "")
+            .replace("0.5 E", "E")
+            .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
+            .replace(/^Tower (\d+)$/g, "$1 (Tower)")
+            .replace("Blomfield", "Blomefield")
+            .replace(" Gun", "")
+            // Edinorog are 18lb now
+            .replace("24 (Edinorog)", "18 (Edinorog)")
 
-    const cannon = {
-        name,
-        family: getFamily(name),
-    } as CannonEntity
+    const cannon = {} as CannonEntity
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
-            // @ts-expect-error
             cannon[group] = {}
         }
 
@@ -199,8 +200,10 @@ const addData = (fileData: XmlGeneric): void => {
         value: round(cannon.damage.basic.value / cannon.damage["reload time"].value, 2),
     }
 
+    cannon.name = getName()
+    cannon.family = getFamily(cannon.name)
     if (cannon.family !== "unicorn") {
-        cannons[type].push(cannon)
+        cannons[getType()].push(cannon)
     }
 }
 

@@ -34,10 +34,7 @@ interface Amount {
     amount: number
     isPercentage: boolean
 }
-interface SelectedWood {
-    frame: WoodTrimOrFrame
-    trim: WoodTrimOrFrame
-}
+type SelectedWood = WoodTypeList<WoodTrimOrFrame>
 interface WoodDisplayBaseData {
     frame: string
     trim: string
@@ -80,7 +77,7 @@ class Wood {
 }
 
 class WoodBase extends Wood {
-    private readonly _woodData!: SelectedWood
+    private readonly _woodData = {} as SelectedWood
     constructor(compareId: WoodColumnType, woodData: SelectedWood, woodCompare: CompareWoods) {
         super(compareId, woodCompare)
 

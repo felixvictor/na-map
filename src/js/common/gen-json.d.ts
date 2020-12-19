@@ -80,6 +80,7 @@ type Cannon = {
     [K in CannonType]: CannonEntity[]
 }
 export interface CannonEntity {
+    [index: string]: string | CannonDamage | CannonFamily | CannonGeneric | CannonPenetration
     name: string
     family: CannonFamily
     damage: CannonDamage

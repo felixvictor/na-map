@@ -36,7 +36,7 @@ export const cannonFamilyList: Record<CannonType, CannonFamily[]> = {
     long: ["regular", "navy", "blomefield"],
     carronade: ["regular", "obusiers"],
 }
-export const cannonEntityType = ["damage", "generic", "penetration"]!
+export const cannonEntityType = ["name", "family", "damage", "generic", "penetration"]!
 export type CannonEntityType = typeof cannonEntityType[number]
 export const peneDistance = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500]
 export type PeneDistance = typeof peneDistance[number]
