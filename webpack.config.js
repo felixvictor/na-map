@@ -282,10 +282,6 @@ const config = {
         "popper.js": "Popper",
     },
 
-    resolve: {
-        extensions: [".ts", ".js", ".json"],
-    },
-
     optimization: {
         runtimeChunk: "single",
         splitChunks: {
@@ -370,6 +366,16 @@ const config = {
         }),
         */
     ],
+
+    resolve: {
+        alias: {
+            Flags: dirFlags,
+            Fonts: dirFonts,
+            Icons: dirIcons,
+            Lib: dirLib,
+        },
+        extensions: [".ts", ".js", ".json"],
+    },
 
     target: isProduction ? "browserslist" : "web",
 

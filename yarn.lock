@@ -3088,7 +3088,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/d3-color@npm:*":
+"@types/d3-color@npm:*, @types/d3-color@npm:^2.0.1":
   version: 2.0.1
   resolution: "@types/d3-color@npm:2.0.1"
   checksum: 744f8325d1053688fad049be2504b5b058411ddccc3f665afb06cb0899405dd2845d714a7d99df1b0a95f8c56d4abba62517d0a7d018534fe9da4f48216889fa
@@ -7640,7 +7640,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csso@npm:^4.0.2":
+"csso@npm:^4.0.2, csso@npm:^4.2.0":
   version: 4.2.0
   resolution: "csso@npm:4.2.0"
   dependencies:
@@ -7760,7 +7760,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-color@npm:1 - 2":
+"d3-color@npm:1 - 2, d3-color@npm:^2.0.0":
   version: 2.0.0
   resolution: "d3-color@npm:2.0.0"
   checksum: 637e1115981b7598d3f86418478e7bfc4939d23b48eecbf5ea2297048724e13e42dda60963cbf2ebe3866705fe2eb87fa27e529da55ad57cda16aa799747554d
@@ -15281,6 +15281,7 @@ fsevents@~2.1.2:
     "@types/css": ^0.0.31
     "@types/d3-array": ^2.8.0
     "@types/d3-axis": ^2.0.0
+    "@types/d3-color": ^2.0.1
     "@types/d3-drag": ^2.0.0
     "@types/d3-format": ^2.0.0
     "@types/d3-hierarchy": ^2.0.0
@@ -15326,10 +15327,12 @@ fsevents@~2.1.2:
     css: ^3.0.0
     css-loader: ^5.0.1
     css-minimizer-webpack-plugin: ^1.1.5
+    csso: ^4.2.0
     csv-parser: ^3.0.0
     d3-area-label: ^1.5.0
     d3-array: ^2.9.1
     d3-axis: ^2.0.0
+    d3-color: ^2.0.0
     d3-drag: ^2.0.0
     d3-format: ^2.0.0
     d3-hierarchy: ^2.0.0
