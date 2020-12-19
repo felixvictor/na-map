@@ -162,7 +162,9 @@ export default class WindRose {
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => this._navbarClick())
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => {
+            this._navbarClick()
+        })
     }
 
     _setupWindInput(): void {

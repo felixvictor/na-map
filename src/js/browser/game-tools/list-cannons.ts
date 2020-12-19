@@ -72,8 +72,9 @@ export default class ListCannons {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "na-map/src/lib/gen-generic/cannons.json"))
-            .default as Cannon
+        const cannonData = (
+            await import(/* webpackChunkName: "data-cannons" */ "na-map/src/lib/gen-generic/cannons.json")
+        ).default as Cannon
         this._setupData(cannonData)
     }
 
@@ -139,7 +140,7 @@ export default class ListCannons {
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement)?.addEventListener("click", async () => {
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()

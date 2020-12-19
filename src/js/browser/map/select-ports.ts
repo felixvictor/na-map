@@ -153,8 +153,9 @@ export default class SelectPorts {
         if (!this._dataLoaded) {
             this._frontlinesData = await loadJsonFile<FrontlinesPerServer>(`${this._map.serverName}-frontlines.json`)
 
-            const distances = (await import(/* webpackChunkName: "data-distances" */ `na-map/src/lib/gen-generic/distances.json`))
-                .default as Distance[]
+            const distances = (
+                await import(/* webpackChunkName: "data-distances" */ `na-map/src/lib/gen-generic/distances.json`)
+            ).default as Distance[]
             this._distances = new Map(
                 distances.map(([fromPortId, toPortId, distance]) => [
                     fromPortId * this._numberPorts + toPortId,
@@ -450,7 +451,7 @@ export default class SelectPorts {
         }
 
         const findClosestSourcePort = (sellPort: PortWithTrades, itemId: number): number => {
-            let minDistance = Infinity
+            let minDistance = Number.POSITIVE_INFINITY
             const sourcePortIds = new Set(
                 this._ports.portDataDefault
                     .filter((port) => port.dropsTrading?.includes(itemId) ?? port.dropsNonTrading?.includes(itemId))
@@ -663,9 +664,9 @@ export default class SelectPorts {
     }
 
     _frontlineAttackingNationSelected(): void {
-        const nation = this._frontlineAttackingNationSelector?.options[
-            this._frontlineAttackingNationSelector.selectedIndex
-        ].value as NationShortName
+        const nation =
+            this._frontlineAttackingNationSelector?.options[this._frontlineAttackingNationSelector.selectedIndex]
+                .value ?? ""
 
         if (validNationShortName(nation)) {
             this._setFrontlinePorts("attacking", nation)
@@ -676,9 +677,9 @@ export default class SelectPorts {
     }
 
     _frontlineDefendingNationSelected(): void {
-        const nation = this._frontlineDefendingNationSelector?.options[
-            this._frontlineDefendingNationSelector.selectedIndex
-        ].value as NationShortName
+        const nation =
+            this._frontlineDefendingNationSelector?.options[this._frontlineDefendingNationSelector.selectedIndex]
+                .value ?? ""
 
         if (validNationShortName(nation)) {
             this._setFrontlinePorts("defending", nation)
@@ -689,8 +690,7 @@ export default class SelectPorts {
     }
 
     _nationSelected(): void {
-        this._nation = this._propNationSelector?.options[this._propNationSelector.selectedIndex]
-            .value as NationShortName
+        this._nation = this._propNationSelector?.options[this._propNationSelector.selectedIndex].value ?? ""
 
         if (validNationShortName(this._nation)) {
             this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)

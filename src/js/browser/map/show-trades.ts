@@ -289,7 +289,9 @@ export default class ShowTrades {
 
     _setupListener(): void {
         document.querySelector(`#${this._showId}`)?.addEventListener("change", async () => this._showSelected())
-        document.querySelector(`#${this._profitId}`)?.addEventListener("change", () => this._profitValueSelected())
+        document.querySelector(`#${this._profitId}`)?.addEventListener("change", () => {
+            this._profitValueSelected()
+        })
         this._nationSelector.addEventListener("change", (event) => {
             this._nationChanged()
             event.preventDefault()

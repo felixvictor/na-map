@@ -75,7 +75,9 @@ export default class TrilateratePosition {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", () => this._navbarClick())
+        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", () => {
+            this._navbarClick()
+        })
     }
 
     _injectModal(): void {

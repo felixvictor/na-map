@@ -54,7 +54,7 @@ type CountyGroup = Map<string, Port[]>
  * @returns Decompressed file content or void
  */
 const decompress = (compressedContent: Buffer): void | Buffer => {
-    return lzma.decompress(compressedContent, {}, (decompressedContent: void | Buffer, error?: string) => {
+    lzma.decompress(compressedContent, {}, (decompressedContent: void | Buffer, error?: string) => {
         if (error) {
             throw new Error(error)
         }

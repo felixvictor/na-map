@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-export const serverIds = ["eu1", "eu2"] as const
+export const serverIds = ["eu1", "eu2"]!
 export type ServerId = typeof serverIds[number]
 
 export interface Server {

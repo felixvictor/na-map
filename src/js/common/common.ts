@@ -10,10 +10,10 @@
 
 import { ArrayIndex } from "./interface"
 
-export const woodFamily = ["regular", "seasoned", "exceptional"] as const
+export const woodFamily = ["regular", "seasoned", "exceptional"]!
 export type WoodFamily = typeof woodFamily[number]
 
-export const woodType = ["frame", "trim"] as const
+export const woodType = ["frame", "trim"]!
 export type WoodType = typeof woodType[number]
 export type WoodTypeList<T> = {
     [K in WoodType]: T
@@ -25,7 +25,7 @@ export type WoodTypeNestedArray<T> = {
     [K1 in WoodType]: ArrayIndex<T>
 }
 
-export const cannonType = ["medium", "long", "carronade"] as const
+export const cannonType = ["medium", "long", "carronade"]!
 export type CannonType = typeof cannonType[number]
 export type CannonTypeList<T> = {
     [K in CannonType]: T
@@ -36,7 +36,7 @@ export const cannonFamilyList: Record<CannonType, CannonFamily[]> = {
     long: ["regular", "navy", "blomefield"],
     carronade: ["regular", "obusiers"],
 }
-export const cannonEntityType = ["damage", "generic", "penetration"] as const
+export const cannonEntityType = ["damage", "generic", "penetration"]!
 export type CannonEntityType = typeof cannonEntityType[number]
 export const peneDistance = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500]
 export type PeneDistance = typeof peneDistance[number]
@@ -48,22 +48,7 @@ export interface Nation {
     sortName: string // Name for sorting
 }
 
-export const nationShortName = [
-    "CN",
-    "DE",
-    "DK",
-    "ES",
-    "FR",
-    "FT",
-    "GB",
-    "NT",
-    "PL",
-    "PR",
-    "RU",
-    "SE",
-    "US",
-    "VP",
-] as const
+export const nationShortName = ["CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"]!
 export type NationShortName = typeof nationShortName[number]
 export const nationShortNameAlternative = [
     "CNa",
@@ -80,7 +65,7 @@ export const nationShortNameAlternative = [
     "SEa",
     "USa",
     "VPa",
-] as const
+]!
 export type NationShortNameAlternative = typeof nationShortNameAlternative[number]
 
 export const nationFullName = [
@@ -98,7 +83,7 @@ export const nationFullName = [
     "Sverige",
     "United States",
     "Verenigde Provinciën",
-] as const
+]!
 export type NationFullName = typeof nationFullName[number]
 export const nations: Nation[] = [
     { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },

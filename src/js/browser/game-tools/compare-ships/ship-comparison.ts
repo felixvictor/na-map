@@ -130,7 +130,9 @@ export class ShipComparison extends Ship {
         }
 
         this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>()
-            .on("drag", (event: Event, d: DragData): void => dragged(event, d))
+            .on("drag", (event: Event, d: DragData): void => {
+                dragged(event, d)
+            })
             .container(() => this._mainG.node() as DragContainerElement)
     }
 
@@ -243,16 +245,10 @@ export class ShipComparison extends Ship {
             .attr("transform", `rotate(${this._windProfile.initRotate})`)
 
         // Base profile shape
-        this._gWindProfile
-            .append("path")
-            .attr("class", "base-profile")
-            .attr("d", line(arcsBase) as string)
+        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase)!)
 
         // Comp profile lines
-        this._gWindProfile
-            .append("path")
-            .attr("class", "comp-profile")
-            .attr("d", line(this._arcsComp) as string)
+        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp)!)
     }
 
     updateWindProfileRotation(): void {

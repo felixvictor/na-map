@@ -38,7 +38,7 @@ interface SeasonedCost extends StandardCost {
     doubloon: number
     tool: number
 }
-const tableType = ["Resources", "Extra", "Materials"] as const
+const tableType = ["Resources", "Extra", "Materials"]!
 type TableType = typeof tableType[number]
 type TableTypeList<T> = {
     [K in TableType]: T
@@ -80,7 +80,9 @@ export default class ListShipBlueprints {
 
     async _loadAndSetupData(): Promise<void> {
         this._blueprintData = (
-            await import(/* webpackChunkName: "data-ship-blueprints" */ "na-map/src/lib/gen-generic/ship-blueprints.json")
+            await import(
+                /* webpackChunkName: "data-ship-blueprints" */ "na-map/src/lib/gen-generic/ship-blueprints.json"
+            )
         ).default as ShipBlueprint[]
         this._woodData = (await import(/* webpackChunkName: "data-woods" */ "na-map/src/lib/gen-generic/woods.json"))
             .default as WoodData
@@ -90,8 +92,9 @@ export default class ListShipBlueprints {
          * - key: resource name
          * - values: extractionCost
          */
-        const costs = (await import(/* webpackChunkName: "data-ship-blueprints" */ "na-map/src/lib/gen-generic/prices.json"))
-            .default as Price
+        const costs = (
+            await import(/* webpackChunkName: "data-ship-blueprints" */ "na-map/src/lib/gen-generic/prices.json")
+        ).default as Price
         this._extractionCosts = new Map<string, StandardCost>(
             costs.standard.map((cost) => [cost.name, { reales: cost.reales, labour: cost?.labour ?? 0 }])
         )
@@ -179,7 +182,9 @@ export default class ListShipBlueprints {
 
         select$
             .addClass("selectpicker")
-            .on("change", (event) => this._blueprintSelected(event))
+            .on("change", (event) => {
+                this._blueprintSelected(event)
+            })
             .selectpicker({ noneSelectedText: "Select blueprint", width: "fit" })
             .val("default")
             .selectpicker("refresh")
@@ -188,7 +193,9 @@ export default class ListShipBlueprints {
     _setupWoodSelectListener(type: WoodType, select$: JQuery): void {
         select$
             .addClass("selectpicker")
-            .on("change", () => this._woodSelected(type, select$))
+            .on("change", () => {
+                this._woodSelected(type, select$)
+            })
             .selectpicker({ noneSelectedText: `Select ${type}`, width: "fit" })
             .val("default")
             .selectpicker("refresh")

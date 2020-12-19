@@ -237,10 +237,12 @@ export default class MakeJourney {
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => this._navbarClick())
-        document
-            .querySelector(`#${this._deleteLastLegButtonId}`)
-            ?.addEventListener("mouseup", () => this._deleteLastLeg())
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => {
+            this._navbarClick()
+        })
+        document.querySelector(`#${this._deleteLastLegButtonId}`)?.addEventListener("mouseup", () => {
+            this._deleteLastLeg()
+        })
     }
 
     _setupWindInput(): void {
@@ -442,7 +444,7 @@ export default class MakeJourney {
     _correctJourney(): void {
         const defaultTranslate = 20
         const svg = d3Select<SVGSVGElement, unknown>("#na-svg")
-        const currentTransform = d3ZoomTransform(svg.node() as SVGSVGElement)
+        const currentTransform = d3ZoomTransform(svg.node()!)
         // Don't scale on higher zoom level
         const scale = Math.max(1, currentTransform.k)
         const fontSize = this._fontSize / scale

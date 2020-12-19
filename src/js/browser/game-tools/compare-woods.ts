@@ -574,7 +574,9 @@ export default class CompareWoods {
 
     _setupSelectListener(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         select$
-            .on("change", () => this._woodSelected(compareId, type, select$))
+            .on("change", () => {
+                this._woodSelected(compareId, type, select$)
+            })
             .selectpicker({ title: `Select ${type}` })
     }
 

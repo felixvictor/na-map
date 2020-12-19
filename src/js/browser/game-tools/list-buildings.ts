@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
@@ -43,13 +42,14 @@ export default class ListBuildings {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._buildingData = (await import(/* webpackChunkName: "data-buildings" */ "na-map/src/lib/gen-generic/buildings.json"))
-            .default as Building[]
+        this._buildingData = (
+            await import(/* webpackChunkName: "data-buildings" */ "na-map/src/lib/gen-generic/buildings.json")
+        ).default as Building[]
     }
 
     _setupListener(): void {
         let firstClick = true
-        ;(document.querySelector(`#${this._buttonId}`) as HTMLElement).addEventListener("click", async () => {
+        document.querySelector(`#${this._buttonId}`)!.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
@@ -88,7 +88,9 @@ export default class ListBuildings {
 
         select$
             .addClass("selectpicker")
-            .on("change", (event: Event) => this._buildingSelected(event))
+            .on("change", (event: Event) => {
+                this._buildingSelected(event)
+            })
             .selectpicker({ noneSelectedText: "Select building" })
         select$.val("default").selectpicker("refresh")
     }
@@ -201,11 +203,7 @@ export default class ListBuildings {
      * Show buildings for selected building type
      */
     _buildingSelected(event: Event): void {
-        const building = String(
-            $(event.currentTarget as EventTarget)
-                .find(":selected")
-                .val()
-        )
+        const building = String($(event.currentTarget!).find(":selected").val())
 
         // Remove old recipe list
         d3Select(`#${this._baseId} div`).remove()

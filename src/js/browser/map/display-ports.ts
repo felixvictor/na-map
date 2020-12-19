@@ -253,7 +253,7 @@ export default class DisplayPorts {
     static _importAll(r: __WebpackModuleApi.RequireContext): NationListAlternative<string> {
         const images = {} as NationListAlternative<string>
         r.keys().forEach((item) => {
-            images[item.replace("./", "").replace(".svg", "") as NationShortName] = r(item)
+            images[item.replace("./", "").replace(".svg", "")!] = r(item)
         })
         return images
     }

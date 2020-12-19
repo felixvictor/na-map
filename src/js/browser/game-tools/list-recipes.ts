@@ -51,10 +51,12 @@ export default class ListRecipes {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json"))
-            .default as Module[]
-        this._recipeData = (await import(/* webpackChunkName: "data-recipes" */ "na-map/src/lib/gen-generic/recipes.json")).default
-            .recipe as RecipeGroup[]
+        this._moduleData = (
+            await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json")
+        ).default as Module[]
+        this._recipeData = (
+            await import(/* webpackChunkName: "data-recipes" */ "na-map/src/lib/gen-generic/recipes.json")
+        ).default.recipe as RecipeGroup[]
         this._recipes = new Map<number, RecipeEntity>(
             this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))
         )
@@ -116,7 +118,9 @@ export default class ListRecipes {
 
         select$
             .addClass("selectpicker")
-            .on("change", (event) => this._recipeSelected(event))
+            .on("change", (event) => {
+                this._recipeSelected(event)
+            })
             .selectpicker({
                 dropupAuto: false,
                 liveSearch: true,

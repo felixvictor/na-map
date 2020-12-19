@@ -46,7 +46,6 @@ import { copyToClipboard } from "../../util"
 import JQuery from "jquery"
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
 import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
-import { WoodColumnType } from "../../../common/types"
 
 import CompareWoods from "../compare-woods"
 import { ShipBase } from "./ship-base"
@@ -97,7 +96,7 @@ interface PropertyWithCap {
 type ModuleType = string
 type ModuleId = number
 
-const shipColumnType = ["Base", "C1", "C2"] as const
+const shipColumnType = ["Base", "C1", "C2"]!
 type ShipColumnType = typeof shipColumnType[number]
 type ColumnArray<T> = {
     [K in ShipColumnType]: T[]
@@ -285,7 +284,7 @@ export class CompareShips {
 
     _setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
         CompareShips._setSelect(this._selectWood$[columnId][type], woodId)
-        this.woodCompare._woodSelected(columnId as WoodColumnType, type, this._selectWood$[columnId][type])
+        this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type])
     }
 
     _cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
@@ -519,8 +518,9 @@ export class CompareShips {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json"))
-            .default as Module[]
+        this._moduleDataDefault = (
+            await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json")
+        ).default as Module[]
         this._shipData = (await import(/* webpackChunkName: "data-ships" */ "na-map/src/lib/gen-generic/ships.json"))
             .default as ShipData[]
         this._setupData()
@@ -933,11 +933,7 @@ export class CompareShips {
                 this._selectWood$[columnId] = {}
                 for (const type of woodType) {
                     this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`)
-                    this.woodCompare._setupWoodSelects(
-                        columnId as WoodColumnType,
-                        type,
-                        this._selectWood$[columnId][type]
-                    )
+                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type])
                 }
             }
 
@@ -1086,7 +1082,7 @@ export class CompareShips {
             return Boolean(module)
         })
 
-        return module as ModuleEntity
+        return module!
     }
 
     /**
@@ -1457,7 +1453,7 @@ export class CompareShips {
                         this._setSelectedShip(
                             otherCompareId,
                             new ShipComparison(
-                                otherCompareId as string,
+                                otherCompareId,
                                 singleShipData,
                                 (this.selectedShips[otherCompareId] as ShipComparison).shipCompareData,
                                 this
@@ -1468,12 +1464,7 @@ export class CompareShips {
             } else {
                 this._setSelectedShip(
                     compareId,
-                    new ShipComparison(
-                        compareId as string,
-                        (this.selectedShips.Base as ShipBase).shipData,
-                        singleShipData,
-                        this
-                    )
+                    new ShipComparison(compareId, (this.selectedShips.Base as ShipBase).shipData, singleShipData, this)
                 )
             }
 
@@ -1535,18 +1526,14 @@ export class CompareShips {
             }
 
             if (this._baseId !== "ship-journey") {
-                this.woodCompare.enableSelects(compareId as WoodColumnType)
+                this.woodCompare.enableSelects(compareId)
             }
         })
         if (this._baseId !== "ship-journey") {
             for (const type of woodType) {
                 this._selectWood$[compareId][type]
                     .on("changed.bs.select", () => {
-                        this.woodCompare._woodSelected(
-                            compareId as WoodColumnType,
-                            type,
-                            this._selectWood$[compareId][type]
-                        )
+                        this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type])
                         this._refreshShips(compareId)
                     })
                     .selectpicker({ title: `Wood ${type}`, width: "150px" })
@@ -1565,7 +1552,7 @@ export class CompareShips {
             this._setShip(columnId, ids[i])
             i += 1
 
-            this.woodCompare.enableSelects(columnId as WoodColumnType)
+            this.woodCompare.enableSelects(columnId)
             this._setupModulesSelect(columnId)
 
             if (ids[i]) {

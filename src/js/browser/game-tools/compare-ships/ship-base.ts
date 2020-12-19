@@ -172,7 +172,9 @@ export class ShipBase extends Ship {
         }
 
         this._drag = d3Drag<SVGCircleElement | SVGPathElement, DragData>()
-            .on("drag", (event: Event, d: DragData): void => dragged(event, d))
+            .on("drag", (event: Event, d: DragData): void => {
+                dragged(event, d)
+            })
             .container(() => this._mainG.node() as DragContainerElement)
     }
 
@@ -303,10 +305,7 @@ export class ShipBase extends Ship {
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate))
 
-        gWindProfile
-            .append("path")
-            .attr("class", "base-profile")
-            .attr("d", line(arcsBase) as string)
+        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase)!)
 
         // Speed marker
         gWindProfile

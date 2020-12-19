@@ -25,7 +25,6 @@ declare global {
     }
 }
 SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): Record<string, unknown> {
-    // @ts-expect-error
     return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params
 }
 
@@ -76,7 +75,9 @@ const serverNameSelected = (): void => {
  * Setup listeners
  */
 const setupListener = (): void => {
-    document.querySelector(`#${baseId}`)?.addEventListener("change", () => serverNameSelected())
+    document.querySelector(`#${baseId}`)?.addEventListener("change", () => {
+        serverNameSelected()
+    })
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
     $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {

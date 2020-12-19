@@ -54,7 +54,7 @@ export const registerPage = (title: string): void => {
  * {@link https://stackoverflow.com/a/29552301}
  */
 export const initAnalytics = (): void => {
-    ga.l = Number(new Date())
+    ga.l = Date.now()
     ga("create", GA_TRACKING_ID, "auto")
     ga("set", "anonymizeIp", true)
     ga("set", "transport", "beacon")

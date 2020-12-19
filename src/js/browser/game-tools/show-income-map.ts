@@ -95,7 +95,7 @@ export default class ShowIncomeMap extends BaseModal {
      * Get width of baseId
      */
     _getWidth(): number {
-        return Math.floor((this.#mainDiv.node() as HTMLDivElement).offsetWidth) ?? 0
+        return Math.floor(this.#mainDiv.node()!.offsetWidth) ?? 0
     }
 
     _setupData(data: PortJsonData): void {
@@ -192,7 +192,7 @@ export default class ShowIncomeMap extends BaseModal {
         const rowHeight = Math.floor(20 * 1.618)
         const rowPadding = Math.floor(2 * 1.618)
         const columnPadding = Math.floor(5 * 1.618)
-        const nations = (this.#tree.children ?? []).sort((a, b) => (b.value as number) - (a.value as number))
+        const nations = (this.#tree.children ?? []).sort((a, b) => b.value! - a.value!)
 
         const minColumnWidth = 160 + columnPadding * 2 // Width of "Verenigde Provinciën" plus padding
         const totalWidth = nations.length * minColumnWidth - columnPadding * 2
@@ -218,31 +218,31 @@ export default class ShowIncomeMap extends BaseModal {
                 svg.append("rect")
                     .attr("width", columnWidth)
                     .attr("height", rowHeight)
-                    .style("fill", (d) => this.#colourScale(d.data.id as string))
+                    .style("fill", (d) => this.#colourScale(d.data.id!))
 
                 svg.append("text")
                     .attr("x", columnPadding)
                     .attr("y", "25%")
-                    .text((d) => d.data.id as string)
-                    .style("fill", (d) => getContrastColour(this.#colourScale(d.data.id as string)))
+                    .text((d) => d.data.id!)
+                    .style("fill", (d) => getContrastColour(this.#colourScale(d.data.id!)))
 
                 svg.append("rect")
                     .attr("class", "rect-background")
                     .attr("y", rowHeight + rowPadding)
                     .attr("width", columnWidth)
                     .attr("height", rowHeight)
-                    .style("fill", (d) => this.#colourScale(d.data.id as string))
+                    .style("fill", (d) => this.#colourScale(d.data.id!))
 
                 svg.append("rect")
                     .attr("y", rowHeight + rowPadding)
-                    .attr("width", (d) => columnWidth * ((d.value as number) / (d.parent?.value as number)))
+                    .attr("width", (d) => columnWidth * (d.value! / (d.parent?.value ?? 1)))
                     .attr("height", rowHeight)
-                    .style("fill", (d) => this.#colourScale(d.data.id as string))
+                    .style("fill", (d) => this.#colourScale(d.data.id!))
 
                 svg.append("text")
                     .attr("x", columnWidth - columnPadding)
                     .attr("y", "75%")
-                    .html((d) => formatSiInt(d.value as number, true))
+                    .html((d) => formatSiInt(d.value!, true))
                     .style("text-anchor", "end")
 
                 return div
@@ -253,7 +253,7 @@ export default class ShowIncomeMap extends BaseModal {
         return `
             <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex flex-column text-left mt-1 mr-3 p-0">
-                <div><span class="x-large">${d.data.id as string}</span><br />${d.parent?.data.id as string}</div>
+                <div><span class="x-large">${d.data.id ?? ""}</span><br />${d.parent?.data?.id ?? ""}</div>
             </div>
             <div class="d-flex flex-column text-left mt-1 p-0">
                 <div class="mr-3">
@@ -261,11 +261,11 @@ export default class ShowIncomeMap extends BaseModal {
                     <span class="des">Port</span>
                 </div>
                 <div class="mr-3">
-                    ${formatPercentSig(d.data.data.value / (d.parent?.value as number))}<br />
+                    ${formatPercentSig(d.data.data.value / (d.parent?.value ?? 1))}<br />
                     <span class="des">Nation</span>
                 </div>
                 <div class="mr-3">
-                    ${formatPercentSig(d.data.data.value / (d.parent?.parent?.value as number))}<br />
+                    ${formatPercentSig(d.data.data.value / (d.parent?.parent?.value ?? 1))}<br />
                     <span class="des">World</span>
                 </div>
             </div>
@@ -298,7 +298,7 @@ export default class ShowIncomeMap extends BaseModal {
                     .append("path")
                     .attr("class", "cell")
                     .attr("d", (d) => `M${d.polygon.join(",")}z`)
-                    .style("fill", (d) => this.#colourScale(d.parent?.data.id as string))
+                    .style("fill", (d) => this.#colourScale(d.parent?.data.id ?? ""))
             )
     }
 
@@ -314,12 +314,12 @@ export default class ShowIncomeMap extends BaseModal {
                     .attr("class", "label")
                     .attr("transform", (d) => `translate(${d.polygon.site.x},${d.polygon.site.y})`)
                     .style("font-size", (d) => `${this.#fontScale(d.data.data.value)}px`)
-                    .style("fill", (d) => getContrastColour(this.#colourScale(d.parent?.data.id as string)))
+                    .style("fill", (d) => getContrastColour(this.#colourScale(d.parent?.data.id ?? "")))
             )
         labels
             .append("text")
             .attr("class", "name")
-            .text((d) => d.data.data.id as string)
+            .text((d) => d.data.data.id!)
         labels
             .append("text")
             .attr("class", "value")
@@ -338,7 +338,9 @@ export default class ShowIncomeMap extends BaseModal {
                     .attr("d", (d) => {
                         return `M${d.polygon.join(",")}z`
                     })
-                    .on("mouseover", (event: Event, d) => this._showDetails(event, d))
+                    .on("mouseover", (event: Event, d) => {
+                        this._showDetails(event, d)
+                    })
                     .on("mouseleave", ShowIncomeMap._hideDetails)
             )
     }

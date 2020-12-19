@@ -18,7 +18,7 @@ import { cleanName, sortBy } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
-import { PortBonus, PortBonusJson, PortBonusType, PortBonusValue } from "../common/types"
+import { PortBonus, PortBonusJson, PortBonusValue } from "../common/types"
 
 interface CSVData {
     [index: string]: string
@@ -63,7 +63,7 @@ const convert = async (csvData: CSVData[]) => {
                         .replace("Bonus ", "")
                         .replace(" and Rig", "")
                         .toLowerCase()
-                        .slice(0, -2) as PortBonusType
+                        .slice(0, -2)!
                     port.portBonus[bonusType] = bonusValue
                 })
 

@@ -39,10 +39,12 @@ export default class ListIngredients {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json"))
-            .default as Module[]
-        this._ingredientData = (await import(/* webpackChunkName: "data-recipes" */ "na-map/src/lib/gen-generic/recipes.json"))
-            .default.ingredient as RecipeIngredientEntity[]
+        this._moduleData = (
+            await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json")
+        ).default as Module[]
+        this._ingredientData = (
+            await import(/* webpackChunkName: "data-recipes" */ "na-map/src/lib/gen-generic/recipes.json")
+        ).default.ingredient as RecipeIngredientEntity[]
     }
 
     _setupListener(): void {

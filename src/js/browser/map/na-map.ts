@@ -272,8 +272,16 @@ class NAMap {
         this._svg
             // eslint-disable-next-line unicorn/no-null
             .on("dblclick.zoom", null)
-            .on("click", (event: Event) => NAMap._stopProperty(event), true)
-            .on("dblclick", (event: Event) => this._doDoubleClickAction(event))
+            .on(
+                "click",
+                (event: Event) => {
+                    NAMap._stopProperty(event)
+                },
+                true
+            )
+            .on("dblclick", (event: Event) => {
+                this._doDoubleClickAction(event)
+            })
 
         document.querySelector("#propertyDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Select port on property")
@@ -291,8 +299,12 @@ class NAMap {
             this._showAbout()
         })
 
-        document.querySelector("#double-click-action")?.addEventListener("change", () => this._doubleClickSelected())
-        document.querySelector("#show-grid")?.addEventListener("change", () => this._showGridSelected())
+        document.querySelector("#double-click-action")?.addEventListener("change", () => {
+            this._doubleClickSelected()
+        })
+        document.querySelector("#show-grid")?.addEventListener("change", () => {
+            this._showGridSelected()
+        })
     }
 
     _setupScale(): void {
@@ -315,7 +327,9 @@ class NAMap {
                 [this.coord.max, this.coord.max],
             ])
             .scaleExtent([this.minScale, this._maxScale])
-            .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => this._naZoomed(event))
+            .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+                this._naZoomed(event)
+            })
 
         this._svg = d3Select<SVGSVGElement, Event>("#na-map")
             .append<SVGSVGElement>("svg")

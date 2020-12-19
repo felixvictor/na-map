@@ -207,7 +207,7 @@ export default class ListLoot {
                 body: this._getModalBody.bind(this),
                 footer: this._getModalFooter,
             }),
-            document.querySelector("#modal-section") as HTMLDivElement
+            document.querySelector("#modal-section")!
         )
     }
 
@@ -231,7 +231,7 @@ export default class ListLoot {
 
     _initModal(): void {
         this._injectModal()
-        this.#mainDiv = document.querySelector(`#${this.#baseId}`) as HTMLDivElement
+        this.#mainDiv = document.querySelector(`#${this.#baseId}`)! as HTMLDivElement
         for (const type of this.#types) {
             this.#select$[type] = $(`#${this.#selectId[type]}`)
         }

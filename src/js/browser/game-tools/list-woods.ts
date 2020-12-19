@@ -71,8 +71,9 @@ export default class ListWoods {
     }
 
     async _loadData(): Promise<void> {
-        this._woodDataDefault = (await import(/* webpackChunkName: "data-woods" */ "na-map/src/lib/gen-generic/woods.json"))
-            .default as WoodData
+        this._woodDataDefault = (
+            await import(/* webpackChunkName: "data-woods" */ "na-map/src/lib/gen-generic/woods.json")
+        ).default as WoodData
     }
 
     _setupData(): void {
@@ -242,7 +243,7 @@ export default class ListWoods {
         const activeFamilies = new Set<WoodFamily>()
         for (const input of this._switchesSel) {
             if (input.checked) {
-                const family = input.id.replace(`${this._checkboxId}-`, "") as WoodFamily
+                const family = input.id.replace(`${this._checkboxId}-`, "")!
                 activeFamilies.add(family)
             }
         }

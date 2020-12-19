@@ -357,7 +357,7 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
 
     const frontlineDefendingNation = {} as NationList<FDNPort[]>
     for (const [key, fromPorts] of [...frontlineDefendingNationMap]) {
-        const nationShortName = key.slice(0, 2) as NationShortName
+        const nationShortName = key.slice(0, 2)!
         const toPortId = Number(key.slice(2))
         if (!frontlineDefendingNation[nationShortName]) {
             frontlineDefendingNation[nationShortName] = []

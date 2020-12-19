@@ -81,7 +81,7 @@ export default class ShowPortOwnerships {
      * Get width of baseId
      */
     _getWidth(): number {
-        return Math.floor((this._mainDiv.node() as HTMLDivElement).offsetWidth) ?? 0
+        return Math.floor(this._mainDiv.node()!.offsetWidth) ?? 0
     }
 
     async _loadAndSetupData(): Promise<void> {
@@ -140,7 +140,9 @@ export default class ShowPortOwnerships {
 
         select$
             .addClass("selectpicker")
-            .on("change", (event) => this._regionSelected(event))
+            .on("change", (event) => {
+                this._regionSelected(event)
+            })
             .selectpicker({ noneSelectedText: "Select region" })
             .val("default")
             .selectpicker("refresh")
@@ -303,7 +305,7 @@ export default class ShowPortOwnerships {
             .timeFormat("%-d %B %Y")
             .zQualitative(true)
             .zColorScale(this._colourScale as ScaleOrdinal<string | number, string>)
-            .width(this._getWidth())(this._div.node() as HTMLDivElement)
+            .width(this._getWidth())(this._div.node()!)
     }
 
     /**

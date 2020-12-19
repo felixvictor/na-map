@@ -95,6 +95,7 @@ const loadData = async (baseAPIFilename: string): Promise<boolean> => {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`)
 
+            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             deletePromise.push(deleteAPIFiles(outfileName))
             getPromise.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName))
         }

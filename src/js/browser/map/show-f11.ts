@@ -81,7 +81,9 @@ export default class ShowF11 {
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => this._navbarClick())
+        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", () => {
+            this._navbarClick()
+        })
         window.addEventListener("keydown", (event) => {
             if (event.code === "F11" && event.shiftKey) {
                 this._navbarClick()
@@ -94,7 +96,7 @@ export default class ShowF11 {
 
         const body = d3Select(`#${this._modalId} .modal-body`)
         const form = body.append("form").attr("id", this._formId).attr("role", "form")
-        this._formSel = form.node() as HTMLFormElement
+        this._formSel = form.node()!
 
         form.append("div").classed("alert alert-primary", true).text("Use F11 in open world.")
 
@@ -208,8 +210,8 @@ export default class ShowF11 {
     }
 
     _getInputValue(element: HTMLInputElement | null): number {
-        const { value } = element as HTMLInputElement
-        return value === "" ? Infinity : Number(value)
+        const { value } = element!
+        return value === "" ? Number.POSITIVE_INFINITY : Number(value)
     }
 
     _getXCoord(): number {
@@ -260,8 +262,8 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-coord")
             .text(formatF11(F11Y))
-        const F11XDim = F11XText.node()?.getBBox() as DOMRect
-        const F11YDim = F11YText.node()?.getBBox() as DOMRect
+        const F11XDim = (F11XText.node()?.getBBox() ?? {}) as DOMRect
+        const F11YDim = (F11YText.node()?.getBBox() ?? {}) as DOMRect
 
         const timeStamp = dayjs().utc()
         const timeStampLocal = dayjs()
@@ -277,8 +279,8 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`)
-        const timeStampDim = timeStampText.node()?.getBBox() as DOMRect
-        const timeStampLocalDim = timeStampLocalText.node()?.getBBox() as DOMRect
+        const timeStampDim = (timeStampText.node()?.getBBox() ?? {}) as DOMRect
+        const timeStampLocalDim = (timeStampLocalText.node()?.getBBox() ?? {}) as DOMRect
 
         const coordHeight = F11XDim && F11YDim ? Math.round(F11XDim.height + F11YDim.height) * 1.2 : 0
         const coordWidth = F11XDim && F11YDim ? Math.round(Math.max(F11XDim.width, F11YDim.width) + 5) : 0

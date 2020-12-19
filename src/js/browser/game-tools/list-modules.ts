@@ -41,8 +41,9 @@ export default class ListModules {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json"))
-            .default as Module[]
+        this._moduleData = (
+            await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json")
+        ).default as Module[]
     }
 
     _setupListener(): void {
@@ -86,7 +87,9 @@ export default class ListModules {
 
         select$
             .addClass("selectpicker")
-            .on("change", (event) => this._moduleSelected(event))
+            .on("change", (event) => {
+                this._moduleSelected(event)
+            })
             .selectpicker({ noneSelectedText: "Select module category" })
             .val("default")
             .selectpicker("refresh")
