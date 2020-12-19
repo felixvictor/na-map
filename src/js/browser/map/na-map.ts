@@ -11,7 +11,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import "bootstrap-select/js/bootstrap-select"
+import "bootstrap-select"
 import { range as d3Range } from "d3-array"
 import {
     zoom as d3Zoom,

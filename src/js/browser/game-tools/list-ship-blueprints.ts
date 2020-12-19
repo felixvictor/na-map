@@ -11,7 +11,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
-import "bootstrap-select/js/bootstrap-select"
+import "bootstrap-select"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"

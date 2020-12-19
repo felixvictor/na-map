@@ -10,7 +10,7 @@
 
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
-import "bootstrap-select/js/bootstrap-select"
+import "bootstrap-select"
 import { h, render } from "preact"
 import htm from "htm"
 

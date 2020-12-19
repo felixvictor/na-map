@@ -17,6 +17,7 @@ import {
     lineRadial as d3LineRadial,
     PieArcDatum,
 } from "d3-shape"
+import "d3-transition"
 
 import { isEmpty } from "../../../common/common"
 import { pluralise, segmentRadians } from "../../../common/common-browser"

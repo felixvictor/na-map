@@ -12,6 +12,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/modal"
 
+import "bootstrap-select"
 import { group as d3Group, max as d3Max, min as d3Min } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"

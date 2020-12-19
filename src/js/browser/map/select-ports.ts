@@ -11,7 +11,7 @@
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/dropdown"
 
-import "bootstrap-select/js/bootstrap-select"
+import "bootstrap-select"
 
 import dayjs, { Dayjs } from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
