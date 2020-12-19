@@ -47,7 +47,7 @@ export default class ShipList {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json")).default // @ts-expect-error
+        const shipData = (await import(/* webpackChunkName: "data-ships" */ "na-map/src/lib/gen-generic/ships.json")).default // @ts-expect-error
             .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
 
         this.#shipListData = shipData.map(

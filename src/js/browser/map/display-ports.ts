@@ -78,7 +78,7 @@ import { PortBonus, portBonusType } from "../../common/types"
 import Cookie from "../util/cookie"
 import RadioButton from "../util/radio-button"
 // @ts-expect-error
-import { default as swordsIcon } from "Icons/icon-swords.svg"
+import { default as swordsIcon } from "na-map/src/icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 
@@ -303,7 +303,7 @@ export default class DisplayPorts {
         this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
 
         const readData = {} as ReadData
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "Lib/gen-generic/ports.json"))
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "na-map/src/lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<PortJsonData>(dataSources, readData)
 
@@ -623,7 +623,7 @@ export default class DisplayPorts {
 
     _setupFlags(): void {
         this.#nationIcons = DisplayPorts._importAll(
-            (require as __WebpackModuleApi.RequireFunction).context("Flags", false, /\.svg$/)
+            (require as __WebpackModuleApi.RequireFunction).context("na-map/src/images/flags", false, /\.svg$/)
         )
 
         const getPattern = (id: string): SVGPatternElement => {

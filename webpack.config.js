@@ -368,12 +368,6 @@ const config = {
     ],
 
     resolve: {
-        alias: {
-            Flags: dirFlags,
-            Fonts: dirFonts,
-            Icons: dirIcons,
-            Lib: dirLib,
-        },
         extensions: [".ts", ".js", ".json"],
     },
 

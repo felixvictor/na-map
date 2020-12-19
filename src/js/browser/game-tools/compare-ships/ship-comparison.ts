@@ -21,7 +21,7 @@ import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt }
 
 import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math"
 import { rotationAngleInDegrees } from "../../util"
-import { default as shipIcon } from "Icons/icon-ship.svg"
+import { default as shipIcon } from "na-map/src/icons/icon-ship.svg"
 
 import { Selection } from "d3-selection"
 

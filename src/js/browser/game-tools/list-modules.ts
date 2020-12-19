@@ -41,7 +41,7 @@ export default class ListModules {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+        this._moduleData = (await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json"))
             .default as Module[]
     }
 

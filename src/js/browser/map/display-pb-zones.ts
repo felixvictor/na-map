@@ -104,7 +104,7 @@ export default class DisplayPbZones {
     }
 
     async _loadData(): Promise<void> {
-        this._pbZonesDefault = (await import(/* webpackChunkName: "data-pb-zones" */ "Lib/gen-generic/pb-zones.json"))
+        this._pbZonesDefault = (await import(/* webpackChunkName: "data-pb-zones" */ "na-map/src/lib/gen-generic/pb-zones.json"))
             .default as PbZone[]
     }
 

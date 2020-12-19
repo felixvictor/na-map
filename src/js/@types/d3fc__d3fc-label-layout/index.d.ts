@@ -4,7 +4,7 @@ declare module "@d3fc/d3fc-label-layout" {
 
     type Point = import("../../common/common-math").Point
     type Segment = import("../../browser/map/make-journey").Segment
-    type ArrayLike = import("../../../../node_modules/@types/d3-selection").ArrayLike<SVGSVGElement | SVGGElement>
+    type ArrayLike = import("d3-selection").ArrayLike<SVGSVGElement | SVGGElement>
 
     type SizeF = (d: Segment, i: number, nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike) => Point
     type PositionF = (d: Segment) => Point

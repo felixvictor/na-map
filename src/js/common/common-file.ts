@@ -16,8 +16,15 @@ import { promisify } from "util"
 import { apiBaseFiles } from "./common-var"
 import { baseAPIFilename, serverStartDate } from "./common-dir"
 import { serverIds } from "./servers"
-// @ts-expect-error
-import { ErrnoException } from "node/globals"
+
+// https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/globals.d.ts
+interface ErrnoException extends Error {
+    errno?: number
+    code?: string
+    path?: string
+    syscall?: string
+    stack?: string
+}
 
 const execP = promisify(exec)
 
@@ -36,8 +43,9 @@ export const saveJsonAsync = async (fileName: string, data: object): Promise<voi
     await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
 }
 
-export const saveTextFile = (fileName: string, data: string): void =>
+export const saveTextFile = (fileName: string, data: string): void => {
     fs.writeFileSync(fileName, data, { encoding: "utf8" })
+}
 
 const isNodeError = (error: Error): error is ErrnoException => error instanceof Error
 
@@ -49,7 +57,7 @@ export const readTextFile = (fileName: string): string => {
         if (isNodeError(error as Error) && (error as ErrnoException).code === "ENOENT") {
             console.error("File", fileName, "not found")
         } else {
-            throw error
+            putFetchError(error as string)
         }
     }
 

@@ -72,7 +72,7 @@ export default class ListCannons {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "Lib/gen-generic/cannons.json"))
+        const cannonData = (await import(/* webpackChunkName: "data-cannons" */ "na-map/src/lib/gen-generic/cannons.json"))
             .default as Cannon
         this._setupData(cannonData)
     }

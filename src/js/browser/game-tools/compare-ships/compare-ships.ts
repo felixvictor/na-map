@@ -518,9 +518,9 @@ export class CompareShips {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ "Lib/gen-generic/modules.json"))
+        this._moduleDataDefault = (await import(/* webpackChunkName: "data-modules" */ "na-map/src/lib/gen-generic/modules.json"))
             .default as Module[]
-        this._shipData = (await import(/* webpackChunkName: "data-ships" */ "Lib/gen-generic/ships.json"))
+        this._shipData = (await import(/* webpackChunkName: "data-ships" */ "na-map/src/lib/gen-generic/ships.json"))
             .default as ShipData[]
         this._setupData()
         if (this._baseId !== "ship-journey") {
