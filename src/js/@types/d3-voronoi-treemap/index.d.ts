@@ -1,6 +1,6 @@
 declare module "d3-voronoi-treemap" {
     import seedrandom from "seedrandom"
-    type Point = import("../../common/common-math").Point
+    type Point = import("common/common-math").Point
 
     interface ClippingPolygon {
         0: Point

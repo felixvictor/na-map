@@ -19,11 +19,11 @@ import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter, findNationByNationShortName } from "../../common/common"
-import { insertBaseModal, loadJsonFile } from "../../common/common-browser"
+import { capitalizeFirstLetter, findNationByNationShortName } from "common/common"
+import { insertBaseModal, loadJsonFile } from "common/common-browser"
 import { displayClan } from "../util"
-import { PortBattlePerServer } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+import { PortBattlePerServer } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)

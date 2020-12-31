@@ -28,9 +28,9 @@ import {
     colourRedDark,
     colourWhite,
     insertBaseModal,
-} from "../../../common/common-browser"
-import { isEmpty, WoodType, woodType } from "../../../common/common"
-import { formatPP, formatSignFloat, formatSignPercent } from "../../../common/common-format"
+} from "common/common-browser"
+import { isEmpty, WoodType, woodType } from "common/common"
+import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
 import {
     hashids,
     hullRepairsPercent,
@@ -38,14 +38,14 @@ import {
     repairTime,
     rigRepairsPercent,
     stripShipName,
-} from "../../../common/common-game-tools"
-import { getOrdinal } from "../../../common/common-math"
-import { sortBy } from "../../../common/common-node"
+} from "common/common-game-tools"
+import { getOrdinal } from "common/common-math"
+import { sortBy } from "common/common-node"
 import { copyToClipboard } from "../../util"
 
 import JQuery from "jquery"
-import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "../../../common/gen-json"
-import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "../../../common/interface"
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "common/gen-json"
+import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "common/interface"
 
 import CompareWoods from "../compare-woods"
 import { ShipBase } from "./ship-base"

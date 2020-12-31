@@ -24,16 +24,16 @@ import {
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { appDescription, appTitle, appVersion, insertBaseModal } from "../../common/common-browser"
-import { defaultFontSize, nearestPow2, roundToThousands } from "../../common/common-math"
-import { mapSize } from "../../common/common-var"
+import { appDescription, appTitle, appVersion, insertBaseModal } from "common/common-browser"
+import { defaultFontSize, nearestPow2, roundToThousands } from "common/common-math"
+import { mapSize } from "common/common-var"
 
 import { displayClan } from "../util"
 
-import { Bound, MinMaxCoord, ZoomLevel } from "../../common/interface"
-import Cookie from "../util/cookie"
+import { Bound, MinMaxCoord, ZoomLevel } from "common/interface"
+import Cookie from "util/cookie"
 
-import RadioButton from "../util/radio-button"
+import RadioButton from "util/radio-button"
 import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"

@@ -20,23 +20,23 @@ import { Point, voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 import seedrandom from "seedrandom"
 
 import { registerEvent } from "../analytics"
-import { findNationByNationShortName, nations } from "../../common/common"
+import { findNationByNationShortName, nations } from "common/common"
 import {
     colourList,
     insertBaseModal,
     loadJsonFiles,
     showCursorDefault,
     showCursorWait,
-} from "../../common/common-browser"
-import { formatPercentSig, formatSiCurrency, formatSiInt } from "../../common/common-format"
-import { getContrastColour } from "../../common/common-game-tools"
+} from "common/common-browser"
+import { formatPercentSig, formatSiCurrency, formatSiInt } from "common/common-format"
+import { getContrastColour } from "common/common-game-tools"
 
 import { BaseModal } from "./base-modal"
 
 import { Vertex } from "d3-weighted-voronoi"
 import JQuery from "jquery"
-import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
-import { DataSource, HtmlString, PortIncome, PortJsonData } from "../../common/interface"
+import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
+import { DataSource, HtmlString, PortIncome, PortJsonData } from "common/interface"
 
 interface TreeMapPolygon extends Array<Point> {
     0: Point

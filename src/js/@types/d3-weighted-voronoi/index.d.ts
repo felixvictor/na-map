@@ -1,6 +1,6 @@
 declare module "d3-weighted-voronoi" {
     import { ClippingPolygon } from "d3-voronoi-treemap"
-    type Point = import("../../common/common-math").Point
+    type Point = import("common/common-math").Point
     type ConflictList = undefined
 
     interface Vertex {

@@ -15,12 +15,12 @@ import { select as d3Select } from "d3-selection"
 import "bootstrap-select"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatInt } from "../../common/common-format"
-import { getCurrencyAmount } from "../../common/common-game-tools"
-import { sortBy } from "../../common/common-node"
+import { insertBaseModal } from "common/common-browser"
+import { formatInt } from "common/common-format"
+import { getCurrencyAmount } from "common/common-game-tools"
+import { sortBy } from "common/common-node"
 
-import { Building, BuildingResult } from "../../common/gen-json"
+import { Building, BuildingResult } from "common/gen-json"
 
 export default class ListBuildings {
     private readonly _baseName: string

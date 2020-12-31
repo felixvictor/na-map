@@ -12,7 +12,7 @@ import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/toast"
 import { select as d3Select, Selection } from "d3-selection"
 
-import { iconSmallSrc } from "../../common/common-browser"
+import { iconSmallSrc } from "common/common-browser"
 
 /**
  * Toast

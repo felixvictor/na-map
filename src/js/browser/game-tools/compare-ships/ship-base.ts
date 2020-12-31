@@ -19,10 +19,10 @@ import {
 } from "d3-shape"
 import "d3-transition"
 
-import { isEmpty } from "../../../common/common"
-import { pluralise, segmentRadians } from "../../../common/common-browser"
-import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "../../../common/common-format"
-import { degreesToCompass, getOrdinal } from "../../../common/common-math"
+import { isEmpty } from "common/common"
+import { pluralise, segmentRadians } from "common/common-browser"
+import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "common/common-format"
+import { degreesToCompass, getOrdinal } from "common/common-math"
 import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util"
 
 import { Selection } from "d3-selection"
@@ -36,10 +36,10 @@ import {
     repairsSetSize,
     rigRepairsVolume,
     rumRepairsFactor,
-} from "../../../common/common-game-tools"
-import { default as shipIcon } from "../../../../icons/icon-ship.svg"
+} from "common/common-game-tools"
+import { default as shipIcon } from "icons/icon-ship.svg"
 
-import { ShipData } from "../../../common/gen-json"
+import { ShipData } from "common/gen-json"
 import { DragData, ShipDisplayData } from "./types"
 
 /**

@@ -15,15 +15,15 @@ import "bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { convertInvCoordX, convertInvCoordY } from "../../common/common-math"
-import { circleRadiusFactor, insertBaseModal } from "../../common/common-browser"
-import { sortBy } from "../../common/common-node"
+import { convertInvCoordX, convertInvCoordY } from "common/common-math"
+import { circleRadiusFactor, insertBaseModal } from "common/common-browser"
+import { sortBy } from "common/common-node"
 import { copyF11ToClipboard } from "../util"
-import { trilaterate, Vector } from "../util/transliterate"
-import Toast from "../util/toast"
+import { trilaterate, Vector } from "util/transliterate"
+import Toast from "util/toast"
 
 import JQuery from "jquery"
-import { HtmlString } from "../../common/interface"
+import { HtmlString } from "common/interface"
 
 import DisplayPorts from "./display-ports"
 

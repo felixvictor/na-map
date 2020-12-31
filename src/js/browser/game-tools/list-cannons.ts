@@ -22,12 +22,12 @@ import {
     cannonType,
     CannonTypeList,
     capitalizeFirstLetter,
-} from "../../common/common"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixed } from "../../common/common-format"
+} from "common/common"
+import { insertBaseModal } from "common/common-browser"
+import { formatFloatFixed } from "common/common-format"
 
-import { Cannon, CannonEntity, CannonValue } from "../../common/gen-json"
-import { HeaderMap, HtmlResult, HtmlString } from "../../common/interface"
+import { Cannon, CannonEntity, CannonValue } from "common/gen-json"
+import { HeaderMap, HtmlResult, HtmlString } from "common/interface"
 
 interface FamilyRowData {
     family: CannonFamily

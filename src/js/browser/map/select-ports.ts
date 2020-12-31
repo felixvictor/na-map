@@ -24,12 +24,12 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
-import { Nation, nations, NationShortName, validNationShortName } from "../../common/common"
-import { initMultiDropdownNavbar, loadJsonFile, TupleKeyMap } from "../../common/common-browser"
-import { formatInt, formatSiCurrency } from "../../common/common-format"
-import { Coordinate, Distance, getDistance, Point } from "../../common/common-math"
-import { simpleStringSort, sortBy } from "../../common/common-node"
-import { serverMaintenanceHour } from "../../common/common-var"
+import { Nation, nations, NationShortName, validNationShortName } from "common/common"
+import { initMultiDropdownNavbar, loadJsonFile, TupleKeyMap } from "common/common-browser"
+import { formatInt, formatSiCurrency } from "common/common-format"
+import { Coordinate, Distance, getDistance, Point } from "common/common-math"
+import { simpleStringSort, sortBy } from "common/common-node"
+import { serverMaintenanceHour } from "common/common-var"
 import {
     FrontlinesPerServer,
     GoodList,
@@ -40,8 +40,8 @@ import {
     PortWithTrades,
     TradeGoodProfit,
     TradeProfit,
-} from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+} from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 import { NAMap } from "./na-map"
 import DisplayPorts from "./display-ports"

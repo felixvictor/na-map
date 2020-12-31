@@ -31,13 +31,13 @@ import {
 } from "d3-shape"
 
 import { registerEvent } from "../analytics"
-import { NationFullName, nations, NationShortName } from "../../common/common"
-import { colourList, insertBaseModal, loadJsonFile } from "../../common/common-browser"
-import { getContrastColour } from "../../common/common-game-tools"
+import { NationFullName, nations, NationShortName } from "common/common"
+import { colourList, insertBaseModal, loadJsonFile } from "common/common-browser"
+import { getContrastColour } from "common/common-game-tools"
 
 import JQuery from "jquery"
-import { Ownership, OwnershipNation } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+import { Ownership, OwnershipNation } from "common/gen-json"
+import { HtmlString } from "common/interface"
 import { Group } from "timelines-chart"
 
 /**

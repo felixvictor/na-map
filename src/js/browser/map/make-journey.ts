@@ -24,8 +24,8 @@ import "../../../scss/roundslider.scss"
 import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal, pluralise } from "../../common/common-browser"
-import { formatF11 } from "../../common/common-format"
+import { degreesPerSecond, insertBaseModal, pluralise } from "common/common-browser"
+import { formatF11 } from "common/common-format"
 import {
     compassDirections,
     convertInvCoordX,
@@ -36,10 +36,10 @@ import {
     getDistance,
     Point,
     speedFactor,
-} from "../../common/common-math"
+} from "common/common-math"
 import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util"
 
-import { HtmlString } from "../../common/interface"
+import { HtmlString } from "common/interface"
 
 import { CompareShips } from "../game-tools/compare-ships"
 

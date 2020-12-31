@@ -15,12 +15,12 @@ import { sum as d3Sum } from "d3-array"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter, findNationByNationShortName } from "../../common/common"
-import { insertBaseModal, loadJsonFile } from "../../common/common-browser"
+import { capitalizeFirstLetter, findNationByNationShortName } from "common/common"
+import { insertBaseModal, loadJsonFile } from "common/common-browser"
 
-import { PortBasic, PortBattlePerServer, PortPerServer } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
-import { PortBonus, portBonusType, PortBonusValue } from "../../common/types"
+import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
+import { HtmlString } from "common/interface"
+import { PortBonus, portBonusType, PortBonusValue } from "common/types"
 
 interface PortData {
     id: number

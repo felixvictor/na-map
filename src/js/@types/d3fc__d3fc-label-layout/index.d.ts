@@ -2,7 +2,7 @@ declare module "@d3fc/d3fc-label-layout" {
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface Strategy {}
 
-    type Point = import("../../common/common-math").Point
+    type Point = import("common/common-math").Point
     type Segment = import("../../browser/map/make-journey").Segment
     type ArrayLike = import("d3-selection").ArrayLike<SVGSVGElement | SVGGElement>
 

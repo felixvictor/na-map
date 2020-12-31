@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { HtmlString } from "../../common/interface"
+import { HtmlString } from "common/interface"
 
 export class BaseModal {
     readonly serverId: string

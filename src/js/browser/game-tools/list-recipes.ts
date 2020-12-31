@@ -15,16 +15,16 @@ import "bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatInt, formatSignPercent } from "../../common/common-format"
-import { getCurrencyAmount } from "../../common/common-game-tools"
-import { getOrdinal } from "../../common/common-math"
-import { sortBy } from "../../common/common-node"
-import { servers } from "../../common/servers"
+import { insertBaseModal } from "common/common-browser"
+import { formatInt, formatSignPercent } from "common/common-format"
+import { getCurrencyAmount } from "common/common-game-tools"
+import { getOrdinal } from "common/common-math"
+import { sortBy } from "common/common-node"
+import { servers } from "common/servers"
 
 import JQuery from "jquery"
-import { Module, RecipeEntity, RecipeGroup } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+import { Module, RecipeEntity, RecipeGroup } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 const replacer = (match: string, p1: number, p2: number): string =>
     `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`

@@ -9,7 +9,7 @@
  */
 
 import { registerEvent } from "../analytics"
-import { appVersion } from "../../common/common-browser"
+import { appVersion } from "common/common-browser"
 
 import { CompareShips } from "./compare-ships"
 import CompareWoods from "./compare-woods"

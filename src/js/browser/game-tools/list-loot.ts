@@ -15,9 +15,9 @@ import { h, render } from "preact"
 import htm from "htm"
 
 import { registerEvent } from "../analytics"
-import { formatInt } from "../../common/common-format"
-import { getBaseModalHTML } from "../../common/common-game-tools"
-import { sortBy } from "../../common/common-node"
+import { formatInt } from "common/common-format"
+import { getBaseModalHTML } from "common/common-game-tools"
+import { sortBy } from "common/common-node"
 
 import JQuery from "jquery"
 import {
@@ -28,9 +28,9 @@ import {
     LootLootEntity,
     LootTypeList,
     LootChestItemsEntity,
-} from "../../common/gen-json"
-import { lootType, LootType } from "../../common/types"
-import { HtmlResult, HtmlString } from "../../common/interface"
+} from "common/gen-json"
+import { lootType, LootType } from "common/types"
+import { HtmlResult, HtmlString } from "common/interface"
 
 const html = htm.bind(h)
 

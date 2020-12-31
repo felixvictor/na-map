@@ -1,10 +1,24 @@
-// Path-based compiler options (outDir, outFile, rootDir, include, files) are resolved from the config file they're found in
-// https://github.com/microsoft/TypeScript/issues/29172
 {
-  "extends": "./tsconfig-main.json",
-  "compilerOptions": {
-    // "outFile": "./",                       /* Concatenate and emit output to single file. */
-    "outDir": "./dist/js" /* Redirect output structure to the directory. */,
-    "rootDir": "./src/js" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
-  }
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
+        "sourceMap": true,
+        "removeComments": true,
+        "isolatedModules": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "baseUrl": "./src",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "allowUmdGlobalAccess": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "paths": {
+            "common/*": ["js/common/*"],
+            "icons/*": ["icons/*"],
+            "scss/*": ["scss/*"],
+            "util/*": ["js/browser/util/*"]
+        }
+    }
 }

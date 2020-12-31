@@ -1,6 +1,6 @@
 import { Selection } from "d3-selection"
 import { ValuesType } from "utility-types"
-import { ShipGunDeck } from "../../../common/gen-json"
+import { ShipGunDeck } from "common/gen-json"
 
 export interface ShipDisplayData {
     [index: string]: ValuesType<ShipDisplayData>

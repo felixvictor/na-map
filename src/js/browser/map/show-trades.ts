@@ -17,19 +17,19 @@ import { extent as d3Extent } from "d3-array"
 import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 
-import { nations, NationShortName } from "../../common/common"
-import { formatInt, formatSiCurrency, formatSiInt } from "../../common/common-format"
-import { defaultFontSize, roundToThousands } from "../../common/common-math"
+import { nations, NationShortName } from "common/common"
+import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
+import { defaultFontSize, roundToThousands } from "common/common-math"
 
 import JQuery from "jquery"
-import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "../../common/gen-json"
+import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "common/gen-json"
 import { ZoomTransform } from "d3-zoom"
-import { Bound, HtmlString } from "../../common/interface"
+import { Bound, HtmlString } from "common/interface"
 
-import Cookie from "../util/cookie"
-import RadioButton from "../util/radio-button"
+import Cookie from "util/cookie"
+import RadioButton from "util/radio-button"
 import SelectPorts from "./select-ports"
-import { loadJsonFile } from "../../common/common-browser"
+import { loadJsonFile } from "common/common-browser"
 
 interface Node {
     name: string

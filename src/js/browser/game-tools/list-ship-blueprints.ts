@@ -15,14 +15,14 @@ import "bootstrap-select"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { woodType, WoodType, WoodTypeList } from "../../common/common"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatInt } from "../../common/common-format"
-import { sortBy } from "../../common/common-node"
+import { woodType, WoodType, WoodTypeList } from "common/common"
+import { insertBaseModal } from "common/common-browser"
+import { formatInt } from "common/common-format"
+import { sortBy } from "common/common-node"
 
 import JQuery from "jquery"
-import { Price, ShipBlueprint, WoodData } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+import { Price, ShipBlueprint, WoodData } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 interface ItemNeeded {
     // item

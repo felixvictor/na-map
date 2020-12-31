@@ -13,13 +13,13 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { formatF11 } from "../../common/common-format"
-import { insertBaseModal } from "../../common/common-browser"
-import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "../../common/common-math"
+import { formatF11 } from "common/common-format"
+import { insertBaseModal } from "common/common-browser"
+import { between, convertCoordX, convertCoordY, convertInvCoordX, convertInvCoordY } from "common/common-math"
 import { copyF11ToClipboard } from "../util"
 
 import JQuery from "jquery"
-import { BaseModalPure, HtmlString, MinMaxCoord } from "../../common/interface"
+import { BaseModalPure, HtmlString, MinMaxCoord } from "common/interface"
 
 import { NAMap } from "./na-map"
 

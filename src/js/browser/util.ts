@@ -10,7 +10,7 @@
 
 import { scaleBand as d3ScaleBand, ScaleLinear } from "d3-scale"
 
-import { numberSegments } from "../common/common-browser"
+import { numberSegments } from "common/common-browser"
 import {
     compassToDegrees,
     Coordinate,
@@ -18,7 +18,7 @@ import {
     degreesQuarterCircle,
     degreesToCompass,
     radiansToDegrees,
-} from "../common/common-math"
+} from "common/common-math"
 
 import JQuery from "jquery"
 import { Selection } from "d3-selection"

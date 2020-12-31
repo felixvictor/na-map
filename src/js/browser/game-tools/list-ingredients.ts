@@ -14,13 +14,13 @@ import "bootstrap/js/dist/tooltip"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatSignInt, formatSignPercent } from "../../common/common-format"
-import { sortBy } from "../../common/common-node"
+import { insertBaseModal } from "common/common-browser"
+import { formatSignInt, formatSignPercent } from "common/common-format"
+import { sortBy } from "common/common-node"
 import { chunkify } from "../util"
 
-import { Module, RecipeIngredientEntity } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+import { Module, RecipeIngredientEntity } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 export default class ListIngredients {
     private readonly _baseName: string

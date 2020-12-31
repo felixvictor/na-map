@@ -17,7 +17,6 @@ const sass = require("sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 // const SriPlugin = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
-const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
 const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
@@ -36,6 +35,7 @@ const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 // Variables
 const PACKAGE = require("./package.json")
+const TSCONFIG = require("./tsconfig.json")
 const repairs = require(`${dirLib}/gen-generic/repairs.json`)
 const { isProduction } = require("webpack-mode")
 const servers = [
@@ -96,6 +96,17 @@ const colourRed = colours.get("red")
 const colourRedLight = colours.get("red-light")
 const colourRedDark = colours.get("red-dark")
 const colourWhite = colours.get("white")
+
+console.log(Object.entries(TSCONFIG.compilerOptions.paths))
+const aliasPaths = {}
+for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
+    aliasPaths[key.replace("/*", "")] = path.resolve(
+        __dirname,
+        TSCONFIG.compilerOptions.baseUrl,
+        value.map((path) => path.replace("/*", ""))[0]
+    )
+}
+console.log(TSCONFIG.compilerOptions.baseUrl, aliasPaths)
 
 const babelOpt = {
     cacheDirectory: true,
@@ -297,9 +308,6 @@ const config = {
     },
 
     plugins: [
-        new CleanWebpackPlugin({
-            verbose: false,
-        }),
         new MiniCssExtractPlugin({
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
         }),
@@ -369,6 +377,7 @@ const config = {
 
     resolve: {
         extensions: [".ts", ".js", ".json"],
+        alias: aliasPaths,
     },
 
     target: isProduction ? "browserslist" : "web",

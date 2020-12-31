@@ -19,12 +19,12 @@ import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
 import { registerEvent } from "../analytics"
 
-import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
-import { compassDirections, degreesToRadians } from "../../common/common-math"
+import { degreesPerSecond, insertBaseModal } from "common/common-browser"
+import { compassDirections, degreesToRadians } from "common/common-math"
 import { displayCompass, getUserWind, printSmallCompassRose } from "../util"
 
 import { RoundSliderPos } from "round-slider"
-import { HtmlString } from "../../common/interface"
+import { HtmlString } from "common/interface"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -33,7 +33,7 @@ import utc from "dayjs/plugin/utc"
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
-import Cookie from "../util/cookie"
+import Cookie from "util/cookie"
 
 export default class WindRose {
     private readonly _line: Line<[number, number]>

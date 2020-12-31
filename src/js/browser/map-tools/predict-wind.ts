@@ -19,11 +19,11 @@ import "../../../scss/roundslider.scss"
 import { RoundSliderPos } from "round-slider"
 
 import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal } from "../../common/common-browser"
-import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "../../common/common-math"
+import { degreesPerSecond, insertBaseModal } from "common/common-browser"
+import { compassDirections, compassToDegrees, degreesToCompass, degreesToRadians } from "common/common-math"
 import { displayCompass, displayCompassAndDegrees, getUserWind, printCompassRose } from "../util"
 
-import { HtmlString } from "../../common/interface"
+import { HtmlString } from "common/interface"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"

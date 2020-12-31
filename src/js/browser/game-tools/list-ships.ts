@@ -13,13 +13,13 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatFloatFixed, formatInt } from "../../common/common-format"
-import { beautifyShipName } from "../../common/common-game-tools"
-import { sortBy } from "../../common/common-node"
+import { insertBaseModal } from "common/common-browser"
+import { formatFloatFixed, formatInt } from "common/common-format"
+import { beautifyShipName } from "common/common-game-tools"
+import { sortBy } from "common/common-node"
 
-import { ShipData } from "../../common/gen-json"
-import { HeaderMap, HtmlString } from "../../common/interface"
+import { ShipData } from "common/gen-json"
+import { HeaderMap, HtmlString } from "common/interface"
 
 type ShipListData = Array<[number | string, string]>
 

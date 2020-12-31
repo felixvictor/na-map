@@ -28,7 +28,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { capitalizeFirstLetter, nations, NationShortName } from "../../common/common"
+import { capitalizeFirstLetter, nations, NationShortName } from "common/common"
 import {
     colourGreenDark,
     colourList,
@@ -37,8 +37,8 @@ import {
     loadJsonFile,
     loadJsonFiles,
     primary300,
-} from "../../common/common-browser"
-import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "../../common/common-format"
+} from "common/common-browser"
+import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
 import {
     Coordinate,
     defaultCircleSize,
@@ -49,9 +49,9 @@ import {
     getOrdinalSVG,
     Point,
     roundToThousands,
-} from "../../common/common-math"
-import { simpleStringSort } from "../../common/common-node"
-import { displayClanLitHtml } from "../../common/common-game-tools"
+} from "common/common-math"
+import { simpleStringSort } from "common/common-node"
+import { displayClanLitHtml } from "common/common-game-tools"
 
 import JQuery from "jquery"
 import {
@@ -62,7 +62,7 @@ import {
     NationListAlternative,
     TradeItem,
     TradeGoodProfit,
-} from "../../common/gen-json"
+} from "common/gen-json"
 import {
     Bound,
     DataSource,
@@ -72,12 +72,12 @@ import {
     PortJsonData,
     SVGGDatum,
     ZoomLevel,
-} from "../../common/interface"
-import { PortBonus, portBonusType } from "../../common/types"
+} from "common/interface"
+import { PortBonus, portBonusType } from "common/types"
 
-import Cookie from "../util/cookie"
-import RadioButton from "../util/radio-button"
-import { default as swordsIcon } from "../../../icons/icon-swords.svg"
+import Cookie from "util/cookie"
+import RadioButton from "util/radio-button"
+import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 

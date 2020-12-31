@@ -17,28 +17,28 @@ import {
     PieArcDatum,
     lineRadial as d3LineRadial,
 } from "d3-shape"
-import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "../../../common/common-format"
+import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "common/common-format"
 
-import { degreesToCompass, getOrdinal, roundToThousands } from "../../../common/common-math"
+import { degreesToCompass, getOrdinal, roundToThousands } from "common/common-math"
 import { rotationAngleInDegrees } from "../../util"
-import { default as shipIcon } from "../../../../icons/icon-ship.svg"
+import { default as shipIcon } from "icons/icon-ship.svg"
 
 import { Selection } from "d3-selection"
 
 import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
 
-import { colourWhite, pluralise, segmentRadians } from "../../../common/common-browser"
+import { colourWhite, pluralise, segmentRadians } from "common/common-browser"
 import {
     hullRepairsVolume,
     repairsSetSize,
     rigRepairsVolume,
     rumRepairsFactor,
-} from "../../../common/common-game-tools"
+} from "common/common-game-tools"
 
-import { ShipData } from "../../../common/gen-json"
+import { ShipData } from "common/gen-json"
 import { DragData, ShipDisplayData } from "./types"
-import { HtmlString } from "../../../common/interface"
+import { HtmlString } from "common/interface"
 
 export class ShipComparison extends Ship {
     // Ship data of the ship to be compared to

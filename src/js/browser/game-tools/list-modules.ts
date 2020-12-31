@@ -15,15 +15,15 @@ import "bootstrap-select"
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { insertBaseModal } from "../../common/common-browser"
-import { formatPP, formatSignInt, formatSignPercent } from "../../common/common-format"
-import { getOrdinal } from "../../common/common-math"
-import { sortBy } from "../../common/common-node"
+import { insertBaseModal } from "common/common-browser"
+import { formatPP, formatSignInt, formatSignPercent } from "common/common-format"
+import { getOrdinal } from "common/common-math"
+import { sortBy } from "common/common-node"
 import { chunkify } from "../util"
 
 import JQuery from "jquery"
-import { Module, ModuleEntity } from "../../common/gen-json"
-import { HtmlString } from "../../common/interface"
+import { Module, ModuleEntity } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 export default class ListModules {
     private readonly _baseName: string

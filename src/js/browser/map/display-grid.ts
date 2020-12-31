@@ -12,11 +12,11 @@ import { Axis, axisBottom as d3AxisBottom, axisRight as d3AxisRight } from "d3-a
 import { select as d3Select, Selection } from "d3-selection"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
-import { formatF11 } from "../../common/common-format"
-import { convertInvCoordX, convertInvCoordY, roundToThousands } from "../../common/common-math"
+import { formatF11 } from "common/common-format"
+import { convertInvCoordX, convertInvCoordY, roundToThousands } from "common/common-math"
 
 import { D3ZoomEvent, ZoomTransform } from "d3-zoom"
-import { ZoomLevel } from "../../common/interface"
+import { ZoomLevel } from "common/interface"
 
 import { NAMap } from "./na-map"
 

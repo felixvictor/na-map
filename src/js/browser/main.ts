@@ -8,12 +8,12 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { serverIds } from "../common/servers"
+import { serverIds } from "common/servers"
 
-import Cookie from "./util/cookie"
-import RadioButton from "./util/radio-button"
+import Cookie from "util/cookie"
+import RadioButton from "util/radio-button"
 
-import "../../scss/main.scss"
+import "scss/main.scss"
 
 /**
  *  Workaround for google translate uses indexOf on svg text

@@ -11,12 +11,12 @@
 import { select as d3Select, Selection } from "d3-selection"
 import { arc as d3Arc, pie as d3Pie } from "d3-shape"
 
-import { numberSegments } from "../../../common/common-browser"
+import { numberSegments } from "common/common-browser"
 
 import { CompareShips } from "./compare-ships"
 import { ShipDisplayData } from "./types"
-import { ShipGunDeck, ShipGuns } from "../../../common/gen-json"
-import { HtmlString } from "../../../common/interface"
+import { ShipGunDeck, ShipGuns } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 export class Ship {
     readonly ticksSpeed: number[]

@@ -10,16 +10,16 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
-import { servers } from "../../common/servers"
+import { servers } from "common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
-import Cookie from "../util/cookie"
-import RadioButton from "../util/radio-button"
+import Cookie from "util/cookie"
+import RadioButton from "util/radio-button"
 
 import DisplayPorts from "./display-ports"
 
-import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "../../common/gen-json"
-import { Bound } from "../../common/interface"
-import { Point } from "../../common/common-math"
+import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "common/gen-json"
+import { Bound } from "common/interface"
+import { Point } from "common/common-math"
 
 export default class DisplayPbZones {
     showPB: string
