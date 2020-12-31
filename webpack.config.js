@@ -278,6 +278,7 @@ const getSvgLoaderOpt = (path) => ({
 
 const config = {
     devServer: {
+        host: "localhost",
         hot: true,
         open: true,
     },
