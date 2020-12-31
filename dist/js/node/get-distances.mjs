@@ -133,7 +133,7 @@ class Map {
         this.#completedPorts.add(startPortId);
         this.visit(startIndex);
         const queue = new Deque([[startIndex, 0]]);
-        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length !== 0) {
+        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length > 0) {
             let [index, pixelDistance] = queue.shift();
             const spot = this.getPortId(this.getSpot(index));
             if (spot > startPortId) {
