@@ -97,7 +97,6 @@ const colourRedLight = colours.get("red-light")
 const colourRedDark = colours.get("red-dark")
 const colourWhite = colours.get("white")
 
-console.log(Object.entries(TSCONFIG.compilerOptions.paths))
 const aliasPaths = {}
 for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
     aliasPaths[key.replace("/*", "")] = path.resolve(
@@ -106,7 +105,6 @@ for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
         value.map((path) => path.replace("/*", ""))[0]
     )
 }
-console.log(TSCONFIG.compilerOptions.baseUrl, aliasPaths)
 
 const babelOpt = {
     cacheDirectory: true,
