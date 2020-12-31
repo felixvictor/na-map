@@ -93,6 +93,9 @@ export default class ShowIncomeMap extends BaseModal {
     }
 
     _setupData(data: PortJsonData): void {
+        const minFontSize = 8
+        const maxFontSize = 32
+
         // Combine port data with port battle data
         const portData = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
@@ -104,7 +107,7 @@ export default class ShowIncomeMap extends BaseModal {
 
         const minIncome = d3Min(portData, (d) => d.netIncome) ?? 0
         const maxIncome = d3Max(portData, (d) => d.netIncome) ?? 0
-        this.#fontScale = d3ScaleLinear().domain([minIncome, maxIncome]).range([8, 48]).clamp(true)
+        this.#fontScale = d3ScaleLinear().domain([minIncome, maxIncome]).range([minFontSize, maxFontSize]).clamp(true)
 
         const nationWithoutIncomeData = new Set(["NT", "FT"])
         const nationWithIncome = new Set()
