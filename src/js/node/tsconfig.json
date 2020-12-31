@@ -4,6 +4,7 @@
     "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "baseUrl": "./",
+        "noEmit": false,
         "paths": {},
         "outDir": "../../../dist/js" /* Redirect output structure to the directory. */,
         "rootDir": "../" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
