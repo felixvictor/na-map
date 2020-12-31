@@ -29,7 +29,7 @@ export default class RadioButton {
      * Set radio button
      */
     set(id: string): void {
-        document.querySelector(`#${this.#name}-${id}`)!.checked = true
+        ;((document.querySelector(`#${this.#name}-${id}`) ?? {}) as HTMLInputElement).checked = true
     }
 
     /**
@@ -37,7 +37,7 @@ export default class RadioButton {
      */
     get(): string {
         // Radio button value
-        let { value } = document.querySelector(`input[name="${this.#name}"]:checked`)!
+        let { value } = (document.querySelector(`input[name="${this.#name}"]:checked`) ?? {}) as HTMLInputElement
 
         if (typeof value === "undefined" || !this.#ids.includes(value)) {
             // Use default value if radio button does not exist or has invalid data

@@ -26,7 +26,7 @@ import {
 import { insertBaseModal } from "common/common-browser"
 import { formatFloatFixed } from "common/common-format"
 
-import { Cannon, CannonEntity, CannonValue } from "common/gen-json"
+import { Cannon, CannonDamage, CannonEntity, CannonGeneric, CannonPenetration, CannonValue } from "common/gen-json"
 import { HeaderMap, HtmlResult, HtmlString } from "common/interface"
 
 interface FamilyRowData {
@@ -118,16 +118,20 @@ export default class ListCannons {
                     )
                     for (const [groupKey, groupValue] of cannonSorted) {
                         if (groupKey === "name") {
-                            elements.push(this._getFormattedName(groupValue))
+                            elements.push(this._getFormattedName(groupValue as string))
                         } else if (groupKey !== "family") {
-                            for (const [, elementValue] of Object.entries<CannonValue>(groupValue)) {
-                                elements.push({
-                                    value: elementValue.value,
-                                    formattedValue:
-                                        elementValue.value === 0
-                                            ? ""
-                                            : formatFloatFixed(elementValue.value, elementValue.digits ?? 0),
-                                })
+                            for (const [, elementValue] of Object.entries(
+                                groupValue as CannonDamage | CannonGeneric | CannonPenetration
+                            )) {
+                                if (elementValue) {
+                                    elements.push({
+                                        value: elementValue.value,
+                                        formattedValue:
+                                            elementValue.value === 0
+                                                ? ""
+                                                : formatFloatFixed(elementValue.value, elementValue?.digits ?? 0),
+                                    })
+                                }
                             }
                         }
                     }

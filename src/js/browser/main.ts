@@ -21,10 +21,11 @@ import "scss/main.scss"
  */
 declare global {
     interface SVGAnimatedString {
-        indexOf: () => Record<string, unknown>
+        indexOf: () => number
     }
 }
-SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): Record<string, unknown> {
+SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): number {
+    // @ts-expect-error
     return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params
 }
 
