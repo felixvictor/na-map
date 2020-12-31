@@ -218,7 +218,7 @@ function parseData(serverId: ServerId, portData: APIPort[], date: string): void 
  * @returns Resolved promise
  */
 const processFiles = async (serverId: ServerId, fileNames: string[]): Promise<unknown> => {
-    // eslint-disable-next-line unicorn/no-reduce
+    // eslint-disable-next-line unicorn/no-array-reduce
     return fileNames.reduce(
         async (sequence, fileName) =>
             sequence

@@ -30,6 +30,7 @@ const countDecimals = (value: number | undefined): number => {
         return 0
     }
 
+    // eslint-disable-next-line unicorn/explicit-length-check
     return value.toString().split(".")[1].length ?? 0
 }
 

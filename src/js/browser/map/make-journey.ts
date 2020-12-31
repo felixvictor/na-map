@@ -521,7 +521,7 @@ export default class MakeJourney {
             .value((d: Segment): string => {
                 const lines = d.label.split("|")
                 // Find longest line (number of characters)
-                // eslint-disable-next-line unicorn/no-reduce
+                // eslint-disable-next-line unicorn/no-array-reduce
                 const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0)
                 return lines[index]
             })

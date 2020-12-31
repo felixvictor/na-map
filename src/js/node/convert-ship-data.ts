@@ -401,7 +401,7 @@ const convertGenericShipData = (): ShipData[] => {
                 },
                 speedDegrees,
                 speed: {
-                    // eslint-disable-next-line unicorn/no-reduce
+                    // eslint-disable-next-line unicorn/no-array-reduce
                     min: speedDegrees.reduce((a, b) => Math.min(a, b)),
                     max: roundToThousands(calcPortSpeed),
                 },

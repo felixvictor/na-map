@@ -31,12 +31,7 @@ import { Ship } from "./ship"
 import { CompareShips } from "./compare-ships"
 import { ShipComparison } from "./ship-comparison"
 
-import {
-    hullRepairsVolume,
-    repairsSetSize,
-    rigRepairsVolume,
-    rumRepairsFactor,
-} from "common/common-game-tools"
+import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor } from "common/common-game-tools"
 import { default as shipIcon } from "icons/icon-ship.svg"
 
 import { ShipData } from "common/gen-json"

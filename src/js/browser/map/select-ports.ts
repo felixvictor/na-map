@@ -518,9 +518,9 @@ export default class SelectPorts {
             .map((port) => {
                 port.sailingDistanceToTradePort = this._getSailingDistance(port.id, tradePort.id)
                 port.goodsToBuyInTradePort = getGoodsToBuyInTradePort(port)
-                port.buyInTradePort = Boolean(port.goodsToBuyInTradePort.length)
+                port.buyInTradePort = port.goodsToBuyInTradePort.length > 0
                 port.goodsToSellInTradePort = getGoodsToSellInTradePort(port)
-                port.sellInTradePort = Boolean(port.goodsToSellInTradePort.length)
+                port.sellInTradePort = port.goodsToSellInTradePort.length > 0
 
                 return port
             })

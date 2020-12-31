@@ -183,7 +183,7 @@ class Map {
         // Queue holds unchecked positions ([index, distance from start port])
         const queue = new Deque([[startIndex, 0]])
 
-        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length !== 0) {
+        while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length > 0) {
             let [index, pixelDistance]: [Index, PixelDistance] = queue.shift()
             const spot = this.getPortId(this.getSpot(index))
 

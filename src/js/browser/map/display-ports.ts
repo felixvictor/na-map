@@ -670,7 +670,7 @@ export default class DisplayPorts {
             .forEach((nation) => {
                 const patternElement = getPattern(nation)
                 patternElement.append(getImage(nation))
-                // eslint-disable-next-line unicorn/prefer-node-append
+                // eslint-disable-next-line unicorn/prefer-dom-node-append
                 const patternNode = svgDefNode.appendChild(patternElement)
 
                 if (nation !== "FT") {

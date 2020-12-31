@@ -22,13 +22,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
 
 import { registerEvent } from "../../analytics"
-import {
-    appVersion,
-    colourGreenDark,
-    colourRedDark,
-    colourWhite,
-    insertBaseModal,
-} from "common/common-browser"
+import { appVersion, colourGreenDark, colourRedDark, colourWhite, insertBaseModal } from "common/common-browser"
 import { isEmpty, WoodType, woodType } from "common/common"
 import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
 import {
@@ -1545,6 +1539,7 @@ export class CompareShips {
         let i = 0
 
         this._columns.some((columnId) => {
+            // eslint-disable-next-line unicorn/prefer-array-some
             if (!this._shipData.find((ship) => ship.id === ids[i])) {
                 return false
             }
