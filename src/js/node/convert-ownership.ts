@@ -54,7 +54,8 @@ type CountyGroup = Map<string, Port[]>
  * @returns Decompressed file content or void
  */
 const decompress = (compressedContent: Buffer): void | Buffer => {
-    lzma.decompress(compressedContent, {}, (decompressedContent: void | Buffer, error?: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    return lzma.decompress(compressedContent, {}, (decompressedContent: void | Buffer, error?: string) => {
         if (error) {
             throw new Error(error)
         }
