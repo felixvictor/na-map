@@ -13,7 +13,7 @@ import Excel from "exceljs";
 import sass from "sass";
 import { range } from "../common/common";
 import { commonPaths, serverStartDate } from "../common/common-dir";
-import { readJson } from "../common/common-file";
+import { executeCommand, readJson } from "../common/common-file";
 import { sortBy } from "../common/common-node";
 const shallowWaterFrigates = new Set(["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"]);
 const minDeepWaterBR = 80;
@@ -350,8 +350,19 @@ const createPortBattleSheets = async () => {
     fillSheet(swSheet, swShips, portsShallowWater);
     await workbook.xlsx.writeFile(commonPaths.filePbSheet);
 };
+const isGitFileChanged = (fileName) => {
+    const gitCommand = "git diff";
+    const result = executeCommand(`${gitCommand} ${fileName}`);
+    return result.length > 0;
+};
+const isSourceDataChanged = () => {
+    const files = [commonPaths.filePort, commonPaths.fileShip];
+    return files.some((file) => isGitFileChanged(file));
+};
 export const createPortBattleSheet = async () => {
-    setupData();
-    await createPortBattleSheets();
+    if (!isSourceDataChanged()) {
+        setupData();
+        await createPortBattleSheets();
+    }
 };
 //# sourceMappingURL=create-pb-sheets.js.map

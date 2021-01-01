@@ -74,4 +74,19 @@ export const uncompressApiData = () => {
 export const putFetchError = (error) => {
     console.error("Request failed -->", error);
 };
+export const executeCommand = (command) => {
+    let result = {};
+    try {
+        result = execSync(command);
+    }
+    catch (error) {
+        if (isNodeError(error) && error.code === "ENOENT") {
+            console.error("Command failed -->", error);
+        }
+        else {
+            putFetchError(error);
+        }
+    }
+    return result;
+};
 //# sourceMappingURL=common-file.js.map
