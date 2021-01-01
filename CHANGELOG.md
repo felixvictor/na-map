@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.3.7](///compare/v12.3.6...v12.3.7) (2021-01-01)
+
+
+### Bug Fixes
+
+* **create pb sheets:** create xslx file only if source files have changed 2b07fca
+
 ### [12.3.6](///compare/v12.3.5...v12.3.6) (2021-01-01)
 
 ### [12.3.5](///compare/v12.3.4...v12.3.5) (2021-01-01)
