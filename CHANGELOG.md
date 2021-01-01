@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.3.4](///compare/v12.3.3...v12.3.4) (2021-01-01)
+
+
+### Bug Fixes
+
+* **convert ownership:** fixed 29f1d9c
+
 ### [12.3.3](///compare/v12.3.2...v12.3.3) (2020-12-31)
 
 
