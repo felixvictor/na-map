@@ -32,7 +32,7 @@
         "main:develop-test": "                run-s build:load build:js                 'build:data:* full-client'                  build:deploy-test",
         "main:develop-test2": "               run-s build:load build:js                 'build:data:* full-client'                  build:deploy-test2",
         "main:maintenance": "yarn --silent && run-s build:load                          'build:data:* full-server'                  build:deploy-main-quiet",
-        "main:release": "                     run-s build:load build:js build:commit-js 'build:data:* full-client'          release build:deploy-main",
+        "main:release": "    git pull &&      run-s build:load build:js build:commit-js 'build:data:* full-client'          release build:deploy-main",
         "pre-build:distances": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances.mjs",
         "pre-build:distances-cut": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-cut.mjs",
         "pre-build:distances-test": "yarn node --max-heap-size=10000 --experimental-specifier-resolution=node dist/js/node/get-distances-test.mjs",
