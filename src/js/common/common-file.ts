@@ -114,3 +114,19 @@ export const uncompressApiData = (): void => {
 export const putFetchError = (error: string): void => {
     console.error("Request failed -->", error)
 }
+
+export const executeCommand = (command: string): Buffer => {
+    let result = {} as Buffer
+
+    try {
+        result = execSync(command)
+    } catch (error: unknown) {
+        if (isNodeError(error as Error) && (error as ErrnoException).code === "ENOENT") {
+            console.error("Command failed -->", error)
+        } else {
+            putFetchError(error as string)
+        }
+    }
+
+    return result
+}

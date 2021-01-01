@@ -16,7 +16,7 @@ import sass from "sass"
 
 import { range } from "../common/common"
 import { commonPaths, serverStartDate } from "../common/common-dir"
-import { readJson } from "../common/common-file"
+import { executeCommand, readJson } from "../common/common-file"
 import { sortBy } from "../common/common-node"
 
 import { PortBasic, ShipData } from "../common/gen-json"
@@ -146,6 +146,9 @@ const defaultFont: Partial<Excel.Font> = {
  */
 // @ts-expect-error
 import StylesXform from "exceljs/lib/xlsx/xform/style/styles-xform"
+import { default as fs } from "fs"
+import { bool } from "sharp"
+import dayjs, { Dayjs } from "dayjs"
 const origStylesXformInit = StylesXform.prototype.init
 StylesXform.prototype.init = function () {
     // eslint-disable-next-line prefer-rest-params
@@ -508,7 +511,32 @@ const createPortBattleSheets = async (): Promise<void> => {
     await workbook.xlsx.writeFile(commonPaths.filePbSheet)
 }
 
+/*
+const getLastCommitDate = (fileName: string): Dayjs => {
+    const gitCommand = "git log -1 --format=%cd"
+
+    const dateString = executeCommand(`${gitCommand} ${fileName}`)
+    return dayjs(dateString.toString())
+}
+*/
+
+const isGitFileChanged = (fileName: string): boolean => {
+    const gitCommand = "git diff"
+
+    const result = executeCommand(`${gitCommand} ${fileName}`)
+
+    return result.length > 0
+}
+
+const isSourceDataChanged = (): boolean => {
+    const files = [commonPaths.filePort, commonPaths.fileShip]
+
+    return files.some((file) => isGitFileChanged(file))
+}
+
 export const createPortBattleSheet = async (): Promise<void> => {
-    setupData()
-    await createPortBattleSheets()
+    if (!isSourceDataChanged()) {
+        setupData()
+        await createPortBattleSheets()
+    }
 }
