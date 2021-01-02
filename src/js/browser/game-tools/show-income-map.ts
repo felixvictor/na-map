@@ -1,8 +1,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Port ownership list.
- * @module    game-tools/list-port-ownerships
+ * @file      Income map.
+ * @module    game-tools/show-income-map
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
