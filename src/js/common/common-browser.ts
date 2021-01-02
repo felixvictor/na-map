@@ -220,3 +220,33 @@ export class TupleKeyMap<K, V> extends Map {
         })
     }
 }
+
+/**
+ * {@link https://stackoverflow.com/a/54662026}
+ * @param id - Id
+ */
+export const getCanvasElementById = (id: string): HTMLCanvasElement => {
+    const canvas = document.querySelector(id)
+
+    if (!(canvas instanceof HTMLCanvasElement)) {
+        throw new TypeError(
+            `The element of id "${id}" is not a HTMLCanvasElement. Make sure a <canvas id="${id}""> element is present in the document.`
+        )
+    }
+
+    return canvas
+}
+
+/**
+ * {@link https://stackoverflow.com/a/54662026}
+ * @param canvas - Canvas
+ */
+export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
+    const context = canvas.getContext("2d")
+
+    if (context === null) {
+        throw new Error("This browser does not support 2-dimensional canvas rendering contexts.")
+    }
+
+    return context
+}
