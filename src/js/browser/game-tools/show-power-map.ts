@@ -59,39 +59,6 @@ export default class PowerMap extends BaseModal {
         const minIncome = d3Min(this.#portData, (d) => (d.netIncome < 0 ? 0 : d.netIncome)) ?? 0
         const maxIncome = d3Max(this.#portData, (d) => (d.netIncome < 0 ? 0 : d.netIncome)) ?? 0
         this.#incomeScale = d3ScaleLinear().domain([minIncome, maxIncome]).range([0, 1]).clamp(true)
-
-        /*
-        const nationWithoutIncomeData = new Set(["NT", "FT"])
-        const nationWithIncome = new Set()
-
-        const flatData: PortHierarchy[] = [
-            // Port leaves
-            ...portData
-                .filter((port) => port.netIncome > 0 && !nationWithoutIncomeData.has(port.nation))
-                .map((port) => {
-                    nationWithIncome.add(port.nation)
-                    return {
-                        id: port.name,
-                        value: port.netIncome,
-                        parentId: findNationByNationShortName(port.nation)?.sortName,
-                    }
-                }),
-            // Nation nodes
-            ...nations
-                .filter((nation) => nationWithIncome.has(nation.short))
-                .map((nation) => ({
-                    id: nation.sortName,
-                    value: 0,
-                    parentId: "World",
-                })),
-            // Root node
-            { id: "World", value: 0, parentId: undefined },
-        ]
-
-        this.#nestedData = d3Stratify<PortHierarchy>()(flatData)
-        this.#tree = d3Hierarchy(this.#nestedData).sum((d: HierarchyNode<PortHierarchy>) => d.data.value)
-
-         */
     }
 
     async _loadData(): Promise<PortJsonData> {
@@ -145,25 +112,41 @@ export default class PowerMap extends BaseModal {
         const points = this.#portData.map((port) => port.coordinates)
         const delaunay = d3Delaunay.from(points)
         console.log(delaunay)
-        const maxY = d3Max(points, (point) => point[1])
-        const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, maxY ? maxY + 100 : this.#coord.max]
+        let maxY = d3Max(points, (point) => point[1])
+        maxY = maxY ? maxY + 100 : this.#coord.max
+        const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, maxY]
         const voronoi = delaunay.voronoi(bounds)
         console.log(bounds, voronoi)
 
-        for (let i = 0; i < points.length; i++) {
-            this.#ctx.save()
+        for (const [i, point] of points.entries()) {
             const nationColour = this.#colourScale(this.#portData[i].nation)
-            this.#ctx.fillStyle =
+            this.#ctx.fillStyle = nationColour
+
+            this.#ctx.save()
+            this.#ctx.beginPath()
+
+            voronoi.renderCell(i, this.#ctx)
+            this.#ctx.fill()
+            this.#ctx.fill()
+
+            this.#ctx.restore()
+
+            /*
+            if (this.#portData[i].netIncome > 0) {
+                        const colour =
                 (this.#portData[i].netIncome > 0
                     ? d3Color(nationColour)
                           ?.darker(this.#incomeScale(this.#portData[i].netIncome))
                           .toString()
                     : nationColour) ?? "#455"
-            this.#ctx.beginPath()
-            voronoi.renderCell(i, this.#ctx)
-            this.#ctx.fill()
-            this.#ctx.stroke()
-            this.#ctx.restore()
+                const radialGradient = this.#ctx.createRadialGradient(point[0], point[1], 100, point[0], point[1], 300)
+                radialGradient.addColorStop(0, colour)
+                radialGradient.addColorStop(0.8, nationColour)
+                this.#ctx.fillStyle = radialGradient
+            }
+
+            this.#ctx.fillRect(point[0], point[1], 300, 300)
+            */
         }
     }
 
