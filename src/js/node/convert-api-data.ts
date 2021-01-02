@@ -4,7 +4,7 @@
  * @file      Convert API data.
  * @module    convert-api-data
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 

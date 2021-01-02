@@ -4,7 +4,7 @@
  * @file      Types for api port json.
  * @module    api-shop.d
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 

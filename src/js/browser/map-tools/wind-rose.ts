@@ -4,7 +4,7 @@
  * @file      Show wind rose continuously.
  * @module    map-tools/wind-rose
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 

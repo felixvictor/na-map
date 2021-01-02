@@ -4,7 +4,7 @@
  * @file      Make a journey.
  * @module    map-tools/make-journey
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
