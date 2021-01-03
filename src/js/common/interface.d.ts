@@ -74,3 +74,5 @@ export interface PortJsonData {
     pb: PortBattlePerServer[]
     server: PortPerServer[]
 }
+
+export type PowerMapList = Array<[string, number[]]>

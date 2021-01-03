@@ -8,11 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { max as d3Max, min as d3Min } from "d3-array"
-import { color as d3Color } from "d3-color"
+import { max as d3Max } from "d3-array"
 import { Delaunay as d3Delaunay } from "d3-delaunay"
-import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select } from "d3-selection"
+import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
+import { select as d3Select, Selection } from "d3-selection"
 import {
     colourList,
     getCanvasRenderingContext2D,
@@ -20,63 +19,55 @@ import {
     showCursorDefault,
     showCursorWait,
 } from "common/common-browser"
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
 
 import { BaseModal } from "./base-modal"
 
-import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
-import { DataSource, MinMaxCoord, PortIncome, PortJsonData } from "common/interface"
+import { PortBasic } from "common/gen-json"
+import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
+
+dayjs.extend(customParseFormat)
+
+export interface JsonData {
+    power: PowerMapList
+}
 
 /**
  *
  */
 export default class PowerMap extends BaseModal {
-    readonly #coord
-    readonly #colourScale: ScaleOrdinal<string, string>
-    #portData = {} as Array<PortBasic & PortPerServer & PortBattlePerServer>
-
     #ctx = {} as CanvasRenderingContext2D
-    #incomeScale = {} as ScaleLinear<number, number>
+    #portData = {} as PortBasic[]
+    #powerData = {} as PowerMapList
+    readonly #colourScale: ScaleOrdinal<number, string>
+    readonly #coord
 
     constructor(serverId: string, coord: MinMaxCoord) {
         super(serverId, "Show power map")
 
         this.#coord = coord
-        this.#colourScale = d3ScaleOrdinal<string>().range(colourList)
+        this.#colourScale = d3ScaleOrdinal<number, string>().range(colourList)
 
         void this._setupListener()
     }
 
-    _setupData(data: PortJsonData): void {
-        // Combine port data with port battle data
-        this.#portData = data.ports.map((port: PortBasic) => {
-            const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
-            const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) ?? ({} as PortBattlePerServer)
-            const combinedData = { ...port, ...serverData, ...pbData } as PortIncome
-
-            return combinedData
-        })
-
-        const minIncome = d3Min(this.#portData, (d) => (d.netIncome < 0 ? 0 : d.netIncome)) ?? 0
-        const maxIncome = d3Max(this.#portData, (d) => (d.netIncome < 0 ? 0 : d.netIncome)) ?? 0
-        this.#incomeScale = d3ScaleLinear().domain([minIncome, maxIncome]).range([0, 1]).clamp(true)
+    _setupData(data: JsonData): void {
+        this.#powerData = data.power
     }
 
-    async _loadData(): Promise<PortJsonData> {
+    async _loadData(): Promise<JsonData> {
         const dataSources: DataSource[] = [
             {
-                fileName: `${this.serverId}-ports.json`,
-                name: "server",
-            },
-            {
-                fileName: `${this.serverId}-pb.json`,
-                name: "pb",
+                fileName: `${this.serverId}-power.json`,
+                name: "power",
             },
         ]
-        const readData = {} as PortJsonData
+        const readData = {} as JsonData
 
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        this.#portData = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
-        await loadJsonFiles<PortJsonData>(dataSources, readData)
+        await loadJsonFiles<JsonData>(dataSources, readData)
 
         return readData
     }
@@ -108,6 +99,11 @@ export default class PowerMap extends BaseModal {
          */
     }
 
+    _drawEnd(): void {
+        console.timeEnd("animation")
+        showCursorDefault()
+    }
+
     _drawPowerMap(): void {
         const points = this.#portData.map((port) => port.coordinates)
         const delaunay = d3Delaunay.from(points)
@@ -119,41 +115,40 @@ export default class PowerMap extends BaseModal {
         const voronoi = delaunay.voronoi(bounds)
         console.log(voronoi)
 
-        // for (const [i, point] of points.entries()) {
-        for (let i = 0; i < points.length; i++) {
-            const nationColour = this.#colourScale(this.#portData[i].nation)
-            this.#ctx.fillStyle = nationColour
+        let dateIndex = -1
+        const drawMap = (): void => {
+            dateIndex += 1
+            const date = this.#powerData[dateIndex][0]
+            const ports = this.#powerData[dateIndex][1]
+            console.timeLog("animation", dateIndex, date)
+            for (const [index, nation] of ports.entries()) {
+                const nationColour = this.#colourScale(nation)
 
-            //            this.#ctx.save()
-            this.#ctx.beginPath()
-
-            voronoi.renderCell(i, this.#ctx)
-            this.#ctx.fill()
-            // this.#ctx.fill()
-
-            //          this.#ctx.restore()
-
-            /*
-            if (this.#portData[i].netIncome > 0) {
-                        const colour =
-                (this.#portData[i].netIncome > 0
-                    ? d3Color(nationColour)
-                          ?.darker(this.#incomeScale(this.#portData[i].netIncome))
-                          .toString()
-                    : nationColour) ?? "#455"
-                const radialGradient = this.#ctx.createRadialGradient(point[0], point[1], 100, point[0], point[1], 300)
-                radialGradient.addColorStop(0, colour)
-                radialGradient.addColorStop(0.8, nationColour)
-                this.#ctx.fillStyle = radialGradient
+                this.#ctx.beginPath()
+                voronoi.renderCell(index, this.#ctx)
+                this.#ctx.fillStyle = nationColour
+                this.#ctx.fill()
             }
 
-            this.#ctx.fillRect(point[0], point[1], 300, 300)
-            */
+            this.#ctx.fillStyle = "black"
+            this.#ctx.fillText(dayjs(date).format("D MMMM YYYY"), 500, 500)
         }
+
+        const drawPowerLoop = () => {
+            if (dateIndex < this.#powerData.length - 1) {
+                window.requestAnimationFrame(drawPowerLoop)
+                drawMap()
+            } else {
+                this._drawEnd()
+            }
+        }
+
+        console.time("animation")
+        drawPowerLoop()
     }
 
     _initPowerMap(): void {
-        const pixelRatio = 8
+        const pixelRatio = 2
 
         // Get elements
         const main = d3Select("#na-map")
@@ -168,7 +163,7 @@ export default class PowerMap extends BaseModal {
         const widthCss = svg.style("width")
 
         // Position canvas on top of svg
-        div.style("position", "relative").style("top", `-${heightCss}`)
+        div.style("position", "relative").style("top", `-${heightCss}`).style("opacity", 0.5)
 
         // Get current transformation
         const currentTransformMatrix = (map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
@@ -188,6 +183,10 @@ export default class PowerMap extends BaseModal {
         this.#ctx = getCanvasRenderingContext2D(canvasNode)
         this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
+        this.#ctx.font = `${300 * pixelRatio}px Junicode`
+
+        // Remove port icons
+        map.remove()
 
         console.log(map, currentTransformMatrix, scale, tx, ty)
         console.log(pixelRatio, scale, scale * pixelRatio)
@@ -206,6 +205,5 @@ export default class PowerMap extends BaseModal {
         showCursorWait()
         this._initPowerMap()
         this._drawPowerMap()
-        showCursorDefault()
     }
 }

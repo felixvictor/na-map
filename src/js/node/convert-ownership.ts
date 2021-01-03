@@ -25,6 +25,7 @@ import { ServerId, serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
 import { NationList, Ownership, OwnershipNation } from "../common/gen-json"
+import { PowerMapList } from "../common/interface"
 import { Group, Line, Segment } from "timelines-chart"
 
 const fileExtension = ".json.xz"
@@ -32,8 +33,11 @@ const fileExtension = ".json.xz"
 type ServerIdList<T> = {
     [K in ServerId]: T
 }
+
 const ports = {} as ServerIdList<Map<string, Port>>
+const portOwnershipPerDate = {} as ServerIdList<PowerMapList>
 const numPortsDates = {} as ServerIdList<Array<OwnershipNation<number>>>
+
 let serverId: ServerId
 const fileBaseNameRegex = {} as ServerIdList<RegExp>
 const fileNames = {} as ServerIdList<string[]>
@@ -119,6 +123,7 @@ function parseData(serverId: ServerId, portData: APIPort[], date: string): void 
         .forEach((nation) => {
             numPorts[nation.short] = 0
         })
+    const nationsForPowerMap = []
 
     for (const port of portData) {
         /**
@@ -199,7 +204,12 @@ function parseData(serverId: ServerId, portData: APIPort[], date: string): void 
                 initData()
             }
         }
+
+        nationsForPowerMap.push(port.Nation)
     }
+
+    console.log(serverId, date, nationsForPowerMap.length)
+    portOwnershipPerDate[serverId].push([date, nationsForPowerMap])
 
     const numPortsDate = {} as OwnershipNation<number>
     numPortsDate.date = date
@@ -281,6 +291,10 @@ const writeResult = async (serverId: ServerId): Promise<void> => {
 
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-ownership.json`), grouped)
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-nation.json`), numPortsDates[serverId])
+    await saveJsonAsync(
+        path.resolve(commonPaths.dirGenServer, `${serverId}-power.json`),
+        portOwnershipPerDate[serverId]
+    )
 }
 
 /**
@@ -300,6 +314,7 @@ const convertOwnership = async (serverId: ServerId): Promise<void> => {
 
     ports[serverId] = new Map()
     numPortsDates[serverId] = []
+    portOwnershipPerDate[serverId] = []
 
     try {
         fileNames[serverId] = await readDirRecursive(commonPaths.dirAPI, [ignoreFileName])
