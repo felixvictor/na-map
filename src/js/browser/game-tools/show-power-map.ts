@@ -115,8 +115,9 @@ export default class PowerMap extends BaseModal {
         let maxY = d3Max(points, (point) => point[1])
         maxY = maxY ? maxY + 100 : this.#coord.max
         const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, maxY]
+        console.log(bounds)
         const voronoi = delaunay.voronoi(bounds)
-        console.log(bounds, voronoi)
+        console.log(voronoi)
 
         // for (const [i, point] of points.entries()) {
         for (let i = 0; i < points.length; i++) {
@@ -152,35 +153,43 @@ export default class PowerMap extends BaseModal {
     }
 
     _initPowerMap(): void {
+        const pixelRatio = 8
+
+        // Get elements
         const main = d3Select("#na-map")
         const svg = d3Select("#na-map svg")
-        const heightCss = svg.style("height")
-        const widthCss = svg.style("width")
-        const div = main.append("div").style("position", "relative").style("top", `-${heightCss}`)
+        const map = d3Select("g#map")
+        const div = main.append("div")
         const canvas = div.append("canvas")
         const canvasNode = canvas.node() as HTMLCanvasElement
 
-        //        .attr("width", Number.parseFloat(width))
-        //        .attr("height", Number.parseFloat(height))
+        // Get svg size and map transform
+        const heightCss = svg.style("height")
+        const widthCss = svg.style("width")
+
+        // Position canvas on top of svg
+        div.style("position", "relative").style("top", `-${heightCss}`)
+
+        // Get current transformation
+        const currentTransformMatrix = (map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
+        const scale = currentTransformMatrix.a
+        const tx = currentTransformMatrix.e
+        const ty = currentTransformMatrix.f
 
         // Set display size (css pixels)
         canvasNode.style.height = heightCss
         canvasNode.style.width = widthCss
 
-        // Set actual size in memory (scaled to account for extra pixel density).
-        const pixelRatio = 8
+        // Set actual size in memory
         canvasNode.height = Math.floor(Number.parseFloat(heightCss) * pixelRatio)
         canvasNode.width = Math.floor(Number.parseFloat(widthCss) * pixelRatio)
 
+        // Set context and transformation
         this.#ctx = getCanvasRenderingContext2D(canvasNode)
-        const matrix = new DOMMatrixReadOnly(d3Select("#map").style("transform"))
-        const scale = matrix.m11
-        const tx = matrix.m41
-        const ty = matrix.m42
         this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
 
-        console.log(matrix, scale, tx, ty)
+        console.log(map, currentTransformMatrix, scale, tx, ty)
         console.log(pixelRatio, scale, scale * pixelRatio)
         console.log(
             `${heightCss} x ${widthCss}`,
