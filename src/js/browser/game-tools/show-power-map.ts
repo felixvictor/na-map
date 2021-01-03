@@ -118,18 +118,19 @@ export default class PowerMap extends BaseModal {
         const voronoi = delaunay.voronoi(bounds)
         console.log(bounds, voronoi)
 
-        for (const [i, point] of points.entries()) {
+        // for (const [i, point] of points.entries()) {
+        for (let i = 0; i < points.length; i++) {
             const nationColour = this.#colourScale(this.#portData[i].nation)
             this.#ctx.fillStyle = nationColour
 
-            this.#ctx.save()
+            //            this.#ctx.save()
             this.#ctx.beginPath()
 
             voronoi.renderCell(i, this.#ctx)
             this.#ctx.fill()
-            this.#ctx.fill()
+            // this.#ctx.fill()
 
-            this.#ctx.restore()
+            //          this.#ctx.restore()
 
             /*
             if (this.#portData[i].netIncome > 0) {
@@ -153,20 +154,40 @@ export default class PowerMap extends BaseModal {
     _initPowerMap(): void {
         const main = d3Select("#na-map")
         const svg = d3Select("#na-map svg")
-        const height = svg.style("height")
-        const width = svg.style("width")
-        const div = main.append("div").style("position", "relative").style("top", `-${height}`)
-        const canvas = div
-            .append("canvas")
-            .attr("width", Number.parseFloat(width))
-            .attr("height", Number.parseFloat(height))
-        this.#ctx = getCanvasRenderingContext2D(canvas.node() as HTMLCanvasElement)
+        const heightCss = svg.style("height")
+        const widthCss = svg.style("width")
+        const div = main.append("div").style("position", "relative").style("top", `-${heightCss}`)
+        const canvas = div.append("canvas")
+        const canvasNode = canvas.node() as HTMLCanvasElement
+
+        //        .attr("width", Number.parseFloat(width))
+        //        .attr("height", Number.parseFloat(height))
+
+        // Set display size (css pixels)
+        canvasNode.style.height = heightCss
+        canvasNode.style.width = widthCss
+
+        // Set actual size in memory (scaled to account for extra pixel density).
+        const pixelRatio = 8
+        canvasNode.height = Math.floor(Number.parseFloat(heightCss) * pixelRatio)
+        canvasNode.width = Math.floor(Number.parseFloat(widthCss) * pixelRatio)
+
+        this.#ctx = getCanvasRenderingContext2D(canvasNode)
         const matrix = new DOMMatrixReadOnly(d3Select("#map").style("transform"))
         const scale = matrix.m11
         const tx = matrix.m41
         const ty = matrix.m42
-        this.#ctx.translate(tx, ty)
-        this.#ctx.scale(scale, scale)
+        this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
+        this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
+
+        console.log(matrix, scale, tx, ty)
+        console.log(pixelRatio, scale, scale * pixelRatio)
+        console.log(
+            `${heightCss} x ${widthCss}`,
+            `${Math.floor(Number.parseFloat(heightCss) * pixelRatio)} x ${Math.floor(
+                Number.parseFloat(widthCss) * pixelRatio
+            )}`
+        )
     }
 
     /**

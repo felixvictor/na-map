@@ -242,7 +242,7 @@ export const getCanvasElementById = (id: string): HTMLCanvasElement => {
  * @param canvas - Canvas
  */
 export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
-    const context = canvas.getContext("2d")
+    const context = canvas.getContext("2d", { alpha: false })
 
     if (context === null) {
         throw new Error("This browser does not support 2-dimensional canvas rendering contexts.")
