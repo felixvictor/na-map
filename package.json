@@ -77,6 +77,7 @@
     "dependencies": {
         "@d3fc/d3fc-label-layout": "^7.0.3",
         "@types/d3-delaunay": "^5.3.0",
+        "@types/d3-timer": "^2.0.0",
         "bootstrap": "^4.5.3",
         "bootstrap-select": "^1.13.18",
         "d3-area-label": "^1.5.0",
@@ -91,6 +92,7 @@
         "d3-scale": "^3.2.3",
         "d3-selection": "^2.0.0",
         "d3-shape": "^2.0.0",
+        "d3-timer": "^2.0.0",
         "d3-transition": "^2.0.0",
         "d3-voronoi-treemap": "^1.1.1",
         "d3-weighted-voronoi": "^1.1.1",

@@ -11,7 +11,17 @@
 import { max as d3Max } from "d3-array"
 import { Delaunay as d3Delaunay } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select, Selection } from "d3-selection"
+import { select as d3Select } from "d3-selection"
+import { timer as d3Timer } from "d3-timer"
+
+// eslint-disable-next-line no-warning-comments
+/*
+TODO
+- Remove free town?
+- Smoothen polygons
+- Add controls (speed, date range)
+ */
+
 import {
     colourList,
     getCanvasRenderingContext2D,
@@ -102,6 +112,7 @@ export default class PowerMap extends BaseModal {
     _drawEnd(): void {
         console.timeEnd("animation")
         showCursorDefault()
+        d3Select("g#map").classed("d-none", false)
     }
 
     _drawPowerMap(): void {
@@ -115,36 +126,71 @@ export default class PowerMap extends BaseModal {
         const voronoi = delaunay.voronoi(bounds)
         console.log(voronoi)
 
+        const customSel = d3Select(document.createElement("custom"))
+        const delay = 400
         let dateIndex = -1
-        const drawMap = (): void => {
-            dateIndex += 1
-            const date = this.#powerData[dateIndex][0]
-            const ports = this.#powerData[dateIndex][1]
-            console.timeLog("animation", dateIndex, date)
-            for (const [index, nation] of ports.entries()) {
-                const nationColour = this.#colourScale(nation)
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const sleep = async (ms: number) => {
+            // eslint-disable-next-line no-promise-executor-return
+            return new Promise((resolve) => setTimeout(resolve, ms))
+        }
+
+        const databind = (): void => {
+            const ports = this.#powerData[dateIndex][1]
+
+            customSel
+                .selectAll<SVGRectElement, number>("custom.rect")
+                .data(ports, (d, index) => String(index))
+                .join(
+                    (enter) =>
+                        enter
+                            .append<SVGRectElement>("custom")
+                            .attr("class", "rect")
+                            .attr("fillStyle", (d) => this.#colourScale(d)),
+                    (update) =>
+                        update
+                            .transition()
+                            .duration(delay)
+                            .attr("fillStyle", (d) => this.#colourScale(d))
+                            .selection()
+                )
+        }
+
+        const drawMap = (): void => {
+            const date = this.#powerData[dateIndex][0]
+
+            console.timeLog("animation", dateIndex, date)
+            customSel.selectAll("custom.rect").each((d, index, nodes) => {
                 this.#ctx.beginPath()
                 voronoi.renderCell(index, this.#ctx)
-                this.#ctx.fillStyle = nationColour
+                this.#ctx.fillStyle = d3Select(nodes[index]).attr("fillStyle")
                 this.#ctx.fill()
-            }
+            })
 
             this.#ctx.fillStyle = "black"
             this.#ctx.fillText(dayjs(date).format("D MMMM YYYY"), 500, 500)
         }
 
-        const drawPowerLoop = () => {
-            if (dateIndex < this.#powerData.length - 1) {
-                window.requestAnimationFrame(drawPowerLoop)
-                drawMap()
-            } else {
-                this._drawEnd()
+        const drawPowerLoop = async () => {
+            while (dateIndex < this.#powerData.length - 1) {
+                dateIndex += 1
+                databind()
+                const t = d3Timer((elapsed) => {
+                    drawMap()
+                    if (elapsed > delay) {
+                        t.stop()
+                    }
+                })
+                // eslint-disable-next-line no-await-in-loop
+                await sleep(delay * 1.1)
             }
+
+            this._drawEnd()
         }
 
         console.time("animation")
-        drawPowerLoop()
+        void drawPowerLoop()
     }
 
     _initPowerMap(): void {
@@ -186,16 +232,7 @@ export default class PowerMap extends BaseModal {
         this.#ctx.font = `${300 * pixelRatio}px Junicode`
 
         // Remove port icons
-        map.remove()
-
-        console.log(map, currentTransformMatrix, scale, tx, ty)
-        console.log(pixelRatio, scale, scale * pixelRatio)
-        console.log(
-            `${heightCss} x ${widthCss}`,
-            `${Math.floor(Number.parseFloat(heightCss) * pixelRatio)} x ${Math.floor(
-                Number.parseFloat(widthCss) * pixelRatio
-            )}`
-        )
+        map.classed("d-none", true)
     }
 
     /**
