@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="webpack-env" />
-
 import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
 
@@ -34,6 +32,7 @@ import {
     colourList,
     colourRedDark,
     colourWhite,
+    getIcons,
     loadJsonFile,
     loadJsonFiles,
     primary300,
@@ -242,19 +241,6 @@ export default class DisplayPorts {
          * Get showRadius setting from cookie or use default value
          */
         this.showRadius = this._getShowRadiusSetting()
-    }
-
-    /**
-     * {@link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack}
-     * @param r - webpack require.context
-     * @returns Images
-     */
-    static _importAll(r: __WebpackModuleApi.RequireContext): NationListAlternative<string> {
-        const images = {} as NationListAlternative<string>
-        r.keys().forEach((item) => {
-            images[item.replace("./", "").replace(".svg", "")!] = r(item)
-        })
-        return images
     }
 
     static _hideDetails(this: JQuery.PlainObject): void {
@@ -621,9 +607,7 @@ export default class DisplayPorts {
     }
 
     _setupFlags(): void {
-        this.#nationIcons = DisplayPorts._importAll(
-            (require as __WebpackModuleApi.RequireFunction).context("../../../images/flags", false, /\.svg$/)
-        )
+        this.#nationIcons = getIcons()
 
         const getPattern = (id: string): SVGPatternElement => {
             const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern")

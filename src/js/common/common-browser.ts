@@ -8,10 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+/// <reference types="webpack-env" />
+
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
 import { BaseModalPure, DataSource } from "./interface"
+import { NationListAlternative } from "common/gen-json"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -211,4 +214,21 @@ export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRe
     }
 
     return context
+}
+
+/**
+ * {@link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack}
+ * @param r - webpack require.context
+ * @returns Images
+ */
+const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<string> => {
+    const images = {} as NationListAlternative<string>
+    r.keys().forEach((item) => {
+        images[item.replace("./", "").replace(".svg", "")!] = r(item)
+    })
+    return images
+}
+
+export const getIcons = (): NationListAlternative<string> => {
+    return importAll((require as __WebpackModuleApi.RequireFunction).context("../../images/flags", false, /\.svg$/))
 }
