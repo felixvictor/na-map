@@ -22,18 +22,19 @@ TODO
 - Add controls (speed, date range)
  */
 
+import { nations, range } from "common/common"
 import {
-    colourList,
+    nationColourList,
     getCanvasRenderingContext2D,
     loadJsonFiles,
     showCursorDefault,
     showCursorWait,
 } from "common/common-browser"
 import dayjs from "dayjs"
+
 import customParseFormat from "dayjs/plugin/customParseFormat"
 
 import { BaseModal } from "./base-modal"
-
 import { PortBasic } from "common/gen-json"
 import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 
@@ -57,7 +58,9 @@ export default class PowerMap extends BaseModal {
         super(serverId, "Show power map")
 
         this.#coord = coord
-        this.#colourScale = d3ScaleOrdinal<number, string>().range(colourList)
+        this.#colourScale = d3ScaleOrdinal<number, string>()
+            .domain(range(0, nations.length - 1))
+            .range(nationColourList)
 
         void this._setupListener()
     }

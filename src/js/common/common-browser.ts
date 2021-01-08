@@ -90,6 +90,23 @@ export const colourList = [
     "#f2b6be",
 ]
 
+export const nationColourList = [
+    "#ffffff", // Neutral
+    "#111111", // Pirates
+    "#f1bf00", // España
+    "#0039a6", // France
+    "#cf142b", // Great Britain
+    "#21468b", // Verenigde Provinciën
+    "#ac0234", // Danmark-Norge
+    "#006aa7", // Sverige
+    "#bf0a30", // United States
+    "#aaa", // Free Town
+    "#0039a6", // Russian Empire
+    "#333", // Kingdom of Prussia
+    "#eb001a", // Commonwealth of Poland
+    "#fecd21", // China
+]
+
 /**
  * Enable nested dropdowns in navbar
  * {@link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar}
