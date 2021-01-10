@@ -13,6 +13,7 @@ import { Delaunay as d3Delaunay } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
+import loadImage from "image-promise"
 
 // eslint-disable-next-line no-warning-comments
 /*
@@ -22,14 +23,15 @@ TODO
 - Add controls (speed, date range)
  */
 
-import { nations, range } from "common/common"
+import { nations, range, sleep } from "common/common"
 import {
     nationColourList,
     getCanvasRenderingContext2D,
     loadJsonFiles,
     showCursorDefault,
     showCursorWait,
-} from "common/common-browser"
+    getIcons, colourWhite, colourRedDark
+} from "common/common-browser";
 import dayjs from "dayjs"
 
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -49,6 +51,7 @@ export interface JsonData {
  */
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
+    #pattern = [] as Array<null | CanvasPattern>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
     readonly #colourScale: ScaleOrdinal<number, string>
@@ -118,8 +121,58 @@ export default class PowerMap extends BaseModal {
         d3Select("g#map").classed("d-none", false)
     }
 
-    _drawPowerMap(): void {
-        const points = this.#portData.map((port) => port.coordinates)
+    async _setPattern(): Promise<void> {
+        const icons = Object.values(getIcons())
+
+        try {
+            const images = await loadImage(icons)
+            images.forEach((image, index) => {
+                this.#pattern[index] = this.#ctx.createPattern(image, "repeat")
+            })
+        } catch (error: unknown) {
+            console.error("One or more images have failed to load :(")
+            console.error(error.errored)
+            console.info("But these loaded fine:")
+            console.info(error.loaded)
+        }
+    }
+
+    _getTextWidth(text: string): number {
+        const { actualBoundingBoxLeft, actualBoundingBoxRight } = this.#ctx.measureText(text)
+        return Math.abs(actualBoundingBoxLeft + actualBoundingBoxRight)
+    }
+
+    _getTextHeight(text: string): number {
+        const { fontBoundingBoxAscent, fontBoundingBoxDescent } = this.#ctx.measureText(text)
+        return Math.abs(fontBoundingBoxDescent - fontBoundingBoxAscent)
+    }
+
+    _getTextDim(): { height: number; width: number } {
+        const height = this._getTextHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        const width = this._getTextWidth("25 September 2028")
+        console.log("getTextDim", height, width)
+        return {
+            height,
+            width,
+        }
+    }
+
+    async _drawPowerMap(): Promise<void> {
+        const freeTowns = new Set([
+            96, // La Tortue
+            112, // La Mona
+            150, // Aves
+            179, // Guayaguayare
+            214, // Dariena
+            231, // Great Corn
+            286, // El Rancho
+            343, // Tumbado
+            366, // Shroud Cay
+        ])
+        const nationNotShown = new Set([
+            9, // Free Town
+        ])
+        const points = this.#portData.filter((port) => !freeTowns.has(port.id)).map((port) => port.coordinates)
         const delaunay = d3Delaunay.from(points)
         console.log(delaunay)
         let maxY = d3Max(points, (point) => point[1])
@@ -129,56 +182,46 @@ export default class PowerMap extends BaseModal {
         const voronoi = delaunay.voronoi(bounds)
         console.log(voronoi)
 
-        const customSel = d3Select(document.createElement("custom"))
-        const delay = 400
+        const textPosX = 300
+        const textPosY = 200
+        const textPadding = 50
+        const delay = 100
         let dateIndex = -1
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const sleep = async (ms: number) => {
-            // eslint-disable-next-line no-promise-executor-return
-            return new Promise((resolve) => setTimeout(resolve, ms))
-        }
-
-        const databind = (): void => {
-            const ports = this.#powerData[dateIndex][1]
-
-            customSel
-                .selectAll<SVGRectElement, number>("custom.rect")
-                .data(ports, (d, index) => String(index))
-                .join(
-                    (enter) =>
-                        enter
-                            .append<SVGRectElement>("custom")
-                            .attr("class", "rect")
-                            .attr("fillStyle", (d) => this.#colourScale(d)),
-                    (update) =>
-                        update
-                            .transition()
-                            .duration(delay)
-                            .attr("fillStyle", (d) => this.#colourScale(d))
-                            .selection()
-                )
-        }
+        await this._setPattern()
+        const textDim = this._getTextDim()
 
         const drawMap = (): void => {
             const date = this.#powerData[dateIndex][0]
-
+            const ports = this.#powerData[dateIndex][1].filter((nationId) => !nationNotShown.has(nationId))
             console.timeLog("animation", dateIndex, date)
-            customSel.selectAll("custom.rect").each((d, index, nodes) => {
+            for (const [index, nationId] of ports.entries()) {
                 this.#ctx.beginPath()
                 voronoi.renderCell(index, this.#ctx)
-                this.#ctx.fillStyle = d3Select(nodes[index]).attr("fillStyle")
+                this.#ctx.fillStyle = this.#pattern[nationId] ?? "#000"
                 this.#ctx.fill()
-            })
+            }
 
-            this.#ctx.fillStyle = "black"
-            this.#ctx.fillText(dayjs(date).format("D MMMM YYYY"), 500, 500)
+            this.#ctx.fillStyle = colourWhite
+            this.#ctx.fillRect(
+                this.#coord.max - textDim.width - textPosX - textPadding,
+                textPosY - textPadding,
+                textDim.width + 2 * textPadding,
+                textDim.height + 2 * textPadding
+            )
+            this.#ctx.fillStyle = colourRedDark
+            const dateF = dayjs(date).format("D MMMM YYYY")
+            const currentTextWidth = this._getTextWidth(dateF)
+            this.#ctx.fillText(
+                dateF,
+                this.#coord.max - textDim.width + (textDim.width - currentTextWidth - textPadding) - textPosX,
+                textPosY + textPadding / 2
+            )
         }
 
         const drawPowerLoop = async () => {
             while (dateIndex < this.#powerData.length - 1) {
                 dateIndex += 1
-                databind()
                 const t = d3Timer((elapsed) => {
                     drawMap()
                     if (elapsed > delay) {
@@ -212,7 +255,7 @@ export default class PowerMap extends BaseModal {
         const widthCss = svg.style("width")
 
         // Position canvas on top of svg
-        div.style("position", "relative").style("top", `-${heightCss}`).style("opacity", 0.5)
+        div.style("position", "relative").style("top", `-${heightCss}`).style("opacity", 0.7)
 
         // Get current transformation
         const currentTransformMatrix = (map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
@@ -232,7 +275,8 @@ export default class PowerMap extends BaseModal {
         this.#ctx = getCanvasRenderingContext2D(canvasNode)
         this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
-        this.#ctx.font = `${300 * pixelRatio}px Junicode`
+        this.#ctx.font = `${200 * pixelRatio}px Junicode`
+        this.#ctx.textBaseline = "top"
 
         // Remove port icons
         map.classed("d-none", true)
@@ -244,6 +288,6 @@ export default class PowerMap extends BaseModal {
     _menuItemSelected(): void {
         showCursorWait()
         this._initPowerMap()
-        this._drawPowerMap()
+        void this._drawPowerMap()
     }
 }

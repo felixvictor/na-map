@@ -15,6 +15,7 @@ import { select as d3Select } from "d3-selection"
 import { degreesFullCircle } from "./common-math"
 import { BaseModalPure, DataSource } from "./interface"
 import { NationListAlternative } from "common/gen-json"
+import { findNationByNationShortName } from "common/common"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -243,7 +244,15 @@ const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<
     r.keys().forEach((item) => {
         images[item.replace("./", "").replace(".svg", "")!] = r(item)
     })
-    return images
+
+    // Sort by nation
+    const sortedImages = Object.fromEntries(
+        Object.entries(images).sort(
+            ([nation1], [nation2]) =>
+                findNationByNationShortName(nation1)!.id - findNationByNationShortName(nation2)!.id
+        )
+    )
+    return sortedImages
 }
 
 export const getIcons = (): NationListAlternative<string> => {
