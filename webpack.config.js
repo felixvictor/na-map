@@ -205,7 +205,7 @@ const svgoOpt = {
         { convertShapeToPath: true },
         { sortAttrs: false },
         { transformsWithOnePath: false },
-        { removeDimensions: true },
+        { removeDimensions: false },
         { removeAttrs: false },
         { removeElementsByAttr: true },
         { removeStyleElement: true },
