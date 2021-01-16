@@ -11,7 +11,7 @@
 import { max as d3Max } from "d3-array"
 import { Delaunay as d3Delaunay } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
@@ -30,8 +30,10 @@ import {
     loadJsonFiles,
     showCursorDefault,
     showCursorWait,
-    getIcons, colourWhite, colourRedDark
-} from "common/common-browser";
+    getIcons,
+    colourWhite,
+    colourRedDark,
+} from "common/common-browser"
 import dayjs from "dayjs"
 
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -46,15 +48,22 @@ export interface JsonData {
     power: PowerMapList
 }
 
+interface ImagePromiseError {
+    loaded: string[]
+    errored: string[]
+}
+
 /**
  *
  */
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
     #pattern = [] as Array<null | CanvasPattern>
+    #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
     readonly #colourScale: ScaleOrdinal<number, string>
+
     readonly #coord
 
     constructor(serverId: string, coord: MinMaxCoord) {
@@ -70,6 +79,8 @@ export default class PowerMap extends BaseModal {
 
     _setupData(data: JsonData): void {
         this.#powerData = data.power
+
+        this.#map = d3Select("g#map")
     }
 
     async _loadData(): Promise<JsonData> {
@@ -115,10 +126,26 @@ export default class PowerMap extends BaseModal {
          */
     }
 
+
+    _showMapElements(show: boolean): void {
+        // Remove port icons
+        this.#map.classed("d-none", !show)
+        // Remove summary
+        d3Select("main div.overlay").classed("d-none", !show)
+    }
+
+    _mapElementsOff(): void {
+        this._showMapElements(false)
+    }
+
+    _mapElementsOn(): void {
+        this._showMapElements(true)
+    }
+
     _drawEnd(): void {
         console.timeEnd("animation")
         showCursorDefault()
-        d3Select("g#map").classed("d-none", false)
+        this._mapElementsOn()
     }
 
     async _setPattern(): Promise<void> {
@@ -131,26 +158,26 @@ export default class PowerMap extends BaseModal {
             })
         } catch (error: unknown) {
             console.error("One or more images have failed to load :(")
-            console.error(error.errored)
+            console.error((error as ImagePromiseError).errored)
             console.info("But these loaded fine:")
-            console.info(error.loaded)
+            console.info((error as ImagePromiseError).loaded)
         }
+    }
+
+    _getTextHeight(text: string): number {
+        const { actualBoundingBoxAscent, actualBoundingBoxDescent } = this.#ctx.measureText(text)
+        return Math.floor(Math.abs(actualBoundingBoxDescent - actualBoundingBoxAscent))
     }
 
     _getTextWidth(text: string): number {
         const { actualBoundingBoxLeft, actualBoundingBoxRight } = this.#ctx.measureText(text)
-        return Math.abs(actualBoundingBoxLeft + actualBoundingBoxRight)
-    }
-
-    _getTextHeight(text: string): number {
-        const { fontBoundingBoxAscent, fontBoundingBoxDescent } = this.#ctx.measureText(text)
-        return Math.abs(fontBoundingBoxDescent - fontBoundingBoxAscent)
+        return Math.floor(actualBoundingBoxLeft + actualBoundingBoxRight)
     }
 
     _getTextDim(): { height: number; width: number } {
         const height = this._getTextHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        const width = this._getTextWidth("25 September 2028")
-        console.log("getTextDim", height, width)
+        const width = this._getTextWidth("25 September 2020")
+
         return {
             height,
             width,
@@ -220,7 +247,7 @@ export default class PowerMap extends BaseModal {
         }
 
         const drawPowerLoop = async () => {
-            while (dateIndex < this.#powerData.length - 1) {
+            while (dateIndex < this.#powerData.length - 415) {
                 dateIndex += 1
                 const t = d3Timer((elapsed) => {
                     drawMap()
@@ -245,7 +272,7 @@ export default class PowerMap extends BaseModal {
         // Get elements
         const main = d3Select("#na-map")
         const svg = d3Select("#na-map svg")
-        const map = d3Select("g#map")
+
         const div = main.append("div")
         const canvas = div.append("canvas")
         const canvasNode = canvas.node() as HTMLCanvasElement
@@ -258,7 +285,7 @@ export default class PowerMap extends BaseModal {
         div.style("position", "relative").style("top", `-${heightCss}`).style("opacity", 0.7)
 
         // Get current transformation
-        const currentTransformMatrix = (map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
+        const currentTransformMatrix = (this.#map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
         const scale = currentTransformMatrix.a
         const tx = currentTransformMatrix.e
         const ty = currentTransformMatrix.f
@@ -277,9 +304,6 @@ export default class PowerMap extends BaseModal {
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
         this.#ctx.font = `${200 * pixelRatio}px Junicode`
         this.#ctx.textBaseline = "top"
-
-        // Remove port icons
-        map.classed("d-none", true)
     }
 
     /**
@@ -287,6 +311,7 @@ export default class PowerMap extends BaseModal {
      */
     _menuItemSelected(): void {
         showCursorWait()
+        this._mapElementsOff()
         this._initPowerMap()
         void this._drawPowerMap()
     }

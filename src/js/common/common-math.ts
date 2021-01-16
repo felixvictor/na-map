@@ -250,9 +250,9 @@ export const between = (value: number, a: number, b: number, inclusive: boolean)
 }
 
 /**
- * Calculate the closest power of 2
- * (see {@link https://bocoup.com/blog/find-the-closest-power-of-2-with-javascript})
+ * Calculate the closest smaller integer power of 2
+ * (see {@link https://stackoverflow.com/q/26965171})
  * @param   aSize - Input
  * @returns Closest power of 2 of aSize
  */
-export const nearestPow2 = (aSize: number): number => 2 ** Math.round(Math.log2(aSize))
+export const nearestPow2 = (aSize: number): number => 2 ** Math.floor(Math.log(aSize) / Math.log(2))
