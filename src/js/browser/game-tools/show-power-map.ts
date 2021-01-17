@@ -163,7 +163,7 @@ export default class PowerMap extends BaseModal {
 
     _getTextHeight(text: string): number {
         const { actualBoundingBoxAscent, actualBoundingBoxDescent } = this.#ctx.measureText(text)
-        return Math.floor(Math.abs(actualBoundingBoxDescent - actualBoundingBoxAscent))
+        return Math.floor(actualBoundingBoxAscent + actualBoundingBoxDescent)
     }
 
     _getTextWidth(text: string): number {
@@ -173,7 +173,7 @@ export default class PowerMap extends BaseModal {
 
     _getTextDim(): { height: number; width: number } {
         const height = this._getTextHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        const width = this._getTextWidth("25 September 2020")
+        const width = this._getTextWidth("26 September 2020")
 
         return {
             height,
@@ -182,24 +182,24 @@ export default class PowerMap extends BaseModal {
     }
 
     _initDrawDate(): void {
-        const textPosX = 300
-        const textPosY = 200
-        const textPadding = 50
+        const textMarginX = 300
+        const textMarginY = 200
+        const textPaddingY = 50
 
+        const textPaddingX = textPaddingY * 2
         const textDim = this._getTextDim()
 
-        this.#textBackgroundX = this.#coord.max - textDim.width - textPosX - textPadding
-        this.#textBackgroundY = textPosY - textPadding
-        this.#textBackgroundHeight = textDim.height + 2 * textPadding
-        this.#textBackgroundWidth = textDim.width + 2 * textPadding
+        this.#textBackgroundX = this.#coord.max - textMarginX - textPaddingX - textDim.width
+        this.#textBackgroundY = textMarginY - textPaddingY
+        this.#textBackgroundHeight = textDim.height + 2 * textPaddingY
+        this.#textBackgroundWidth = textDim.width + 2 * textPaddingX
 
-        this.#textRectX = this.#coord.max - textDim.width + (textDim.width - textPadding) - textPosX
-        this.#textRectY = textPosY + textPadding / 2
+        this.#textRectX = this.#coord.max - textMarginX
+        this.#textRectY = textMarginY + textDim.height
     }
 
     _drawDate(date: string): void {
         const dateF = dayjs(date).format("D MMMM YYYY")
-        const currentTextWidth = this._getTextWidth(dateF)
 
         // Date background
         this.#ctx.globalAlpha = 0.8
@@ -214,19 +214,16 @@ export default class PowerMap extends BaseModal {
         // Date
         this.#ctx.globalAlpha = 1
         this.#ctx.fillStyle = colourRedDark
-        this.#ctx.fillText(dateF, this.#textRectX - currentTextWidth, this.#textRectY)
+        this.#ctx.fillText(dateF, this.#textRectX, this.#textRectY)
     }
 
     _drawPowerMap(): void {
-        const nationNotShown = new Set([
-            9, // Free Town
-        ])
-        const delay = 100
+        const delay = 0
         let dateIndex = -1
 
         const drawMap = (): void => {
             const date = this.#powerData[dateIndex][0]
-            const ports = this.#powerData[dateIndex][1].filter((nationId) => !nationNotShown.has(nationId))
+            const ports = this.#powerData[dateIndex][1]
 
             console.timeLog("animation", dateIndex, date)
 
@@ -323,7 +320,8 @@ export default class PowerMap extends BaseModal {
         this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
         this.#ctx.font = `${200 * pixelRatio}px Junicode`
-        this.#ctx.textBaseline = "top"
+        this.#ctx.textBaseline = "bottom"
+        this.#ctx.textAlign = "end"
 
         await this._setPattern()
         this._initDrawDate()

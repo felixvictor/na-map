@@ -203,12 +203,12 @@ function parseData(serverId: ServerId, portData: APIPort[], date: string): void 
                 // console.log("!ports.get(port.Id)");
                 initData()
             }
-        }
 
-        nationsForPowerMap.push(port.Nation)
+            nationsForPowerMap.push(port.Nation)
+        }
     }
 
-    console.log(serverId, date, nationsForPowerMap.length)
+    // console.log(serverId, date, nationsForPowerMap.length)
     portOwnershipPerDate[serverId].push([date, nationsForPowerMap])
 
     const numPortsDate = {} as OwnershipNation<number>
