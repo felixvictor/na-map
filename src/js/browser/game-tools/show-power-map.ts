@@ -9,19 +9,11 @@
  */
 
 import { max as d3Max } from "d3-array"
-import { Delaunay as d3Delaunay } from "d3-delaunay"
+import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
-
-// eslint-disable-next-line no-warning-comments
-/*
-TODO
-- Remove free town?
-- Smoothen polygons
-- Add controls (speed, date range)
- */
 
 import { nations, range, sleep } from "common/common"
 import {
@@ -44,7 +36,7 @@ import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 
 dayjs.extend(customParseFormat)
 
-export interface JsonData {
+interface JsonData {
     power: PowerMapList
 }
 
@@ -58,12 +50,18 @@ interface ImagePromiseError {
  */
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
-    #pattern = [] as Array<null | CanvasPattern>
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #pattern = [] as Array<null | CanvasPattern>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
+    #textBackgroundHeight = 0
+    #textBackgroundWidth = 0
+    #textBackgroundX = 0
+    #textBackgroundY = 0
+    #textRectX = 0
+    #textRectY = 0
+    #voronoi = {} as Voronoi<Delaunay.Point>
     readonly #colourScale: ScaleOrdinal<number, string>
-
     readonly #coord
 
     constructor(serverId: string, coord: MinMaxCoord) {
@@ -126,7 +124,6 @@ export default class PowerMap extends BaseModal {
          */
     }
 
-
     _showMapElements(show: boolean): void {
         // Remove port icons
         this.#map.classed("d-none", !show)
@@ -184,70 +181,67 @@ export default class PowerMap extends BaseModal {
         }
     }
 
-    async _drawPowerMap(): Promise<void> {
-        const freeTowns = new Set([
-            96, // La Tortue
-            112, // La Mona
-            150, // Aves
-            179, // Guayaguayare
-            214, // Dariena
-            231, // Great Corn
-            286, // El Rancho
-            343, // Tumbado
-            366, // Shroud Cay
-        ])
-        const nationNotShown = new Set([
-            9, // Free Town
-        ])
-        const points = this.#portData.filter((port) => !freeTowns.has(port.id)).map((port) => port.coordinates)
-        const delaunay = d3Delaunay.from(points)
-        console.log(delaunay)
-        let maxY = d3Max(points, (point) => point[1])
-        maxY = maxY ? maxY + 100 : this.#coord.max
-        const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, maxY]
-        console.log(bounds)
-        const voronoi = delaunay.voronoi(bounds)
-        console.log(voronoi)
-
+    _initDrawDate(): void {
         const textPosX = 300
         const textPosY = 200
         const textPadding = 50
+
+        const textDim = this._getTextDim()
+
+        this.#textBackgroundX = this.#coord.max - textDim.width - textPosX - textPadding
+        this.#textBackgroundY = textPosY - textPadding
+        this.#textBackgroundHeight = textDim.height + 2 * textPadding
+        this.#textBackgroundWidth = textDim.width + 2 * textPadding
+
+        this.#textRectX = this.#coord.max - textDim.width + (textDim.width - textPadding) - textPosX
+        this.#textRectY = textPosY + textPadding / 2
+    }
+
+    _drawDate(date: string): void {
+        const dateF = dayjs(date).format("D MMMM YYYY")
+        const currentTextWidth = this._getTextWidth(dateF)
+
+        // Date background
+        this.#ctx.globalAlpha = 0.8
+        this.#ctx.fillStyle = colourWhite
+        this.#ctx.fillRect(
+            this.#textBackgroundX,
+            this.#textBackgroundY,
+            this.#textBackgroundWidth,
+            this.#textBackgroundHeight
+        )
+
+        // Date
+        this.#ctx.globalAlpha = 1
+        this.#ctx.fillStyle = colourRedDark
+        this.#ctx.fillText(dateF, this.#textRectX - currentTextWidth, this.#textRectY)
+    }
+
+    _drawPowerMap(): void {
+        const nationNotShown = new Set([
+            9, // Free Town
+        ])
         const delay = 100
         let dateIndex = -1
-
-        await this._setPattern()
-        const textDim = this._getTextDim()
 
         const drawMap = (): void => {
             const date = this.#powerData[dateIndex][0]
             const ports = this.#powerData[dateIndex][1].filter((nationId) => !nationNotShown.has(nationId))
+
             console.timeLog("animation", dateIndex, date)
+
             for (const [index, nationId] of ports.entries()) {
                 this.#ctx.beginPath()
-                voronoi.renderCell(index, this.#ctx)
+                this.#voronoi.renderCell(index, this.#ctx)
                 this.#ctx.fillStyle = this.#pattern[nationId] ?? "#000"
                 this.#ctx.fill()
             }
 
-            this.#ctx.fillStyle = colourWhite
-            this.#ctx.fillRect(
-                this.#coord.max - textDim.width - textPosX - textPadding,
-                textPosY - textPadding,
-                textDim.width + 2 * textPadding,
-                textDim.height + 2 * textPadding
-            )
-            this.#ctx.fillStyle = colourRedDark
-            const dateF = dayjs(date).format("D MMMM YYYY")
-            const currentTextWidth = this._getTextWidth(dateF)
-            this.#ctx.fillText(
-                dateF,
-                this.#coord.max - textDim.width + (textDim.width - currentTextWidth - textPadding) - textPosX,
-                textPosY + textPadding / 2
-            )
+            this._drawDate(date)
         }
 
         const drawPowerLoop = async () => {
-            while (dateIndex < this.#powerData.length - 415) {
+            while (dateIndex < this.#powerData.length - 1) {
                 dateIndex += 1
                 const t = d3Timer((elapsed) => {
                     drawMap()
@@ -266,13 +260,39 @@ export default class PowerMap extends BaseModal {
         void drawPowerLoop()
     }
 
-    _initPowerMap(): void {
+    _initVoronoi(): void {
+        // Ignore free towns
+        const freeTowns = new Set([
+            96, // La Tortue
+            112, // La Mona
+            150, // Aves
+            179, // Guayaguayare
+            214, // Dariena
+            231, // Great Corn
+            286, // El Rancho
+            343, // Tumbado
+            366, // Shroud Cay
+        ])
+        const points = this.#portData.filter((port) => !freeTowns.has(port.id)).map((port) => port.coordinates)
+
+        const delaunay = d3Delaunay.from(points)
+        console.log("delaunay", delaunay)
+
+        let maxY = d3Max(points, (point) => point[1])
+        maxY = maxY ? Math.floor(maxY * 1.05) : this.#coord.max
+        const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, maxY]
+        console.log("bounds", bounds)
+
+        this.#voronoi = delaunay.voronoi(bounds)
+        console.log("voronoi", this.#voronoi)
+    }
+
+    async _initCanvas(): Promise<void> {
         const pixelRatio = 2
 
         // Get elements
         const main = d3Select("#na-map")
         const svg = d3Select("#na-map svg")
-
         const div = main.append("div")
         const canvas = div.append("canvas")
         const canvasNode = canvas.node() as HTMLCanvasElement
@@ -304,6 +324,9 @@ export default class PowerMap extends BaseModal {
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
         this.#ctx.font = `${200 * pixelRatio}px Junicode`
         this.#ctx.textBaseline = "top"
+
+        await this._setPattern()
+        this._initDrawDate()
     }
 
     /**
@@ -312,7 +335,8 @@ export default class PowerMap extends BaseModal {
     _menuItemSelected(): void {
         showCursorWait()
         this._mapElementsOff()
-        this._initPowerMap()
-        void this._drawPowerMap()
+        void this._initCanvas()
+        this._initVoronoi()
+        this._drawPowerMap()
     }
 }
