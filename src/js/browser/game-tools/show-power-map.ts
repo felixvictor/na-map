@@ -54,6 +54,7 @@ export default class PowerMap extends BaseModal {
     #pattern = [] as Array<null | CanvasPattern>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
+    #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
     #textBackgroundHeight = 0
     #textBackgroundWidth = 0
     #textBackgroundX = 0
@@ -240,6 +241,8 @@ export default class PowerMap extends BaseModal {
         const drawPowerLoop = async () => {
             while (dateIndex < this.#powerData.length - 1) {
                 dateIndex += 1
+
+                this.#rangeInput.attr("value", dateIndex)
                 const t = d3Timer((elapsed) => {
                     drawMap()
                     if (elapsed > delay) {
@@ -282,6 +285,27 @@ export default class PowerMap extends BaseModal {
 
         this.#voronoi = delaunay.voronoi(bounds)
         console.log("voronoi", this.#voronoi)
+    }
+
+    _initRange(): void {
+        const baseName = "power-map"
+        const inputId = `range-${baseName}`
+
+        const div = d3Select("#na-map div")
+            .append("div")
+            .style("position", "absolute")
+            .style("width", "400px")
+            .style("top", "200px")
+            .style("left", "1000px")
+        div.append("label").attr("for", inputId).text("Date range")
+        this.#rangeInput = div
+            .append("input")
+            .attr("id", inputId)
+            .attr("type", "range")
+            .attr("class", "custom-range")
+            .attr("width", "750")
+            .attr("min", "0")
+            .attr("max", String(this.#powerData.length - 1))
     }
 
     async _initCanvas(): Promise<void> {
@@ -334,6 +358,7 @@ export default class PowerMap extends BaseModal {
         showCursorWait()
         this._mapElementsOff()
         void this._initCanvas()
+        this._initRange()
         this._initVoronoi()
         this._drawPowerMap()
     }
