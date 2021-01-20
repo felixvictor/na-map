@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.3.9](///compare/v12.3.8...v12.3.9) (2021-01-20)
+
+
+### Bug Fixes
+
+* **port investments:** November 2020 data 6f36226
+
 ### [12.3.8](///compare/v12.3.7...v12.3.8) (2021-01-18)
 
 
