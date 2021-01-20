@@ -12,7 +12,7 @@ import { max as d3Max } from "d3-array"
 import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
-import { timer as d3Timer } from "d3-timer"
+import { Timer, timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
 import { nations, range, sleep } from "common/common"
@@ -245,6 +245,7 @@ export default class PowerMap extends BaseModal {
                 this.#rangeInput.attr("value", dateIndex)
                 const t = d3Timer((elapsed) => {
                     drawMap()
+
                     if (elapsed > delay) {
                         t.stop()
                     }
@@ -257,6 +258,8 @@ export default class PowerMap extends BaseModal {
         }
 
         console.time("animation")
+        const updateValue = (event: Event) => event
+        ;(this.#rangeInput.node() as HTMLInputElement).addEventListener("change", updateValue)
         void drawPowerLoop()
     }
 
