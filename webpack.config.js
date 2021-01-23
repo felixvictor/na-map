@@ -108,12 +108,7 @@ for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
 
 const babelOpt = {
     cacheDirectory: true,
-    plugins: [
-        "@babel/plugin-proposal-class-properties",
-        "@babel/plugin-proposal-nullish-coalescing-operator",
-        "@babel/plugin-syntax-dynamic-import",
-        "@babel/plugin-transform-spread",
-    ],
+    plugins: ["@babel/plugin-proposal-class-properties"],
     presets: [
         [
             "@babel/preset-env",
@@ -239,7 +234,7 @@ const faviconsOpt = {
     cache: true,
     devMode: "webapp",
     inject: true,
-    prefix: dirPrefixIcons,
+    prefix: `${dirPrefixIcons}/`,
     favicons: {
         appDescription: PACKAGE.description,
         appName: PACKAGE.name,
@@ -301,7 +296,7 @@ const config = {
 
     output: {
         crossOriginLoading: "anonymous",
-        filename: isProduction ? "[name].[contenthash].js" : "[name].js",
+        filename: isProduction ? "[name].[contenthash].mjs" : "[name].mjs",
         path: dirOutput,
         publicPath,
     },

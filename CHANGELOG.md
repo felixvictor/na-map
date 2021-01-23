@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.0](///compare/v12.3.9...v12.4.0) (2021-01-23)
+
+
+### Features
+
+* **browserslist:** updated 38a6d3b
+
+
+### Bug Fixes
+
+* **port investments:** December 2020 data b5f23bd
+
+### [12.3.9](///compare/v12.3.8...v12.3.9) (2021-01-20)
+
+
+### Bug Fixes
+
+* **port investments:** November 2020 data 6f36226
+
+### [12.3.8](///compare/v12.3.7...v12.3.8) (2021-01-18)
+
+
+### Bug Fixes
+
+* **display ports:** patrol zones corrected after server reset f17113e
+
 ### [12.3.7](///compare/v12.3.6...v12.3.7) (2021-01-01)
 
 

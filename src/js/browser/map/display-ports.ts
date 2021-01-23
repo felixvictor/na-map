@@ -541,7 +541,7 @@ export default class DisplayPorts {
             { name: "La Mona", coordinates: [6180, 4100], radius: 170, shallow: false, shipClass: { min: 7, max: 4 } },
         ] as PatrolZone[]
 
-        const start = dayjs.utc("2020-07-24").hour(10)
+        const start = dayjs.utc("2021-01-17").hour(10)
         const index = dayjs.utc().diff(start, "day") % patrolZones.length
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
         const { radius, name, shallow, shipClass } = patrolZones[index]
