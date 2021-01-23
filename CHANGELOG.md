@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.0](///compare/v12.3.9...v12.4.0) (2021-01-23)
+
+
+### Features
+
+* **browserslist:** updated 38a6d3b
+
+
+### Bug Fixes
+
+* **port investments:** December 2020 data b5f23bd
+
 ### [12.3.9](///compare/v12.3.8...v12.3.9) (2021-01-20)
 
 
