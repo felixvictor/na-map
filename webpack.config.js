@@ -234,7 +234,7 @@ const faviconsOpt = {
     cache: true,
     devMode: "webapp",
     inject: true,
-    prefix: dirPrefixIcons,
+    prefix: `${dirPrefixIcons}/`,
     favicons: {
         appDescription: PACKAGE.description,
         appName: PACKAGE.name,
