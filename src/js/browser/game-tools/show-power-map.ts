@@ -50,6 +50,7 @@ interface ImagePromiseError {
  */
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
+    #lastIndex = 0
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #maxY: number | undefined
     #pattern = [] as Array<null | CanvasPattern>
@@ -63,6 +64,7 @@ export default class PowerMap extends BaseModal {
     #textBackgroundY = 0
     #textRectX = 0
     #textRectY = 0
+
     #voronoi = {} as Voronoi<Delaunay.Point>
 
     readonly #colourScale: ScaleOrdinal<number, string>
@@ -82,6 +84,7 @@ export default class PowerMap extends BaseModal {
 
     _setupData(data: JsonData): void {
         this.#powerData = data.power
+        this.#lastIndex = this.#powerData.length - 1
 
         this.#map = d3Select("g#map")
     }
@@ -222,50 +225,52 @@ export default class PowerMap extends BaseModal {
         this.#ctx.fillText(dateF, this.#textRectX, this.#textRectY)
     }
 
-    _drawPowerMap(): void {
+    _drawMap(index: number, date: string, ports: number[]): void {
+        console.timeLog("animation", index, date)
+
+        for (const [index, nationId] of ports.entries()) {
+            this.#ctx.beginPath()
+            this.#voronoi.renderCell(index, this.#ctx)
+            this.#ctx.fillStyle = this.#pattern[nationId] ?? "#000"
+            this.#ctx.fill()
+        }
+
+        this._drawDate(date)
+    }
+
+    async _drawLoop(index: number): Promise<void> {
         const delay = 0
-        let dateIndex = -1
+        let date: string
+        let ports: number[]
 
-        const drawMap = (): void => {
-            const date = this.#powerData[dateIndex][0]
-            const ports = this.#powerData[dateIndex][1]
+        while (this.#stopCommand && index < this.#lastIndex) {
+            index += 1
+            date = this.#powerData[index][0]
+            ports = this.#powerData[index][1]
 
-            console.timeLog("animation", dateIndex, date)
+            this.#rangeInput.attr("value", index)
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            const t = d3Timer((elapsed) => {
+                this._drawMap(index, date, ports)
 
-            for (const [index, nationId] of ports.entries()) {
-                this.#ctx.beginPath()
-                this.#voronoi.renderCell(index, this.#ctx)
-                this.#ctx.fillStyle = this.#pattern[nationId] ?? "#000"
-                this.#ctx.fill()
-            }
-
-            this._drawDate(date)
+                if (elapsed > delay || this.#stopCommand) {
+                    t.stop()
+                }
+            })
+            // eslint-disable-next-line no-await-in-loop
+            await sleep(delay * 1.1)
         }
 
-        const drawPowerLoop = async () => {
-            while (this.#stopCommand && dateIndex < this.#powerData.length - 410) {
-                dateIndex += 1
+        this._drawEnd()
+    }
 
-                this.#rangeInput.attr("value", dateIndex)
-                const t = d3Timer((elapsed) => {
-                    drawMap()
-
-                    if (elapsed > delay || this.#stopCommand) {
-                        console.log("stop")
-                        t.stop()
-                    }
-                })
-                // eslint-disable-next-line no-await-in-loop
-                await sleep(delay * 1.1)
-            }
-
-            this._drawEnd()
-        }
+    _drawPowerMap(): void {
+        const index = -1
 
         console.time("animation")
         const updateValue = (event: Event) => event
         ;(this.#rangeInput.node() as HTMLInputElement).addEventListener("change", updateValue)
-        void drawPowerLoop()
+        void this._drawLoop(index)
     }
 
     _initVoronoi(): void {
@@ -311,7 +316,7 @@ export default class PowerMap extends BaseModal {
         const playButtonClicked = (event: Event) => {
             console.log(event, event.currentTarget)
             const isPlayButton = d3Select(event.currentTarget as HTMLButtonElement).classed("icon-play")
-            this.#stopCommand = !isPlayButton
+            this.#stopCommand = isPlayButton
             d3Select(event.currentTarget as HTMLButtonElement)
                 .classed("icon-pause", isPlayButton)
                 .classed("icon-play", !isPlayButton)
@@ -354,7 +359,7 @@ export default class PowerMap extends BaseModal {
             .attr("class", "form-control-range custom-range mb-1")
             .attr("width", "750")
             .attr("min", "0")
-            .attr("max", String(this.#powerData.length - 1))
+            .attr("max", String(this.#lastIndex))
 
         const buttonGroup = div.append("div").attr("class", "btn-group").attr("role", "group")
         // icon-start
