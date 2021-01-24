@@ -15,7 +15,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { Timer, timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
-import { nations, range, sleep } from "common/common"
+import { capitalizeFirstLetter, nations, range, sleep } from "common/common"
 import {
     nationColourList,
     getCanvasRenderingContext2D,
@@ -51,9 +51,11 @@ interface ImagePromiseError {
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #maxY: number | undefined
     #pattern = [] as Array<null | CanvasPattern>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
+    #stopCommand = true
     #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
     #textBackgroundHeight = 0
     #textBackgroundWidth = 0
@@ -62,7 +64,9 @@ export default class PowerMap extends BaseModal {
     #textRectX = 0
     #textRectY = 0
     #voronoi = {} as Voronoi<Delaunay.Point>
+
     readonly #colourScale: ScaleOrdinal<number, string>
+
     readonly #coord
 
     constructor(serverId: string, coord: MinMaxCoord) {
@@ -151,9 +155,9 @@ export default class PowerMap extends BaseModal {
 
         try {
             const images = await loadImage(icons)
-            images.forEach((image, index) => {
+            for (const [index, image] of images.entries()) {
                 this.#pattern[index] = this.#ctx.createPattern(image, "repeat")
-            })
+            }
         } catch (error: unknown) {
             console.error("One or more images have failed to load :(")
             console.error((error as ImagePromiseError).errored)
@@ -239,14 +243,15 @@ export default class PowerMap extends BaseModal {
         }
 
         const drawPowerLoop = async () => {
-            while (dateIndex < this.#powerData.length - 1) {
+            while (this.#stopCommand && dateIndex < this.#powerData.length - 410) {
                 dateIndex += 1
 
                 this.#rangeInput.attr("value", dateIndex)
                 const t = d3Timer((elapsed) => {
                     drawMap()
 
-                    if (elapsed > delay) {
+                    if (elapsed > delay || this.#stopCommand) {
+                        console.log("stop")
                         t.stop()
                     }
                 })
@@ -281,34 +286,92 @@ export default class PowerMap extends BaseModal {
         const delaunay = d3Delaunay.from(points)
         console.log("delaunay", delaunay)
 
-        let maxY = d3Max(points, (point) => point[1])
-        maxY = maxY ? Math.floor(maxY * 1.05) : this.#coord.max
-        const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, maxY]
+        this.#maxY = d3Max(points, (point) => point[1])
+        this.#maxY = this.#maxY ? Math.floor(this.#maxY * 1.05) : this.#coord.max
+        const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, this.#maxY]
         console.log("bounds", bounds)
 
         this.#voronoi = delaunay.voronoi(bounds)
         console.log("voronoi", this.#voronoi)
     }
 
-    _initRange(): void {
+    _initRange(dim: { top: number; left: number }): void {
         const baseName = "power-map"
         const inputId = `range-${baseName}`
+        const buttonBaseId = `button-${baseName}`
+
+        const startButtonClicked = (event: Event) => {
+            console.log(event, event.currentTarget)
+        }
+
+        const backButtonClicked = (event: Event) => {
+            console.log(event, event.currentTarget)
+        }
+
+        const playButtonClicked = (event: Event) => {
+            console.log(event, event.currentTarget)
+            const isPlayButton = d3Select(event.currentTarget as HTMLButtonElement).classed("icon-play")
+            this.#stopCommand = !isPlayButton
+            d3Select(event.currentTarget as HTMLButtonElement)
+                .classed("icon-pause", isPlayButton)
+                .classed("icon-play", !isPlayButton)
+        }
+
+        const forwardButtonClicked = (event: Event) => {
+            console.log(event, event.currentTarget)
+        }
+
+        const endButtonClicked = (event: Event) => {
+            console.log(event, event.currentTarget)
+        }
+
+        const addButton = (icon: string): Selection<HTMLElement, unknown, HTMLElement, unknown> =>
+            buttonGroup
+                .append("button")
+                .attr("type", "button")
+                .attr("id", `${buttonBaseId}-${icon}`)
+                .attr("class", "btn btn-default icon-outline-button")
+                .attr("title", capitalizeFirstLetter(icon))
+                .append("i")
+                .attr("class", `icon icon-large icon-${icon}`)
 
         const div = d3Select("#na-map div")
             .append("div")
-            .style("position", "absolute")
+            .style("position", "relative")
             .style("width", "400px")
-            .style("top", "200px")
-            .style("left", "1000px")
+            .style("top", `-${dim.top}px`)
+            .style("left", `${dim.left}px`)
+            .style("background-color", colourWhite)
+            .attr("class", "p-3")
+            .append("form")
+            .append("div")
+            .attr("class", "form-group mb-1")
         div.append("label").attr("for", inputId).text("Date range")
         this.#rangeInput = div
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
-            .attr("class", "custom-range")
+            .attr("class", "form-control-range custom-range mb-1")
             .attr("width", "750")
             .attr("min", "0")
             .attr("max", String(this.#powerData.length - 1))
+
+        const buttonGroup = div.append("div").attr("class", "btn-group").attr("role", "group")
+        // icon-start
+        const startButton = addButton("start")
+        // icon-back
+        const backButton = addButton("back")
+        const playButton = addButton("pause")
+        // icon-forward
+        const forwardButton = addButton("forward")
+        // icon-end
+        const endButton = addButton("end")
+
+        startButton.on("click", startButtonClicked)
+        backButton.on("click", backButtonClicked)
+        playButton.on("click", playButtonClicked)
+        forwardButton.on("click", forwardButtonClicked)
+        endButton.on("click", endButtonClicked)
     }
 
     async _initCanvas(): Promise<void> {
@@ -349,9 +412,9 @@ export default class PowerMap extends BaseModal {
         this.#ctx.font = `${200 * pixelRatio}px Junicode`
         this.#ctx.textBaseline = "bottom"
         this.#ctx.textAlign = "end"
-
-        await this._setPattern()
         this._initDrawDate()
+        this._initRange({ top: (this.#coord.max - (this.#maxY ?? 0)) * scale + ty, left: tx })
+        await this._setPattern()
     }
 
     /**
@@ -360,9 +423,8 @@ export default class PowerMap extends BaseModal {
     _menuItemSelected(): void {
         showCursorWait()
         this._mapElementsOff()
-        void this._initCanvas()
-        this._initRange()
         this._initVoronoi()
+        void this._initCanvas()
         this._drawPowerMap()
     }
 }

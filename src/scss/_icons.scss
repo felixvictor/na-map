@@ -11,15 +11,25 @@
 /// Icons
 /// https://github.com/danklammer/bytesize-icons
 
+@use "sass:math";
+
 $icon-dir: "../icons";
+
+$icon-size: 24px;
+$icon-size-large: math.round($icon-size * 1.2);
 
 .icon {
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    width: $icon-size;
+    height: $icon-size;
     overflow: visible;
     vertical-align: middle;
     background-color: $body-color;
+}
+
+.icon-large {
+    width: $icon-size-large;
+    height: $icon-size-large;
 }
 
 .icon-navbar {
@@ -36,8 +46,9 @@ $icon-dir: "../icons";
     }
 }
 
-$icon-list: bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left clone-right
-    close copy crew deep gift gunnery hull image info labour map mast pb-list open options sailing shallow trading;
+$icon-list: back bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left
+    clone-right close copy crew deep end forward gift gunnery hull image info labour map mast pb-list open options pause
+    play sailing shallow start stop trading;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {

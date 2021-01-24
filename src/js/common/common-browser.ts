@@ -170,9 +170,13 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`
 
 export const loadJsonFiles = async <T>(dataSources: DataSource[], readData: T): Promise<void> => {
+    showCursorWait()
+
     for await (const dataSource of dataSources) {
         readData[dataSource.name as keyof T] = await loadJsonFile(dataSource.fileName)
     }
+
+    showCursorDefault()
 }
 
 class FetchError extends Error {
@@ -241,9 +245,9 @@ export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRe
  */
 const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<string> => {
     const images = {} as NationListAlternative<string>
-    r.keys().forEach((item) => {
+    for (const item of r.keys()) {
         images[item.replace("./", "").replace(".svg", "")!] = r(item)
-    })
+    }
 
     // Sort by nation
     const sortedImages = Object.fromEntries(
