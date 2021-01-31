@@ -8,14 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { max as d3Max } from "d3-array"
+import { group as d3Group, max as d3Max, rollups as d3Rollups } from "d3-array"
 import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select, Selection } from "d3-selection"
+import { select as d3Select, selectAll, Selection } from "d3-selection"
 import { Timer, timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
-import { capitalizeFirstLetter, nations, range, sleep } from "common/common"
+import { capitalizeFirstLetter, findNationById, nations, range, sleep } from "common/common"
 import {
     nationColourList,
     getCanvasRenderingContext2D,
@@ -33,6 +33,8 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import { BaseModal } from "./base-modal"
 import { PortBasic } from "common/gen-json"
 import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
+import { getContrastColour } from "common/common-game-tools"
+import { formatSiInt } from "common/common-format"
 
 dayjs.extend(customParseFormat)
 
@@ -45,26 +47,39 @@ interface ImagePromiseError {
     errored: string[]
 }
 
+interface DivDimension {
+    top: number
+    left: number
+    width: number
+}
+
 /**
  *
  */
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
+    #controllerWidth = 400
+    #delay = 400
     #lastIndex = 0
+    #legendColumnPadding = 0
+    #legendColumnWidth = 0
+    #legendContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #legendNationContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #legendRowHeight = 0
+    #legendRowPadding = 0
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #maxY: number | undefined
     #pattern = [] as Array<null | CanvasPattern>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
-    #stopCommand = true
     #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
+    #stopCommand = true
     #textBackgroundHeight = 0
     #textBackgroundWidth = 0
     #textBackgroundX = 0
     #textBackgroundY = 0
     #textRectX = 0
     #textRectY = 0
-
     #voronoi = {} as Voronoi<Delaunay.Point>
 
     readonly #colourScale: ScaleOrdinal<number, string>
@@ -239,7 +254,6 @@ export default class PowerMap extends BaseModal {
     }
 
     async _drawLoop(index: number): Promise<void> {
-        const delay = 0
         let date: string
         let ports: number[]
 
@@ -253,12 +267,13 @@ export default class PowerMap extends BaseModal {
             const t = d3Timer((elapsed) => {
                 this._drawMap(index, date, ports)
 
-                if (elapsed > delay || this.#stopCommand) {
+                if (elapsed > this.#delay || this.#stopCommand) {
                     t.stop()
                 }
             })
+            this._drawNationLegend(ports)
             // eslint-disable-next-line no-await-in-loop
-            await sleep(delay * 1.1)
+            await sleep(this.#delay * 1.1)
         }
 
         this._drawEnd()
@@ -300,7 +315,123 @@ export default class PowerMap extends BaseModal {
         console.log("voronoi", this.#voronoi)
     }
 
-    _initRange(dim: { top: number; left: number }): void {
+    _initLegend(dim: DivDimension): void {
+        this.#legendContainer = d3Select("#na-map div")
+            .append("div")
+            .style("position", "relative")
+            .style("width", `${dim.width}px`)
+            .style("top", `-${dim.top}px`)
+            .style("left", `${dim.left}px`)
+            .attr("class", "d-flex justify-content-between")
+    }
+
+    _initNationLegend(dim: DivDimension): void {
+        this.#legendRowHeight = Math.floor(20 * 1.618)
+        this.#legendRowPadding = Math.floor(0.5 * 1.618)
+        this.#legendColumnPadding = Math.floor(2 * 1.618)
+
+        const width = dim.width - dim.left - this.#controllerWidth * 1.1
+        const minColumnWidth = 160 + this.#legendColumnPadding * 2 // Width of "Verenigde Provinciën" plus padding
+        const totalWidth = nations.length * minColumnWidth - this.#legendColumnPadding * 2
+        const rows = Math.ceil(totalWidth / width)
+        const columnsPerRow = Math.ceil(nations.length / rows)
+        this.#legendColumnWidth = Math.ceil(width / columnsPerRow - this.#legendColumnPadding * 2)
+        this.#legendNationContainer = this.#legendContainer
+            .append("div")
+            // .style("position", "relative")
+            // .style("width", `${width}px`)
+            // .style("top", `-${dim.top}px`)
+            // .style("left", `${dim.left + this.#controllerWidth * 1.1}px`)
+            // .style("background-color", colourWhite)
+            .attr("class", "d-flex flex-wrap justify-content-between pl-3")
+    }
+
+    _drawNationLegend(ports: number[]): void {
+        const nations = d3Rollups(
+            ports,
+            (d) => d.length,
+            // (d) => findNationById(d).sortName
+            (d) => d
+        ).sort((a, b) => b[1] - a[1])
+        const totalPorts = ports.length
+        const t = this.#legendNationContainer.transition().duration(this.#delay)
+
+        console.log(ports, nations)
+
+        const div = this.#legendNationContainer
+            .selectAll<HTMLDivElement, [number, number]>(".legend")
+            .data(nations, (d, index) =>
+                //                    String(index).padStart(2, "0") + String(d[0]).padStart(2, "0") + String(d[1]).padStart(3, "0")
+                // String(index).padStart(2, "0") + String(d[0]).padStart(2, "0")
+                String(d[0])
+            )
+            .join(
+                (enter) => {
+                    console.log("enter", enter)
+                    const div = enter.append("div").attr("class", "legend mt-3")
+
+                    const svg = div
+                        .append("svg")
+                        .attr("class", "svg-text")
+                        .attr("width", this.#legendColumnWidth)
+                        .attr("height", this.#legendRowHeight * 2 + this.#legendRowPadding)
+
+                    svg.append("rect")
+                        .attr("class", "nation-header")
+                        .attr("width", this.#legendColumnWidth)
+                        .attr("height", this.#legendRowHeight)
+                        .style("fill", (d) => this.#colourScale(d[0]))
+
+                    svg.append("text")
+                        .attr("class", "nation-name")
+                        .attr("x", this.#legendColumnPadding)
+                        .attr("y", "25%")
+                        .text((d) => findNationById(d[0]).sortName)
+                        .style("fill", (d) => getContrastColour(this.#colourScale(d[0])))
+
+                    svg.append("rect")
+                        .attr("class", "rect-background")
+                        .attr("y", this.#legendRowHeight + this.#legendRowPadding)
+                        .attr("width", this.#legendColumnWidth)
+                        .attr("height", this.#legendRowHeight)
+                        .style("fill", (d) => this.#colourScale(d[0]))
+
+                    svg.append("rect")
+                        .attr("class", "value")
+                        .attr("y", this.#legendRowHeight + this.#legendRowPadding)
+                        .attr("width", (d) => this.#legendColumnWidth * (d[1] / totalPorts))
+                        .attr("height", this.#legendRowHeight)
+                        .style("fill", (d) => this.#colourScale(d[0]))
+
+                    svg.append("text")
+                        .attr("class", "value")
+                        .attr("x", this.#legendColumnWidth - this.#legendColumnPadding)
+                        .attr("y", "75%")
+                        .html((d) => formatSiInt(d[1], true))
+                        .style("text-anchor", "end")
+
+                    // div.call((enter) => enter.transition(t).attr("y", 0))
+
+                    return div
+                },
+                (update) => {
+                    console.log("update", update)
+                    return update.attr("fill", "black").attr("y", 0)
+                    // .call((update) => update.transition(t).attr("x", (d, i) => i * 16))
+                },
+                (exit) => {
+                    console.log("exit", exit)
+                    return (
+                        exit
+                            .attr("fill", "brown")
+                            // .call((exit) => exit.transition(t).attr("y", 30)
+                            .remove()
+                    )
+                }
+            )
+    }
+
+    _initController(dim: DivDimension): void {
         const baseName = "power-map"
         const inputId = `range-${baseName}`
         const buttonBaseId = `button-${baseName}`
@@ -340,14 +471,14 @@ export default class PowerMap extends BaseModal {
                 .append("i")
                 .attr("class", `icon icon-large icon-${icon}`)
 
-        const div = d3Select("#na-map div")
+        const div = this.#legendContainer
             .append("div")
-            .style("position", "relative")
-            .style("width", "400px")
-            .style("top", `-${dim.top}px`)
-            .style("left", `${dim.left}px`)
+            // .style("position", "relative")
+            //            .style("width", `${this.#controllerWidth}px`)
+            // .style("top", `-${dim.top}px`)
+            // .style("left", `${dim.left}px`)
             .style("background-color", colourWhite)
-            .attr("class", "p-3")
+            .attr("class", "p-3 mt-3")
             .append("form")
             .append("div")
             .attr("class", "form-group mb-1")
@@ -417,8 +548,19 @@ export default class PowerMap extends BaseModal {
         this.#ctx.font = `${200 * pixelRatio}px Junicode`
         this.#ctx.textBaseline = "bottom"
         this.#ctx.textAlign = "end"
+
+        const gTiles = d3Select("#na-map svg g.map-tiles")
+        const tilesWidth = (gTiles.node() as SVGGElement).getBoundingClientRect().width
+        console.log("tiles", gTiles, tilesWidth)
+        const dim: DivDimension = {
+            top: (this.#coord.max - (this.#maxY ?? 0)) * scale + ty,
+            left: tx,
+            width: Math.floor(tilesWidth),
+        }
         this._initDrawDate()
-        this._initRange({ top: (this.#coord.max - (this.#maxY ?? 0)) * scale + ty, left: tx })
+        this._initLegend(dim)
+        this._initController(dim)
+        this._initNationLegend(dim)
         await this._setPattern()
     }
 

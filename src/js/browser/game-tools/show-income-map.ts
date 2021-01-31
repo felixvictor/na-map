@@ -204,7 +204,7 @@ export default class ShowIncomeMap extends BaseModal {
             .selectAll(".legend")
             .data(nations)
             .join((enter) => {
-                const div = enter.append("div").attr("class", "mt-3")
+                const div = enter.append("div").attr("class", "legend mt-3")
 
                 const svg = div
                     .append("svg")
