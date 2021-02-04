@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.4.1](///compare/v12.4.0...v12.4.1) (2021-02-04)
+
+
+### Bug Fixes
+
+* **display pb zones:** fort and tower ranges increased 65860c3
+
 ## [12.4.0](///compare/v12.3.9...v12.4.0) (2021-01-23)
 
 
