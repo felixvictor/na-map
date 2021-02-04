@@ -11,8 +11,8 @@
 import { group as d3Group, max as d3Max, rollups as d3Rollups } from "d3-array"
 import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select, selectAll, Selection } from "d3-selection"
-import { Timer, timer as d3Timer } from "d3-timer"
+import { select as d3Select, selectAll as d3SelectAll, Selection } from "d3-selection"
+import { timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
 import { capitalizeFirstLetter, findNationById, nations, range, sleep } from "common/common"
@@ -59,6 +59,7 @@ interface DivDimension {
 export default class PowerMap extends BaseModal {
     #ctx = {} as CanvasRenderingContext2D
     #controllerWidth = 400
+    #columnsPerRow = 0
     #delay = 400
     #lastIndex = 0
     #legendColumnPadding = 0
@@ -69,10 +70,12 @@ export default class PowerMap extends BaseModal {
     #legendRowPadding = 0
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #maxY: number | undefined
+    #nationOldIndex = new Map<number, number>()
     #pattern = [] as Array<null | CanvasPattern>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
     #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
+    #rows = 0
     #stopCommand = true
     #textBackgroundHeight = 0
     #textBackgroundWidth = 0
@@ -80,6 +83,7 @@ export default class PowerMap extends BaseModal {
     #textBackgroundY = 0
     #textRectX = 0
     #textRectY = 0
+
     #voronoi = {} as Voronoi<Delaunay.Point>
 
     readonly #colourScale: ScaleOrdinal<number, string>
@@ -256,6 +260,7 @@ export default class PowerMap extends BaseModal {
     async _drawLoop(index: number): Promise<void> {
         let date: string
         let ports: number[]
+        this.#lastIndex = 200
 
         while (this.#stopCommand && index < this.#lastIndex) {
             index += 1
@@ -330,12 +335,12 @@ export default class PowerMap extends BaseModal {
         this.#legendRowPadding = Math.floor(0.5 * 1.618)
         this.#legendColumnPadding = Math.floor(2 * 1.618)
 
-        const width = dim.width - dim.left - this.#controllerWidth * 1.1
+        const width = dim.width - dim.left - this.#controllerWidth
         const minColumnWidth = 160 + this.#legendColumnPadding * 2 // Width of "Verenigde Provinciën" plus padding
         const totalWidth = nations.length * minColumnWidth - this.#legendColumnPadding * 2
-        const rows = Math.ceil(totalWidth / width)
-        const columnsPerRow = Math.ceil(nations.length / rows)
-        this.#legendColumnWidth = Math.ceil(width / columnsPerRow - this.#legendColumnPadding * 2)
+        this.#rows = Math.ceil(totalWidth / width)
+        this.#columnsPerRow = Math.ceil(nations.length / this.#rows)
+        this.#legendColumnWidth = Math.ceil(width / this.#columnsPerRow - this.#legendColumnPadding * 2)
         this.#legendNationContainer = this.#legendContainer
             .append("div")
             // .style("position", "relative")
@@ -344,31 +349,50 @@ export default class PowerMap extends BaseModal {
             // .style("left", `${dim.left + this.#controllerWidth * 1.1}px`)
             // .style("background-color", colourWhite)
             .attr("class", "d-flex flex-wrap justify-content-between pl-3")
+
+        console.log(width, minColumnWidth, totalWidth, this.#legendColumnWidth, this.#rows, this.#columnsPerRow)
+    }
+
+    _getTopPosition(index: number): string {
+        const top = index === -1 ? -100 : Math.ceil((index + 1) / this.#columnsPerRow) * this.#legendRowHeight
+        console.log("_getTopPosition", top)
+        return `${top}px`
+    }
+
+    _getLeftPosition(index: number): string {
+        const left = index === -1 ? -100 : 0
+        console.log("_getLeftPosition", left)
+        return `${left}px`
     }
 
     _drawNationLegend(ports: number[]): void {
         const nations = d3Rollups(
             ports,
             (d) => d.length,
-            // (d) => findNationById(d).sortName
             (d) => d
-        ).sort((a, b) => b[1] - a[1])
+        ).sort((a, b) => b[1] - a[1] || a[0] - b[0])
         const totalPorts = ports.length
-        const t = this.#legendNationContainer.transition().duration(this.#delay)
 
-        console.log(ports, nations)
+        console.log(ports, nations, this.#nationOldIndex)
 
-        const div = this.#legendNationContainer
+        this.#legendNationContainer
             .selectAll<HTMLDivElement, [number, number]>(".legend")
-            .data(nations, (d, index) =>
-                //                    String(index).padStart(2, "0") + String(d[0]).padStart(2, "0") + String(d[1]).padStart(3, "0")
-                // String(index).padStart(2, "0") + String(d[0]).padStart(2, "0")
-                String(d[0])
-            )
+            .data(nations, (d, index) => String(index).padStart(2, "0") + String(d[0]).padStart(2, "0"))
             .join(
                 (enter) => {
-                    console.log("enter", enter)
-                    const div = enter.append("div").attr("class", "legend mt-3")
+                    const div = enter
+                        .append("div")
+                        .attr("class", "legend mt-3")
+                        .style("position", "relative")
+                        .style("top", (d) => this._getTopPosition(this.#nationOldIndex.get(d[0]) ?? -1))
+                        .style("left", (d) => this._getLeftPosition(this.#nationOldIndex.get(d[0]) ?? -1))
+                        // .style("opacity", 0)
+                        .transition()
+                        .duration(this.#delay)
+                        .style("top", (d, index) => this._getTopPosition(index))
+                        .style("left", (d, index) => this._getLeftPosition(index))
+                        // .style("opacity", 1)
+                        .selection()
 
                     const svg = div
                         .append("svg")
@@ -399,36 +423,44 @@ export default class PowerMap extends BaseModal {
                     svg.append("rect")
                         .attr("class", "value")
                         .attr("y", this.#legendRowHeight + this.#legendRowPadding)
-                        .attr("width", (d) => this.#legendColumnWidth * (d[1] / totalPorts))
                         .attr("height", this.#legendRowHeight)
+                        .attr("width", (d) => this.#legendColumnWidth * (d[1] / totalPorts))
                         .style("fill", (d) => this.#colourScale(d[0]))
 
                     svg.append("text")
                         .attr("class", "value")
                         .attr("x", this.#legendColumnWidth - this.#legendColumnPadding)
                         .attr("y", "75%")
-                        .html((d) => formatSiInt(d[1], true))
                         .style("text-anchor", "end")
+                        .html((d) => formatSiInt(d[1], true))
 
-                    // div.call((enter) => enter.transition(t).attr("y", 0))
+                    enter.datum(function (d, i, nodes) {
+                        console.log("datum 1", this, d, i, nodes)
+                        return [d, i]
+                    })
+                    enter.datum(function (d, i, nodes) {
+                        console.log("datum 2", this, d, i, nodes)
+                    })
 
-                    return div
+                    return svg
                 },
+
                 (update) => {
-                    console.log("update", update)
-                    return update.attr("fill", "black").attr("y", 0)
-                    // .call((update) => update.transition(t).attr("x", (d, i) => i * 16))
-                },
-                (exit) => {
-                    console.log("exit", exit)
-                    return (
-                        exit
-                            .attr("fill", "brown")
-                            // .call((exit) => exit.transition(t).attr("y", 30)
-                            .remove()
-                    )
+                    update
+                        .select("rect.value")
+                        .attr("width", (d) => this.#legendColumnWidth * (d[1] / totalPorts))
+                        .style("fill", (d) => this.#colourScale(d[0]))
+
+                    update.select("text.value").html((d) => formatSiInt(d[1], true))
+
+                    return update
                 }
             )
+
+        this.#nationOldIndex = new Map<number, number>()
+        for (const [index, nation] of nations.entries()) {
+            this.#nationOldIndex.set(nation[0], index)
+        }
     }
 
     _initController(dim: DivDimension): void {
