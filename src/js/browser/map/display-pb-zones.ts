@@ -22,6 +22,8 @@ import { Bound } from "common/interface"
 import { Point } from "common/common-math"
 
 export default class DisplayPbZones {
+    readonly #fortRangeRadius = 15
+    readonly #towerRangeRadius = 12
     showPB: string
     #serverType: string
     private readonly _ports!: DisplayPorts
@@ -189,8 +191,6 @@ export default class DisplayPbZones {
                 }
             )
 
-        const fortRangeRadius = 10
-        const towerRangeRadius = 8
         const fortSize = 3
         const towerSize = 1.5
         this._g
@@ -207,7 +207,7 @@ export default class DisplayPbZones {
                             enter
                                 .append("path")
                                 .attr("class", "tower-range")
-                                .attr("d", (d) => drawSvgCircle(d[0], d[1], towerRangeRadius))
+                                .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#towerRangeRadius))
                         )
                     g.selectAll<SVGPathElement, Point[]>("path.fort-range")
                         .data((d) => d.forts)
@@ -215,7 +215,7 @@ export default class DisplayPbZones {
                             enter
                                 .append("path")
                                 .attr("class", "fort-range")
-                                .attr("d", (d) => drawSvgCircle(d[0], d[1], fortRangeRadius))
+                                .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#fortRangeRadius))
                         )
 
                     // Forts
