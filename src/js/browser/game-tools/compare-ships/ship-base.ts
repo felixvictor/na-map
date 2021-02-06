@@ -23,7 +23,7 @@ import { isEmpty } from "common/common"
 import { pluralise, segmentRadians } from "common/common-browser"
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "common/common-format"
 import { degreesToCompass, getOrdinal } from "common/common-math"
-import { drawSvgCircle, drawSvgLine, rotationAngleInDegrees } from "../../util"
+import { drawSvgCircle, drawSvgVLine, rotationAngleInDegrees } from "../../util"
 
 import { Selection } from "d3-selection"
 
@@ -280,7 +280,7 @@ export class ShipBase extends Ship {
                 "d",
                 (d) =>
                     String(drawSvgCircle(d.compassTextX, d.compassTextY, circleSize)) +
-                    drawSvgLine(d.compassTextX, d.compassTextY, -d.compassTextY / 2)
+                    drawSvgVLine(d.compassTextX, d.compassTextY, -d.compassTextY / 2)
             )
 
             .attr("class", "wind-profile-arrow")

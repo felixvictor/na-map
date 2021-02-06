@@ -8,10 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { group as d3Group, max as d3Max, rollups as d3Rollups } from "d3-array"
+import { max as d3Max, rollups as d3Rollups } from "d3-array"
 import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select, selectAll as d3SelectAll, Selection } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
@@ -35,7 +35,6 @@ import { PortBasic } from "common/gen-json"
 import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
-import { getOrdinal } from "common/common-math"
 
 dayjs.extend(customParseFormat)
 
@@ -58,15 +57,17 @@ interface DivDimension {
  *
  */
 export default class PowerMap extends BaseModal {
+    readonly #baseId = "power-map"
     #ctx = {} as CanvasRenderingContext2D
-    #controllerWidth = 330
+    readonly #controllerWidth = 330
     #columnsPerRow = 0
-    #delay = 4000
+    readonly #delay = 4000
     #lastIndex = 0
     #legendColumnPadding = 0
     #legendColumnWidth = 0
     #legendContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #legendNationContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #legendNationItemContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #legendNationIndexContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendRowHeight = 0
     #legendRowPadding = 0
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
@@ -332,53 +333,40 @@ export default class PowerMap extends BaseModal {
     }
 
     _initNationLegend(dim: DivDimension): void {
-        this.#legendRowHeight = Math.floor(20 * 1.618)
-        this.#legendRowPadding = Math.floor(0.5 * 1.618)
-        this.#legendColumnPadding = Math.floor(2 * 1.618)
+        this.#legendRowHeight = Math.floor(40 * 1.618)
+        this.#legendRowPadding = Math.floor(1.618)
+        this.#legendColumnPadding = Math.floor(5 * 1.618)
 
         const width = dim.width - this.#controllerWidth
-        const minColumnWidth = 160 + this.#legendColumnPadding * 2 // Width of "Verenigde Provinciën" plus padding
+        const minColumnWidth = 75 + this.#legendColumnPadding * 2 // Width of "Verenigde Provinciën" plus padding
         const totalWidth = nations.length * minColumnWidth - this.#legendColumnPadding * 2
         this.#rows = Math.ceil(totalWidth / width)
         this.#columnsPerRow = Math.ceil(nations.length / this.#rows)
         this.#legendColumnWidth = Math.ceil(width / this.#columnsPerRow - this.#legendColumnPadding * 2)
-        this.#legendNationContainer = this.#legendContainer
-            .append("div")
-            // .style("position", "relative")
-            .style("width", `${width}px`)
-            // .style("top", `-${dim.top}px`)
-            // .style("left", `${dim.left + this.#controllerWidth * 1.1}px`)
-            // .style("background-color", colourWhite)
-            // .attr("class", "d-flex flex-wrap justify-content-between pl-3")
-            .attr("class", "pl-3")
-
-        console.log(
-            dim,
-            this.#controllerWidth,
-            width,
-            minColumnWidth,
-            totalWidth,
-            this.#legendColumnWidth,
-            this.#rows,
-            this.#columnsPerRow
-        )
+        const legendNationContainer = this.#legendContainer.append("div")
+        this.#legendNationItemContainer = legendNationContainer.append("div")
+        this.#legendNationIndexContainer = legendNationContainer.append("div")
     }
 
     _getTopPosition(index: number): string {
-        const top =
+        let top =
             index === -1
                 ? -this.#legendRowHeight
-                : Math.floor(index / this.#columnsPerRow) * (this.#legendRowHeight + this.#legendRowPadding)
-        console.log("_getTopPosition", index, Math.floor(index / this.#columnsPerRow), top)
-        return `${top + 16}px`
+                : Math.floor(index / this.#columnsPerRow) * (this.#legendRowPadding * 10 + this.#legendRowHeight)
+        // Add padding
+        top += 16
+
+        return `${top}px`
     }
 
     _getLeftPosition(index: number): string {
-        const left =
+        let left =
             index === -1
                 ? -this.#legendColumnWidth
-                : Math.ceil(((index % this.#columnsPerRow) * this.#legendColumnWidth) / this.#columnsPerRow)
-        console.log("_getLeftPosition", index, left)
+                : Math.floor((index % this.#columnsPerRow) * (this.#legendColumnPadding + this.#legendColumnWidth))
+        // Add padding
+        left += 16 + this.#controllerWidth
+
         return `${left}px`
     }
 
@@ -390,9 +378,7 @@ export default class PowerMap extends BaseModal {
         ).sort((a, b) => b[1] - a[1] || a[0] - b[0])
         const totalPorts = ports.length
 
-        console.log(ports, nations, this.#nationOldIndex)
-
-        this.#legendNationContainer
+        this.#legendNationItemContainer
             .selectAll<HTMLDivElement, [number, number]>("svg.svg-text")
             .data(nations, (d, index) => String(index).padStart(2, "0") + String(d[0]).padStart(2, "0"))
             .join(
@@ -401,18 +387,11 @@ export default class PowerMap extends BaseModal {
                         .append("svg")
                         .attr("class", "svg-text")
                         .attr("width", this.#legendColumnWidth)
-                        .attr("height", this.#legendRowHeight * 2 + this.#legendRowPadding)
-                        .style("position", "relative")
+                        .attr("height", this.#legendRowHeight + this.#legendRowPadding)
+                        .style("position", "absolute")
 
-                        .style("top", (d, index) => {
-                            console.log("old", this.#nationOldIndex.get(d[0]) ?? -1, "current", index)
-                            return this._getTopPosition(this.#nationOldIndex.get(d[0]) ?? -1)
-                        })
-                        .style("left", (d, index) => {
-                            console.log("old", this.#nationOldIndex.get(d[0]) ?? -1, "current", index)
-                            return this._getLeftPosition(this.#nationOldIndex.get(d[0]) ?? -1)
-                        })
-
+                        .style("top", (d) => this._getTopPosition(this.#nationOldIndex.get(d[0]) ?? -1))
+                        .style("left", (d) => this._getLeftPosition(this.#nationOldIndex.get(d[0]) ?? -1))
                         .transition()
                         .duration(this.#delay)
                         .style("top", (d, index) => this._getTopPosition(index))
@@ -422,27 +401,27 @@ export default class PowerMap extends BaseModal {
                     svg.append("rect")
                         .attr("class", "nation-header")
                         .attr("width", this.#legendColumnWidth)
-                        .attr("height", this.#legendRowHeight)
+                        .attr("height", Math.floor(this.#legendRowHeight / 2))
                         .style("fill", (d) => this.#colourScale(d[0]))
 
                     svg.append("text")
                         .attr("class", "nation-name")
-                        .attr("x", this.#legendColumnPadding)
+                        .attr("x", Math.floor(this.#legendColumnPadding / 2))
                         .attr("y", "25%")
-                        .html((d, index) => `${index + 1}. ${findNationById(d[0]).sortName}`)
+                        .html((d) => `${findNationById(d[0]).sortName}`)
                         .style("fill", (d) => getContrastColour(this.#colourScale(d[0])))
 
                     svg.append("rect")
                         .attr("class", "rect-background")
-                        .attr("y", this.#legendRowHeight + this.#legendRowPadding)
-                        .attr("width", this.#legendColumnWidth)
-                        .attr("height", this.#legendRowHeight)
+                        .attr("y", Math.floor(this.#legendRowHeight / 2 + this.#legendRowPadding))
+                        .attr("width", "100%")
+                        .attr("height", Math.floor(this.#legendRowHeight / 2))
                         .style("fill", (d) => this.#colourScale(d[0]))
 
                     svg.append("rect")
                         .attr("class", "value")
-                        .attr("y", this.#legendRowHeight + this.#legendRowPadding)
-                        .attr("height", this.#legendRowHeight)
+                        .attr("y", Math.floor(this.#legendRowHeight / 2 + this.#legendRowPadding))
+                        .attr("height", Math.floor(this.#legendRowHeight / 2))
                         .attr("width", (d) => this.#legendColumnWidth * (d[1] / totalPorts))
                         .style("fill", (d) => this.#colourScale(d[0]))
 
@@ -468,6 +447,48 @@ export default class PowerMap extends BaseModal {
                 }
             )
 
+        this.#legendNationIndexContainer
+            .selectAll<HTMLDivElement, [number, number]>("svg.index")
+            .data(nations, (d, index) => index)
+            .join(
+                (enter) => {
+                    const svg = enter
+                        .append("svg")
+                        .attr("class", "index")
+                        .style("position", "absolute")
+                        .style("top", (d, index) => this._getTopPosition(index))
+                        .style("left", (d, index) => this._getLeftPosition(index))
+
+                    svg.append("text")
+                        .attr("x", this.#legendColumnWidth / 2)
+                        .attr("y", (this.#legendRowHeight + this.#legendRowPadding) / 2)
+                        .attr("fill", colourWhite)
+                        .attr("opacity", 0)
+                        .attr("text-anchor", "middle")
+                        .attr("dominant-baseline", "mathematical")
+                        .attr("font-variant", "normal")
+                        .attr("font-size", `${this.#legendRowHeight}px`)
+                        .text((d, index) => index + 1)
+
+                        .transition()
+                        .duration(this.#delay)
+                        .attr("opacity", 0.3)
+                        .selection()
+
+                    return svg
+                },
+                (update) => update,
+                (exit) =>
+                    exit
+                        .attr("opacity", 0.3)
+                        .transition()
+                        .duration(this.#delay)
+                        .attr("opacity", 0)
+                        .remove()
+                        .selection()
+            )
+
+        // Remember old indexes
         this.#nationOldIndex = new Map<number, number>()
         for (const [index, nation] of nations.entries()) {
             this.#nationOldIndex.set(nation[0], index)
@@ -475,9 +496,8 @@ export default class PowerMap extends BaseModal {
     }
 
     _initController(dim: DivDimension): void {
-        const baseName = "power-map"
-        const inputId = `range-${baseName}`
-        const buttonBaseId = `button-${baseName}`
+        const inputId = `range-${this.#baseId}`
+        const buttonBaseId = `button-${this.#baseId}`
 
         const startButtonClicked = (event: Event) => {
             console.log(event, event.currentTarget)
