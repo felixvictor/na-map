@@ -25,6 +25,7 @@ import {
     getIcons,
     colourWhite,
     colourRedDark,
+    getElementWidth,
 } from "common/common-browser"
 import dayjs from "dayjs"
 
@@ -57,17 +58,15 @@ interface DivDimension {
  *
  */
 export default class PowerMap extends BaseModal {
-    readonly #baseId = "power-map"
-    #ctx = {} as CanvasRenderingContext2D
-    readonly #controllerWidth = 330
     #columnsPerRow = 0
-    readonly #delay = 4000
+    #controllerWidth = 0
+    #ctx = {} as CanvasRenderingContext2D
     #lastIndex = 0
     #legendColumnPadding = 0
     #legendColumnWidth = 0
     #legendContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #legendNationItemContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendNationIndexContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #legendNationItemContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendRowHeight = 0
     #legendRowPadding = 0
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
@@ -85,12 +84,11 @@ export default class PowerMap extends BaseModal {
     #textBackgroundY = 0
     #textRectX = 0
     #textRectY = 0
-
     #voronoi = {} as Voronoi<Delaunay.Point>
-
+    readonly #baseId = "power-map"
     readonly #colourScale: ScaleOrdinal<number, string>
-
     readonly #coord
+    readonly #delay = 200
 
     constructor(serverId: string, coord: MinMaxCoord) {
         super(serverId, "Show power map")
@@ -262,7 +260,7 @@ export default class PowerMap extends BaseModal {
     async _drawLoop(index: number): Promise<void> {
         let date: string
         let ports: number[]
-        this.#lastIndex = 200
+        // this.#lastIndex = 200
 
         while (this.#stopCommand && index < this.#lastIndex) {
             index += 1
@@ -534,17 +532,9 @@ export default class PowerMap extends BaseModal {
                 .append("i")
                 .attr("class", `icon icon-large icon-${icon}`)
 
-        const div = this.#legendContainer
-            .append("div")
-            // .style("position", "relative")
-            .style("width", `${this.#controllerWidth}px`)
-            // .style("top", `-${dim.top}px`)
-            // .style("left", `${dim.left}px`)
-            .style("background-color", colourWhite)
-            .attr("class", "p-3 mt-3")
-            .append("form")
-            .append("div")
-            .attr("class", "form-group mb-1")
+        const div = this.#legendContainer.append("div").style("background-color", colourWhite).attr("class", "p-3 mt-3")
+
+        div.append("form").append("div").attr("class", "form-group mb-1")
         div.append("label").attr("for", inputId).text("Date range")
         this.#rangeInput = div
             .append("input")
@@ -565,6 +555,8 @@ export default class PowerMap extends BaseModal {
         const forwardButton = addButton("forward")
         // icon-end
         const endButton = addButton("end")
+
+        this.#controllerWidth = getElementWidth(div.node() as HTMLElement)
 
         startButton.on("click", startButtonClicked)
         backButton.on("click", backButtonClicked)
@@ -613,12 +605,12 @@ export default class PowerMap extends BaseModal {
         this.#ctx.textAlign = "end"
 
         const gTiles = d3Select("#na-map svg g.map-tiles")
-        const tilesWidth = (gTiles.node() as SVGGElement).getBoundingClientRect().width
+        const tilesWidth = getElementWidth(gTiles.node() as SVGElement)
         console.log("tiles", gTiles, tilesWidth)
         const dim: DivDimension = {
             top: (this.#coord.max - (this.#maxY ?? 0)) * scale + ty,
             left: tx,
-            width: Math.floor(tilesWidth),
+            width: tilesWidth,
         }
         this._initDrawDate()
         this._initLegend(dim)
