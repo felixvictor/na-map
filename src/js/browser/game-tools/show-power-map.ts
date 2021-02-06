@@ -453,6 +453,8 @@ export default class PowerMap extends BaseModal {
                     const svg = enter
                         .append("svg")
                         .attr("class", "index")
+                        .attr("width", this.#legendColumnWidth)
+                        .attr("height", this.#legendRowHeight + this.#legendRowPadding)
                         .style("position", "absolute")
                         .style("top", (d, index) => this._getTopPosition(index))
                         .style("left", (d, index) => this._getLeftPosition(index))
