@@ -30,7 +30,8 @@ const dirMap = path.resolve(dirSrc, "images", "map")
 const dirPrefixIcons = path.join("images", "icons")
 
 const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
-const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
+const filePostcssProdConfig = path.resolve(dirSrc, "postcss.prod.config.js")
+const filePostcssDevConfig = path.resolve(dirSrc, "postcss.dev.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 // Variables
@@ -147,7 +148,7 @@ const htmlMinifyOpt = {
 
 const postcssLoaderOpt = {
     postcssOptions: {
-        config: filePostcssConfig,
+        config: isProduction? filePostcssProdConfig:filePostcssDevConfig,
     },
     sourceMap: true,
 }
