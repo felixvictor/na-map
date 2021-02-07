@@ -15,7 +15,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
-import { capitalizeFirstLetter, findNationById, nations, range, sleep } from "common/common"
+import { findNationById, nations, range, sleep } from "common/common"
 import {
     nationColourList,
     getCanvasRenderingContext2D,
@@ -62,6 +62,7 @@ export default class PowerMap extends BaseModal {
     #controllerWidth = 0
     #ctx = {} as CanvasRenderingContext2D
     #lastIndex = 0
+    #index = -1
     #legendColumnPadding = 0
     #legendColumnWidth = 0
     #legendContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
@@ -77,7 +78,7 @@ export default class PowerMap extends BaseModal {
     #powerData = {} as PowerMapList
     #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
     #rows = 0
-    #stopCommand = true
+    #stopCommand = false
     #textBackgroundHeight = 0
     #textBackgroundWidth = 0
     #textBackgroundX = 0
@@ -88,7 +89,9 @@ export default class PowerMap extends BaseModal {
     readonly #baseId = "power-map"
     readonly #colourScale: ScaleOrdinal<number, string>
     readonly #coord
-    readonly #delay = 200
+    readonly #delayDefault = 200
+    #delay = 200
+    readonly #speedFactor = 2
 
     constructor(serverId: string, coord: MinMaxCoord) {
         super(serverId, "Show power map")
@@ -167,7 +170,6 @@ export default class PowerMap extends BaseModal {
     }
 
     _drawEnd(): void {
-        console.timeEnd("animation")
         showCursorDefault()
         this._mapElementsOn()
     }
@@ -245,8 +247,6 @@ export default class PowerMap extends BaseModal {
     }
 
     _drawMap(index: number, date: string, ports: number[]): void {
-        console.timeLog("animation", index, date)
-
         for (const [index, nationId] of ports.entries()) {
             this.#ctx.beginPath()
             this.#voronoi.renderCell(index, this.#ctx)
@@ -257,20 +257,19 @@ export default class PowerMap extends BaseModal {
         this._drawDate(date)
     }
 
-    async _drawLoop(index: number): Promise<void> {
+    async _drawLoop(): Promise<void> {
         let date: string
         let ports: number[]
-        // this.#lastIndex = 200
 
-        while (this.#stopCommand && index < this.#lastIndex) {
-            index += 1
-            date = this.#powerData[index][0]
-            ports = this.#powerData[index][1]
+        while (!this.#stopCommand && this.#index < this.#lastIndex) {
+            this.#index += 1
+            this._setRangeValue()
+            date = this.#powerData[this.#index][0]
+            ports = this.#powerData[this.#index][1]
 
-            this.#rangeInput.attr("value", index)
             // eslint-disable-next-line @typescript-eslint/no-loop-func
             const t = d3Timer((elapsed) => {
-                this._drawMap(index, date, ports)
+                this._drawMap(this.#index, date, ports)
 
                 if (elapsed > this.#delay || this.#stopCommand) {
                     t.stop()
@@ -285,12 +284,7 @@ export default class PowerMap extends BaseModal {
     }
 
     _drawPowerMap(): void {
-        const index = -1
-
-        console.time("animation")
-        const updateValue = (event: Event) => event
-        ;(this.#rangeInput.node() as HTMLInputElement).addEventListener("change", updateValue)
-        void this._drawLoop(index)
+        void this._drawLoop()
     }
 
     _initVoronoi(): void {
@@ -366,6 +360,10 @@ export default class PowerMap extends BaseModal {
         left += 16 + this.#controllerWidth
 
         return `${left}px`
+    }
+
+    _resetOldIndex(): void {
+        this.#nationOldIndex = new Map<number, number>()
     }
 
     _drawNationLegend(ports: number[]): void {
@@ -489,55 +487,29 @@ export default class PowerMap extends BaseModal {
             )
 
         // Remember old indexes
-        this.#nationOldIndex = new Map<number, number>()
+        this._resetOldIndex()
         for (const [index, nation] of nations.entries()) {
             this.#nationOldIndex.set(nation[0], index)
         }
     }
 
-    _initController(dim: DivDimension): void {
+    _getRangeValue(): string {
+        return this.#rangeInput.property("value")
+    }
+
+    _setRangeValue(): void {
+        this.#rangeInput.property("value", this.#index)
+    }
+
+    _updateRangeValue(): void {
+        this.#index = Number.parseFloat(this._getRangeValue())
+        this._setRangeValue()
+    }
+
+    _initRange(div: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
-        const buttonBaseId = `button-${this.#baseId}`
 
-        const startButtonClicked = (event: Event) => {
-            console.log(event, event.currentTarget)
-        }
-
-        const backButtonClicked = (event: Event) => {
-            console.log(event, event.currentTarget)
-        }
-
-        const playButtonClicked = (event: Event) => {
-            console.log(event, event.currentTarget)
-            const isPlayButton = d3Select(event.currentTarget as HTMLButtonElement).classed("icon-play")
-            this.#stopCommand = isPlayButton
-            d3Select(event.currentTarget as HTMLButtonElement)
-                .classed("icon-pause", isPlayButton)
-                .classed("icon-play", !isPlayButton)
-        }
-
-        const forwardButtonClicked = (event: Event) => {
-            console.log(event, event.currentTarget)
-        }
-
-        const endButtonClicked = (event: Event) => {
-            console.log(event, event.currentTarget)
-        }
-
-        const addButton = (icon: string): Selection<HTMLElement, unknown, HTMLElement, unknown> =>
-            buttonGroup
-                .append("button")
-                .attr("type", "button")
-                .attr("id", `${buttonBaseId}-${icon}`)
-                .attr("class", "btn btn-default icon-outline-button")
-                .attr("title", capitalizeFirstLetter(icon))
-                .append("i")
-                .attr("class", `icon icon-large icon-${icon}`)
-
-        const div = this.#legendContainer.append("div").style("background-color", colourWhite).attr("class", "p-3 mt-3")
-
-        div.append("form").append("div").attr("class", "form-group mb-1")
-        div.append("label").attr("for", inputId).text("Date range")
+        div.append("label").attr("for", inputId).text("Date controller")
         this.#rangeInput = div
             .append("input")
             .attr("id", inputId)
@@ -547,27 +519,140 @@ export default class PowerMap extends BaseModal {
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
 
-        const buttonGroup = div.append("div").attr("class", "btn-group").attr("role", "group")
-        // icon-start
-        const startButton = addButton("start")
-        // icon-back
-        const backButton = addButton("back")
-        const playButton = addButton("pause")
-        // icon-forward
-        const forwardButton = addButton("forward")
-        // icon-end
-        const endButton = addButton("end")
+        this.#rangeInput.on("change", () => {
+            this._updateRangeValue()
+        })
+    }
 
-        this.#controllerWidth = getElementWidth(div.node() as HTMLElement)
+    _getYear(index: number): number {
+        return dayjs(this.#powerData[index][0]).year()
+    }
 
+    _initButtons(div: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+        const buttonBaseId = `button-${this.#baseId}`
+
+        const togglePlayButton = () => {
+            playButton.classed("icon-pause", !this.#stopCommand).classed("icon-play", this.#stopCommand)
+        }
+
+        const update = () => {
+            const date = this.#powerData[this.#index][0]
+            const ports = this.#powerData[this.#index][1]
+
+            this._setRangeValue()
+            this._resetOldIndex()
+            this.#stopCommand = true
+            togglePlayButton()
+
+            this._drawMap(this.#index, date, ports)
+            this._drawNationLegend(ports)
+        }
+
+        const playButtonClicked = () => {
+            this.#stopCommand = !this.#stopCommand
+            togglePlayButton()
+
+            if (!this.#stopCommand) {
+                void this._drawLoop()
+            }
+        }
+
+        const startButtonClicked = () => {
+            this.#index = 0
+            update()
+        }
+
+        const backButtonClicked = () => {
+            let index = this.#index
+            const currentYear = this._getYear(index)
+            let previousYear = currentYear
+
+            for (; index > 0 && previousYear === currentYear; index--) {
+                previousYear = this._getYear(index)
+            }
+
+            this.#index = index
+            update()
+        }
+
+        const forwardButtonClicked = () => {
+            let index = this.#index
+            const currentYear = this._getYear(index)
+            let nextYear = currentYear
+
+            for (; index < this.#lastIndex && nextYear === currentYear; index++) {
+                nextYear = this._getYear(index)
+            }
+
+            this.#index = index
+            update()
+        }
+
+        const endButtonClicked = () => {
+            this.#index = this.#lastIndex
+            update()
+        }
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const slowerButtonClicked = () => {
+            this.#delay *= this.#speedFactor
+        }
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const normalButtonClicked = () => {
+            this.#delay = this.#delayDefault
+        }
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const fasterButtonClicked = () => {
+            this.#delay = Math.max(10, this.#delay / this.#speedFactor)
+        }
+
+        const addButton = (icon: string, title: string): Selection<HTMLElement, unknown, HTMLElement, unknown> =>
+            buttonGroup
+                .append("button")
+                .attr("type", "button")
+                .attr("id", `${buttonBaseId}-${icon}`)
+                .attr("class", "btn btn-default icon-button p-0")
+                .attr("title", title)
+                .append("i")
+                .attr("class", `icon icon-large icon-${icon}`)
+
+        const buttonToolbar = div.append("div").attr("class", "btn-toolbar").attr("role", "toolbar")
+
+        let buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
+        const startButton = addButton("start", "Start")
+        const backButton = addButton("back", "Year back")
+        const playButton = addButton("pause", "Pause")
+        const forwardButton = addButton("forward", "Year forward")
+        const endButton = addButton("end", "End")
         startButton.on("click", startButtonClicked)
         backButton.on("click", backButtonClicked)
         playButton.on("click", playButtonClicked)
         forwardButton.on("click", forwardButtonClicked)
         endButton.on("click", endButtonClicked)
+
+        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
+        const slowerButton = addButton("slower", "Slower")
+        const normalButton = addButton("normal", "Normal speed")
+        const fasterButton = addButton("faster", "Faster")
+        slowerButton.on("click", slowerButtonClicked)
+        normalButton.on("click", normalButtonClicked)
+        fasterButton.on("click", fasterButtonClicked)
+    }
+
+    _initController(): void {
+        const div = this.#legendContainer.append("div").style("background-color", colourWhite).attr("class", "p-3 mt-3")
+        div.append("form").append("div").attr("class", "form-group mb-1")
+
+        this._initRange(div)
+        this._initButtons(div)
+
+        this.#controllerWidth = getElementWidth(div.node() as HTMLElement)
     }
 
     async _initCanvas(): Promise<void> {
+        const fontSize = 200
         const pixelRatio = 2
 
         // Get elements
@@ -602,7 +687,7 @@ export default class PowerMap extends BaseModal {
         this.#ctx = getCanvasRenderingContext2D(canvasNode)
         this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
-        this.#ctx.font = `${200 * pixelRatio}px Junicode`
+        this.#ctx.font = `${fontSize * pixelRatio}px Junicode`
         this.#ctx.textBaseline = "bottom"
         this.#ctx.textAlign = "end"
 
@@ -616,7 +701,7 @@ export default class PowerMap extends BaseModal {
         }
         this._initDrawDate()
         this._initLegend(dim)
-        this._initController(dim)
+        this._initController()
         this._initNationLegend(dim)
         await this._setPattern()
     }

@@ -36,8 +36,7 @@ $icon-size-large: math.round($icon-size * 1.2);
     background-color: $navbar-light-color;
 }
 
-.icon-outline-button {
-    border-width: 1.4px;
+.icon-button {
     i {
         background-color: $secondary-500;
     }
@@ -46,9 +45,14 @@ $icon-size-large: math.round($icon-size * 1.2);
     }
 }
 
+.icon-outline-button {
+    @extend .icon-button;
+    border-width: 1.4px;
+}
+
 $icon-list: back bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left
-    clone-right close copy crew deep end forward gift gunnery hull image info labour map mast pb-list open options pause
-    play sailing shallow start stop trading;
+    clone-right close copy crew deep end faster forward gift gunnery hull image info labour map mast pb-list normal open
+    options pause play sailing shallow slower start stop trading;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {
