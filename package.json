@@ -98,6 +98,7 @@
         "image-promise": "^7.0.1",
         "js-cookie": "^2.2.1",
         "preact": "^10.5.11",
+        "resize-observer": "^1.0.0",
         "round-slider": "^1.6.1",
         "seedrandom": "^3.0.5",
         "timelines-chart": "2.11.1"
@@ -136,6 +137,7 @@
         "@types/pngjs": "^3.4.2",
         "@types/polylabel": "^1.0.5",
         "@types/recursive-readdir": "^2.2.0",
+        "@types/resize-observer-browser": "^0.1.5",
         "@types/sass": "^1.16.0",
         "@types/seedrandom": "^2.4.28",
         "@types/sharp": "^0.27.1",

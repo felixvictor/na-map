@@ -25,6 +25,7 @@ import {
     getIcons,
     colourWhite,
     colourRedDark,
+    getElementHeight,
     getElementWidth,
 } from "common/common-browser"
 import dayjs from "dayjs"
@@ -59,12 +60,13 @@ interface DivDimension {
  */
 export default class PowerMap extends BaseModal {
     #columnsPerRow = 0
-    #controllerWidth = 0
     #ctx = {} as CanvasRenderingContext2D
+    #dateElem = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #lastIndex = 0
     #index = -1
     #legendColumnPadding = 0
     #legendColumnWidth = 0
+    #legendControllerHeight = 0
     #legendContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendNationIndexContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendNationItemContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
@@ -79,12 +81,6 @@ export default class PowerMap extends BaseModal {
     #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
     #rows = 0
     #stopCommand = false
-    #textBackgroundHeight = 0
-    #textBackgroundWidth = 0
-    #textBackgroundX = 0
-    #textBackgroundY = 0
-    #textRectX = 0
-    #textRectY = 0
     #voronoi = {} as Voronoi<Delaunay.Point>
     readonly #baseId = "power-map"
     readonly #colourScale: ScaleOrdinal<number, string>
@@ -200,50 +196,10 @@ export default class PowerMap extends BaseModal {
         return Math.floor(actualBoundingBoxLeft + actualBoundingBoxRight)
     }
 
-    _getTextDim(): { height: number; width: number } {
-        const height = this._getTextHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        const width = this._getTextWidth("26 September 2020")
-
-        return {
-            height,
-            width,
-        }
-    }
-
-    _initDrawDate(): void {
-        const textMarginX = 300
-        const textMarginY = 200
-        const textPaddingY = 50
-
-        const textPaddingX = textPaddingY * 2
-        const textDim = this._getTextDim()
-
-        this.#textBackgroundX = this.#coord.max - textMarginX - textPaddingX - textDim.width
-        this.#textBackgroundY = textMarginY - textPaddingY
-        this.#textBackgroundHeight = textDim.height + 2 * textPaddingY
-        this.#textBackgroundWidth = textDim.width + 2 * textPaddingX
-
-        this.#textRectX = this.#coord.max - textMarginX
-        this.#textRectY = textMarginY + textDim.height
-    }
-
     _drawDate(date: string): void {
         const dateF = dayjs(date).format("D MMMM YYYY")
 
-        // Date background
-        this.#ctx.globalAlpha = 0.8
-        this.#ctx.fillStyle = colourWhite
-        this.#ctx.fillRect(
-            this.#textBackgroundX,
-            this.#textBackgroundY,
-            this.#textBackgroundWidth,
-            this.#textBackgroundHeight
-        )
-
-        // Date
-        this.#ctx.globalAlpha = 1
-        this.#ctx.fillStyle = colourRedDark
-        this.#ctx.fillText(dateF, this.#textRectX, this.#textRectY)
+        this.#dateElem.text(dateF)
     }
 
     _drawMap(index: number, date: string, ports: number[]): void {
@@ -321,7 +277,10 @@ export default class PowerMap extends BaseModal {
             .style("width", `${dim.width}px`)
             .style("top", `-${dim.top}px`)
             .style("left", `${dim.left}px`)
-            .attr("class", "d-flex justify-content-between")
+            .attr("class", "d-flex flex-column")
+
+        this._initController()
+        this._initNationLegend(dim)
     }
 
     _initNationLegend(dim: DivDimension): void {
@@ -329,7 +288,7 @@ export default class PowerMap extends BaseModal {
         this.#legendRowPadding = Math.floor(1.618)
         this.#legendColumnPadding = Math.floor(5 * 1.618)
 
-        const width = dim.width - this.#controllerWidth
+        const { width } = dim
         const minColumnWidth = 75 + this.#legendColumnPadding * 2 // Width of "Verenigde Provinciën" plus padding
         const totalWidth = nations.length * minColumnWidth - this.#legendColumnPadding * 2
         this.#rows = Math.ceil(totalWidth / width)
@@ -346,18 +305,16 @@ export default class PowerMap extends BaseModal {
                 ? -this.#legendRowHeight
                 : Math.floor(index / this.#columnsPerRow) * (this.#legendRowPadding * 10 + this.#legendRowHeight)
         // Add padding
-        top += 16
+        top += 32 + this.#legendControllerHeight
 
         return `${top}px`
     }
 
     _getLeftPosition(index: number): string {
-        let left =
+        const left =
             index === -1
                 ? -this.#legendColumnWidth
                 : Math.floor((index % this.#columnsPerRow) * (this.#legendColumnPadding + this.#legendColumnWidth))
-        // Add padding
-        left += 16 + this.#controllerWidth
 
         return `${left}px`
     }
@@ -506,16 +463,17 @@ export default class PowerMap extends BaseModal {
         this._setRangeValue()
     }
 
-    _initRange(div: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+    _initRange(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
 
-        div.append("label").attr("for", inputId).text("Date controller")
-        this.#rangeInput = div
+        const formGroup = formRow.append("div").attr("class", "form-group col-md-3 mr-3 mb-0")
+        formGroup.append("label").attr("for", inputId).attr("class", "visually-hidden").attr("title", "Date controller")
+        this.#rangeInput = formGroup
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
-            .attr("class", "form-control-range custom-range mb-1")
-            .attr("width", "750")
+            .attr("class", "form-control-range custom-range d-inline-block")
+            .attr("style", "height:0")
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
 
@@ -524,11 +482,15 @@ export default class PowerMap extends BaseModal {
         })
     }
 
+    _initDate(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+        this.#dateElem = formRow.append("div").attr("class", "col-md-4 mr-3").attr("style", "font-size:40px")
+    }
+
     _getYear(index: number): number {
         return dayjs(this.#powerData[index][0]).year()
     }
 
-    _initButtons(div: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+    _initButtons(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const buttonBaseId = `button-${this.#baseId}`
 
         const togglePlayButton = () => {
@@ -618,7 +580,7 @@ export default class PowerMap extends BaseModal {
                 .append("i")
                 .attr("class", `icon icon-large icon-${icon}`)
 
-        const buttonToolbar = div.append("div").attr("class", "btn-toolbar").attr("role", "toolbar")
+        const buttonToolbar = formRow.append("div").attr("class", "btn-toolbar col-md-4").attr("role", "toolbar")
 
         let buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
         const startButton = addButton("start", "Start")
@@ -642,13 +604,22 @@ export default class PowerMap extends BaseModal {
     }
 
     _initController(): void {
-        const div = this.#legendContainer.append("div").style("background-color", colourWhite).attr("class", "p-3 mt-3")
-        div.append("form").append("div").attr("class", "form-group mb-1")
+        const div = this.#legendContainer.append("div").style("background-color", colourWhite).attr("class", "p-2 mt-2")
+        const formRow = div.append("form").append("div").attr("class", "form-row d-flex align-items-center")
 
-        this._initRange(div)
-        this._initButtons(div)
+        const ro = new ResizeObserver((entries) => {
+            this.#legendControllerHeight = getElementHeight(entries[0].target as HTMLElement)
+            this.#legendContainer.selectAll("svg.svg-text").style("top", (d, index) => this._getTopPosition(index))
+            this.#legendContainer.selectAll("svg.index").style("top", (d, index) => this._getTopPosition(index))
+        })
 
-        this.#controllerWidth = getElementWidth(div.node() as HTMLElement)
+        this._initRange(formRow)
+        this._initDate(formRow)
+        this._initButtons(formRow)
+
+        this.#legendControllerHeight = getElementHeight(div.node() as HTMLElement)
+
+        ro.observe(div.node() as HTMLElement)
     }
 
     async _initCanvas(): Promise<void> {
@@ -699,10 +670,7 @@ export default class PowerMap extends BaseModal {
             left: tx,
             width: tilesWidth,
         }
-        this._initDrawDate()
         this._initLegend(dim)
-        this._initController()
-        this._initNationLegend(dim)
         await this._setPattern()
     }
 

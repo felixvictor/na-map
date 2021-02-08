@@ -263,6 +263,12 @@ export const getIcons = (): NationListAlternative<string> => {
     return importAll((require as __WebpackModuleApi.RequireFunction).context("../../images/flags", false, /\.svg$/))
 }
 
+export const getElementHeight = (element: HTMLElement | SVGElement): number => {
+    const { height } = element.getBoundingClientRect()
+
+    return Math.floor(height)
+}
+
 export const getElementWidth = (element: HTMLElement | SVGElement): number => {
     const { width } = element.getBoundingClientRect()
 
