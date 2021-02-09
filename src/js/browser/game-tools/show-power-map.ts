@@ -24,7 +24,6 @@ import {
     showCursorWait,
     getIcons,
     colourWhite,
-    colourRedDark,
     getElementHeight,
     getElementWidth,
 } from "common/common-browser"
@@ -61,13 +60,14 @@ interface DivDimension {
 export default class PowerMap extends BaseModal {
     #columnsPerRow = 0
     #ctx = {} as CanvasRenderingContext2D
-    #dateElem = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #dateElem = {} as Selection<HTMLLabelElement, unknown, HTMLElement, unknown>
     #lastIndex = 0
     #index = -1
     #legendColumnPadding = 0
     #legendColumnWidth = 0
-    #legendControllerHeight = 0
     #legendContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #legendControllerHeight = 0
+    #legendControllerElement = {} as HTMLDivElement
     #legendNationIndexContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendNationItemContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendRowHeight = 0
@@ -76,6 +76,7 @@ export default class PowerMap extends BaseModal {
     #maxY: number | undefined
     #nationOldIndex = new Map<number, number>()
     #pattern = [] as Array<null | CanvasPattern>
+    #playButton = {} as Selection<HTMLElement, unknown, HTMLElement, unknown>
     #portData = {} as PortBasic[]
     #powerData = {} as PowerMapList
     #rangeInput = {} as Selection<HTMLInputElement, unknown, HTMLElement, unknown>
@@ -87,6 +88,7 @@ export default class PowerMap extends BaseModal {
     readonly #coord
     readonly #delayDefault = 200
     #delay = 200
+
     readonly #speedFactor = 2
 
     constructor(serverId: string, coord: MinMaxCoord) {
@@ -184,16 +186,6 @@ export default class PowerMap extends BaseModal {
             console.info("But these loaded fine:")
             console.info((error as ImagePromiseError).loaded)
         }
-    }
-
-    _getTextHeight(text: string): number {
-        const { actualBoundingBoxAscent, actualBoundingBoxDescent } = this.#ctx.measureText(text)
-        return Math.floor(actualBoundingBoxAscent + actualBoundingBoxDescent)
-    }
-
-    _getTextWidth(text: string): number {
-        const { actualBoundingBoxLeft, actualBoundingBoxRight } = this.#ctx.measureText(text)
-        return Math.floor(actualBoundingBoxLeft + actualBoundingBoxRight)
     }
 
     _drawDate(date: string): void {
@@ -458,72 +450,97 @@ export default class PowerMap extends BaseModal {
         this.#rangeInput.property("value", this.#index)
     }
 
-    _updateRangeValue(): void {
+    _updateRangeValue(updateDateOnly = false): void {
         this.#index = Number.parseFloat(this._getRangeValue())
-        this._setRangeValue()
+        this._updateController(updateDateOnly)
     }
 
     _initRange(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
 
-        const formGroup = formRow.append("div").attr("class", "form-group col-md-3 mr-3 mb-0")
-        formGroup.append("label").attr("for", inputId).attr("class", "visually-hidden").attr("title", "Date controller")
+        const formGroup = formRow.append("div").attr("class", "form-group col-md-9 row mb-0")
         this.#rangeInput = formGroup
+            .append("div")
+            .attr("class", "col-md-6")
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
-            .attr("class", "form-control-range custom-range d-inline-block")
-            .attr("style", "height:0")
+            .attr("class", "form-control-range custom-range")
+            .attr("style", "height:100%")
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
+        this.#dateElem = formGroup
+            .append("label")
+            .attr("for", inputId)
+            .attr("class", "col-md-6 col-form-label")
+            .attr("style", "font-size:3vh")
+            .attr("title", "Date")
 
-        this.#rangeInput.on("change", () => {
-            this._updateRangeValue()
-        })
-    }
-
-    _initDate(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
-        this.#dateElem = formRow.append("div").attr("class", "col-md-4 mr-3").attr("style", "font-size:40px")
+        let down = false
+        this.#rangeInput
+            .on("change", () => {
+                this._updateRangeValue()
+            })
+            .on("mousedown", () => {
+                down = true
+                this.#stopCommand = true
+                this._togglePlayButton()
+            })
+            .on("mousemove", () => {
+                if (down) {
+                    this._updateRangeValue(true)
+                }
+            })
+            .on("mouseup", () => {
+                down = false
+            })
     }
 
     _getYear(index: number): number {
         return dayjs(this.#powerData[index][0]).year()
     }
 
-    _initButtons(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
-        const buttonBaseId = `button-${this.#baseId}`
+    _togglePlayButton(): void {
+        this.#playButton.classed("icon-pause", !this.#stopCommand).classed("icon-play", this.#stopCommand)
+    }
 
-        const togglePlayButton = () => {
-            playButton.classed("icon-pause", !this.#stopCommand).classed("icon-play", this.#stopCommand)
-        }
+    _updateController(updateDateOnly = false): void {
+        const date = this.#powerData[this.#index][0]
+        const ports = this.#powerData[this.#index][1]
 
-        const update = () => {
-            const date = this.#powerData[this.#index][0]
-            const ports = this.#powerData[this.#index][1]
+        this._setRangeValue()
+        this._drawDate(date)
+        this._adjustControllerHeight()
+        this.#stopCommand = true
+        this._togglePlayButton()
 
-            this._setRangeValue()
+        if (!updateDateOnly) {
             this._resetOldIndex()
-            this.#stopCommand = true
-            togglePlayButton()
-
             this._drawMap(this.#index, date, ports)
             this._drawNationLegend(ports)
         }
+    }
 
+    _initButtons(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
+        const buttonBaseId = `button-${this.#baseId}`
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const playButtonClicked = () => {
             this.#stopCommand = !this.#stopCommand
-            togglePlayButton()
+            this._togglePlayButton()
 
             if (!this.#stopCommand) {
                 void this._drawLoop()
             }
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const startButtonClicked = () => {
             this.#index = 0
-            update()
+            this._updateController()
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const backButtonClicked = () => {
             let index = this.#index
             const currentYear = this._getYear(index)
@@ -534,9 +551,10 @@ export default class PowerMap extends BaseModal {
             }
 
             this.#index = index
-            update()
+            this._updateController()
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const forwardButtonClicked = () => {
             let index = this.#index
             const currentYear = this._getYear(index)
@@ -547,12 +565,13 @@ export default class PowerMap extends BaseModal {
             }
 
             this.#index = index
-            update()
+            this._updateController()
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const endButtonClicked = () => {
             this.#index = this.#lastIndex
-            update()
+            this._updateController()
         }
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -580,17 +599,17 @@ export default class PowerMap extends BaseModal {
                 .append("i")
                 .attr("class", `icon icon-large icon-${icon}`)
 
-        const buttonToolbar = formRow.append("div").attr("class", "btn-toolbar col-md-4").attr("role", "toolbar")
+        const buttonToolbar = formRow.append("div").attr("class", "btn-toolbar col-md-3").attr("role", "toolbar")
 
         let buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
         const startButton = addButton("start", "Start")
         const backButton = addButton("back", "Year back")
-        const playButton = addButton("pause", "Pause")
+        this.#playButton = addButton("pause", "Pause")
         const forwardButton = addButton("forward", "Year forward")
         const endButton = addButton("end", "End")
         startButton.on("click", startButtonClicked)
         backButton.on("click", backButtonClicked)
-        playButton.on("click", playButtonClicked)
+        this.#playButton.on("click", playButtonClicked)
         forwardButton.on("click", forwardButtonClicked)
         endButton.on("click", endButtonClicked)
 
@@ -603,27 +622,34 @@ export default class PowerMap extends BaseModal {
         fasterButton.on("click", fasterButtonClicked)
     }
 
-    _initController(): void {
-        const div = this.#legendContainer.append("div").style("background-color", colourWhite).attr("class", "p-2 mt-2")
-        const formRow = div.append("form").append("div").attr("class", "form-row d-flex align-items-center")
+    _adjustControllerHeight(): void {
+        this.#legendControllerHeight = getElementHeight(this.#legendControllerElement)
+        this.#legendContainer.selectAll("svg.svg-text").style("top", (d, index) => this._getTopPosition(index))
+        this.#legendContainer.selectAll("svg.index").style("top", (d, index) => this._getTopPosition(index))
+    }
 
-        const ro = new ResizeObserver((entries) => {
-            this.#legendControllerHeight = getElementHeight(entries[0].target as HTMLElement)
-            this.#legendContainer.selectAll("svg.svg-text").style("top", (d, index) => this._getTopPosition(index))
-            this.#legendContainer.selectAll("svg.index").style("top", (d, index) => this._getTopPosition(index))
+    _initController(): void {
+        const legendController = this.#legendContainer
+            .append("div")
+            .style("background-color", colourWhite)
+            .attr("class", "p-2 mt-2")
+        this.#legendControllerElement = legendController.node() as HTMLDivElement
+
+        const formRow = legendController.append("form").append("div").attr("class", "form-row align-items-center")
+
+        const ro = new ResizeObserver(() => {
+            this._adjustControllerHeight()
         })
 
         this._initRange(formRow)
-        this._initDate(formRow)
         this._initButtons(formRow)
 
-        this.#legendControllerHeight = getElementHeight(div.node() as HTMLElement)
+        this.#legendControllerHeight = getElementHeight(this.#legendControllerElement)
 
-        ro.observe(div.node() as HTMLElement)
+        ro.observe(this.#legendControllerElement)
     }
 
     async _initCanvas(): Promise<void> {
-        const fontSize = 200
         const pixelRatio = 2
 
         // Get elements
@@ -638,7 +664,7 @@ export default class PowerMap extends BaseModal {
         const widthCss = svg.style("width")
 
         // Position canvas on top of svg
-        div.style("position", "relative").style("top", `-${heightCss}`).style("opacity", 0.7)
+        div.style("position", "relative").style("top", `-${heightCss}`).style("height", "100%").style("opacity", 0.7)
 
         // Get current transformation
         const currentTransformMatrix = (this.#map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
@@ -658,9 +684,6 @@ export default class PowerMap extends BaseModal {
         this.#ctx = getCanvasRenderingContext2D(canvasNode)
         this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
         this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
-        this.#ctx.font = `${fontSize * pixelRatio}px Junicode`
-        this.#ctx.textBaseline = "bottom"
-        this.#ctx.textAlign = "end"
 
         const gTiles = d3Select("#na-map svg g.map-tiles")
         const tilesWidth = getElementWidth(gTiles.node() as SVGElement)
