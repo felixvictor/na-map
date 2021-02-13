@@ -3,10 +3,10 @@ declare module "d3-tile" {
 
     export type Tile = [number, number, number]
 
-    export interface Tiles extends ArrayLike<Tile> {
+    export interface Tiles extends Array<Tile> {
         [index: number]: Tile
-        translate: [number, number]
-        scale: number
+        readonly translate: [number, number]
+        readonly scale: number
     }
 
     export interface TileFn extends Function {

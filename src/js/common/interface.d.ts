@@ -80,3 +80,8 @@ export interface PowerMapPerDay {
     1: number[]
 }
 export type PowerMapList = PowerMapPerDay[]
+
+export interface ImagePromiseError {
+    loaded: string[]
+    errored: string[]
+}
