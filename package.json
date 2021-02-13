@@ -215,7 +215,7 @@
         "webpack-cli": "^4.5.0",
         "webpack-dev-server": "^4.0.0-beta.0",
         "webpack-mode": "^1.1.0",
-        "webpack-subresource-integrity": "^1.5.2",
+        "webpack-subresource-integrity": "^5.0.0-alpha.3",
         "xml-js": "^1.6.11",
         "xss": "^1.0.8",
         "yarn-deduplicate": "^3.1.0"

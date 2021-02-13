@@ -15,7 +15,7 @@ const parseCss = require("css")
 const PreloadWebpackPlugin = require("preload-webpack-plugin")
 const sass = require("sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
-// const SriPlugin = require("webpack-subresource-integrity")
+const { SubresourceIntegrityPlugin } = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
 
 const dirOutput = path.resolve(__dirname, "public")
@@ -148,7 +148,7 @@ const htmlMinifyOpt = {
 
 const postcssLoaderOpt = {
     postcssOptions: {
-        config: isProduction? filePostcssProdConfig:filePostcssDevConfig,
+        config: isProduction ? filePostcssProdConfig : filePostcssDevConfig,
     },
     sourceMap: true,
 }
@@ -362,12 +362,7 @@ const config = {
             },
         }),
         new SitemapPlugin({ base: targetUrl, paths: sitemapPaths, options: { skipGzip: false } }),
-        /*
-        new SriPlugin({
-            hashFuncNames: ["sha384"],
-            enabled: isProduction,
-        }),
-        */
+        new SubresourceIntegrityPlugin(),
     ],
 
     resolve: {
