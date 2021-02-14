@@ -4,7 +4,7 @@
  * @file      Common data and functions for node.
  * @module    src/common-math
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 export const timeFactor = 2.63;
@@ -108,5 +108,5 @@ export const between = (value, a, b, inclusive) => {
     const max = Math.max.apply(Math, [a, b]);
     return inclusive ? value >= min && value <= max : value > min && value < max;
 };
-export const nearestPow2 = (aSize) => 2 ** Math.round(Math.log2(aSize));
+export const nearestPow2 = (aSize) => 2 ** Math.floor(Math.log(aSize) / Math.log(2));
 //# sourceMappingURL=common-math.js.map

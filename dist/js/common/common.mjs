@@ -4,7 +4,7 @@
  * @file      Common data and functions.
  * @module    src/node/common
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 export const woodFamily = ["regular", "seasoned", "exceptional"];
@@ -155,5 +155,38 @@ export const findNationByNationShortName = (nationShortName) => nations.find((na
 export const findNationById = (nationId) => nationMap.get(nationId);
 export const putImportError = (error) => {
     console.error("Import request failed -->", error);
+};
+export class TupleKeyMap extends Map {
+    constructor() {
+        super(...arguments);
+        this.map = new Map();
+    }
+    set(key, value) {
+        this.map.set(JSON.stringify(key), value);
+        return this;
+    }
+    get(key) {
+        return this.map.get(JSON.stringify(key));
+    }
+    clear() {
+        this.map.clear();
+    }
+    delete(key) {
+        return this.map.delete(JSON.stringify(key));
+    }
+    has(key) {
+        return this.map.has(JSON.stringify(key));
+    }
+    get size() {
+        return this.map.size;
+    }
+    forEach(callbackfn, thisArg) {
+        this.map.forEach((value, key) => {
+            callbackfn.call(thisArg, value, JSON.parse(key), this);
+        });
+    }
+}
+export const sleep = async (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 };
 //# sourceMappingURL=common.js.map

@@ -4,7 +4,7 @@
  * @file      Convert port ownership.
  * @module    convert-ownership
  * @author    iB aka Felix Victor
- * @copyright 2018, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import * as fs from "fs";
@@ -20,6 +20,7 @@ import { cleanName, sortBy } from "../common/common-node";
 import { serverIds } from "../common/servers";
 const fileExtension = ".json.xz";
 const ports = {};
+const portOwnershipPerDate = {};
 const numPortsDates = {};
 let serverId;
 const fileBaseNameRegex = {};
@@ -65,6 +66,7 @@ function parseData(serverId, portData, date) {
         .forEach((nation) => {
         numPorts[nation.short] = 0;
     });
+    const nationsForPowerMap = [];
     for (const port of portData) {
         const getObject = () => {
             const dateF = getDate(date);
@@ -118,8 +120,10 @@ function parseData(serverId, portData, date) {
             else {
                 initData();
             }
+            nationsForPowerMap.push(port.Nation);
         }
     }
+    portOwnershipPerDate[serverId].push([date, nationsForPowerMap]);
     const numPortsDate = {};
     numPortsDate.date = date;
     nations
@@ -165,6 +169,7 @@ const writeResult = async (serverId) => {
         .sort(sortBy(["region"]));
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-ownership.json`), grouped);
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-nation.json`), numPortsDates[serverId]);
+    await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverId}-power.json`), portOwnershipPerDate[serverId]);
 };
 const convertOwnership = async (serverId) => {
     const ignoreFileName = (fileName, stats) => {
@@ -172,6 +177,7 @@ const convertOwnership = async (serverId) => {
     };
     ports[serverId] = new Map();
     numPortsDates[serverId] = [];
+    portOwnershipPerDate[serverId] = [];
     try {
         fileNames[serverId] = await readDirRecursive(commonPaths.dirAPI, [ignoreFileName]);
         sortFileNames(fileNames[serverId]);
