@@ -18,7 +18,7 @@
  * @file      Display grid.
  * @module    map-tools/display-grid
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -28,7 +28,7 @@
  * @file      Display map.
  * @module    map/map
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -38,7 +38,7 @@
  * @file      Display port battle zones.
  * @module    map/display-pb-zones
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -48,7 +48,7 @@
  * @file      Display ports.
  * @module    map/display-ports
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -58,7 +58,7 @@
  * @file      Get position.
  * @module    get-position
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -68,7 +68,17 @@
  * @file      Make a journey.
  * @module    map-tools/make-journey
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright Felix Victor 2017 to 2021
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Port ownership list.
+ * @module    game-tools/list-port-ownerships
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -78,7 +88,7 @@
  * @file      Select ports.
  * @module    map/select-ports
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -88,7 +98,7 @@
  * @file      Show F11 coordinates.
  * @module    map-tools/show-f11
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -98,7 +108,7 @@
  * @file      Show trades.
  * @module    map-tools/show-trades
  * @author    iB aka Felix Victor
- * @copyright 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -108,6 +118,6 @@
  * @file      Toast.
  * @module    util/toast
  * @author    iB aka Felix Victor
- * @copyright 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */

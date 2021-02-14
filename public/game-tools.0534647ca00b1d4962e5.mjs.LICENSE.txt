@@ -4,7 +4,17 @@
  * @file      Game tools main file.
  * @module    game-tools/index
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Income map.
+ * @module    game-tools/show-income-map
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -14,7 +24,7 @@
  * @file      List buildings.
  * @module    game-tools/list-buildings
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,7 +34,7 @@
  * @file      List cannons.
  * @module    game-tools/list-cannons
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -34,7 +44,7 @@
  * @file      List ingredients.
  * @module    game-tools/list-ingredients
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -44,7 +54,7 @@
  * @file      List loot and chests.
  * @module    game-tools/list-loot
  * @author    iB aka Felix Victor
- * @copyright 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -54,7 +64,7 @@
  * @file      List modules.
  * @module    game-tools/list-modules
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -64,7 +74,7 @@
  * @file      List port battles.
  * @module    game-tools/list-pb
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -74,7 +84,7 @@
  * @file      List port bonus.
  * @module    game-tools/list-port-bonus
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -84,7 +94,7 @@
  * @file      List recipes.
  * @module    game-tools/list-recipes
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -94,7 +104,7 @@
  * @file      List ship blueprints.
  * @module    game-tools/list-ship-blueprints
  * @author    iB aka Felix Victor
- * @copyright 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -104,7 +114,7 @@
  * @file      List woods.
  * @module    game-tools/list-woods
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -112,19 +122,9 @@
  * This file is part of na-map.
  *
  * @file      Port ownership list.
- * @module    game-tools/list-port-ownerships
+ * @module    game-tools/show-port-ownerships
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      base modal class.
- * @module    game-tools/base-modal
- * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -134,6 +134,6 @@
  * @file      ship list.
  * @module    ship-list
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
