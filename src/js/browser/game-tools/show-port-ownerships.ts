@@ -31,10 +31,11 @@ import {
 } from "d3-shape"
 
 import { registerEvent } from "../analytics"
+import { BaseModal } from "./base-modal"
 import { NationFullName, nations, NationShortName } from "common/common"
 import { colourList, insertBaseModal, loadJsonFile } from "common/common-browser"
-import { getContrastColour } from "common/common-game-tools"
 
+import { getContrastColour } from "common/common-game-tools"
 import JQuery from "jquery"
 import { Ownership, OwnershipNation } from "common/gen-json"
 import { HtmlString } from "common/interface"
@@ -43,12 +44,8 @@ import { Group } from "timelines-chart"
 /**
  *
  */
-export default class ShowPortOwnerships {
+export default class ShowPortOwnerships extends BaseModal {
     #serverId!: string
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
     private _ownershipData: Ownership[] = {} as Ownership[]
     // noinspection JSMismatchedCollectionQueryUpdate
     private _nationData: Array<OwnershipNation<number>> = {} as Array<OwnershipNation<number>>
@@ -58,11 +55,7 @@ export default class ShowPortOwnerships {
     private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
 
     constructor(serverId: string) {
-        this.#serverId = serverId
-        this._baseName = "Port ownership"
-        this._baseId = "ownership-list"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        super(serverId, "Ownership overview")
 
         this._colourScale = d3ScaleOrdinal<string>().range(colourList)
 
@@ -85,8 +78,8 @@ export default class ShowPortOwnerships {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._nationData = await loadJsonFile<Array<OwnershipNation<number>>>(`${this.#serverId}-nation.json`)
-        this._ownershipData = await loadJsonFile<Ownership[]>(`${this.#serverId}-ownership.json`)
+        this._nationData = await loadJsonFile<Array<OwnershipNation<number>>>(`${this.serverId}-nation.json`)
+        this._ownershipData = await loadJsonFile<Ownership[]>(`${this.serverId}-ownership.json`)
     }
 
     /**
@@ -95,13 +88,13 @@ export default class ShowPortOwnerships {
     _setupListener(): void {
         let firstClick = true
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
+        document.querySelector(`#${this.buttonId}`)?.addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
             }
 
-            registerEvent("Tools", this._baseName)
+            registerEvent("Tools", this.baseName)
 
             this._ownershipListSelected()
         })
@@ -111,14 +104,14 @@ export default class ShowPortOwnerships {
      * Inject modal
      */
     _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName })
+        insertBaseModal({ id: this.modalId, title: this.baseName })
 
-        const select = `${this._baseId}-select`
-        const body = d3Select(`#${this._modalId} .modal-body`)
+        const select = `${this.baseId}-select`
+        const body = d3Select(`#${this.modalId} .modal-body`)
 
         body.append("label").append("select").attr("name", select).attr("id", select)
 
-        this._mainDiv = body.append("div").attr("id", `${this._baseId}`)
+        this._mainDiv = body.append("div").attr("id", `${this.baseId}`)
         this._div = this._mainDiv.append("div")
         this._svg = this._mainDiv.append("svg").attr("class", "area")
     }
@@ -130,13 +123,13 @@ export default class ShowPortOwnerships {
     }
 
     _setupSelect(): void {
-        const select$ = $(`#${this._baseId}-select`)
+        const select$ = $(`#${this.baseId}-select`)
         const options = this._getOptions()
         select$.append(options)
     }
 
     _setupSelectListener(): void {
-        const select$ = $(`#${this._baseId}-select`)
+        const select$ = $(`#${this.baseId}-select`)
 
         select$
             .addClass("selectpicker")
@@ -164,13 +157,13 @@ export default class ShowPortOwnerships {
         let emptyModal = false
 
         // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
+        if (!document.querySelector(`#${this.modalId}`)) {
             emptyModal = true
             this._initModal()
         }
 
         // Show modal
-        $(`#${this._modalId}`)
+        $(`#${this.modalId}`)
             .on("shown.bs.modal", () => {
                 // Inject chart after modal is shown to calculate modal width
                 if (emptyModal) {

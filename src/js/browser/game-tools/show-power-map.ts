@@ -15,6 +15,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
 import loadImage from "image-promise"
 
+import { registerEvent } from "../analytics"
 import { findNationById, nations, range, sleep } from "common/common"
 import {
     nationColourList,
@@ -30,7 +31,6 @@ import {
 import dayjs from "dayjs"
 
 import customParseFormat from "dayjs/plugin/customParseFormat"
-
 import { BaseModal } from "./base-modal"
 import { PortBasic } from "common/gen-json"
 import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
@@ -72,6 +72,7 @@ export default class PowerMap extends BaseModal {
     #legendNationItemContainer = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #legendRowHeight = 0
     #legendRowPadding = 0
+    #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #maxY: number | undefined
     #nationOldIndex = new Map<number, number>()
@@ -92,7 +93,7 @@ export default class PowerMap extends BaseModal {
     readonly #speedFactor = 2
 
     constructor(serverId: string, coord: MinMaxCoord) {
-        super(serverId, "Show power map")
+        super(serverId, "Ownership map")
 
         this.#coord = coord
         this.#colourScale = d3ScaleOrdinal<number, string>()
@@ -134,22 +135,21 @@ export default class PowerMap extends BaseModal {
      * Setup listener
      */
     async _setupListener(): Promise<void> {
-        await this._loadAndSetupData()
-        this._menuItemSelected()
+        let firstClick = true
 
-        /*
-        const firstClick = true
-        document.querySelector(`#${this.buttonId}`)?.addEventListener("click", async () => {
+        await this._loadAndSetupData()
+        ;(document.querySelector(`#${this.buttonId}`) as HTMLButtonElement).addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
                 await this._loadAndSetupData()
+            } else {
+                this.#index = 0
             }
 
             registerEvent("Tools", this.baseName)
 
             this._menuItemSelected()
         })
-         */
     }
 
     _showMapElements(show: boolean): void {
@@ -251,15 +251,12 @@ export default class PowerMap extends BaseModal {
         const points = this.#portData.filter((port) => !freeTowns.has(port.id)).map((port) => port.coordinates)
 
         const delaunay = d3Delaunay.from(points)
-        console.log("delaunay", delaunay)
 
         this.#maxY = d3Max(points, (point) => point[1])
         this.#maxY = this.#maxY ? Math.floor(this.#maxY * 1.05) : this.#coord.max
         const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, this.#maxY]
-        console.log("bounds", bounds)
 
         this.#voronoi = delaunay.voronoi(bounds)
-        console.log("voronoi", this.#voronoi)
     }
 
     _initLegend(dim: DivDimension): void {
@@ -297,7 +294,7 @@ export default class PowerMap extends BaseModal {
                 ? -this.#legendRowHeight
                 : Math.floor(index / this.#columnsPerRow) * (this.#legendRowPadding * 10 + this.#legendRowHeight)
         // Add padding
-        top += 32 + this.#legendControllerHeight
+        top += 16 + this.#legendControllerHeight
 
         return `${top}px`
     }
@@ -458,26 +455,26 @@ export default class PowerMap extends BaseModal {
     _initRange(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
 
-        const formGroup = formRow.append("div").attr("class", "form-group col-md-8 form-row mb-0")
+        const formGroup = formRow.append("div").attr("class", "form-group col-md-7 form-row mb-0")
         this.#rangeInput = formGroup
             .append("div")
             .attr("class", "col-md-5")
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
-            .attr("class", "form-control-range custom-range")
+            .attr("class", "form-control-range custom-range px-md-2")
             .attr("style", "height:100%")
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
-        formGroup
-            .append("div")
-            .attr("class", "col-md-1")
+        formGroup.append("div").attr("class", "col-md-1")
+
         this.#dateElem = formGroup
             .append("label")
             .attr("for", inputId)
             .attr("class", "col-md-6 col-form-label")
             .attr("style", "font-size:120%")
             .attr("title", "Date")
+            .text("Start")
 
         let down = false
         this.#rangeInput
@@ -567,7 +564,7 @@ export default class PowerMap extends BaseModal {
                 nextYear = this._getYear(index)
             }
 
-            this.#index = index
+            this.#index = index - 1
             this._updateController()
         }
 
@@ -594,7 +591,8 @@ export default class PowerMap extends BaseModal {
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const closeButtonClicked = () => {
-
+            this._drawEnd()
+            this.#mainDiv.remove()
         }
 
         const addButton = (icon: string, title: string): Selection<HTMLElement, unknown, HTMLElement, unknown> =>
@@ -607,7 +605,7 @@ export default class PowerMap extends BaseModal {
                 .append("i")
                 .attr("class", `icon icon-large icon-${icon}`)
 
-        const buttonToolbar = formRow.append("div").attr("class", "btn-toolbar col-md-3").attr("role", "toolbar")
+        const buttonToolbar = formRow.append("div").attr("class", "btn-toolbar col-md-4").attr("role", "toolbar")
 
         let buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         const startButton = addButton("start", "Start")
@@ -616,7 +614,7 @@ export default class PowerMap extends BaseModal {
         buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         this.#playButton = addButton("pause", "Pause")
 
-        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
+        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
         const forwardButton = addButton("forward", "Year forward")
         const endButton = addButton("end", "End")
 
@@ -637,7 +635,6 @@ export default class PowerMap extends BaseModal {
         buttonGroup = formRow.append("div").attr("class", "btn-group col-md-1").attr("role", "group")
         const closeButton = addButton("close", "Close")
         closeButton.on("click", closeButtonClicked)
-
     }
 
     _adjustControllerHeight(): void {
@@ -650,7 +647,7 @@ export default class PowerMap extends BaseModal {
         const legendController = this.#legendContainer
             .append("div")
             .style("background-color", colourWhite)
-            .attr("class", "p-2 mt-2")
+            .attr("class", "p-2")
         this.#legendControllerElement = legendController.node() as HTMLDivElement
 
         const formRow = legendController.append("form").append("div").attr("class", "form-row align-items-center")
@@ -663,7 +660,6 @@ export default class PowerMap extends BaseModal {
         this._initButtons(formRow)
 
         this.#legendControllerHeight = getElementHeight(this.#legendControllerElement)
-
         ro.observe(this.#legendControllerElement)
     }
 
@@ -673,8 +669,8 @@ export default class PowerMap extends BaseModal {
         // Get elements
         const main = d3Select("#na-map")
         const svg = d3Select("#na-map svg")
-        const div = main.append("div")
-        const canvas = div.append("canvas")
+        this.#mainDiv = main.append("div")
+        const canvas = this.#mainDiv.append("canvas")
         const canvasNode = canvas.node() as HTMLCanvasElement
 
         // Get svg size and map transform
@@ -682,7 +678,11 @@ export default class PowerMap extends BaseModal {
         const widthCss = svg.style("width")
 
         // Position canvas on top of svg
-        div.style("position", "relative").style("top", `-${heightCss}`).style("height", "100%").style("opacity", 0.7)
+        this.#mainDiv
+            .style("position", "relative")
+            .style("top", `-${heightCss}`)
+            .style("height", "100%")
+            .style("opacity", 0.7)
 
         // Get current transformation
         const currentTransformMatrix = (this.#map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
@@ -705,7 +705,6 @@ export default class PowerMap extends BaseModal {
 
         const gTiles = d3Select("#na-map svg g.map-tiles")
         const tilesWidth = getElementWidth(gTiles.node() as SVGElement)
-        console.log("tiles", gTiles, tilesWidth)
         const dim: DivDimension = {
             top: (this.#coord.max - (this.#maxY ?? 0)) * scale + ty,
             left: tx,
