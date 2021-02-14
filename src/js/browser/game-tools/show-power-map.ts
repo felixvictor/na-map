@@ -458,10 +458,10 @@ export default class PowerMap extends BaseModal {
     _initRange(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
 
-        const formGroup = formRow.append("div").attr("class", "form-group col-md-9 row mb-0")
+        const formGroup = formRow.append("div").attr("class", "form-group col-md-8 form-row mb-0")
         this.#rangeInput = formGroup
             .append("div")
-            .attr("class", "col-md-6")
+            .attr("class", "col-md-5")
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
@@ -469,11 +469,14 @@ export default class PowerMap extends BaseModal {
             .attr("style", "height:100%")
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
+        formGroup
+            .append("div")
+            .attr("class", "col-md-1")
         this.#dateElem = formGroup
             .append("label")
             .attr("for", inputId)
             .attr("class", "col-md-6 col-form-label")
-            .attr("style", "font-size:3vh")
+            .attr("style", "font-size:120%")
             .attr("title", "Date")
 
         let down = false
@@ -550,7 +553,7 @@ export default class PowerMap extends BaseModal {
                 previousYear = this._getYear(index)
             }
 
-            this.#index = index
+            this.#index = index + 1
             this._updateController()
         }
 
@@ -589,6 +592,11 @@ export default class PowerMap extends BaseModal {
             this.#delay = Math.max(10, this.#delay / this.#speedFactor)
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const closeButtonClicked = () => {
+
+        }
+
         const addButton = (icon: string, title: string): Selection<HTMLElement, unknown, HTMLElement, unknown> =>
             buttonGroup
                 .append("button")
@@ -601,12 +609,17 @@ export default class PowerMap extends BaseModal {
 
         const buttonToolbar = formRow.append("div").attr("class", "btn-toolbar col-md-3").attr("role", "toolbar")
 
-        let buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
+        let buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         const startButton = addButton("start", "Start")
         const backButton = addButton("back", "Year back")
+
+        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         this.#playButton = addButton("pause", "Pause")
+
+        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         const forwardButton = addButton("forward", "Year forward")
         const endButton = addButton("end", "End")
+
         startButton.on("click", startButtonClicked)
         backButton.on("click", backButtonClicked)
         this.#playButton.on("click", playButtonClicked)
@@ -620,6 +633,11 @@ export default class PowerMap extends BaseModal {
         slowerButton.on("click", slowerButtonClicked)
         normalButton.on("click", normalButtonClicked)
         fasterButton.on("click", fasterButtonClicked)
+
+        buttonGroup = formRow.append("div").attr("class", "btn-group col-md-1").attr("role", "group")
+        const closeButton = addButton("close", "Close")
+        closeButton.on("click", closeButtonClicked)
+
     }
 
     _adjustControllerHeight(): void {
