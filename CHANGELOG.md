@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.5.0](///compare/v12.4.1...v12.5.0) (2021-02-14)
+
+
+### Features
+
+* show port ownership map (animated) 3ca7590
+
 ### [12.4.1](///compare/v12.4.0...v12.4.1) (2021-02-04)
 
 
