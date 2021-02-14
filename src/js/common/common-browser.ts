@@ -4,14 +4,18 @@
  * @file      Common data and functions for browser.
  * @module    src/node/common-browser
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+
+/// <reference types="webpack-env" />
 
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
 import { BaseModalPure, DataSource } from "./interface"
+import { NationListAlternative } from "common/gen-json"
+import { findNationByNationShortName } from "common/common"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -87,6 +91,23 @@ export const colourList = [
     "#f2b6be",
 ]
 
+export const nationColourList = [
+    "#ffffff", // Neutral
+    "#111111", // Pirates
+    "#f1bf00", // España
+    "#0039a6", // France
+    "#cf142b", // Great Britain
+    "#21468b", // Verenigde Provinciën
+    "#ac0234", // Danmark-Norge
+    "#006aa7", // Sverige
+    "#bf0a30", // United States
+    "#aaa", // Free Town
+    "#0039a6", // Russian Empire
+    "#333", // Kingdom of Prussia
+    "#eb001a", // Commonwealth of Poland
+    "#fecd21", // China
+]
+
 /**
  * Enable nested dropdowns in navbar
  * {@link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar}
@@ -149,9 +170,13 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`
 
 export const loadJsonFiles = async <T>(dataSources: DataSource[], readData: T): Promise<void> => {
+    showCursorWait()
+
     for await (const dataSource of dataSources) {
         readData[dataSource.name as keyof T] = await loadJsonFile(dataSource.fileName)
     }
+
+    showCursorDefault()
 }
 
 class FetchError extends Error {
@@ -184,39 +209,68 @@ export const showCursorDefault = (): void => {
 }
 
 /**
- * {@link https://stackoverflow.com/a/43593634}
+ * {@link https://stackoverflow.com/a/54662026}
+ * @param id - Id
  */
-export class TupleKeyMap<K, V> extends Map {
-    private readonly map = new Map<string, V>()
+export const getCanvasElementById = (id: string): HTMLCanvasElement => {
+    const canvas = document.querySelector(id)
 
-    set(key: K, value: V): this {
-        this.map.set(JSON.stringify(key), value)
-        return this
+    if (!(canvas instanceof HTMLCanvasElement)) {
+        throw new TypeError(
+            `The element of id "${id}" is not a HTMLCanvasElement. Make sure a <canvas id="${id}""> element is present in the document.`
+        )
     }
 
-    get(key: K): V | undefined {
-        return this.map.get(JSON.stringify(key))
+    return canvas
+}
+
+/**
+ * {@link https://stackoverflow.com/a/54662026}
+ * @param canvas - Canvas
+ */
+export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
+    const context = canvas.getContext("2d")
+
+    if (context === null) {
+        throw new Error("This browser does not support 2-dimensional canvas rendering contexts.")
     }
 
-    clear(): void {
-        this.map.clear()
+    return context
+}
+
+/**
+ * {@link https://stackoverflow.com/questions/42118296/dynamically-import-images-from-a-directory-using-webpack}
+ * @param r - webpack require.context
+ * @returns Images
+ */
+const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<string> => {
+    const images = {} as NationListAlternative<string>
+    for (const item of r.keys()) {
+        images[item.replace("./", "").replace(".svg", "")!] = r(item)
     }
 
-    delete(key: K): boolean {
-        return this.map.delete(JSON.stringify(key))
-    }
+    // Sort by nation
+    const sortedImages = Object.fromEntries(
+        Object.entries(images).sort(
+            ([nation1], [nation2]) =>
+                findNationByNationShortName(nation1)!.id - findNationByNationShortName(nation2)!.id
+        )
+    )
+    return sortedImages
+}
 
-    has(key: K): boolean {
-        return this.map.has(JSON.stringify(key))
-    }
+export const getIcons = (): NationListAlternative<string> => {
+    return importAll((require as __WebpackModuleApi.RequireFunction).context("../../images/flags", false, /\.svg$/))
+}
 
-    get size(): number {
-        return this.map.size
-    }
+export const getElementHeight = (element: HTMLElement | SVGElement): number => {
+    const { height } = element.getBoundingClientRect()
 
-    forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
-        this.map.forEach((value, key) => {
-            callbackfn.call(thisArg, value, JSON.parse(key), this)
-        })
-    }
+    return Math.floor(height)
+}
+
+export const getElementWidth = (element: HTMLElement | SVGElement): number => {
+    const { width } = element.getBoundingClientRect()
+
+    return Math.floor(width)
 }

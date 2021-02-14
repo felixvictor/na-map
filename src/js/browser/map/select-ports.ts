@@ -4,7 +4,7 @@
  * @file      Select ports.
  * @module    map/select-ports
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,8 +24,8 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../analytics"
-import { Nation, nations, NationShortName, validNationShortName } from "common/common"
-import { initMultiDropdownNavbar, loadJsonFile, TupleKeyMap } from "common/common-browser"
+import { Nation, nations, NationShortName, TupleKeyMap, validNationShortName } from "common/common"
+import { initMultiDropdownNavbar, loadJsonFile } from "common/common-browser"
 import { formatInt, formatSiCurrency } from "common/common-format"
 import { Coordinate, Distance, getDistance, Point } from "common/common-math"
 import { simpleStringSort, sortBy } from "common/common-node"

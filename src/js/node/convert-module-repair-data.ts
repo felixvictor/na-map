@@ -4,7 +4,7 @@
  * @file      Convert repair data from modules.
  * @module    src/node/convert-module-repair
  * @author    iB aka Felix Victor
- * @copyright 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 

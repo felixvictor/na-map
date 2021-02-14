@@ -4,7 +4,7 @@
  * @file      Common types.
  * @module    interface.d
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -73,4 +73,15 @@ export interface PortJsonData {
     ports: PortBasic[]
     pb: PortBattlePerServer[]
     server: PortPerServer[]
+}
+
+export interface PowerMapPerDay {
+    0: string
+    1: number[]
+}
+export type PowerMapList = PowerMapPerDay[]
+
+export interface ImagePromiseError {
+    loaded: string[]
+    errored: string[]
 }

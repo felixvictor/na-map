@@ -4,7 +4,7 @@
  * @file      Display map.
  * @module    map/map
  * @author    iB aka Felix Victor
- * @copyright 2017, 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -42,6 +42,7 @@ import ShowF11 from "./show-f11"
 import ShowTrades from "./show-trades"
 import MakeJourney from "./make-journey"
 import TrilateratePosition from "./get-position"
+import PowerMap from "../game-tools/show-power-map"
 
 interface Tile {
     z: number
@@ -259,6 +260,7 @@ class NAMap {
         this._init()
         this._journey = new MakeJourney(this.rem)
         void new TrilateratePosition(this._ports)
+        void new PowerMap(this.serverName, this.coord)
 
         /*
         Marks.forEach(mark => {

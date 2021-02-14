@@ -4,7 +4,7 @@
  * @file      Common data and functions.
  * @module    src/node/common
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -236,4 +236,47 @@ export const findNationById = (nationId: number): Nation => nationMap.get(nation
  */
 export const putImportError = (error: string): void => {
     console.error("Import request failed -->", error)
+}
+
+/**
+ * {@link https://stackoverflow.com/a/43593634}
+ */
+export class TupleKeyMap<K, V> extends Map {
+    private readonly map = new Map<string, V>()
+
+    set(key: K, value: V): this {
+        this.map.set(JSON.stringify(key), value)
+        return this
+    }
+
+    get(key: K): V | undefined {
+        return this.map.get(JSON.stringify(key))
+    }
+
+    clear(): void {
+        this.map.clear()
+    }
+
+    delete(key: K): boolean {
+        return this.map.delete(JSON.stringify(key))
+    }
+
+    has(key: K): boolean {
+        return this.map.has(JSON.stringify(key))
+    }
+
+    get size(): number {
+        return this.map.size
+    }
+
+    forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
+        this.map.forEach((value, key) => {
+            callbackfn.call(thisArg, value, JSON.parse(key), this)
+        })
+    }
+}
+
+export const sleep = async (ms: number) => {
+    // eslint-disable-next-line no-promise-executor-return
+    return new Promise((resolve) => setTimeout(resolve, ms))
 }

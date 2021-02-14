@@ -15,7 +15,7 @@ const parseCss = require("css")
 const PreloadWebpackPlugin = require("preload-webpack-plugin")
 const sass = require("sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
-// const SriPlugin = require("webpack-subresource-integrity")
+const { SubresourceIntegrityPlugin } = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
 
 const dirOutput = path.resolve(__dirname, "public")
@@ -30,7 +30,8 @@ const dirMap = path.resolve(dirSrc, "images", "map")
 const dirPrefixIcons = path.join("images", "icons")
 
 const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
-const filePostcssConfig = path.resolve(dirSrc, "postcss.config.js")
+const filePostcssProdConfig = path.resolve(dirSrc, "postcss.prod.config.js")
+const filePostcssDevConfig = path.resolve(dirSrc, "postcss.dev.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 // Variables
@@ -147,7 +148,7 @@ const htmlMinifyOpt = {
 
 const postcssLoaderOpt = {
     postcssOptions: {
-        config: filePostcssConfig,
+        config: isProduction ? filePostcssProdConfig : filePostcssDevConfig,
     },
     sourceMap: true,
 }
@@ -200,7 +201,7 @@ const svgoOpt = {
         { convertShapeToPath: true },
         { sortAttrs: false },
         { transformsWithOnePath: false },
-        { removeDimensions: true },
+        { removeDimensions: false },
         { removeAttrs: false },
         { removeElementsByAttr: true },
         { removeStyleElement: true },
@@ -361,12 +362,7 @@ const config = {
             },
         }),
         new SitemapPlugin({ base: targetUrl, paths: sitemapPaths, options: { skipGzip: false } }),
-        /*
-        new SriPlugin({
-            hashFuncNames: ["sha384"],
-            enabled: isProduction,
-        }),
-        */
+        new SubresourceIntegrityPlugin(),
     ],
 
     resolve: {

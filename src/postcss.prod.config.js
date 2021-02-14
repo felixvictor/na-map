@@ -9,6 +9,7 @@ const purgecssSafelistDeep = [
     /dropdown-backdrop/,
     /fade/,
     /focus/,
+    /^icon-/,
     /list-unstyled/,
     /modal/,
     /^rs-/,

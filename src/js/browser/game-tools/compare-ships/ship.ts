@@ -4,7 +4,7 @@
  * @file      Compare ships ship file.
  * @module    game-tools/compare-ships/ship
  * @author    iB aka Felix Victor
- * @copyright 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 

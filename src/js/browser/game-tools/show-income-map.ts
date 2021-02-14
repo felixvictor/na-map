@@ -1,10 +1,10 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Port ownership list.
- * @module    game-tools/list-port-ownerships
+ * @file      Income map.
+ * @module    game-tools/show-income-map
  * @author    iB aka Felix Victor
- * @copyright 2018, 2019, 2020
+ * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -204,7 +204,7 @@ export default class ShowIncomeMap extends BaseModal {
             .selectAll(".legend")
             .data(nations)
             .join((enter) => {
-                const div = enter.append("div").attr("class", "mt-3")
+                const div = enter.append("div").attr("class", "legend mt-3")
 
                 const svg = div
                     .append("svg")
