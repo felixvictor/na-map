@@ -302,7 +302,6 @@ class NAMap {
 
     _setupSvg(): void {
         this.#zoom = d3Zoom<SVGSVGElement, Event>()
-            .wheelDelta((event: Event) => -this.#wheelDelta * Math.sign((event as WheelEvent).deltaY))
             /*
             .translateExtent([
                 [
@@ -312,7 +311,16 @@ class NAMap {
                 [this.coord.max, this.coord.max],
             ])
              */
+            .extent([
+                [100, 100],
+                [300, 300],
+            ])
             .scaleExtent([this.minMapScale, this.#maxMapScale])
+            .translateExtent([
+                [this.coord.min, this.coord.min],
+                [this.coord.max, this.coord.max],
+            ])
+            .wheelDelta((event: Event) => -this.#wheelDelta * Math.sign((event as WheelEvent).deltaY))
             .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
                 this._naZoomed(event)
             })
@@ -377,6 +385,7 @@ class NAMap {
         }
         */
 
+        console.log("zoom", this.#zoom.extent(), this.#zoom.translateExtent(), this.#zoom.scaleExtent())
         console.log("transform", transform, tiles.length, tiles.scale, tiles[0][2])
 
         this._updateMap(tiles)
@@ -389,21 +398,20 @@ class NAMap {
         } = tiles
         const data = tiles as Tile[]
 
-        let widthChanged = 0
         // @ts-expect-error
         this._gMap
+            .attr("transform", `translate(${tx * k},${ty * k}) scale(${k})`)
             .selectAll<HTMLImageElement, Tile>("image")
             .data(data, (d: Tile) => d)
-            .join("image")
-            .attr("xlink:href", ([x, y, z]) => `images/map/${z}/${y}/${x}.webp`)
-            .attr("x", ([x]) => (x + tx) * k)
-            .attr("y", ([, y]) => (y + ty) * k)
-            .attr("width", () => {
-                widthChanged++
-                return k
-            })
-            .attr("height", k)
-        console.log("widthChanged", widthChanged)
+            .join((enter) =>
+                enter
+                    .append("image")
+                    .attr("xlink:href", ([x, y, z]) => `images/map/${z}/${y}/${x}.webp`)
+                    .attr("x", ([x]) => x)
+                    .attr("y", ([, y]) => y)
+                    .attr("width", 1)
+                    .attr("height", 1)
+            )
     }
 
     _clearMap(): void {
