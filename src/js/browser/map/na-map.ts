@@ -52,11 +52,12 @@ class NAMap {
     f11!: ShowF11
     readonly gridOverlay: HTMLElement
     height = 0
-    minScale = 1
-    readonly #maxScale = 32
-    #currentScale = this.minScale
+    readonly #maxTileZoom = 5
+    minMapScale = 1
+    readonly #maxMapScale = 256
+    #initialMapScale = this.minMapScale
     readonly #tileSize = 256
-    readonly #wheelDelta = 0.5
+    readonly #wheelDelta = 1
     readonly #labelZoomThreshold = 2
     readonly #PBZoneZoomThreshold = 4
     readonly rem = defaultFontSize // Font size in px
@@ -296,12 +297,12 @@ class NAMap {
         /**
          * Current map scale
          */
-        this.#currentScale = nearestPow2(Math.min(this.height, this.width) / this.#tileSize)
+        this.#initialMapScale = nearestPow2(Math.min(this.height, this.width) / this.#tileSize)
     }
 
     _setupSvg(): void {
         this.#zoom = d3Zoom<SVGSVGElement, Event>()
-            //.wheelDelta((event: Event) => -this.#wheelDelta * Math.sign((event as WheelEvent).deltaY))
+            .wheelDelta((event: Event) => -this.#wheelDelta * Math.sign((event as WheelEvent).deltaY))
             /*
             .translateExtent([
                 [
@@ -311,11 +312,7 @@ class NAMap {
                 [this.coord.max, this.coord.max],
             ])
              */
-            .extent([
-                [0, 0],
-                [this.width, this.height],
-            ])
-            .scaleExtent([this.minScale, this.#maxScale])
+            .scaleExtent([this.minMapScale, this.#maxMapScale])
             .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
                 this._naZoomed(event)
             })
@@ -353,6 +350,18 @@ class NAMap {
         const x1 = this.width
         const y1 = this.height
 
+        // Zoom in at scale larger than maxTileZoom
+        const zoomDelta = Math.log2(transform.k) <= this.#maxTileZoom ? 0 : this.#maxTileZoom - Math.log2(transform.k)
+        const tiles = d3Tile()
+            .extent([
+                [x0, y0],
+                [x1, y1],
+            ])
+            .scale(this.#tileSize * transform.k)
+            .tileSize(this.#tileSize)
+            .zoomDelta(zoomDelta)(transform) as Tiles
+
+        /*
         const position = (tile: Tile, tiles: Tiles): [number, number] => {
             const [x, y] = tile
             const {
@@ -362,39 +371,13 @@ class NAMap {
             return [(x + tx) * k, (y + ty) * k]
         }
 
-        // const scaleTiler = nearestPow2(Math.min(this.height, this.width))
-        const scaleTiler = this.#tileSize * transform.k
-        const tiler = d3Tile()
-        tiler
-            .extent([
-                [x0, y0],
-                [x1, y1],
-            ])
-            .scale(scaleTiler)
-            .tileSize(this.#tileSize)
-
-        const tiles = tiler({ x: transform.x, y: transform.y }) as Tiles
         for (const t of tiles) {
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             console.log(`tile ${t} is at ${position(t, tiles)}`)
         }
+        */
 
-        const z = Math.log2(scaleTiler / this.#tileSize)
-        const z0 = Math.round(Math.max(z, 0))
-
-        const k = 2 ** (z - z0) * this.#tileSize
-        const x = Number(transform.x) - scaleTiler / 2
-        const y = Number(transform.y) - scaleTiler / 2
-        const xmin = Math.max(0, Math.floor((x0 - x) / k))
-        const xmax = Math.min(1 << z0, Math.ceil((x1 - x) / k))
-        const ymin = Math.max(0, Math.floor((y0 - y) / k))
-        const ymax = Math.min(1 << z0, Math.ceil((y1 - y) / k))
-
-        console.log("z", z, z0, 1 << z0)
-        console.log("min max x, y", xmin, xmax, ymin, ymax)
-        console.log("x, y, k", x, y, k)
-        console.log("x0, x1, y0, y1", x0, x1, y0, y1, x1 >> 1, y1 >> 1)
-        console.log("new", tiles, transform, scaleTiler)
+        console.log("transform", transform, tiles.length, tiles.scale, tiles[0][2])
 
         this._updateMap(tiles)
     }
@@ -406,19 +389,21 @@ class NAMap {
         } = tiles
         const data = tiles as Tile[]
 
+        let widthChanged = 0
         // @ts-expect-error
         this._gMap
             .selectAll<HTMLImageElement, Tile>("image")
             .data(data, (d: Tile) => d)
-            .join((enter) =>
-                enter
-                    .append("image")
-                    .attr("xlink:href", ([x, y, z]) => `images/map/${z}/${y}/${x}.webp`)
-                    .attr("x", ([x]) => (x + tx) * k)
-                    .attr("y", ([, y]) => (y + ty) * k)
-                    .attr("width", k)
-                    .attr("height", k)
-            )
+            .join("image")
+            .attr("xlink:href", ([x, y, z]) => `images/map/${z}/${y}/${x}.webp`)
+            .attr("x", ([x]) => (x + tx) * k)
+            .attr("y", ([, y]) => (y + ty) * k)
+            .attr("width", () => {
+                widthChanged++
+                return k
+            })
+            .attr("height", k)
+        console.log("widthChanged", widthChanged)
     }
 
     _clearMap(): void {
@@ -515,7 +500,6 @@ class NAMap {
     _naZoomed(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
         const { transform } = event
 
-        console.log("_naZoomed", transform)
         // const zoomTransform = this._getZoomTransform(transform)
         /**
          * Top left coordinates of current viewport
@@ -622,7 +606,7 @@ class NAMap {
         console.log("initialZoomAndPan")
         this._svg.call(
             this.#zoom.transform,
-            d3ZoomIdentity.translate(this.width >> 1, this.height >> 1).scale(this.#currentScale)
+            d3ZoomIdentity.translate(this.width / 2, this.height / 2).scale(this.#initialMapScale)
         )
     }
 

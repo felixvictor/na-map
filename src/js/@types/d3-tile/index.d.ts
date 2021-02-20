@@ -22,7 +22,7 @@ declare module "d3-tile" {
         scale(scale?: () => number): number
 
         translate(translate?: () => ZoomTransform): [number, number]
-        translate(translate: ZoomTransform): this
+        translate(translate: [number, number]): this
 
         zoomDelta(): number
         zoomDelta(zoomDelta: number): this
