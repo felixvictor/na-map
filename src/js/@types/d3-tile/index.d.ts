@@ -4,9 +4,9 @@ declare module "d3-tile" {
     export type Tile = [number, number, number]
 
     export interface Tiles extends Array<Tile> {
-        [index: number]: Tile
-        readonly translate: [number, number]
-        readonly scale: number
+        tiles: Tile[]
+        translate: [number, number]
+        scale: number
     }
 
     export interface TileFn extends Function {

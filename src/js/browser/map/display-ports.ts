@@ -45,6 +45,7 @@ import {
     degreesHalfCircle,
     degreesToRadians,
     distancePoints,
+    Extent,
     getOrdinalSVG,
     Point,
     roundToThousands,
@@ -62,16 +63,7 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "common/gen-json"
-import {
-    Bound,
-    DataSource,
-    DivDatum,
-    HtmlResult,
-    HtmlString,
-    PortJsonData,
-    SVGGDatum,
-    ZoomLevel,
-} from "common/interface"
+import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
 
 import Cookie from "util/cookie"
@@ -176,7 +168,7 @@ export default class DisplayPorts {
     #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #lowerBound!: Bound
+    #lowerBound = {} as Point
     #maxNetIncome!: number
     #maxPortPoints!: number
     #maxTaxIncome!: number
@@ -194,8 +186,8 @@ export default class DisplayPorts {
     #portSummaryTextTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #regionPolygon!: Area[]
     #regionPolygonFiltered!: Area[]
-    #scale: number
-    #upperBound!: Bound
+    #scale = 0
+    #upperBound = {} as Point
     readonly #baseId = "show-radius"
     readonly #circleSize = defaultCircleSize
     readonly #cookie: Cookie
@@ -212,7 +204,7 @@ export default class DisplayPorts {
 
     constructor(readonly map: NAMap) {
         this.#serverName = this.map.serverName
-        this.#minScale = this.map.minScale
+        this.#minScale = this.map.minMapScale
         this.#scale = this.#minScale
         this.#f11 = this.map.f11
 
@@ -649,33 +641,31 @@ export default class DisplayPorts {
 
         const svgDefNode = document.querySelector<SVGDefsElement>("#na-svg defs")!
 
-        nations
-            .map((d) => d.short)
-            .forEach((nation) => {
-                const patternElement = getPattern(nation)
-                patternElement.append(getImage(nation))
-                // eslint-disable-next-line unicorn/prefer-dom-node-append
-                const patternNode = svgDefNode.appendChild(patternElement)
+        for (const nation of nations.map((d) => d.short)) {
+            const patternElement = getPattern(nation)
+            patternElement.append(getImage(nation))
+            // eslint-disable-next-line unicorn/prefer-dom-node-append
+            const patternNode = svgDefNode.appendChild(patternElement)
 
-                if (nation !== "FT") {
-                    const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
-                    patternCapital.id = `${nation}c`
-                    patternCapital.append(getCircleCapital())
-                    svgDefNode.append(patternCapital)
-                }
+            if (nation !== "FT") {
+                const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
+                patternCapital.id = `${nation}c`
+                patternCapital.append(getCircleCapital())
+                svgDefNode.append(patternCapital)
+            }
 
-                if (nation !== "NT" && nation !== "FT") {
-                    const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
-                    patternAvail.id = `${nation}a`
-                    patternAvail.append(getRectAvail())
-                    svgDefNode.append(patternAvail)
+            if (nation !== "NT" && nation !== "FT") {
+                const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
+                patternAvail.id = `${nation}a`
+                patternAvail.append(getRectAvail())
+                svgDefNode.append(patternAvail)
 
-                    const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
-                    patternCapitalAvail.id = `${nation}ca`
-                    patternCapitalAvail.append(getCircleCapital())
-                    svgDefNode.append(patternCapitalAvail)
-                }
-            })
+                const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
+                patternCapitalAvail.id = `${nation}ca`
+                patternCapitalAvail.append(getCircleCapital())
+                svgDefNode.append(patternCapitalAvail)
+            }
+        }
     }
 
     _getPortName(id: number): string {
@@ -1011,8 +1001,9 @@ export default class DisplayPorts {
     }
 
     _updateIcons(): void {
-        const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
+        const circleScale = this.#scale
         const circleSize = roundToThousands(this.#circleSize / circleScale)
+        console.log("_updateIcons", this.#minScale, this.#scale, circleScale, this.#circleSize, circleSize)
         const data = this.#portDataFiltered
 
         this.#gIcon
@@ -1075,9 +1066,9 @@ export default class DisplayPorts {
     }
 
     _updatePortCircles(): void {
-        const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
-        const rMin = roundToThousands((this.#circleSize / circleScale) * this.#minRadiusFactor)
-        const rMax = roundToThousands((this.#circleSize / circleScale) * this.#maxRadiusFactor)
+        // const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
+        const rMin = roundToThousands((this.#circleSize / this.#scale) * this.#minRadiusFactor)
+        const rMax = roundToThousands((this.#circleSize / this.#scale) * this.#maxRadiusFactor)
         let data = this.#portDataFiltered
         // eslint-disable-next-line unicorn/consistent-function-scoping
         let cssClass: PortCircleStringF = () => ""
@@ -1187,10 +1178,10 @@ export default class DisplayPorts {
         if (this.zoomLevel === "initial") {
             this.#gText.classed("d-none", true)
         } else {
-            const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
-            const circleSize = roundToThousands(this.#circleSize / circleScale)
-            const fontScale = 2 ** Math.log2((Math.abs(this.#minScale) + this.#scale) * 0.9)
-            const fontSize = roundToThousands(this.#fontSize / fontScale)
+            //  const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
+            const circleSize = roundToThousands(this.#circleSize / this.#scale)
+            //  const fontScale = 2 ** Math.log2((Math.abs(this.#minScale) + this.#scale) * 0.9)
+            const fontSize = roundToThousands(this.#fontSize / this.#scale)
             const data = this.#portDataFiltered
 
             this.#gText
@@ -1304,6 +1295,8 @@ export default class DisplayPorts {
     update(scale?: number): void {
         this.#scale = scale ?? this.#scale
 
+        console.log("display-port update", this.#scale, this.#lowerBound, this.#upperBound)
+
         this._filterVisible()
         this._updateIcons()
         this._updatePortCircles()
@@ -1346,12 +1339,11 @@ export default class DisplayPorts {
 
     /**
      * Set bounds of current viewport
-     * @param lowerBound - Top left coordinates of current viewport
-     * @param upperBound - Bottom right coordinates of current viewport
+     * @param viewport - Current viewport
      */
-    setBounds(lowerBound: Bound, upperBound: Bound): void {
-        this.#lowerBound = lowerBound
-        this.#upperBound = upperBound
+    setBounds(viewport: Extent): void {
+        this.#lowerBound = viewport[0]
+        this.#upperBound = viewport[1]
     }
 
     _showSummary(): void {

@@ -25,7 +25,7 @@ import {
 
 import { registerEvent } from "../analytics"
 import { appDescription, appTitle, appVersion, insertBaseModal } from "common/common-browser"
-import { defaultFontSize, nearestPow2, roundToThousands } from "common/common-math"
+import { defaultFontSize, Extent, nearestPow2, roundToThousands } from "common/common-math"
 
 import { mapSize } from "common/common-var"
 
@@ -44,6 +44,14 @@ import MakeJourney from "./make-journey"
 import TrilateratePosition from "./get-position"
 import PowerMap from "../game-tools/show-power-map"
 
+export type Tile = [number, number, number]
+
+export interface Tiles {
+    tiles: Tile[]
+    translate: [number, number]
+    scale: number
+}
+
 /**
  * Display naval action map
  */
@@ -56,22 +64,27 @@ class NAMap {
     minMapScale = 1
     readonly #maxMapScale = 256
     #initialMapScale = this.minMapScale
+    #currentMapScale = this.minMapScale
     readonly #tileSize = 256
     readonly #wheelDelta = 1
     readonly #labelZoomThreshold = 2
     readonly #PBZoneZoomThreshold = 4
-    #extent = {} as [[number, number], [number, number]]
-    #tiler = {} as TileFn
-    readonly rem = defaultFontSize // Font size in px
+    #extent = {} as Extent
+    #currentTranslate = [0, 0]
+    #viewport = {} as Extent
     #zoom = {} as ZoomBehavior<SVGSVGElement, Event>
+    #x0 = 0
+    #x1 = 0
+    #y0 = 0
+    #y1 = 0
 
+    readonly rem = defaultFontSize // Font size in px
     serverName: string
     showGrid: string
     showTrades!: ShowTrades
     width = 0
     xGridBackgroundHeight: number
     yGridBackgroundWidth: number
-    private _currentTranslate!: ZoomTransform
     private _doubleClickAction: string
     private _gMap!: Selection<SVGGElement, Event, HTMLElement, unknown>
     private _mainG!: Selection<SVGGElement, Event, HTMLElement, unknown>
@@ -306,16 +319,6 @@ class NAMap {
     _setupSvg(): void {
         this.#zoom = d3Zoom<SVGSVGElement, Event>()
             .scaleExtent([this.minMapScale, this.#maxMapScale])
-            /*
-            .translateExtent([
-                [
-                    this.coord.min - this.yGridBackgroundWidth * this.minScale,
-                    this.coord.min - this.xGridBackgroundHeight * this.minScale,
-                ],
-                [this.coord.max, this.coord.max],
-            ])
-             */
-            //.extent(this.#extent)
             .wheelDelta((event: Event) => -this.#wheelDelta * Math.sign((event as WheelEvent).deltaY))
             .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
                 this._naZoomed(event)
@@ -332,9 +335,10 @@ class NAMap {
     }
 
     _setupTiler(): void {
-        this.#tiler = d3Tile()
-            .extent(this.#extent)
-            .tileSize(this.#tileSize)
+        this.#x0 = this.#extent[0][0]
+        this.#x1 = this.#extent[1][0]
+        this.#y0 = this.#extent[0][1]
+        this.#y1 = this.#extent[1][1]
     }
 
     _doubleClickSelected(): void {
@@ -354,30 +358,47 @@ class NAMap {
         this._grid.update()
     }
 
-    _displayMap(transform: ZoomTransform): void {
+    _drawMap(transform: ZoomTransform): void {
         // Zoom in at scale larger than maxTileZoom
         const zoomDelta = Math.log2(transform.k) <= this.#maxTileZoom ? 0 : this.#maxTileZoom - Math.log2(transform.k)
-        const tiles = this.#tiler.scale(this.#tileSize * transform.k).zoomDelta(zoomDelta)(transform) as Tiles
+        const scale = this.#tileSize * transform.k
+        const tiles = {} as Tiles
+        tiles.tiles = []
 
-        /*
-        const position = (tile: Tile, tiles: Tiles): [number, number] => {
-            const [x, y] = tile
-            const {
-                translate: [tx, ty],
-                scale: k,
-            } = tiles
-            return [(x + tx) * k, (y + ty) * k]
+        // Copied from d3-tile
+        const z = Math.log2(scale / this.#tileSize)
+        const z0 = Math.round(Math.max(z + zoomDelta, 0))
+        const k = 2 ** (z - z0) * this.#tileSize
+        const x = transform.x - scale / 2
+        const y = transform.y - scale / 2
+        const xMin = Math.max(0, Math.floor((this.#x0 - x) / k))
+        const xMax = Math.min(1 << z0, Math.ceil((this.#x1 - x) / k))
+        const yMin = Math.max(0, Math.floor((this.#y0 - y) / k))
+        const yMax = Math.min(1 << z0, Math.ceil((this.#y1 - y) / k))
+        for (let y = yMin; y < yMax; ++y) {
+            for (let x = xMin; x < xMax; ++x) {
+                tiles.tiles.push([x, y, z0])
+            }
         }
 
-        for (const t of tiles) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            console.log(`tile ${t} is at ${position(t, tiles)}`)
-        }
-        */
+        tiles.translate = [x / k, y / k]
+        tiles.scale = k
 
-        console.log("tiles", transform, tiles.length, tiles.scale, tiles[0][2])
+        if (tiles.tiles.length > 0) {
+            const tileZoomLevel = z0 + Math.abs(zoomDelta)
+            const tilesPerZoomLevel = 2 ** tileZoomLevel
+            const tileCoverage = this.coord.max / tilesPerZoomLevel
+            const scale = tileCoverage * 2 ** Math.abs(zoomDelta)
+            const vx0 = xMin * scale
+            const vx1 = xMax * scale
+            const vy0 = yMin * scale
+            const vy1 = yMax * scale
+            this.#viewport = [
+                [vx0, vy0],
+                [vx1, vy1],
+            ]
+            this.#currentTranslate = [tiles.translate[0] * tiles.scale, tiles.translate[1] * tiles.scale]
 
-        if (tiles) {
             this._updateMap(tiles)
         }
     }
@@ -386,8 +407,8 @@ class NAMap {
         const {
             translate: [tx, ty],
             scale: k,
+            tiles: data,
         } = tiles
-        const data = tiles as Tile[]
 
         // @ts-expect-error
         this._gMap
@@ -443,89 +464,57 @@ class NAMap {
     }
 
     _setZoomLevelAndData(transform: ZoomTransform): void {
-        if (transform.k !== this._currentScale) {
-            this._currentScale = transform.k
-            if (this._currentScale > this._PBZoneZoomThreshold) {
-                if (this.zoomLevel !== "pbZone") {
-                    this.zoomLevel = "pbZone"
+        if (transform.k !== this.#currentMapScale) {
+            this.#currentMapScale = transform.k
+            /*
+                if (this._currentScale > this._PBZoneZoomThreshold) {
+                    if (this.zoomLevel !== "pbZone") {
+                        this.zoomLevel = "pbZone"
+                    }
+                } else if (this._currentScale > this._labelZoomThreshold) {
+                    if (this.zoomLevel !== "portLabel") {
+                        this.zoomLevel = "portLabel"
+                    }
+                } else if (this.zoomLevel !== "initial") {
+                    this.zoomLevel = "initial"
                 }
-            } else if (this._currentScale > this._labelZoomThreshold) {
-                if (this.zoomLevel !== "portLabel") {
-                    this.zoomLevel = "portLabel"
-                }
-            } else if (this.zoomLevel !== "initial") {
-                this.zoomLevel = "initial"
-            }
 
-            this._setFlexOverlayHeight()
-            this._grid.update()
+                this._setFlexOverlayHeight()
+                this._grid.update()
+    */
         }
 
-        this._pbZone.refresh()
-        this._ports.update(this._currentScale)
+        // this._pbZone.refresh()
+        this._ports.update(this.#currentMapScale)
     }
 
-    /**
-     * Top left coordinates of current viewport
-     */
-    _getLowerBound(zoomTransform: ZoomTransform): Bound {
-        return zoomTransform.invert([this.coord.min, this.coord.min])
-    }
-
-    /**
-     * Bottom right coordinates of current viewport
-     */
-    _getUpperBound(zoomTransform: ZoomTransform): Bound {
-        return zoomTransform.invert([this.width, this.height])
-    }
-
-    _getRoundedTransform(transform: ZoomTransform): ZoomTransform {
-        this._currentTranslate = {
-            x: Math.floor(transform.x),
-            y: Math.floor(transform.y),
-        } as ZoomTransform
-
-        /**
-         * Current transform
-         */
+    _getMapTransform(transform: ZoomTransform): ZoomTransform {
+        const scale = 2 ** (Math.log2(transform.k) - this.#maxTileZoom)
         return d3ZoomIdentity
-            .translate(this._currentTranslate.x, this._currentTranslate.y)
-            .scale(roundToThousands(transform.k))
+            .scale(scale)
+            .translate(this.#currentTranslate[0] / scale, this.#currentTranslate[1] / scale)
     }
 
     /**
      * Zoom svg groups
      */
     _naZoomed(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
-        const { transform } = event
+        const { transform: zoomTransform } = event
 
-        const roundedTransform = this._getRoundedTransform(transform)
+        this._drawMap(zoomTransform)
+        const mapTransform = this._getMapTransform(zoomTransform)
 
-        console.log("naZoomed", transform, roundedTransform)
+        console.log("naZoomed", zoomTransform, mapTransform, this.#currentTranslate)
 
-        /**
-         * Top left coordinates of current viewport
-         */
-        // const lowerBound = this._getLowerBound(zoomTransform)
-
-        /**
-         * Bottom right coordinates of current viewport
-         */
-        // const upperBound = this._getUpperBound(zoomTransform)
-
-        /*
-        this._ports.setBounds(lowerBound, upperBound)
-        this._pbZone.setBounds(lowerBound, upperBound)
-        this.showTrades.setBounds(lowerBound, upperBound)
-*/
-
-        this._displayMap(transform)
+        this._ports.setBounds(this.#viewport)
+        // this._pbZone.setBounds(lowerBound, upperBound)
+        // this.showTrades.setBounds(lowerBound, upperBound)
 
         // this._grid.transform(event)
         // this.showTrades.transform(zoomTransform)
-        this._mainG.attr("transform", transform.toString())
+        this._mainG.attr("transform", mapTransform.toString())
 
-        // this._setZoomLevelAndData(transform)
+        this._setZoomLevelAndData(zoomTransform)
     }
 
     _checkF11Coord(): void {
@@ -560,7 +549,7 @@ class NAMap {
         this._setHeightWidth()
         this._setSvgSize()
         this._setFlexOverlayHeight()
-        this._displayMap(zoomTransform)
+        this._drawMap(zoomTransform)
         this._grid.update()
     }
 
@@ -616,11 +605,9 @@ class NAMap {
 
         // Calculate translate extent
         // {@link https://stackoverflow.com/a/57660500}
-        const [dx0, dy0] = transform.invert(this.#extent[0])
-        const [dx1, dy1] = transform.invert(this.#extent[1])
         this.#zoom.translateExtent([
-            [dx0, dy0],
-            [dx1, dy1],
+            transform.invert(this.#extent[0] as [number, number]),
+            transform.invert(this.#extent[1] as [number, number]),
         ])
     }
 

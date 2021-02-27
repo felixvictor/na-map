@@ -43,10 +43,6 @@ export interface BaseModal {
 export interface BaseModalPure extends BaseModal {
     buttonText?: HtmlString
 }
-/**
- * Lower or upper bound coordinates
- */
-export type Bound = [number, number]
 
 export interface BaseModalHtml extends BaseModal {
     body: () => HtmlResult
