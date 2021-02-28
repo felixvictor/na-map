@@ -285,10 +285,10 @@ export default class DisplayGrid {
     /**
      * Set axis transform
      */
-    transform(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
+    transform(transform: ZoomTransform): void {
         if (this.#isShown) {
             this.testForInitialisation()
-            this._displayAxis(event.transform)
+            this._displayAxis(transform)
         }
     }
 

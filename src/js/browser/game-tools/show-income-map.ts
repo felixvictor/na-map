@@ -31,6 +31,7 @@ import { Vertex } from "d3-weighted-voronoi"
 import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
 import { DataSource, HtmlString, PortIncome, PortJsonData } from "common/interface"
+import { ϕ } from "common/common-math"
 
 interface TreeMapPolygon extends Array<Point> {
     0: Point
@@ -186,9 +187,9 @@ export default class ShowIncomeMap extends BaseModal {
     }
 
     _drawLegend(): void {
-        const rowHeight = Math.floor(20 * 1.618)
-        const rowPadding = Math.floor(2 * 1.618)
-        const columnPadding = Math.floor(5 * 1.618)
+        const rowHeight = Math.floor(20 * ϕ)
+        const rowPadding = Math.floor(2 * ϕ)
+        const columnPadding = Math.floor(5 * ϕ)
         const nations = (this.#tree.children ?? []).sort((a, b) => b.value! - a.value!)
 
         const minColumnWidth = 160 + columnPadding * 2 // Width of "Verenigde Provinciën" plus padding

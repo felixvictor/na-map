@@ -36,6 +36,7 @@ import { PortBasic } from "common/gen-json"
 import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
+import { ϕ } from "common/common-math";
 
 dayjs.extend(customParseFormat)
 
@@ -273,9 +274,9 @@ export default class PowerMap extends BaseModal {
     }
 
     _initNationLegend(dim: DivDimension): void {
-        this.#legendRowHeight = Math.floor(40 * 1.618)
-        this.#legendRowPadding = Math.floor(1.618)
-        this.#legendColumnPadding = Math.floor(5 * 1.618)
+        this.#legendRowHeight = Math.floor(40 * ϕ)
+        this.#legendRowPadding = Math.floor(ϕ)
+        this.#legendColumnPadding = Math.floor(5 * ϕ)
 
         const { width } = dim
         const minColumnWidth = 75 + this.#legendColumnPadding * 2 // Width of "Verenigde Provinciën" plus padding

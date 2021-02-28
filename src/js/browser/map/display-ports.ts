@@ -49,6 +49,7 @@ import {
     getOrdinalSVG,
     Point,
     roundToThousands,
+    ϕ,
 } from "common/common-math"
 import { simpleStringSort } from "common/common-node"
 import { displayClanLitHtml } from "common/common-game-tools"
@@ -194,8 +195,8 @@ export default class DisplayPorts {
     readonly #f11: ShowF11
     readonly #fontSize = defaultFontSize
     readonly #iconSize = 48
-    readonly #maxRadiusFactor = 1.618 * 3
-    readonly #minRadiusFactor = 1.618
+    readonly #maxRadiusFactor = ϕ
+    readonly #minRadiusFactor = ϕ
     readonly #minScale: number
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
@@ -1001,9 +1002,8 @@ export default class DisplayPorts {
     }
 
     _updateIcons(): void {
-        const circleScale = this.#scale
-        const circleSize = roundToThousands(this.#circleSize / circleScale)
-        console.log("_updateIcons", this.#minScale, this.#scale, circleScale, this.#circleSize, circleSize)
+        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
+        const circleSize = this.#circleSize / circleScale
         const data = this.#portDataFiltered
 
         this.#gIcon
@@ -1066,7 +1066,6 @@ export default class DisplayPorts {
     }
 
     _updatePortCircles(): void {
-        // const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
         const rMin = roundToThousands((this.#circleSize / this.#scale) * this.#minRadiusFactor)
         const rMax = roundToThousands((this.#circleSize / this.#scale) * this.#maxRadiusFactor)
         let data = this.#portDataFiltered
@@ -1178,9 +1177,7 @@ export default class DisplayPorts {
         if (this.zoomLevel === "initial") {
             this.#gText.classed("d-none", true)
         } else {
-            //  const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
             const circleSize = roundToThousands(this.#circleSize / this.#scale)
-            //  const fontScale = 2 ** Math.log2((Math.abs(this.#minScale) + this.#scale) * 0.9)
             const fontSize = roundToThousands(this.#fontSize / this.#scale)
             const data = this.#portDataFiltered
 
@@ -1294,8 +1291,6 @@ export default class DisplayPorts {
 
     update(scale?: number): void {
         this.#scale = scale ?? this.#scale
-
-        console.log("display-port update", this.#scale, this.#lowerBound, this.#upperBound)
 
         this._filterVisible()
         this._updateIcons()

@@ -42,6 +42,7 @@ import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAng
 import { HtmlString } from "common/interface"
 
 import { CompareShips } from "../game-tools/compare-ships"
+import { transform } from "html2canvas/dist/types/css/property-descriptors/transform";
 
 interface Journey {
     shipName: string
@@ -443,15 +444,11 @@ export default class MakeJourney {
 
     _correctJourney(): void {
         const defaultTranslate = 20
-        const svg = d3Select<SVGSVGElement, unknown>("#na-svg")
-        const currentTransform = d3ZoomTransform(svg.node()!)
-        // Don't scale on higher zoom level
-        const scale = Math.max(1, currentTransform.k)
-        const fontSize = this._fontSize / scale
-        const textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale)
-        const textPadding = this._labelPadding / scale
-        const circleRadius = 10 / scale
-        const pathWidth = 5 / scale
+        const fontSize = this._fontSize
+        const textTransform = d3ZoomIdentity.translate(defaultTranslate, defaultTranslate )
+        const textPadding = this._labelPadding
+        const circleRadius = 10
+        const pathWidth = 5
 
         /** Correct Text Box
          *  - split text into lines
@@ -504,10 +501,6 @@ export default class MakeJourney {
         // Correct journey stroke width
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`)
-        }
-
-        if (this._compassG) {
-            this._compassG.attr("transform", `scale(${1 / scale})`)
         }
     }
 

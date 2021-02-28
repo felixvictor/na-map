@@ -18,14 +18,15 @@ import RadioButton from "util/radio-button"
 import DisplayPorts from "./display-ports"
 
 import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "common/gen-json"
-import { Bound } from "common/interface"
-import { Point } from "common/common-math"
+import { Extent, Point } from "common/common-math"
 
 export default class DisplayPbZones {
     readonly #fortRangeRadius = 15
     readonly #towerRangeRadius = 12
     showPB: string
     #serverType: string
+    #lowerBound = {} as Point
+    #upperBound = {} as Point
     private readonly _ports!: DisplayPorts
     private readonly _showId: string
     private readonly _showValues: Array<{ id: string; label: string }>
@@ -33,8 +34,6 @@ export default class DisplayPbZones {
     private readonly _showRadios: RadioButton
     private _isDataLoaded: boolean
     private _pbZonesDefault!: PbZone[]
-    private _lowerBound!: Bound
-    private _upperBound!: Bound
     private _defencesFiltered!: PbZoneDefence[]
     private _pbZonesFiltered!: PbZoneBasic[]
     private _raidZonesFiltered!: PbZoneRaid[]
@@ -314,10 +313,10 @@ export default class DisplayPbZones {
         const portsFiltered = this._pbZonesDefault
             .filter(
                 (port) =>
-                    port.position[0] >= this._lowerBound[0] &&
-                    port.position[0] <= this._upperBound[0] &&
-                    port.position[1] >= this._lowerBound[1] &&
-                    port.position[1] <= this._upperBound[1]
+                    port.position[0] >= this.#lowerBound[0] &&
+                    port.position[0] <= this.#upperBound[0] &&
+                    port.position[1] >= this.#lowerBound[1] &&
+                    port.position[1] <= this.#upperBound[1]
             )
             .filter((d) => this._isPortIn(d))
 
@@ -344,12 +343,11 @@ export default class DisplayPbZones {
 
     /**
      * Set bounds of current viewport
-     * @param lowerBound - Top left coordinates of current viewport
-     * @param upperBound - Bottom right coordinates of current viewport
+     * @param viewport - Current viewport
      */
-    setBounds(lowerBound: Bound, upperBound: Bound): void {
-        this._lowerBound = lowerBound
-        this._upperBound = upperBound
+    setBounds(viewport: Extent): void {
+        this.#lowerBound = viewport[0]
+        this.#upperBound = viewport[1]
     }
 
     refresh(): void {

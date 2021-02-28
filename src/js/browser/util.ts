@@ -202,8 +202,8 @@ export const printCompassRose = ({
             let translate: string
 
             dummy.text(d)
-            const textHeight = dummy.node()?.getBBox().height ?? 0
-            const textWidth = dummy.node()?.getBBox().width ?? 0
+            const textHeight = (dummy.node() as SVGTextElement).getBBox().height ?? 0
+            const textWidth = (dummy.node() as SVGTextElement).getBBox().width ?? 0
 
             if ((rotate >= 0 && rotate <= 45) || rotate === 315) {
                 rotate = 90
