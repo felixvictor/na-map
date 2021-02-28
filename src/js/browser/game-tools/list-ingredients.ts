@@ -134,7 +134,8 @@ export default class ListIngredients {
         const rows = this._getRows()
         const splitRows = chunkify(rows, columns)
         let text = ""
-        for (const column of [...new Array(splitRows.length).keys()]) {
+
+        for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
             text += '<table class="table table-sm na-table"><thead>'
             text += "<tr><th>Ingredient</th><th>Recipes</th></tr></thead><tbody>"

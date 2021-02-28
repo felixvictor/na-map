@@ -26,7 +26,7 @@ import {
 import { insertBaseModal } from "common/common-browser"
 import { formatFloatFixed } from "common/common-format"
 
-import { Cannon, CannonDamage, CannonEntity, CannonGeneric, CannonPenetration, CannonValue } from "common/gen-json"
+import { Cannon, CannonDamage, CannonEntity, CannonGeneric, CannonPenetration } from "common/gen-json"
 import { HeaderMap, HtmlResult, HtmlString } from "common/interface"
 
 interface FamilyRowData {

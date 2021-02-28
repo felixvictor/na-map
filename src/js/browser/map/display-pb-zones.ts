@@ -152,10 +152,11 @@ export default class DisplayPbZones {
                     // Port battle join circles
                     g.append("path")
                         .attr("class", "pb-join-circle")
-                        .attr("d", (d) =>
-                            drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 28).concat(
+                        .attr(
+                            "d",
+                            (d) =>
+                                drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 28) +
                                 drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 14)
-                            )
                         )
 
                     // Port battle circles

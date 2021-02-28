@@ -278,8 +278,7 @@ export class Ship {
      */
     _setCompass(): void {
         // Compass
-        const data = new Array(numberSegments / 2)
-        data.fill(1, 0)
+        const data = Array.from({ length: numberSegments / 2 }, () => 1)
         // eslint-disable-next-line unicorn/no-null
         const pie = d3Pie().sort(null).value(1)(data)
 

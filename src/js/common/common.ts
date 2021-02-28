@@ -211,7 +211,7 @@ export const capitalizeFirstLetter = (string: string): string => string.charAt(0
 export const range = (
     start: number, // Start index
     end: number // End index
-): number[] => [...new Array(1 + end - start).keys()].map((v) => start + v)
+): number[] => Array.from({ length: 1 + end - start }, (_, i) => start + i)
 
 /**
  * Find Nation object based on nation name
@@ -270,13 +270,13 @@ export class TupleKeyMap<K, V> extends Map {
     }
 
     forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
-        this.map.forEach((value, key) => {
+        for (const [key, value] of this.map.entries()) {
             callbackfn.call(thisArg, value, JSON.parse(key), this)
-        })
+        }
     }
 }
 
-export const sleep = async (ms: number) => {
+export const sleep = async (ms: number): Promise<NodeJS.Timeout> => {
     // eslint-disable-next-line no-promise-executor-return
     return new Promise((resolve) => setTimeout(resolve, ms))
 }

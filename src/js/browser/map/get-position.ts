@@ -51,7 +51,7 @@ export default class TrilateratePosition {
 
         // Number of input port distances
         this.#NumberOfInputs = 3
-        this.#numbers = [...new Array(this.#NumberOfInputs).keys()]
+        this.#numbers = Array.from({ length: this.#NumberOfInputs }, (_, i) => i)
         this.#baseName = "Get position"
         this.#baseId = "get-position"
         this.#buttonId = `button-${this.#baseId}`
@@ -174,7 +174,7 @@ export default class TrilateratePosition {
             position.y = Math.round(position.y)
 
             this.#ports.map.f11.printCoord(position.x, position.y)
-            this.#ports.map.zoomAndPan(position.x, position.y, 1)
+            this.#ports.map.zoomAndPan(position.x, position.y)
 
             const coordX = Math.round(convertInvCoordX(position.x, position.y) / -1000)
             const coordY = Math.round(convertInvCoordY(position.x, position.y) / -1000)

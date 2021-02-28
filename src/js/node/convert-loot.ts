@@ -42,7 +42,7 @@ const getLootItemName = (name: string, type: string): string => {
     let cleanedName = cleanName(name)
 
     if (type === "Recipe" && !cleanedName.endsWith("Blueprint")) {
-        cleanedName = cleanedName.concat(" Blueprint")
+        cleanedName += " Blueprint"
     }
 
     return cleanedName

@@ -36,7 +36,7 @@ import { PortBasic } from "common/gen-json"
 import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
-import { ϕ } from "common/common-math";
+import { ϕ } from "common/common-math"
 
 dayjs.extend(customParseFormat)
 

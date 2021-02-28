@@ -102,11 +102,11 @@ const getBuildings = (): Building[] => {
         ])
     )
 
-    const apiBuilding = apiItems.filter(
+    const apiBuildings = apiItems.filter(
         (item) => item.ItemType === "Building" && !obsoleteBuildings.has(item.Name)
     ) as APIBuilding[]
 
-    apiBuilding.forEach((apiBuilding) => {
+    for (const apiBuilding of apiBuildings) {
         const building: Building = {
             id: Number(apiBuilding.Id),
             name: cleanName(apiBuilding.Name),
@@ -160,7 +160,7 @@ const getBuildings = (): Building[] => {
 
             buildings.set(building.name, building)
         }
-    })
+    }
 
     return [...buildings.values()]
 }

@@ -147,9 +147,9 @@ export default class ListLoot {
         // Chests
         for (const chest of this.#chestsData) {
             for (const group of chest.itemGroup) {
-                const { items } = group
+                const { chance, items } = group
                 for (const item of items) {
-                    setOptionItems(chest, item, group.chance)
+                    setOptionItems(chest, item, chance)
                 }
             }
         }
