@@ -54,7 +54,6 @@ class NAMap {
     readonly #maxTileZoom = 5
     minMapScale = 1
     readonly #maxMapScale = 256
-    #initialMapScale = this.minMapScale
     #currentMapScale = this.minMapScale
     readonly #tileSize = 256
     readonly #wheelDelta = 1
@@ -168,7 +167,6 @@ class NAMap {
         this.gridOverlay = document.querySelectorAll<HTMLElement>(".overlay")[0]
 
         this._setHeightWidth()
-        this._setupScale()
         this._setupSvg()
         this._setSvgSize()
         this._setupTiler()
@@ -292,13 +290,6 @@ class NAMap {
         document.querySelector("#show-grid")?.addEventListener("change", () => {
             this._showGridSelected()
         })
-    }
-
-    _setupScale(): void {
-        /**
-         * Current map scale
-         */
-        this.#initialMapScale = nearestPow2(Math.min(this.height, this.width) / this.#tileSize)
     }
 
     _setupSvg(): void {
@@ -433,7 +424,6 @@ class NAMap {
 
     _doDoubleClickAction(event: Event): void {
         const [mx, my] = d3Pointer(event as MouseEvent, this.#mainG.node())
-        console.log("_doDoubleClickAction mx my", event, mx, my, this.#mainG.node())
 
         if (this._doubleClickAction === "f11") {
             this.f11.printCoord(mx, my)
@@ -508,7 +498,7 @@ class NAMap {
 
     _init(): void {
         this.zoomLevel = "initial"
-        this.initialZoomAndPan()
+        this._initialZoomAndPan()
         this._checkF11Coord()
         this._setFlexOverlayHeight()
         document.querySelector<HTMLElement>("#navbar-left")?.classList.remove("d-none")
@@ -569,18 +559,42 @@ class NAMap {
         document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${height}px`)
     }
 
-    initialZoomAndPan(): void {
-        const transform = d3ZoomIdentity.translate(this.width / 2, this.height / 2).scale(this.#initialMapScale)
-        this._svg.call(this.#zoom.transform, transform)
+    _getInitialMapScale(): number {
+        let initialMapScale = nearestPow2(Math.min(this.height, this.width) / this.#tileSize)
+        const screenArea = this.height * this.width
+        const mapAreaSmall = (this.#tileSize * initialMapScale) ** 2
+        const mapAreaLarge = (this.#tileSize * initialMapScale * 2) ** 2
 
-        // Calculate translate extent
-        // {@link https://stackoverflow.com/a/57660500}
+        if (screenArea - mapAreaSmall > mapAreaLarge - screenArea) {
+            initialMapScale *= 2
+        }
+
+        return initialMapScale
+    }
+
+    /**
+     * {@link https://stackoverflow.com/a/57660500}
+     * @param transform - Transform
+     */
+    _setTranslateExtent(transform: ZoomTransform): void {
         this.#zoom.translateExtent([
             transform.invert(this.#extent[0] as [number, number]),
             transform.invert(this.#extent[1] as [number, number]),
         ])
     }
 
+    _initialZoomAndPan(): void {
+        const transform = d3ZoomIdentity.translate(this.width / 2, this.height / 2).scale(this._getInitialMapScale())
+
+        this._svg.call(this.#zoom.transform, transform)
+        this._setTranslateExtent(transform)
+    }
+
+    /**
+     * Zoom and pan to x,y coord
+     * @param x - x coord
+     * @param y - y coord
+     */
     zoomAndPan(x: number, y: number): void {
         const mapScale = 32
         const transform = d3ZoomIdentity
@@ -589,14 +603,13 @@ class NAMap {
                 Math.floor((-x + this.coord.max / 2 + this.width / 2) / mapScale),
                 Math.floor(-y + this.coord.max / 2 + this.height / 2) / mapScale
             )
-        console.log("zoomAndPan x y", x, y, this.#initialMapScale, mapScale, this._getMapScale(32), transform)
 
         this._svg.call(this.#zoom.transform, transform)
     }
 
     goToPort(): void {
         if (this._ports.currentPort.id === 0) {
-            this.initialZoomAndPan()
+            this._initialZoomAndPan()
         } else {
             this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y)
         }
