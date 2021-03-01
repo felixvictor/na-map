@@ -546,7 +546,6 @@ export default class SelectPorts {
 
         this._ports.showRadius = "tradePorts"
         this._ports.update()
-        this._map.initialZoomAndPan()
     }
 
     _goodSelected(): void {
