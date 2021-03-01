@@ -137,7 +137,7 @@ export default class ListIngredients {
 
         for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm na-table"><thead>'
+            text += '<table class="table table-sm small na-table"><thead>'
             text += "<tr><th>Ingredient</th><th>Recipes</th></tr></thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"
