@@ -37,6 +37,9 @@ import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
 import { ϕ } from "common/common-math"
+import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
+
+import { NAMap } from "js/browser/map/na-map"
 
 dayjs.extend(customParseFormat)
 
@@ -75,7 +78,7 @@ export default class PowerMap extends BaseModal {
     #legendRowPadding = 0
     #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #map = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
-    #maxY: number | undefined
+    #maxY = 0
     #nationOldIndex = new Map<number, number>()
     #pattern = [] as Array<null | CanvasPattern>
     #playButton = {} as Selection<HTMLElement, unknown, HTMLElement, unknown>
@@ -85,6 +88,7 @@ export default class PowerMap extends BaseModal {
     #rows = 0
     #stopCommand = false
     #voronoi = {} as Voronoi<Delaunay.Point>
+    readonly #NAMap: NAMap
     readonly #baseId = "power-map"
     readonly #colourScale: ScaleOrdinal<number, string>
     readonly #coord
@@ -93,8 +97,9 @@ export default class PowerMap extends BaseModal {
 
     readonly #speedFactor = 2
 
-    constructor(serverId: string, coord: MinMaxCoord) {
+    constructor(readonly map: NAMap, readonly serverId: string, readonly coord: MinMaxCoord) {
         super(serverId, "Ownership map")
+        this.#NAMap = map
 
         this.#coord = coord
         this.#colourScale = d3ScaleOrdinal<number, string>()
@@ -253,8 +258,7 @@ export default class PowerMap extends BaseModal {
 
         const delaunay = d3Delaunay.from(points)
 
-        this.#maxY = d3Max(points, (point) => point[1])
-        this.#maxY = this.#maxY ? Math.floor(this.#maxY * 1.05) : this.#coord.max
+        this.#maxY = d3Max(points, (point) => point[1]) ?? this.#coord.max
         const bounds = [this.#coord.min, this.#coord.min, this.#coord.max, this.#maxY]
 
         this.#voronoi = delaunay.voronoi(bounds)
@@ -505,6 +509,10 @@ export default class PowerMap extends BaseModal {
         this.#playButton.classed("icon-pause", !this.#stopCommand).classed("icon-play", this.#stopCommand)
     }
 
+    _initialMapZoom(): void {
+        this.#NAMap.zoomAndPan(this.#coord.max / 2, this.#coord.max / 2, true)
+    }
+
     _updateController(updateDateOnly = false): void {
         const date = this.#powerData[this.#index][0]
         const ports = this.#powerData[this.#index][1]
@@ -594,6 +602,7 @@ export default class PowerMap extends BaseModal {
         const closeButtonClicked = () => {
             this._drawEnd()
             this.#mainDiv.remove()
+            this._initialMapZoom()
         }
 
         const addButton = (icon: string, title: string): Selection<HTMLElement, unknown, HTMLElement, unknown> =>
@@ -664,32 +673,37 @@ export default class PowerMap extends BaseModal {
         ro.observe(this.#legendControllerElement)
     }
 
+    _getTopAlignedTransform(element: SVGGElement): ZoomTransform {
+        const { a: scale, e: tx } = element.transform.baseVal.consolidate().matrix
+        return d3ZoomIdentity.scale(scale).translate(tx / scale, 0)
+    }
+
     async _initCanvas(): Promise<void> {
         const pixelRatio = 2
 
-        // Get elements
-        const main = d3Select("#na-map")
-        const svg = d3Select("#na-map svg")
-        this.#mainDiv = main.append("div")
-        const canvas = this.#mainDiv.append("canvas")
-        const canvasNode = canvas.node() as HTMLCanvasElement
+        // Move map to top
+        const gMapTiles = d3Select("#na-map svg g.map-tiles")
+        const mapTransform = this._getTopAlignedTransform(this.#map.node() as SVGGElement)
+        const mapTilesTransform = this._getTopAlignedTransform(gMapTiles.node() as SVGGElement)
+        this.#map.attr("transform", mapTransform.toString())
+        gMapTiles.attr("transform", mapTilesTransform.toString())
 
-        // Get svg size and map transform
+        // Get svg size
+        const svg = d3Select("#na-map svg")
         const heightCss = svg.style("height")
         const widthCss = svg.style("width")
 
         // Position canvas on top of svg
-        this.#mainDiv
+        this.#mainDiv = d3Select("#na-map")
+            .append("div")
             .style("position", "relative")
             .style("top", `-${heightCss}`)
             .style("height", "100%")
             .style("opacity", 0.7)
 
-        // Get current transformation
-        const currentTransformMatrix = (this.#map?.node() as SVGGElement)?.transform.baseVal.consolidate().matrix
-        const scale = currentTransformMatrix.a
-        const tx = currentTransformMatrix.e
-        const ty = currentTransformMatrix.f
+        // Add canvas
+        const canvas = this.#mainDiv.append("canvas")
+        const canvasNode = canvas.node() as HTMLCanvasElement
 
         // Set display size (css pixels)
         canvasNode.style.height = heightCss
@@ -701,14 +715,13 @@ export default class PowerMap extends BaseModal {
 
         // Set context and transformation
         this.#ctx = getCanvasRenderingContext2D(canvasNode)
-        this.#ctx.translate(tx * pixelRatio, ty * pixelRatio)
-        this.#ctx.scale(scale * pixelRatio, scale * pixelRatio)
+        this.#ctx.translate(mapTransform.x * pixelRatio, mapTransform.y * pixelRatio)
+        this.#ctx.scale(mapTransform.k * pixelRatio, mapTransform.k * pixelRatio)
 
-        const gTiles = d3Select("#na-map svg g.map-tiles")
-        const tilesWidth = getElementWidth(gTiles.node() as SVGElement)
+        const tilesWidth = getElementWidth(gMapTiles.node() as SVGGElement)
         const dim: DivDimension = {
-            top: (this.#coord.max - (this.#maxY ?? 0)) * scale + ty,
-            left: tx,
+            top: Math.floor(this.map.height - this.#maxY * mapTransform.k + mapTransform.y),
+            left: mapTransform.x,
             width: tilesWidth,
         }
         this._initLegend(dim)
@@ -721,6 +734,7 @@ export default class PowerMap extends BaseModal {
     _menuItemSelected(): void {
         showCursorWait()
         this._mapElementsOff()
+        this._initialMapZoom()
         this._initVoronoi()
         void this._initCanvas()
         this._drawPowerMap()

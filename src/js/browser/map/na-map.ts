@@ -55,6 +55,7 @@ class NAMap {
     minMapScale = 1
     readonly #maxMapScale = 256
     #currentMapScale = this.minMapScale
+    #initialMapScale = this.minMapScale
     readonly #tileSize = 256
     readonly #wheelDelta = 1
     readonly #labelZoomThreshold = 0.25
@@ -95,6 +96,7 @@ class NAMap {
     private readonly _showGridId: string
     private readonly _showGridRadios: RadioButton
     private readonly _showGridValues: string[]
+
 
     /**
      * @param serverName - Naval action server name
@@ -243,7 +245,7 @@ class NAMap {
         this._init()
         this._journey = new MakeJourney(this.rem)
         void new TrilateratePosition(this._ports)
-        void new PowerMap(this.serverName, this.coord)
+        void new PowerMap(this, this.serverName, this.coord)
 
         /*
         Marks.forEach(mark => {
@@ -498,6 +500,7 @@ class NAMap {
 
     _init(): void {
         this.zoomLevel = "initial"
+        this.#initialMapScale = this._getInitialMapScale()
         this._initialZoomAndPan()
         this._checkF11Coord()
         this._setFlexOverlayHeight()
@@ -584,9 +587,8 @@ class NAMap {
     }
 
     _initialZoomAndPan(): void {
-        const transform = d3ZoomIdentity.translate(this.width / 2, this.height / 2).scale(this._getInitialMapScale())
+        const transform = this.zoomAndPan(this.coord.max / 2, this.coord.max / 2, true)
 
-        this._svg.call(this.#zoom.transform, transform)
         this._setTranslateExtent(transform)
     }
 
@@ -594,9 +596,10 @@ class NAMap {
      * Zoom and pan to x,y coord
      * @param x - x coord
      * @param y - y coord
+     * @param init - true if map zoomed to initial scale
      */
-    zoomAndPan(x: number, y: number): void {
-        const mapScale = 32
+    zoomAndPan(x: number, y: number, init = false): ZoomTransform {
+        const mapScale = init ? this.#initialMapScale : 32
         const transform = d3ZoomIdentity
             .scale(mapScale)
             .translate(
@@ -605,6 +608,7 @@ class NAMap {
             )
 
         this._svg.call(this.#zoom.transform, transform)
+        return transform
     }
 
     goToPort(): void {
