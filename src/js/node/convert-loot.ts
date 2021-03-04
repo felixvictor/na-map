@@ -55,12 +55,21 @@ const getLootItemsChance = (chestLootTableId: number): number => {
     return lootTable[0].Items[0].Chance
 }
 
-const getLootContent = (lootItems: ItemsEntity[], itemProbability: number[]): LootLootItemsEntity[] =>
+const getLootContent = (
+    lootItems: ItemsEntity[],
+    itemProbability: number[],
+    revertChance = false
+): LootLootItemsEntity[] =>
     lootItems.map(
         (item): LootLootItemsEntity => ({
             id: Number(item.Template),
             name: itemNames.get(Number(item.Template)) ?? "",
-            chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
+            chance:
+                itemProbability.length > 0
+                    ? Number(itemProbability[Number(item.Chance)])
+                    : revertChance
+                    ? 1 - Number(item.Chance)
+                    : Number(item.Chance),
             amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) },
         })
     )
@@ -86,14 +95,14 @@ const convertLoot = async (): Promise<void> => {
                 ({
                     id: Number(item.Id),
                     name: getLootName(Number(item.Class), item.EventLootTable),
-                    items: getLootContent(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
+                    items: getLootContent(item.Items ?? [], item.itemProbability ?? []).sort(sortBy(["chance", "id"])),
                 } as LootLootEntity)
         )
         .sort(sortBy(["id"]))
 
     // Chests
     const chests = getLootItems(["TimeBasedConvertibleItem"]) as APITimeBasedConvertibleItem[]
-    data.chests = chests
+    data.chest = chests
         .map(
             (item) =>
                 ({
@@ -106,6 +115,20 @@ const convertLoot = async (): Promise<void> => {
                         items: getChestItemsFromChestLootTable(lootChestLootTableId).sort(sortBy(["id"])),
                     })).sort(sortBy(["chance"])),
                 } as LootChestsEntity)
+        )
+        .sort(sortBy(["id"]))
+
+    // Fish
+    const fish = getLootItems(["LootTableItem"]) as APIShipLootTableItem[]
+    data.fish = fish
+        .filter((item) => item.Name.endsWith("Fishing Loot Table"))
+        .map(
+            (item) =>
+                ({
+                    id: Number(item.Id),
+                    name: cleanName(item.Name.replace(" Fishing Loot Table", "")),
+                    items: getLootContent(item.Items ?? [], [], true).sort(sortBy(["chance", "id"])),
+                } as LootLootEntity)
         )
         .sort(sortBy(["id"]))
 
