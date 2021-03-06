@@ -7,6 +7,7 @@
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+export const ϕ = (1 + Math.sqrt(5)) / 2;
 export const timeFactor = 2.63;
 export const speedFactor = 390;
 export const speedConstA = 0.074465523706782;

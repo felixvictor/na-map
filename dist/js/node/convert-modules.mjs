@@ -322,23 +322,17 @@ export const convertModulesAndWoodData = async () => {
     };
     const getModuleType = (module) => {
         let type;
-        let { permanentType, sortingGroup } = module;
-        if (module.usageType === "All" &&
-            sortingGroup &&
-            module.moduleLevel === "U" &&
-            module.moduleType === "Hidden") {
+        let { moduleLevel, moduleType, permanentType, sortingGroup, usageType } = module;
+        if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim";
         }
-        else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
+        else if (moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
             type = "Permanent";
         }
-        else if (module.usageType === "All" &&
-            !sortingGroup &&
-            module.moduleLevel === "U" &&
-            module.moduleType === "Hidden") {
+        else if (usageType === "All" && !sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Perk";
         }
-        else if (module.moduleType === "Regular") {
+        else if (moduleType === "Regular") {
             type = "Ship knowledge";
         }
         else {
@@ -353,7 +347,7 @@ export const convertModulesAndWoodData = async () => {
         }
         else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202F${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
+                ? `\u202F\u2013\u202F${capitalizeFirstLetter(sortingGroup ?? "").replace("_", "/")}`
                 : "";
         }
         permanentType = permanentType === "Default" ? "" : `\u202F\u25CB\u202F${permanentType}`;
@@ -363,7 +357,7 @@ export const convertModulesAndWoodData = async () => {
         .filter((item) => item.ItemType === "Module" &&
         ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent"))
         .filter((item) => !notUsedExceptionalWoodIds.has(item.Id));
-    apiModules.forEach((apiModule) => {
+    for (const apiModule of apiModules) {
         let dontSave = false;
         const module = {
             id: apiModule.Id,
@@ -438,7 +432,7 @@ export const convertModulesAndWoodData = async () => {
             const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module;
             modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule);
         }
-    });
+    }
     const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]));
     const modulesGrouped = d3Group(result, (module) => module.type);
     await saveJsonAsync(commonPaths.fileModules, [...modulesGrouped]);

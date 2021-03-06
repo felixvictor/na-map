@@ -149,7 +149,7 @@ export const capitalToCounty = new Map([
 export const validNationShortName = (nationShortName) => nations.some((nation) => nation.short === nationShortName);
 export const isEmpty = (object) => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
 export const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-export const range = (start, end) => [...new Array(1 + end - start).keys()].map((v) => start + v);
+export const range = (start, end) => Array.from({ length: 1 + end - start }, (_, i) => start + i);
 export const findNationByName = (nationName) => nations.find((nation) => nationName === nation.name);
 export const findNationByNationShortName = (nationShortName) => nations.find((nation) => nation.short === nationShortName);
 export const findNationById = (nationId) => nationMap.get(nationId);
@@ -181,9 +181,9 @@ export class TupleKeyMap extends Map {
         return this.map.size;
     }
     forEach(callbackfn, thisArg) {
-        this.map.forEach((value, key) => {
+        for (const [key, value] of this.map.entries()) {
             callbackfn.call(thisArg, value, JSON.parse(key), this);
-        });
+        }
     }
 }
 export const sleep = async (ms) => {

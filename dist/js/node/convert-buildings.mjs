@@ -65,8 +65,8 @@ const getBuildings = () => {
             labour: recipe.LaborPrice,
         },
     ]));
-    const apiBuilding = apiItems.filter((item) => item.ItemType === "Building" && !obsoleteBuildings.has(item.Name));
-    apiBuilding.forEach((apiBuilding) => {
+    const apiBuildings = apiItems.filter((item) => item.ItemType === "Building" && !obsoleteBuildings.has(item.Name));
+    for (const apiBuilding of apiBuildings) {
         const building = {
             id: Number(apiBuilding.Id),
             name: cleanName(apiBuilding.Name),
@@ -110,7 +110,7 @@ const getBuildings = () => {
             }
             buildings.set(building.name, building);
         }
-    });
+    }
     return [...buildings.values()];
 };
 const getAPISeasonedItem = (name) => apiItems.find((item) => item.ItemType === "Recipe" &&

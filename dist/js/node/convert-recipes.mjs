@@ -51,7 +51,8 @@ const convertRecipes = async () => {
         (item.ItemType === "ShipUpgradeBookItem" || item.SortingGroup === "Resource.Trading"))
         .map((item) => [item.Id, item.Id]));
     const upgradeIds = new Map(apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0]));
-    apiItems.filter((apiRecipe) => recipeItemTypes.has(apiRecipe.ItemType) && (!apiRecipe.NotUsed || itemIsUsed.has(apiRecipe.Id))).forEach((apiRecipe) => {
+    const filteredItems = apiItems.filter((apiRecipe) => recipeItemTypes.has(apiRecipe.ItemType) && (!apiRecipe.NotUsed || itemIsUsed.has(apiRecipe.Id)));
+    for (const apiRecipe of filteredItems) {
         const resultReference = recipeUsingResults.has(apiRecipe.ItemType)
             ? apiRecipe.Results[0]
             : apiRecipe.Qualities[0].Results[0];
@@ -84,7 +85,8 @@ const convertRecipes = async () => {
         if (recipe.result.name) {
             recipes.push(recipe);
         }
-        apiRecipe.FullRequirements.filter((APIingredient) => ingredientIds.has(APIingredient.Template)).forEach((apiIngredient) => {
+        const apiIngredients = apiRecipe.FullRequirements.filter((APIingredient) => ingredientIds.has(APIingredient.Template));
+        for (const apiIngredient of apiIngredients) {
             const recipeName = recipe.module ? recipe.module : recipe.name.replace(" Blueprint", "");
             if (ingredients.has(apiIngredient.Template)) {
                 const updatedIngredient = ingredients.get(apiIngredient.Template);
@@ -100,8 +102,8 @@ const convertRecipes = async () => {
                 };
                 ingredients.set(apiIngredient.Template, ingredient);
             }
-        });
-    });
+        }
+    }
     data.recipe = [...d3Group(recipes, (recipe) => recipe.craftGroup)]
         .sort(sortBy(["id"]))
         .map(([group, recipes]) => {

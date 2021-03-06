@@ -154,26 +154,26 @@ const setRegionFeature = (location, portPos) => {
     }
 };
 const setAndSaveCountyRegionData = async () => {
-    apiPorts.forEach((apiPort) => {
+    for (const apiPort of apiPorts) {
         const { x, y } = apiPortPos.get(Number(apiPort.Id));
         setCountyFeature(apiPort.CountyCapitalName, [x, y]);
         setRegionFeature(apiPort.Location, [x, y]);
-    });
+    }
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/regions.json`, geoJsonRegions);
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/counties.json`, geoJsonCounties);
-    geoJsonRegions.features.forEach((region) => {
+    for (const region of geoJsonRegions.features) {
         region.geometry.type = "Point";
         region.geometry.coordinates = [
             polylabel([region.geometry.coordinates], 1).map((coordinate) => Math.trunc(coordinate)),
         ];
-    });
+    }
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/region-labels.json`, geoJsonRegions);
-    geoJsonCounties.features.forEach((county) => {
+    for (const county of geoJsonCounties.features) {
         county.geometry.type = "Point";
         county.geometry.coordinates = [
             polylabel([county.geometry.coordinates], 1).map((coordinate) => Math.trunc(coordinate)),
         ];
-    });
+    }
     await saveJsonAsync(`${commonPaths.dirGenGeneric}/county-labels.json`, geoJsonCounties);
 };
 export const convertGenericPortData = () => {

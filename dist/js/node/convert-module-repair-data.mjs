@@ -26,7 +26,7 @@ export const convertRepairData = async () => {
     for (const baseFileName of baseFileNames) {
         const fileData = getFileData(baseFileName, "kit");
         const data = {};
-        fileData.Attributes.Pair.forEach((pair) => {
+        for (const pair of fileData.Attributes.Pair) {
             if (pair.Key._text === "REPAIR_VOLUME_PER_ITEM") {
                 data.volume = Number(pair.Value.Value._text);
             }
@@ -36,7 +36,7 @@ export const convertRepairData = async () => {
             if (pair.Key._text === "REPAIR_MODULE_TIME") {
                 data.time = Number(pair.Value.Value._text);
             }
-        });
+        }
         repairs[toCamelCase(baseFileName)] = data;
     }
     await saveJsonAsync(commonPaths.fileRepair, repairs);

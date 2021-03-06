@@ -93,12 +93,10 @@ const setAndSavePortData = async (serverName) => {
 const setAndSaveTradeData = async (serverName) => {
     const trades = [];
     for (const buyPort of portData) {
-        buyPort.inventory
-            .filter((buyGood) => buyGood.buyQuantity > 0)
-            .forEach((buyGood) => {
-            const { buyPrice, buyQuantity } = buyGood;
+        for (const buyGood of buyPort.inventory.filter((buyGood) => buyGood.buyQuantity > 0)) {
+            const { buyPrice, buyQuantity, id: buyGoodId } = buyGood;
             for (const sellPort of portData) {
-                const sellGood = sellPort.inventory.find((good) => good.id === buyGood.id);
+                const sellGood = sellPort.inventory.find((good) => good.id === buyGoodId);
                 if (sellPort.id !== buyPort.id && sellGood) {
                     const { sellPrice, sellQuantity } = sellGood;
                     const quantity = Math.min(buyQuantity, sellQuantity);
@@ -106,19 +104,19 @@ const setAndSaveTradeData = async (serverName) => {
                     const profitTotal = profitPerItem * quantity;
                     if (profitTotal >= minProfit) {
                         const trade = {
-                            good: buyGood.id,
+                            good: buyGoodId,
                             source: { id: Number(buyPort.id), grossPrice: buyPrice },
                             target: { id: Number(sellPort.id), grossPrice: sellPrice },
                             distance: getDistance(buyPort.id, sellPort.id),
                             profitTotal,
                             quantity,
-                            weightPerItem: itemWeights.get(buyGood.id) ?? 0,
+                            weightPerItem: itemWeights.get(buyGoodId) ?? 0,
                         };
                         trades.push(trade);
                     }
                 }
             }
-        });
+        }
     }
     trades.sort(sortBy(["profitTotal"]));
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-trades.json`), trades);
@@ -178,9 +176,8 @@ const setAndSaveFrontlines = async (serverName) => {
     const outNations = new Set(["NT"]);
     const frontlineAttackingNationGroupedByToPort = {};
     const frontlineAttackingNationGroupedByFromPort = {};
-    nations
-        .filter(({ short: nationShort }) => !outNations.has(nationShort))
-        .forEach(({ id: nationId, short: nationShortName }) => {
+    const filteredNations = nations.filter(({ short: nationShort }) => !outNations.has(nationShort));
+    for (const { id: nationId, short: nationShortName } of filteredNations) {
         const frontlinesFrom = apiPorts
             .filter(({ Nation: fromPortNation }) => fromPortNation === nationId || fromPortNation === 0 || fromPortNation === 9)
             .flatMap((fromPort) => apiPorts
@@ -210,7 +207,7 @@ const setAndSaveFrontlines = async (serverName) => {
                 nation: port.toPortNation,
             })),
         }));
-    });
+    }
     const frontlineDefendingNationMap = new Map();
     for (const attackingNation of nationShortName) {
         if (frontlineAttackingNationGroupedByFromPort[attackingNation]) {

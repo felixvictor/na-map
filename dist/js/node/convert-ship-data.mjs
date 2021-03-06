@@ -324,7 +324,7 @@ const getBaseFileNames = (dir) => {
         if (str === "rookie" || str === "trader" || str === "tutorial") {
             const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "").replace("tutorial ", "");
             const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "));
-            str = str.concat(" ").concat(str2);
+            str += ` ${str2}`;
         }
         if (shipNames.has(str)) {
             baseFileNames.add(str);
@@ -361,9 +361,7 @@ const getAdditionalData = (elements, fileData) => {
     return addData;
 };
 const addAdditionalData = (addData, id) => {
-    ships
-        .filter((ship) => ship.id === id)
-        .forEach((ship) => {
+    for (const ship of ships.filter((ship) => ship.id === id)) {
         for (const [group, values] of Object.entries(addData)) {
             if (!ship[group]) {
                 ship[group] = {};
@@ -372,7 +370,7 @@ const addAdditionalData = (addData, id) => {
                 ship[group][element] = value;
             }
         }
-    });
+    }
 };
 const getFileData = (baseFileName, ext) => {
     const fileName = path.resolve(commonPaths.dirModules, `${baseFileName} ${ext}.xml`);

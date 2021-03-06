@@ -25,7 +25,7 @@ const getLootName = (classId, isMission) => {
 const getLootItemName = (name, type) => {
     let cleanedName = cleanName(name);
     if (type === "Recipe" && !cleanedName.endsWith("Blueprint")) {
-        cleanedName = cleanedName.concat(" Blueprint");
+        cleanedName += " Blueprint";
     }
     return cleanedName;
 };
@@ -34,10 +34,14 @@ const getLootItemsChance = (chestLootTableId) => {
     const lootTable = apiItems.filter((item) => Number(item.Id) === chestLootTableId);
     return lootTable[0].Items[0].Chance;
 };
-const getLootContent = (lootItems, itemProbability) => lootItems.map((item) => ({
+const getLootContent = (lootItems, itemProbability, revertChance = false) => lootItems.map((item) => ({
     id: Number(item.Template),
     name: itemNames.get(Number(item.Template)) ?? "",
-    chance: itemProbability.length > 0 ? Number(itemProbability[Number(item.Chance)]) : Number(item.Chance),
+    chance: itemProbability.length > 0
+        ? Number(itemProbability[Number(item.Chance)])
+        : revertChance
+            ? 1 - Number(item.Chance)
+            : Number(item.Chance),
     amount: { min: Number(item.Stack?.Min), max: Number(item.Stack?.Max) },
 }));
 const getChestItems = (lootItems) => lootItems.map((item) => ({
@@ -53,11 +57,11 @@ const convertLoot = async () => {
         .map((item) => ({
         id: Number(item.Id),
         name: getLootName(Number(item.Class), item.EventLootTable),
-        items: getLootContent(item.Items ?? [], item.itemProbability ?? [0]).sort(sortBy(["chance", "id"])),
+        items: getLootContent(item.Items ?? [], item.itemProbability ?? []).sort(sortBy(["chance", "id"])),
     }))
         .sort(sortBy(["id"]));
     const chests = getLootItems(["TimeBasedConvertibleItem"]);
-    data.chests = chests
+    data.chest = chests
         .map((item) => ({
         id: Number(item.Id),
         name: cleanName(item.Name),
@@ -67,6 +71,15 @@ const convertLoot = async () => {
             chance: getLootItemsChance(lootChestLootTableId),
             items: getChestItemsFromChestLootTable(lootChestLootTableId).sort(sortBy(["id"])),
         })).sort(sortBy(["chance"])),
+    }))
+        .sort(sortBy(["id"]));
+    const fish = getLootItems(["LootTableItem"]);
+    data.fish = fish
+        .filter((item) => item.Name.endsWith("Fishing Loot Table"))
+        .map((item) => ({
+        id: Number(item.Id),
+        name: cleanName(item.Name.replace(" Fishing Loot Table", "")),
+        items: getLootContent(item.Items ?? [], [], true).sort(sortBy(["chance", "id"])),
     }))
         .sort(sortBy(["id"]));
     await saveJsonAsync(commonPaths.fileLoot, data);

@@ -61,11 +61,9 @@ const sortFileNames = (fileNames) => {
 const getDate = (date) => new Date(date).getTime();
 function parseData(serverId, portData, date) {
     const numPorts = {};
-    nations
-        .filter((nation) => nation.id !== 9)
-        .forEach((nation) => {
+    for (const nation of nations.filter((nation) => nation.id !== 9)) {
         numPorts[nation.short] = 0;
-    });
+    }
     const nationsForPowerMap = [];
     for (const port of portData) {
         const getObject = () => {
@@ -126,11 +124,9 @@ function parseData(serverId, portData, date) {
     portOwnershipPerDate[serverId].push([date, nationsForPowerMap]);
     const numPortsDate = {};
     numPortsDate.date = date;
-    nations
-        .filter((nation) => nation.id !== 9)
-        .forEach((nation) => {
+    for (const nation of nations.filter((nation) => nation.id !== 9)) {
         numPortsDate[nation.short] = numPorts[nation.short];
-    });
+    }
     numPortsDates[serverId].push(numPortsDate);
 }
 const processFiles = async (serverId, fileNames) => {

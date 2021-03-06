@@ -93,11 +93,11 @@ class Map {
         this.#map = [...new Uint16Array(this.#mapWidth * this.#mapHeight)].map((_, index) => this.#pngData[index << 2] > 127 ? this.#WATER : this.#LAND);
     }
     setPorts() {
-        this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }) => {
+        for (const { Id, EntrancePosition: { z: y, x }, } of this.#port.apiPorts) {
             const [portY, portX] = this.#port.getCoordinates(y, x, this.#mapScale);
             const index = this.getIndex(portY, portX);
             this.setPortSpot(index, Number(Id));
-        });
+        }
     }
     setBorders() {
         const minY = 0;
@@ -156,23 +156,21 @@ class Map {
                 .filter((portId) => portId > startPortId && !foundPortIds.has(portId))
                 .sort(simpleNumberSort);
             console.error("Only", foundPortIds.size + this.#completedPorts.size, "of all", this.#port.numPorts, "ports found! Ports", missingPortIds, "are missing.");
-            missingPortIds.forEach((missingPortId) => {
+            for (const missingPortId of missingPortIds) {
                 this.#distances.push([startPortId, missingPortId, 0]);
-            });
+            }
         }
     }
     async getAndSaveDistances() {
         try {
             console.time("findPath");
-            this.#port.apiPorts
-                .sort((a, b) => Number(a.Id) - Number(b.Id))
-                .forEach((fromPort) => {
+            for (const fromPort of this.#port.apiPorts.sort((a, b) => Number(a.Id) - Number(b.Id))) {
                 const fromPortId = Number(fromPort.Id);
-                const { EntrancePosition: { z: y, x }, } = fromPort;
+                const { EntrancePosition: { z: y, x }, Name: name, } = fromPort;
                 const [fromPortY, fromPortX] = this.#port.getCoordinates(y, x, this.#mapScale);
                 this.findPaths(fromPortId, fromPortY, fromPortX);
-                console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`);
-            });
+                console.timeLog("findPath", `${fromPortId} ${name} (${fromPortY}, ${fromPortX})`);
+            }
             console.timeEnd("findPath");
             await saveJsonAsync(this.#distancesFile, this.#distances.sort((a, b) => {
                 if (a[0] === b[0]) {
