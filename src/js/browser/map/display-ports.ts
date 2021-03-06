@@ -29,9 +29,9 @@ import utc from "dayjs/plugin/utc.js"
 import { capitalizeFirstLetter, nations, NationShortName } from "common/common"
 import {
     colourGreenDark,
+    colourLight,
     colourList,
     colourRedDark,
-    colourWhite,
     getIcons,
     loadJsonFile,
     loadJsonFiles,
@@ -195,8 +195,8 @@ export default class DisplayPorts {
     readonly #f11: ShowF11
     readonly #fontSize = defaultFontSize
     readonly #iconSize = 48
-    readonly #maxRadiusFactor = ϕ
     readonly #minRadiusFactor = ϕ
+    readonly #maxRadiusFactor = ϕ * 4
     readonly #minScale: number
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
@@ -299,7 +299,7 @@ export default class DisplayPorts {
 
         this.#colourScaleHostility = d3ScaleLinear<string, string>()
             .domain([0, 1])
-            .range([colourWhite, colourRedDark])
+            .range([colourLight, colourRedDark])
             .interpolate(d3InterpolateHcl)
         this.#colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
 
@@ -307,21 +307,21 @@ export default class DisplayPorts {
         this.#maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
         this.#colourScaleTax = d3ScaleLinear<string, string>()
             .domain([this.#minTaxIncome, this.#maxTaxIncome])
-            .range([colourWhite, colourGreenDark])
+            .range([colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
         this.#minNetIncome = d3Min(this.portData, (d) => d.netIncome) ?? 0
         this.#maxNetIncome = d3Max(this.portData, (d) => d.netIncome) ?? 0
         this.#colourScaleNet = d3ScaleLinear<string, string>()
             .domain([this.#minNetIncome, 0, this.#maxNetIncome])
-            .range([colourRedDark, colourWhite, colourGreenDark])
+            .range([colourRedDark, colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
         this.#minPortPoints = d3Min(this.portData, (d) => d.portPoints) ?? 0
         this.#maxPortPoints = d3Max(this.portData, (d) => d.portPoints) ?? 0
         this.#colourScalePoints = d3ScaleLinear<string, string>()
             .domain([this.#minPortPoints, this.#maxPortPoints])
-            .range([colourWhite, colourGreenDark])
+            .range([colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
     }
 
@@ -1066,8 +1066,13 @@ export default class DisplayPorts {
     }
 
     _updatePortCircles(): void {
-        const rMin = roundToThousands((this.#circleSize / this.#scale) * this.#minRadiusFactor)
-        const rMax = roundToThousands((this.#circleSize / this.#scale) * this.#maxRadiusFactor)
+        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
+        const scaledCircleSize = this.#circleSize / circleScale
+        const rMin = roundToThousands(scaledCircleSize * this.#minRadiusFactor)
+        const rMax = roundToThousands(scaledCircleSize * this.#maxRadiusFactor)
+
+        const incomeThreshold = 100000
+        const portPointThreshold = 30
         let data = this.#portDataFiltered
         // eslint-disable-next-line unicorn/consistent-function-scoping
         let cssClass: PortCircleStringF = () => ""
@@ -1078,19 +1083,19 @@ export default class DisplayPorts {
 
         // noinspection IfStatementWithTooManyBranchesJS
         if (this.showRadius === "tax") {
-            data = this.#portDataFiltered.filter((d) => d.capturable)
+            data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
             this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
             r = (d): number => this.#portRadius(d.taxIncome) ?? 0
         } else if (this.showRadius === "net") {
-            data = this.#portDataFiltered.filter((d) => d.capturable)
+            data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
             this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
             r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
         } else if (this.showRadius === "points") {
-            data = this.#portDataFiltered.filter((d) => d.capturable)
+            data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints>portPointThreshold)
             this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""

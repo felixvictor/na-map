@@ -21,6 +21,7 @@ import { findNationByNationShortName } from "common/common"
 declare const CGREEN: string,
     CGREENDARK: string,
     CGREENLIGHT: string,
+    CLIGHT: string,
     CPRIMARY300: string,
     CRED: string,
     CREDDARK: string,
@@ -40,6 +41,7 @@ export const appVersion = VERSION
 export const colourGreen = CGREEN
 export const colourGreenDark = CGREENDARK
 export const colourGreenLight = CGREENLIGHT
+export const colourLight = CLIGHT
 export const colourRed = CRED
 export const colourRedDark = CREDDARK
 export const colourRedLight = CREDLIGHT
