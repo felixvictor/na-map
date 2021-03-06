@@ -490,7 +490,7 @@
     <Pair>
       <Key>PERK_CONTROL_EXIT_TIMER_OVERRIDE_DISTANCE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>750</Value>
+        <Value>500</Value>
       </Value>
     </Pair>
     <Pair>
@@ -729,7 +729,7 @@
     <Pair>
       <Key>MAST_DAMAGE_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0</Value>
+        <Value>0.3</Value>
       </Value>
     </Pair>
   </Attributes>
