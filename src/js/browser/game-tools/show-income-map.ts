@@ -164,8 +164,10 @@ export default class ShowIncomeMap extends BaseModal {
     }
 
     async _loadAndSetupData(): Promise<void> {
+        showCursorWait()
         const readData = await this._loadData()
         this._setupData(readData)
+        showCursorDefault()
     }
 
     /**
