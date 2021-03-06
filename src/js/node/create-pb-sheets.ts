@@ -146,9 +146,6 @@ const defaultFont: Partial<Excel.Font> = {
  */
 // @ts-expect-error
 import StylesXform from "exceljs/lib/xlsx/xform/style/styles-xform"
-import { default as fs } from "fs"
-import { bool } from "sharp"
-import dayjs, { Dayjs } from "dayjs"
 const origStylesXformInit = StylesXform.prototype.init
 StylesXform.prototype.init = function () {
     // eslint-disable-next-line prefer-rest-params

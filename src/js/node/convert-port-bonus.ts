@@ -55,17 +55,18 @@ const convert = async (csvData: CSVData[]) => {
             port.name = cleanName(csvPort.Port)
 
             port.portBonus = {} as PortBonus
-            ;["Bonus1", "Bonus2", "Bonus3", "Bonus4", "Bonus5"]
-                .filter((bonusEntry) => csvPort[bonusEntry] !== "Empty")
-                .forEach((bonusEntry) => {
-                    const bonusValue = Number(csvPort[bonusEntry].slice(-1)) as PortBonusValue
-                    const bonusType = csvPort[bonusEntry]
-                        .replace("Bonus ", "")
-                        .replace(" and Rig", "")
-                        .toLowerCase()
-                        .slice(0, -2)!
-                    port.portBonus[bonusType] = bonusValue
-                })
+            const bonusEntries = ["Bonus1", "Bonus2", "Bonus3", "Bonus4", "Bonus5"].filter(
+                (bonusEntry) => csvPort[bonusEntry] !== "Empty"
+            )
+            for (const bonusEntry of bonusEntries) {
+                const bonusValue = Number(csvPort[bonusEntry].slice(-1)) as PortBonusValue
+                const bonusType = csvPort[bonusEntry]
+                    .replace("Bonus ", "")
+                    .replace(" and Rig", "")
+                    .toLowerCase()
+                    .slice(0, -2)!
+                port.portBonus[bonusType] = bonusValue
+            }
 
             return port
         })

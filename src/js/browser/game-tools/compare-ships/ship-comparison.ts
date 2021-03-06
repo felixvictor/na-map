@@ -100,7 +100,7 @@ export class ShipComparison extends Ship {
     _setupDrag(): void {
         const steps = this.shipCompareData.speedDegrees.length
         const degreesPerStep = 360 / steps
-        const domain = [...new Array(steps + 1)].map((_, i) => i * degreesPerStep)
+        const domain = Array.from({ length: steps + 1 }, (_, i) => i * degreesPerStep)
         this._speedScale = d3ScaleLinear()
             .domain(domain)
             .range([...this.shipCompareData.speedDegrees, this.shipCompareData.speedDegrees[0]])

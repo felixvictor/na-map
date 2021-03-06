@@ -60,13 +60,14 @@ export default class ListWoods {
     _getModifiers(type: WoodType): string[] {
         const modifiers = new Set<string>()
 
-        this._woodDataDefault[type].forEach((wood) => {
-            wood.properties
-                .filter((property) => !this._modifiersNotUsed.has(property.modifier))
-                .forEach((property) => {
-                    modifiers.add(property.modifier)
-                })
-        })
+        for (const wood of this._woodDataDefault[type]) {
+            for (const property of wood.properties.filter(
+                (property) => !this._modifiersNotUsed.has(property.modifier)
+            )) {
+                modifiers.add(property.modifier)
+            }
+        }
+
         return [...modifiers].sort(simpleStringSort)
     }
 
@@ -81,7 +82,7 @@ export default class ListWoods {
             this._modifiers[type] = new Set(this._getModifiers(type))
 
             // Add missing properties to each wood
-            this._woodDataDefault[type].forEach((wood) => {
+            for (const wood of this._woodDataDefault[type]) {
                 const currentWoodProperties = new Set(wood.properties.map((property) => property.modifier))
                 for (const modifier of this._modifiers[type]) {
                     if (!currentWoodProperties.has(modifier)) {
@@ -94,7 +95,7 @@ export default class ListWoods {
                 }
 
                 wood.properties.sort((a, b) => a.modifier.localeCompare(b.modifier))
-            })
+            }
         }
 
         this._woodData = { ...this._woodDataDefault }

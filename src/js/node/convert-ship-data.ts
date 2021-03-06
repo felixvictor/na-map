@@ -447,7 +447,7 @@ const getBaseFileNames = (dir: string): void => {
         if (str === "rookie" || str === "trader" || str === "tutorial") {
             const shortenedFileName = fileName.replace("rookie ", "").replace("trader ", "").replace("tutorial ", "")
             const str2 = shortenedFileName.slice(0, shortenedFileName.indexOf(" "))
-            str = str.concat(" ").concat(str2)
+            str += ` ${str2}`
         }
 
         if (shipNames.has(str)) {
@@ -505,22 +505,20 @@ const getAdditionalData = (elements: ElementMap, fileData: XmlGeneric): ShipData
 // Add additional data to the existing data
 const addAdditionalData = (addData: ShipData, id: number): void => {
     // Find current ship
-    ships
-        .filter((ship) => ship.id === id)
-        .forEach((ship) => {
-            // Get all data for each group
-            for (const [group, values] of Object.entries(addData)) {
-                if (!ship[group]) {
-                    ship[group] = {}
-                }
-
-                // Get all elements per group
-                for (const [element, value] of Object.entries(values)) {
-                    // add value
-                    ship[group][element] = value
-                }
+    for (const ship of ships.filter((ship) => ship.id === id)) {
+        // Get all data for each group
+        for (const [group, values] of Object.entries(addData)) {
+            if (!ship[group]) {
+                ship[group] = {}
             }
-        })
+
+            // Get all elements per group
+            for (const [element, value] of Object.entries(values)) {
+                // add value
+                ship[group][element] = value
+            }
+        }
+    }
 }
 
 const getFileData = (baseFileName: string, ext: string): XmlGeneric => {

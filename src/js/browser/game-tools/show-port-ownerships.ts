@@ -33,7 +33,7 @@ import {
 import { registerEvent } from "../analytics"
 import { BaseModal } from "./base-modal"
 import { NationFullName, nations, NationShortName } from "common/common"
-import { colourList, insertBaseModal, loadJsonFile } from "common/common-browser"
+import { colourList, insertBaseModal, loadJsonFile, showCursorDefault, showCursorWait } from "common/common-browser";
 
 import { getContrastColour } from "common/common-game-tools"
 import JQuery from "jquery"
@@ -78,8 +78,10 @@ export default class ShowPortOwnerships extends BaseModal {
     }
 
     async _loadAndSetupData(): Promise<void> {
+        showCursorWait()
         this._nationData = await loadJsonFile<Array<OwnershipNation<number>>>(`${this.serverId}-nation.json`)
         this._ownershipData = await loadJsonFile<Ownership[]>(`${this.serverId}-ownership.json`)
+        showCursorDefault()
     }
 
     /**

@@ -97,6 +97,7 @@ const colourRed = colours.get("red")
 const colourRedLight = colours.get("red-light")
 const colourRedDark = colours.get("red-dark")
 const colourWhite = colours.get("white")
+const colourLight = colours.get("light")
 
 const aliasPaths = {}
 for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
@@ -307,19 +308,20 @@ const config = {
             filename: isProduction ? "[name].[contenthash].css" : "[name].css",
         }),
         new webpack.DefinePlugin({
-            CPRIMARY300: JSON.stringify(primary300),
             CGREEN: JSON.stringify(colourGreen),
-            CGREENLIGHT: JSON.stringify(colourGreenLight),
             CGREENDARK: JSON.stringify(colourGreenDark),
+            CGREENLIGHT: JSON.stringify(colourGreenLight),
+            CLIGHT: JSON.stringify(colourLight),
+            CPRIMARY300: JSON.stringify(primary300),
             CRED: JSON.stringify(colourRed),
-            CREDLIGHT: JSON.stringify(colourRedLight),
             CREDDARK: JSON.stringify(colourRedDark),
+            CREDLIGHT: JSON.stringify(colourRedLight),
             CWHITE: JSON.stringify(colourWhite),
-            NAME: JSON.stringify(libraryName),
             DESCRIPTION: JSON.stringify(descriptionLong),
+            ICONSMALL: JSON.stringify(`${dirPrefixIcons}/android-chrome-48x48.png`),
+            NAME: JSON.stringify(libraryName),
             TITLE: JSON.stringify(PACKAGE.description),
             VERSION: JSON.stringify(PACKAGE.version),
-            ICONSMALL: JSON.stringify(`${dirPrefixIcons}/android-chrome-48x48.png`),
             REPAIR_ARMOR_VOLUME: JSON.stringify(repairs.armorRepair.volume),
             REPAIR_ARMOR_PERCENT: JSON.stringify(repairs.armorRepair.percent),
             REPAIR_ARMOR_TIME: JSON.stringify(repairs.armorRepair.time),

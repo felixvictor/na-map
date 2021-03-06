@@ -67,6 +67,7 @@ const exceptionalWoodIds = new Set([
 /**
  * Convert API module data
  */
+// eslint-disable-next-line complexity
 export const convertModulesAndWoodData = async (): Promise<void> => {
     const modules = new Map()
 
@@ -388,25 +389,15 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleType = (module: ModuleConvertEntity): string => {
         let type: string
-        let { permanentType, sortingGroup } = module
+        let { moduleLevel, moduleType, permanentType, sortingGroup, usageType } = module
 
-        if (
-            module.usageType === "All" &&
-            sortingGroup &&
-            module.moduleLevel === "U" &&
-            module.moduleType === "Hidden"
-        ) {
+        if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim"
-        } else if (module.moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
+        } else if (moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
             type = "Permanent"
-        } else if (
-            module.usageType === "All" &&
-            !sortingGroup &&
-            module.moduleLevel === "U" &&
-            module.moduleType === "Hidden"
-        ) {
+        } else if (usageType === "All" && !sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Perk"
-        } else if (module.moduleType === "Regular") {
+        } else if (moduleType === "Regular") {
             type = "Ship knowledge"
         } else {
             type = "Not used"
@@ -422,7 +413,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
         } else {
             sortingGroup = sortingGroup
-                ? `\u202F\u2013\u202F${capitalizeFirstLetter(module.sortingGroup ?? "").replace("_", "/")}`
+                ? `\u202F\u2013\u202F${capitalizeFirstLetter(sortingGroup ?? "").replace("_", "/")}`
                 : ""
         }
 
@@ -439,7 +430,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         )
         .filter((item) => !notUsedExceptionalWoodIds.has(item.Id)) as APIModule[]
 
-    apiModules.forEach((apiModule) => {
+    for (const apiModule of apiModules) {
         let dontSave = false
         const module = {
             id: apiModule.Id,
@@ -482,6 +473,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 module.type = getModuleType(module)
 
                 for (const rate of moduleRate) {
+                    // eslint-disable-next-line max-depth
                     for (const name of rate.names) {
                         // eslint-disable-next-line max-depth
                         if (module.name.endsWith(name)) {
@@ -535,7 +527,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
             modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule)
         }
-    })
+    }
+
     // Get the not empty modules and sort
     const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]))
     // Group by type

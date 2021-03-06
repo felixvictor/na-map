@@ -29,9 +29,9 @@ import utc from "dayjs/plugin/utc.js"
 import { capitalizeFirstLetter, nations, NationShortName } from "common/common"
 import {
     colourGreenDark,
+    colourLight,
     colourList,
     colourRedDark,
-    colourWhite,
     getIcons,
     loadJsonFile,
     loadJsonFiles,
@@ -45,9 +45,11 @@ import {
     degreesHalfCircle,
     degreesToRadians,
     distancePoints,
+    Extent,
     getOrdinalSVG,
     Point,
     roundToThousands,
+    ϕ,
 } from "common/common-math"
 import { simpleStringSort } from "common/common-node"
 import { displayClanLitHtml } from "common/common-game-tools"
@@ -62,16 +64,7 @@ import {
     TradeItem,
     TradeGoodProfit,
 } from "common/gen-json"
-import {
-    Bound,
-    DataSource,
-    DivDatum,
-    HtmlResult,
-    HtmlString,
-    PortJsonData,
-    SVGGDatum,
-    ZoomLevel,
-} from "common/interface"
+import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
 
 import Cookie from "util/cookie"
@@ -176,7 +169,7 @@ export default class DisplayPorts {
     #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #lowerBound!: Bound
+    #lowerBound = {} as Point
     #maxNetIncome!: number
     #maxPortPoints!: number
     #maxTaxIncome!: number
@@ -194,16 +187,16 @@ export default class DisplayPorts {
     #portSummaryTextTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #regionPolygon!: Area[]
     #regionPolygonFiltered!: Area[]
-    #scale: number
-    #upperBound!: Bound
+    #scale = 0
+    #upperBound = {} as Point
     readonly #baseId = "show-radius"
     readonly #circleSize = defaultCircleSize
     readonly #cookie: Cookie
     readonly #f11: ShowF11
     readonly #fontSize = defaultFontSize
     readonly #iconSize = 48
-    readonly #maxRadiusFactor = 1.618 * 3
-    readonly #minRadiusFactor = 1.618
+    readonly #minRadiusFactor = ϕ
+    readonly #maxRadiusFactor = ϕ * 4
     readonly #minScale: number
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
@@ -212,7 +205,7 @@ export default class DisplayPorts {
 
     constructor(readonly map: NAMap) {
         this.#serverName = this.map.serverName
-        this.#minScale = this.map.minScale
+        this.#minScale = this.map.minMapScale
         this.#scale = this.#minScale
         this.#f11 = this.map.f11
 
@@ -306,7 +299,7 @@ export default class DisplayPorts {
 
         this.#colourScaleHostility = d3ScaleLinear<string, string>()
             .domain([0, 1])
-            .range([colourWhite, colourRedDark])
+            .range([colourLight, colourRedDark])
             .interpolate(d3InterpolateHcl)
         this.#colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
 
@@ -314,21 +307,21 @@ export default class DisplayPorts {
         this.#maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
         this.#colourScaleTax = d3ScaleLinear<string, string>()
             .domain([this.#minTaxIncome, this.#maxTaxIncome])
-            .range([colourWhite, colourGreenDark])
+            .range([colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
         this.#minNetIncome = d3Min(this.portData, (d) => d.netIncome) ?? 0
         this.#maxNetIncome = d3Max(this.portData, (d) => d.netIncome) ?? 0
         this.#colourScaleNet = d3ScaleLinear<string, string>()
             .domain([this.#minNetIncome, 0, this.#maxNetIncome])
-            .range([colourRedDark, colourWhite, colourGreenDark])
+            .range([colourRedDark, colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
         this.#minPortPoints = d3Min(this.portData, (d) => d.portPoints) ?? 0
         this.#maxPortPoints = d3Max(this.portData, (d) => d.portPoints) ?? 0
         this.#colourScalePoints = d3ScaleLinear<string, string>()
             .domain([this.#minPortPoints, this.#maxPortPoints])
-            .range([colourWhite, colourGreenDark])
+            .range([colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
     }
 
@@ -649,33 +642,31 @@ export default class DisplayPorts {
 
         const svgDefNode = document.querySelector<SVGDefsElement>("#na-svg defs")!
 
-        nations
-            .map((d) => d.short)
-            .forEach((nation) => {
-                const patternElement = getPattern(nation)
-                patternElement.append(getImage(nation))
-                // eslint-disable-next-line unicorn/prefer-dom-node-append
-                const patternNode = svgDefNode.appendChild(patternElement)
+        for (const nation of nations.map((d) => d.short)) {
+            const patternElement = getPattern(nation)
+            patternElement.append(getImage(nation))
+            // eslint-disable-next-line unicorn/prefer-dom-node-append
+            const patternNode = svgDefNode.appendChild(patternElement)
 
-                if (nation !== "FT") {
-                    const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
-                    patternCapital.id = `${nation}c`
-                    patternCapital.append(getCircleCapital())
-                    svgDefNode.append(patternCapital)
-                }
+            if (nation !== "FT") {
+                const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
+                patternCapital.id = `${nation}c`
+                patternCapital.append(getCircleCapital())
+                svgDefNode.append(patternCapital)
+            }
 
-                if (nation !== "NT" && nation !== "FT") {
-                    const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
-                    patternAvail.id = `${nation}a`
-                    patternAvail.append(getRectAvail())
-                    svgDefNode.append(patternAvail)
+            if (nation !== "NT" && nation !== "FT") {
+                const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
+                patternAvail.id = `${nation}a`
+                patternAvail.append(getRectAvail())
+                svgDefNode.append(patternAvail)
 
-                    const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
-                    patternCapitalAvail.id = `${nation}ca`
-                    patternCapitalAvail.append(getCircleCapital())
-                    svgDefNode.append(patternCapitalAvail)
-                }
-            })
+                const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
+                patternCapitalAvail.id = `${nation}ca`
+                patternCapitalAvail.append(getCircleCapital())
+                svgDefNode.append(patternCapitalAvail)
+            }
+        }
     }
 
     _getPortName(id: number): string {
@@ -1011,8 +1002,8 @@ export default class DisplayPorts {
     }
 
     _updateIcons(): void {
-        const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
-        const circleSize = roundToThousands(this.#circleSize / circleScale)
+        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
+        const circleSize = this.#circleSize / circleScale
         const data = this.#portDataFiltered
 
         this.#gIcon
@@ -1075,9 +1066,13 @@ export default class DisplayPorts {
     }
 
     _updatePortCircles(): void {
-        const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
-        const rMin = roundToThousands((this.#circleSize / circleScale) * this.#minRadiusFactor)
-        const rMax = roundToThousands((this.#circleSize / circleScale) * this.#maxRadiusFactor)
+        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
+        const scaledCircleSize = this.#circleSize / circleScale
+        const rMin = roundToThousands(scaledCircleSize * this.#minRadiusFactor)
+        const rMax = roundToThousands(scaledCircleSize * this.#maxRadiusFactor)
+
+        const incomeThreshold = 100000
+        const portPointThreshold = 30
         let data = this.#portDataFiltered
         // eslint-disable-next-line unicorn/consistent-function-scoping
         let cssClass: PortCircleStringF = () => ""
@@ -1088,19 +1083,19 @@ export default class DisplayPorts {
 
         // noinspection IfStatementWithTooManyBranchesJS
         if (this.showRadius === "tax") {
-            data = this.#portDataFiltered.filter((d) => d.capturable)
+            data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
             this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
             r = (d): number => this.#portRadius(d.taxIncome) ?? 0
         } else if (this.showRadius === "net") {
-            data = this.#portDataFiltered.filter((d) => d.capturable)
+            data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
             this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
             r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
         } else if (this.showRadius === "points") {
-            data = this.#portDataFiltered.filter((d) => d.capturable)
+            data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints>portPointThreshold)
             this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
@@ -1187,10 +1182,8 @@ export default class DisplayPorts {
         if (this.zoomLevel === "initial") {
             this.#gText.classed("d-none", true)
         } else {
-            const circleScale = 2 ** Math.log2(Math.abs(this.#minScale) + this.#scale)
-            const circleSize = roundToThousands(this.#circleSize / circleScale)
-            const fontScale = 2 ** Math.log2((Math.abs(this.#minScale) + this.#scale) * 0.9)
-            const fontSize = roundToThousands(this.#fontSize / fontScale)
+            const circleSize = roundToThousands(this.#circleSize / this.#scale)
+            const fontSize = roundToThousands(this.#fontSize / this.#scale)
             const data = this.#portDataFiltered
 
             this.#gText
@@ -1346,12 +1339,11 @@ export default class DisplayPorts {
 
     /**
      * Set bounds of current viewport
-     * @param lowerBound - Top left coordinates of current viewport
-     * @param upperBound - Bottom right coordinates of current viewport
+     * @param viewport - Current viewport
      */
-    setBounds(lowerBound: Bound, upperBound: Bound): void {
-        this.#lowerBound = lowerBound
-        this.#upperBound = upperBound
+    setBounds(viewport: Extent): void {
+        this.#lowerBound = viewport[0]
+        this.#upperBound = viewport[1]
     }
 
     _showSummary(): void {

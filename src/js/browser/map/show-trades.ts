@@ -19,12 +19,12 @@ import { select as d3Select, Selection } from "d3-selection"
 
 import { nations, NationShortName } from "common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
-import { defaultFontSize, roundToThousands } from "common/common-math"
+import { defaultFontSize, Extent, Point, roundToThousands } from "common/common-math"
 
 import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "common/gen-json"
 import { ZoomTransform } from "d3-zoom"
-import { Bound, HtmlString } from "common/interface"
+import { HtmlString } from "common/interface"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
@@ -44,6 +44,8 @@ interface Node {
  */
 export default class ShowTrades {
     show: boolean
+    #lowerBound = {} as Point
+    #upperBound = {} as Point
     private readonly _serverName: string
     private readonly _portSelect: SelectPorts
     private _isDataLoaded: boolean
@@ -65,8 +67,6 @@ export default class ShowTrades {
     private readonly _profitCookie: Cookie
     private readonly _profitRadios: RadioButton
     private _profitValue: string
-    private _lowerBound!: Bound
-    private _upperBound!: Bound
     private _profitText!: string
 
     private _g!: Selection<SVGGElement, unknown, HTMLElement, unknown>
@@ -83,8 +83,7 @@ export default class ShowTrades {
     private _portDataFiltered!: Set<number>
     private _tradeItem!: Map<number, string>
 
-    // eslint-disable-next-line max-params
-    constructor(serverName: string, portSelect: SelectPorts, minScale: number, lowerBound: Bound, upperBound: Bound) {
+    constructor(serverName: string, portSelect: SelectPorts, minScale: number, viewport: Extent) {
         this._serverName = serverName
         this._portSelect = portSelect
 
@@ -140,7 +139,7 @@ export default class ShowTrades {
         this._setupProfitRadios()
         this._setupListener()
         this._setupList()
-        this.setBounds(lowerBound, upperBound)
+        this.setBounds(viewport)
 
         if (this.show) {
             this._portSelect.setupInventorySelect(this.show)
@@ -686,10 +685,10 @@ export default class ShowTrades {
             this._portData
                 .filter(
                     (port) =>
-                        port.coordinates[0] >= this._lowerBound[0] &&
-                        port.coordinates[0] <= this._upperBound[0] &&
-                        port.coordinates[1] >= this._lowerBound[1] &&
-                        port.coordinates[1] <= this._upperBound[1]
+                        port.coordinates[0] >= this.#lowerBound[0] &&
+                        port.coordinates[0] <= this.#upperBound[0] &&
+                        port.coordinates[1] >= this.#lowerBound[1] &&
+                        port.coordinates[1] <= this.#upperBound[1]
                 )
                 .map((port) => port.id)
         )
@@ -764,12 +763,11 @@ export default class ShowTrades {
 
     /**
      * Set bounds of current viewport
-     * @param lowerBound - Top left coordinates of current viewport
-     * @param upperBound - Bottom right coordinates of current viewport
+     * @param viewport - Current viewport
      */
-    setBounds(lowerBound: Bound, upperBound: Bound): void {
-        this._lowerBound = lowerBound
-        this._upperBound = upperBound
+    setBounds(viewport: Extent): void {
+        this.#lowerBound = viewport[0]
+        this.#upperBound = viewport[1]
     }
 
     transform(transform: ZoomTransform): void {

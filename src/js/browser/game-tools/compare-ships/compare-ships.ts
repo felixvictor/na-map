@@ -323,7 +323,7 @@ export class CompareShips {
     }
 
     _cloneShipToLeft(currentColumnId: ShipColumnType): void {
-        const newColumnIndex = this._columns.findIndex((element) => element === currentColumnId)
+        const newColumnIndex = this._columns.indexOf(currentColumnId)
         const newColumnId = this._columns[newColumnIndex - 1]
 
         const hasData = this._cloneShipData(currentColumnId, newColumnId)
@@ -336,7 +336,7 @@ export class CompareShips {
     }
 
     _cloneShipToRight(currentColumnId: ShipColumnType): void {
-        const newColumnIndex = this._columns.findIndex((element) => element === currentColumnId)
+        const newColumnIndex = this._columns.indexOf(currentColumnId)
         const newColumnId = this._columns[newColumnIndex + 1]
 
         const hasData = this._cloneShipData(currentColumnId, newColumnId)
@@ -1495,9 +1495,10 @@ export class CompareShips {
             }
 
             if (this._selectedUpgradeIdsPerType[compareId][type].length > 0) {
-                this._selectedUpgradeIdsList[compareId] = this._selectedUpgradeIdsList[compareId].concat(
-                    this._selectedUpgradeIdsPerType[compareId][type]
-                )
+                this._selectedUpgradeIdsList[compareId] = [
+                    ...this._selectedUpgradeIdsList[compareId],
+                    ...this._selectedUpgradeIdsPerType[compareId][type],
+                ]
             }
             // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
         }

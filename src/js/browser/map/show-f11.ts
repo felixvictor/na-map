@@ -279,12 +279,12 @@ export default class ShowF11 {
             .attr("dy", `${circleSize / 2 + 2}px`)
             .attr("class", "f11-time")
             .text(`(${timeStampLocal.format("H.mm")} local)`)
-        const timeStampDim = (timeStampText.node()?.getBBox() ?? {}) as DOMRect
-        const timeStampLocalDim = (timeStampLocalText.node()?.getBBox() ?? {}) as DOMRect
+        const timeStampDim = (timeStampText.node() as SVGTextElement).getBBox() ?? {}
+        const timeStampLocalDim = (timeStampLocalText.node() as SVGTextElement).getBBox() ?? {}
 
         const coordHeight = F11XDim && F11YDim ? Math.round(F11XDim.height + F11YDim.height) * 1.2 : 0
         const coordWidth = F11XDim && F11YDim ? Math.round(Math.max(F11XDim.width, F11YDim.width) + 5) : 0
-        const timeHeight = Math.round(timeStampDim?.height + timeStampLocalDim?.height) * 1.2
+        const timeHeight = Math.round(timeStampDim.height + timeStampLocalDim.height) * 1.2
         const timeWidth =
             timeStampDim && timeStampLocalDim
                 ? Math.round(Math.max(timeStampDim.width, timeStampLocalDim.width) + 5)
@@ -308,7 +308,7 @@ export default class ShowF11 {
 
         if (between(x, this._coord.min, this._coord.max, true) && between(y, this._coord.min, this._coord.max, true)) {
             this._printF11Coord(x, y, F11X, F11Y)
-            this._map.zoomAndPan(x, y, 1)
+            this._map.zoomAndPan(x, y)
         }
     }
 

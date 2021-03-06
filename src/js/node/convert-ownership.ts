@@ -118,11 +118,10 @@ function parseData(serverId: ServerId, portData: APIPort[], date: string): void 
     // console.log("**** new date", date);
 
     const numPorts = {} as NationList<number>
-    nations
-        .filter((nation) => nation.id !== 9)
-        .forEach((nation) => {
-            numPorts[nation.short] = 0
-        })
+    for (const nation of nations.filter((nation) => nation.id !== 9)) {
+        numPorts[nation.short] = 0
+    }
+
     const nationsForPowerMap = []
 
     for (const port of portData) {
@@ -213,11 +212,10 @@ function parseData(serverId: ServerId, portData: APIPort[], date: string): void 
 
     const numPortsDate = {} as OwnershipNation<number>
     numPortsDate.date = date
-    nations
-        .filter((nation) => nation.id !== 9)
-        .forEach((nation) => {
-            numPortsDate[nation.short] = numPorts[nation.short]
-        })
+    for (const nation of nations.filter((nation) => nation.id !== 9)) {
+        numPortsDate[nation.short] = numPorts[nation.short]
+    }
+
     numPortsDates[serverId].push(numPortsDate)
     // console.log("**** 138 -->", [serverId], ports[serverId].get("138"));
 }

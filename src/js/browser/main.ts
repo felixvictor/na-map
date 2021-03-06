@@ -100,7 +100,7 @@ const setupListener = (): void => {
 }
 
 /**
- * Load map and set resize event
+ * Load map
  * @param serverId - Server id
  * @param searchParams - Query arguments
  */
@@ -108,10 +108,6 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
     const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
     const map = new Map.NAMap(serverId, searchParams)
     await map.MapInit()
-
-    window.addEventListener("resize", () => {
-        map.resize()
-    })
 }
 
 /**

@@ -10,6 +10,7 @@
 
 import { HtmlString, SVGString } from "./interface"
 
+export const ϕ = (1 + Math.sqrt(5)) / 2
 export const timeFactor = 2.63
 export const speedFactor = 390
 export const speedConstA = 0.074465523706782
@@ -70,6 +71,8 @@ export interface Point extends Array<number> {
     0: number // X coordinate
     1: number // Y coordinate
 }
+
+export type Extent = [Point, Point]
 
 /**
  * Calculate the angle in correctionValueDegrees between two points

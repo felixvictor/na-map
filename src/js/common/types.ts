@@ -1,7 +1,7 @@
 const frontlinesType = ["attacking", "defending"]!
 export type FrontlinesType = typeof frontlinesType[number]
 
-export const lootType = ["loot", "chests", "items"]!
+export const lootType = ["loot", "chest", "item", "fish"]!
 export type LootType = typeof lootType[number]
 
 const woodColumnType = ["Base", "C1", "C2", "C3"]!

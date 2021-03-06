@@ -151,33 +151,31 @@ const setAndSavePortData = async (serverName: string): Promise<void> => {
 const setAndSaveTradeData = async (serverName: string): Promise<void> => {
     const trades: Trade[] = []
     for (const buyPort of portData) {
-        buyPort.inventory
-            .filter((buyGood) => buyGood.buyQuantity > 0)
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
-            .forEach((buyGood) => {
-                const { buyPrice, buyQuantity } = buyGood
-                for (const sellPort of portData) {
-                    const sellGood = sellPort.inventory.find((good) => good.id === buyGood.id)
-                    if (sellPort.id !== buyPort.id && sellGood) {
-                        const { sellPrice, sellQuantity } = sellGood
-                        const quantity = Math.min(buyQuantity, sellQuantity)
-                        const profitPerItem = sellPrice - buyPrice
-                        const profitTotal = profitPerItem * quantity
-                        if (profitTotal >= minProfit) {
-                            const trade = {
-                                good: buyGood.id,
-                                source: { id: Number(buyPort.id), grossPrice: buyPrice },
-                                target: { id: Number(sellPort.id), grossPrice: sellPrice },
-                                distance: getDistance(buyPort.id, sellPort.id),
-                                profitTotal,
-                                quantity,
-                                weightPerItem: itemWeights.get(buyGood.id) ?? 0,
-                            } as Trade
-                            trades.push(trade)
-                        }
+        for (const buyGood of buyPort.inventory.filter((buyGood) => buyGood.buyQuantity > 0)) {
+            const { buyPrice, buyQuantity, id: buyGoodId } = buyGood
+            for (const sellPort of portData) {
+                const sellGood = sellPort.inventory.find((good) => good.id === buyGoodId)
+                if (sellPort.id !== buyPort.id && sellGood) {
+                    const { sellPrice, sellQuantity } = sellGood
+                    const quantity = Math.min(buyQuantity, sellQuantity)
+                    const profitPerItem = sellPrice - buyPrice
+                    const profitTotal = profitPerItem * quantity
+                    // eslint-disable-next-line max-depth
+                    if (profitTotal >= minProfit) {
+                        const trade = {
+                            good: buyGoodId,
+                            source: { id: Number(buyPort.id), grossPrice: buyPrice },
+                            target: { id: Number(sellPort.id), grossPrice: sellPrice },
+                            distance: getDistance(buyPort.id, sellPort.id),
+                            profitTotal,
+                            quantity,
+                            weightPerItem: itemWeights.get(buyGoodId) ?? 0,
+                        } as Trade
+                        trades.push(trade)
                     }
                 }
-            })
+            }
+        }
     }
 
     trades.sort(sortBy(["profitTotal"]))
@@ -281,56 +279,56 @@ const setAndSaveFrontlines = async (serverName: string): Promise<void> => {
     const frontlineAttackingNationGroupedByToPort = {} as NationList<FANToPort[]>
     const frontlineAttackingNationGroupedByFromPort = {} as NationList<FANFromPort[]>
 
-    nations
-        .filter(({ short: nationShort }) => !outNations.has(nationShort))
-        .forEach(({ id: nationId, short: nationShortName }) => {
-            const frontlinesFrom = apiPorts
-                .filter(
-                    ({ Nation: fromPortNation }) =>
-                        fromPortNation === nationId || fromPortNation === 0 || fromPortNation === 9
-                )
-                .flatMap((fromPort) =>
-                    apiPorts
-                        // toPort must be a capturable port from a nation other than fromNation
-                        .filter((toPort) => !toPort.NonCapturable && toPort.Nation !== fromPort.Nation)
-                        .map(
-                            (toPort) =>
-                                ({
-                                    fromPortId: Number(fromPort.Id),
-                                    fromPortName: fromPort.Name,
-                                    toPortId: Number(toPort.Id),
-                                    toPortName: toPort.Name,
-                                    toPortNation: findNationById(toPort.Nation)?.short,
-                                    distance: getDistance(Number(fromPort.Id), Number(toPort.Id)),
-                                } as DistanceExtended)
-                        )
-                        .sort(sortBy(["distance"]))
-                        .slice(0, frontlinePorts)
-                )
+    const filteredNations = nations.filter(({ short: nationShort }) => !outNations.has(nationShort))
+    for (const { id: nationId, short: nationShortName } of filteredNations) {
+        const frontlinesFrom = apiPorts
+            .filter(
+                ({ Nation: fromPortNation }) =>
+                    fromPortNation === nationId || fromPortNation === 0 || fromPortNation === 9
+            )
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
+            .flatMap((fromPort) =>
+                apiPorts
+                    // toPort must be a capturable port from a nation other than fromNation
+                    .filter((toPort) => !toPort.NonCapturable && toPort.Nation !== fromPort.Nation)
+                    .map(
+                        (toPort) =>
+                            ({
+                                fromPortId: Number(fromPort.Id),
+                                fromPortName: fromPort.Name,
+                                toPortId: Number(toPort.Id),
+                                toPortName: toPort.Name,
+                                toPortNation: findNationById(toPort.Nation)?.short,
+                                distance: getDistance(Number(fromPort.Id), Number(toPort.Id)),
+                            } as DistanceExtended)
+                    )
+                    .sort(sortBy(["distance"]))
+                    .slice(0, frontlinePorts)
+            )
 
-            frontlineAttackingNationGroupedByToPort[nationShortName] = [
-                ...d3Group(frontlinesFrom, (d) => String(d.toPortId)),
-                // ...d3Group(frontlinesFrom, (d) => `${d.toPortId} ${d.toPortName}`),
-            ].map(([key, value]) => ({
-                key,
-                value: value.map((port) => port.fromPortId),
-                // value: value.map((port) => [port.fromPortId, port.fromPortName, port.distance]),
-            }))
+        frontlineAttackingNationGroupedByToPort[nationShortName] = [
+            ...d3Group(frontlinesFrom, (d) => String(d.toPortId)),
+            // ...d3Group(frontlinesFrom, (d) => `${d.toPortId} ${d.toPortName}`),
+        ].map(([key, value]) => ({
+            key,
+            value: value.map((port) => port.fromPortId),
+            // value: value.map((port) => [port.fromPortId, port.fromPortName, port.distance]),
+        }))
 
-            frontlineAttackingNationGroupedByFromPort[nationShortName] = [
-                ...d3Group(frontlinesFrom, (d) => String(d.fromPortId)),
-                // ...d3Group(frontlinesFrom, (d) => `${d.fromPortId} ${d.fromPortName}`),
-            ].map(([key, value]) => ({
-                key,
-                value: value.map(
-                    (port) =>
-                        ({
-                            id: port.toPortId,
-                            nation: port.toPortNation,
-                        } as FANValue)
-                ),
-            }))
-        })
+        frontlineAttackingNationGroupedByFromPort[nationShortName] = [
+            ...d3Group(frontlinesFrom, (d) => String(d.fromPortId)),
+            // ...d3Group(frontlinesFrom, (d) => `${d.fromPortId} ${d.fromPortName}`),
+        ].map(([key, value]) => ({
+            key,
+            value: value.map(
+                (port) =>
+                    ({
+                        id: port.toPortId,
+                        nation: port.toPortNation,
+                    } as FANValue)
+            ),
+        }))
+    }
 
     const frontlineDefendingNationMap: Map<string, Set<string>> = new Map()
     for (const attackingNation of nationShortName) {

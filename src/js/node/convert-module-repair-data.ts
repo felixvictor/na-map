@@ -53,7 +53,7 @@ export const convertRepairData = async (): Promise<void> => {
         const fileData = getFileData(baseFileName, "kit")
         const data = {} as RepairAmount
 
-        fileData.Attributes.Pair.forEach((pair) => {
+        for (const pair of fileData.Attributes.Pair) {
             if (pair.Key._text === "REPAIR_VOLUME_PER_ITEM") {
                 data.volume = Number((pair.Value.Value as TextEntity)._text)
             }
@@ -65,7 +65,7 @@ export const convertRepairData = async (): Promise<void> => {
             if (pair.Key._text === "REPAIR_MODULE_TIME") {
                 data.time = Number((pair.Value.Value as TextEntity)._text)
             }
-        })
+        }
 
         repairs[toCamelCase(baseFileName)] = data
     }

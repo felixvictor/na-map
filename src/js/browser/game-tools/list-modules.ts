@@ -147,8 +147,7 @@ export default class ListModules {
         const rows = [] as HtmlString[]
         for (const type of this._moduleData) {
             if (type[0] === moduleType) {
-                // eslint-disable-next-line @typescript-eslint/no-loop-func
-                type[1].sort(sortBy(["name"])).forEach((module, i) => {
+                for (const [i, module] of type[1].sort(sortBy(["name"])).entries()) {
                     rate = getRate(module.moduleLevel)
                     if (hasSameProperties(module, type[1][i + 1])) {
                         type[1][i + 1].hasSamePropertiesAsPrevious = true
@@ -182,7 +181,7 @@ export default class ListModules {
                                 .join("<br>")}</td></tr>`
                         )
                     }
-                })
+                }
             }
         }
 
@@ -198,7 +197,7 @@ export default class ListModules {
         const rows = this._getRows(moduleType)
         const splitRows = chunkify(rows, columns)
         let text = ""
-        for (const column of [...new Array(splitRows.length).keys()]) {
+        for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
             text += '<table class="table table-sm small na-table"><thead>'
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"

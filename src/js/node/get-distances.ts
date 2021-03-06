@@ -119,12 +119,15 @@ class Map {
      * Add port id to port entrances
      */
     setPorts(): void {
-        this.#port.apiPorts.forEach(({ Id, EntrancePosition: { z: y, x } }: APIPort) => {
+        for (const {
+            Id,
+            EntrancePosition: { z: y, x },
+        } of this.#port.apiPorts) {
             const [portY, portX] = this.#port.getCoordinates(y, x, this.#mapScale)
             const index = this.getIndex(portY, portX)
 
             this.setPortSpot(index, Number(Id))
-        })
+        }
     }
 
     /**
@@ -223,9 +226,9 @@ class Map {
                 missingPortIds,
                 "are missing."
             )
-            missingPortIds.forEach((missingPortId: number) => {
+            for (const missingPortId of missingPortIds) {
                 this.#distances.push([startPortId, missingPortId, 0])
-            })
+            }
         }
     }
 
@@ -235,19 +238,18 @@ class Map {
     async getAndSaveDistances(): Promise<void> {
         try {
             console.time("findPath")
-            this.#port.apiPorts
-                .sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))
-                .forEach((fromPort: APIPort) => {
-                    const fromPortId = Number(fromPort.Id)
-                    const {
-                        EntrancePosition: { z: y, x },
-                    } = fromPort
-                    const [fromPortY, fromPortX] = this.#port.getCoordinates(y, x, this.#mapScale)
+            for (const fromPort of this.#port.apiPorts.sort((a: APIPort, b: APIPort) => Number(a.Id) - Number(b.Id))) {
+                const fromPortId = Number(fromPort.Id)
+                const {
+                    EntrancePosition: { z: y, x },
+                    Name: name,
+                } = fromPort
+                const [fromPortY, fromPortX] = this.#port.getCoordinates(y, x, this.#mapScale)
 
-                    this.findPaths(fromPortId, fromPortY, fromPortX)
+                this.findPaths(fromPortId, fromPortY, fromPortX)
 
-                    console.timeLog("findPath", `${fromPortId} ${fromPort.Name} (${fromPortY}, ${fromPortX})`)
-                })
+                console.timeLog("findPath", `${fromPortId} ${name} (${fromPortY}, ${fromPortX})`)
+            }
 
             console.timeEnd("findPath")
 

@@ -546,7 +546,6 @@ export default class SelectPorts {
 
         this._ports.showRadius = "tradePorts"
         this._ports.update()
-        this._map.initialZoomAndPan()
     }
 
     _goodSelected(): void {
@@ -557,10 +556,10 @@ export default class SelectPorts {
                 this._ports.portDataDefault.filter(
                     (port) =>
                         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                        port.dropsTrading?.some((good: number) => good === goodSelectedId) ||
+                        port.dropsTrading?.includes(goodSelectedId) ||
                         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                        port.dropsNonTrading?.some((good: number) => good === goodSelectedId) ||
-                        port.producesNonTrading?.some((good: number) => good === goodSelectedId)
+                        port.dropsNonTrading?.includes(goodSelectedId) ||
+                        port.producesNonTrading?.includes(goodSelectedId)
                 )
             )
         ) as PortWithTrades[]).map((port) => {
@@ -568,18 +567,14 @@ export default class SelectPorts {
             return port
         })
         const consumingPorts = (JSON.parse(
-            JSON.stringify(
-                this._ports.portDataDefault.filter((port) =>
-                    port.consumesTrading?.some((good) => good === goodSelectedId)
-                )
-            )
+            JSON.stringify(this._ports.portDataDefault.filter((port) => port.consumesTrading?.includes(goodSelectedId)))
         ) as PortWithTrades[]).map((port) => {
             port.isSource = false
             return port
         })
 
         this._ports.setShowRadiusSetting("off")
-        this._ports.portData = sourcePorts.concat(consumingPorts)
+        this._ports.portData = [...sourcePorts, ...consumingPorts]
         this._ports.showRadius = "currentGood"
         this._ports.update()
     }

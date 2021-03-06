@@ -86,6 +86,7 @@
         "d3-scale": "^3.2.3",
         "d3-selection": "^2.0.0",
         "d3-shape": "^2.0.0",
+        "d3-tile": "^1.0.0",
         "d3-timer": "^2.0.0",
         "d3-transition": "^2.0.0",
         "d3-voronoi-treemap": "^1.1.1",

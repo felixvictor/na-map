@@ -31,8 +31,13 @@ import {
 } from "common/gen-json"
 import { lootType, LootType } from "common/types"
 import { HtmlResult, HtmlString } from "common/interface"
+import { WoodType } from "common/common"
 
 const html = htm.bind(h)
+
+type LootData = {
+    [K in WoodType]: Array<LootLootEntity | LootChestsEntity>
+}
 
 export default class ListLoot {
     readonly #baseName: string
@@ -40,14 +45,13 @@ export default class ListLoot {
     readonly #buttonId: HtmlString
     readonly #modalId: HtmlString
     readonly #types = lootType
-    #selectedType: LootType = "" as LootType
     readonly #selectId = {} as LootTypeList<HtmlString>
+    #data = {} as LootData
+    #items!: Map<number, { name: string; sources: Map<number, LootLootItemsEntity> }>
+    #mainDiv!: HTMLDivElement
     #select$ = {} as LootTypeList<JQuery>
     #selectedItemId = 0
-    #mainDiv!: HTMLDivElement
-    #items!: Map<number, { name: string; sources: Map<number, LootLootItemsEntity> }>
-    #lootData!: LootLootEntity[]
-    #chestsData!: LootChestsEntity[]
+    #selectedType: LootType = "" as LootType
 
     constructor() {
         this.#baseName = "List loot and chests"
@@ -75,8 +79,10 @@ export default class ListLoot {
     async _loadAndSetupData(): Promise<void> {
         const sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../../lib/gen-generic/loot.json"))
             .default as Loot
-        this.#lootData = sourceData.loot as LootLootEntity[]
-        this.#chestsData = sourceData.chests as LootChestsEntity[]
+        console.log(sourceData)
+        for (const type of this.#types) {
+            this.#data[type] = sourceData[type]
+        }
     }
 
     _setupListener(): void {
@@ -94,17 +100,9 @@ export default class ListLoot {
         })
     }
 
-    _getLootOptions(): HtmlResult {
+    _getTypeOptions(type: LootType): HtmlResult {
         return html`
-            ${this.#lootData
-                .sort(sortBy(["name"]))
-                .map((item) => html`<option value="${item.id}">${item.name}</option>`)}
-        `
-    }
-
-    _getChestsOptions(): HtmlResult {
-        return html`
-            ${this.#chestsData
+            ${this.#data[type]
                 .sort(sortBy(["name"]))
                 .map((item) => html`<option value="${item.id}">${item.name}</option>`)}
         `
@@ -136,8 +134,8 @@ export default class ListLoot {
             })
         }
 
-        // Loot
-        for (const loot of this.#lootData) {
+        // Loot and fish
+        for (const loot of [...this.#data.loot, ...this.#data.fish] as LootLootEntity[]) {
             const { items } = loot
             for (const item of items) {
                 setOptionItems(loot, item, item.chance)
@@ -145,11 +143,11 @@ export default class ListLoot {
         }
 
         // Chests
-        for (const chest of this.#chestsData) {
+        for (const chest of this.#data.chest as LootChestsEntity[]) {
             for (const group of chest.itemGroup) {
-                const { items } = group
+                const { chance, items } = group
                 for (const item of items) {
-                    setOptionItems(chest, item, group.chance)
+                    setOptionItems(chest, item, chance)
                 }
             }
         }
@@ -161,18 +159,13 @@ export default class ListLoot {
     }
 
     _getOptions(type: LootType): HtmlResult {
+        const regularLootTypes = new Set<LootType>(["chest", "fish", "loot"])
         let h = html``
 
-        if (type === "items") {
+        if (regularLootTypes.has(type)) {
+            h = this._getTypeOptions(type)
+        } else if (type === "item") {
             h = this._getItemsOptions()
-        }
-
-        if (type === "chests") {
-            h = this._getChestsOptions()
-        }
-
-        if (type === "loot") {
-            h = this._getLootOptions()
         }
 
         return h
@@ -213,6 +206,7 @@ export default class ListLoot {
 
     _setupSelectListeners(): void {
         for (const type of this.#types) {
+            const title = type === "loot" ? "ship loot" : type === "fish" ? "fishing region" : type
             this.#select$[type]
                 .on("change", () => {
                     this.#selectedType = type
@@ -223,7 +217,7 @@ export default class ListLoot {
                     liveSearch: true,
                     liveSearchNormalize: true,
                     liveSearchPlaceholder: "Search ...",
-                    title: `Select ${type}`,
+                    title: `Select ${title}`,
                     virtualScroll: true,
                 })
         }
@@ -249,12 +243,16 @@ export default class ListLoot {
         $(`#${this.#modalId}`).modal("show")
     }
 
-    _getLootItemsText(items: Array<LootLootItemsEntity | LootChestItemsEntity>, chance = true): HtmlResult {
+    _getLootItemsText(
+        items: Array<LootLootItemsEntity | LootChestItemsEntity>,
+        title: string,
+        chance = true
+    ): HtmlResult {
         return html`
             <table class="table table-sm small na-table no-sort">
                 <thead>
                     <tr>
-                        <th scope="col">Item</th>
+                        <th scope="col">${title}</th>
                         ${chance ? html`<th scope="col" class="text-right">Chance (0 − 100)</th>` : ""}
                         <th scope="col" class="text-right">Amount</th>
                     </tr>
@@ -284,34 +282,36 @@ export default class ListLoot {
             .map((value) => value[1])
             .sort(sortBy(["chance", "name"]))
 
-        return html`${this._getLootItemsText(items)}`
+        return html`${this._getLootItemsText(items, "Source")}`
     }
 
     _getChestsText(): HtmlResult {
-        const currentChest = this.#chestsData.find((item) => item.id === this.#selectedItemId)!
+        const currentChest = this.#data.chest.find((item) => item.id === this.#selectedItemId) as LootChestsEntity
 
         return html`
             <p>Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(currentChest.lifetime)} hours</p>
             ${currentChest.itemGroup.map(
                 (group) => html` <h5>Group chance: ${ListLoot._printChance(group.chance)}</h5>
-                    ${this._getLootItemsText(group.items.sort(sortBy(["name"])), false)}`
+                    ${this._getLootItemsText(group.items.sort(sortBy(["name"])), "Item", false)}`
             )}
         `
     }
 
     _getLootText(): HtmlResult {
-        const currentItem = this.#lootData.find((item) => item.id === this.#selectedItemId)!
+        const currentItem = this.#data[this.#selectedType].find(
+            (item) => item.id === this.#selectedItemId
+        ) as LootLootEntity
         const items = currentItem.items.sort(sortBy(["chance", "name"]))
 
-        return html`${this._getLootItemsText(items)}`
+        return html`${this._getLootItemsText(items, "Item")}`
     }
 
     _getText(): HtmlResult {
-        if (this.#selectedType === "items") {
+        if (this.#selectedType === "item") {
             return this._getSourceText()
         }
 
-        if (this.#selectedType === "chests") {
+        if (this.#selectedType === "chest") {
             return this._getChestsText()
         }
 

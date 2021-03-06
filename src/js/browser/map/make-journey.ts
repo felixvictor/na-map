@@ -17,7 +17,7 @@ import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
-import { zoomIdentity as d3ZoomIdentity, zoomTransform as d3ZoomTransform } from "d3-zoom"
+import { zoomIdentity as d3ZoomIdentity } from "d3-zoom"
 
 import "round-slider/src/roundslider"
 import "../../../scss/roundslider.scss"
@@ -383,7 +383,7 @@ export default class MakeJourney {
 
         if (this._journey.shipName === this._defaultShipName) {
             // Dummy ship speed
-            speedDegrees = [...new Array(24).fill(this._defaultShipSpeed / 2)]
+            speedDegrees = Array.from({ length: 24 }, () => this._defaultShipSpeed / 2)
         } else {
             ;({ speedDegrees } = this._shipCompare.singleShipData)
         }
@@ -443,15 +443,11 @@ export default class MakeJourney {
 
     _correctJourney(): void {
         const defaultTranslate = 20
-        const svg = d3Select<SVGSVGElement, unknown>("#na-svg")
-        const currentTransform = d3ZoomTransform(svg.node()!)
-        // Don't scale on higher zoom level
-        const scale = Math.max(1, currentTransform.k)
-        const fontSize = this._fontSize / scale
-        const textTransform = d3ZoomIdentity.translate(defaultTranslate / scale, defaultTranslate / scale)
-        const textPadding = this._labelPadding / scale
-        const circleRadius = 10 / scale
-        const pathWidth = 5 / scale
+        const fontSize = this._fontSize
+        const textTransform = d3ZoomIdentity.translate(defaultTranslate, defaultTranslate)
+        const textPadding = this._labelPadding
+        const circleRadius = 10
+        const pathWidth = 5
 
         /** Correct Text Box
          *  - split text into lines
@@ -467,12 +463,12 @@ export default class MakeJourney {
             const lines = d.label.split("|")
             const lineHeight = fontSize * 1.3
             text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
-            lines.forEach((line, j) => {
+            for (const [j, line] of lines.entries()) {
                 const tspan = text.append("tspan").html(line)
                 if (j > 0) {
                     tspan.attr("x", 0).attr("dy", lineHeight)
                 }
-            })
+            }
 
             // Correct box width
             const bbText = (text.node() as SVGTextElement).getBBox()
@@ -504,10 +500,6 @@ export default class MakeJourney {
         // Correct journey stroke width
         if (this._gJourneyPath) {
             this._gJourneyPath.style("stroke-width", `${pathWidth}px`)
-        }
-
-        if (this._compassG) {
-            this._compassG.attr("transform", `scale(${1 / scale})`)
         }
     }
 
@@ -674,11 +666,11 @@ export default class MakeJourney {
     _printJourney(): void {
         this._printLines()
         this._resetJourneyData()
-        this._journey.segments.forEach((d, i) => {
+        for (const [i] of this._journey.segments.entries()) {
             if (i < this._journey.segments.length - 1) {
                 this._setSegmentLabel(i + 1)
             }
-        })
+        }
 
         this._printLabels()
         this._correctJourney()
