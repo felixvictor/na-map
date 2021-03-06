@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.6.0](///compare/v12.5.0...v12.6.0) (2021-03-06)
+
+
+### Features
+
+* **list loot:** fish and fishing regions added 7d67cc6
+
+
+### Bug Fixes
+
+* **display ports:** circle sizes adjusted (with thresholds) 8ffda26
+* **income map:** wait cursor on data load d626a8a
+* **list ingredients:** table font size adjusted to standard small 020f9e8
+* **module data:** February patch ea4db34
+* **port investments:** January 2021 data 8ab5e81
+* **port ownership:** wait cursor on data load c1cee1d
+* **power map:** initial zoom aligned to top 967c97b
+* **select ports:** do not zoom to port after trade relation selection fdb40c7
+
 ## [12.5.0](///compare/v12.4.1...v12.5.0) (2021-02-14)
 
 
