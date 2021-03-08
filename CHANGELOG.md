@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.6.3](///compare/v12.6.2...v12.6.3) (2021-03-08)
+
+
+### Bug Fixes
+
+* **build:** copy-webpack-plugin c4280c5
+* **ship compare:** ship select refresh on init 0f6598b
+
 ### [12.6.2](///compare/v12.6.1...v12.6.2) (2021-03-08)
 
 ### [12.6.1](///compare/v12.6.0...v12.6.1) (2021-03-08)
