@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.6.1](///compare/v12.6.0...v12.6.1) (2021-03-08)
+
+
+### Bug Fixes
+
+* **map:** zoom extent when initial zoom fills viewport 3c5eeec
+* **ship compare:** ship select refresh on init bb6ab84
+
 ## [12.6.0](///compare/v12.5.0...v12.6.0) (2021-03-06)
 
 
