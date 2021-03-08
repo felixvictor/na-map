@@ -56,6 +56,7 @@ class NAMap {
     readonly #maxMapScale = 256
     #currentMapScale = this.minMapScale
     #initialMapScale = this.minMapScale
+    #overfillZoom = false
     readonly #tileSize = 256
     readonly #wheelDelta = 1
     readonly #labelZoomThreshold = 0.25
@@ -96,7 +97,6 @@ class NAMap {
     private readonly _showGridId: string
     private readonly _showGridRadios: RadioButton
     private readonly _showGridValues: string[]
-
 
     /**
      * @param serverName - Naval action server name
@@ -570,6 +570,7 @@ class NAMap {
 
         if (screenArea - mapAreaSmall > mapAreaLarge - screenArea) {
             initialMapScale *= 2
+            this.#overfillZoom = true
         }
 
         return initialMapScale
@@ -580,9 +581,18 @@ class NAMap {
      * @param transform - Transform
      */
     _setTranslateExtent(transform: ZoomTransform): void {
+        let newTransform = transform
+        if (this.#overfillZoom) {
+            const scaleFactor = 2
+            const scale = transform.k / scaleFactor
+            const x = transform.x / scaleFactor
+            const y = transform.y / scaleFactor
+            newTransform = d3ZoomIdentity.scale(scale).translate(x, y)
+        }
+
         this.#zoom.translateExtent([
-            transform.invert(this.#extent[0] as [number, number]),
-            transform.invert(this.#extent[1] as [number, number]),
+            newTransform.invert(this.#extent[0] as [number, number]),
+            newTransform.invert(this.#extent[1] as [number, number]),
         ])
     }
 
