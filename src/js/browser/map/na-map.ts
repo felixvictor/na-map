@@ -569,8 +569,9 @@ class NAMap {
         const mapAreaLarge = (this.#tileSize * initialMapScale * 2) ** 2
 
         if (screenArea - mapAreaSmall > mapAreaLarge - screenArea) {
-            initialMapScale *= 2
+            const scaleFactor = 2
             this.#overfillZoom = true
+            initialMapScale *= scaleFactor
         }
 
         return initialMapScale
@@ -585,9 +586,8 @@ class NAMap {
         if (this.#overfillZoom) {
             const scaleFactor = 2
             const scale = transform.k / scaleFactor
-            const x = transform.x / scaleFactor
-            const y = transform.y / scaleFactor
-            newTransform = d3ZoomIdentity.scale(scale).translate(x, y)
+            const { x, y } = transform
+            newTransform = d3ZoomIdentity.translate(x, y).scale(scale)
         }
 
         this.#zoom.translateExtent([
