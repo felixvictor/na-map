@@ -339,7 +339,7 @@ const config = {
         new CopyPlugin({
             patterns: [
                 { from: "netlify.toml" },
-                { from: `${dirLib}/gen-generic/*.xlsx`, to: `${dirOutput}/data/[name].[ext]` },
+                { from: `${dirLib}/gen-generic/*.xlsx`, to: `${dirOutput}/data/[name][ext]` },
                 { from: `${dirLib}/gen-server`, to: `${dirOutput}/data` },
                 { from: `${dirSrc}/google979f2cf3bed204d6.html` },
                 { from: dirMap, to: `${dirOutput}/images/map` },
