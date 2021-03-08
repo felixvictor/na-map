@@ -23,35 +23,42 @@
 
     @each $color, $value in $theme-colors {
         .#{$color} {
-            color: color-yiq($value);
+            color: color-contrast($value);
             background-color: $value;
         }
     }
 
     @each $color, $value in $colors {
         .#{$color} {
-            color: color-yiq($value);
+            color: color-contrast($value);
             background-color: $value;
         }
     }
 
     @each $color, $value in $primarys {
         .primary-#{$color} {
-            color: color-yiq($value);
+            color: color-contrast($value);
             background-color: $value;
         }
     }
 
     @each $color, $value in $secondarys {
         .secondary-#{$color} {
-            color: color-yiq($value);
+            color: color-contrast($value);
             background-color: $value;
         }
     }
 
     @each $color, $value in $grays {
         .gray-#{$color} {
-            color: color-yiq($value);
+            color: color-contrast($value);
+            background-color: $value;
+        }
+    }
+
+    @each $color, $value in $blues {
+        .blue-#{$color} {
+            color: color-contrast($value);
             background-color: $value;
         }
     }

@@ -2,11 +2,13 @@
 /// This file is part of na-map.
 /// Bootstrap variables.
 ///
-/// copyright 2017, 2018, 2019, 2020
-/// license   http://www.gnu.org/licenses/gpl.html
-/// @group    main
+/// @group    scss
 /// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
 ////
+
+$min-contrast-ratio: 3;
 
 // Options
 $enable-rounded: false;
@@ -27,29 +29,16 @@ $enable-deprecation-messages: false;
 $spacer: 1rem;
 $spacers: (
     0: 0,
-    1: (
-        $spacer * 0.382
-    ),
-    2: (
-        $spacer * 0.618
-    ),
+    1: $spacer * 0.382,
+    2: $spacer * 0.618,
     3: $spacer,
-    4: (
-        $spacer * 1.618
-    ),
-    5: (
-        $spacer * 2.618
-    )
+    4: $spacer * 1.618,
+    5: $spacer * 2.618,
 );
 
 // Body
 $body-bg: $primary-050;
-//$body-color: $secondary-900;
 $body-color: $gray-900;
-//$yiq-text-dark: $body-color;
-//$yiq-text-light: $white;
-$yiq-contrasted-threshold: 127;
-
 $border-color: $primary-300;
 $text-muted: $primary-700;
 
@@ -137,7 +126,7 @@ $pagination-disabled-border-color: $pagination-bg;
 $badge-font-size: 65%;
 $badge-font-weight: 400;
 $badge-padding-y: 0;
-$badge-padding-x: map-get($spacers, 1)/1.618;
+$badge-padding-x: map-get($spacers, 1) / 1.618;
 //$badge-border-radius:               $border-radius !default;
 //$badge-pill-padding-x:              .6em !default;
 // Use a higher than normal value to ensure completely rounded edges when

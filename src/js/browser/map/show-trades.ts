@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util"
+
 import "bootstrap/js/dist/collapse"
 import "bootstrap/js/dist/tooltip"
 

@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util"
 import "bootstrap/js/dist/tooltip"
 
 import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
@@ -1095,7 +1094,7 @@ export default class DisplayPorts {
             fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
             r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
         } else if (this.showRadius === "points") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints>portPointThreshold)
+            data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints > portPointThreshold)
             this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
             cssClass = (): string => "bubble"
             fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
