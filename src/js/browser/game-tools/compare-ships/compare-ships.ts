@@ -1509,21 +1509,25 @@ export class CompareShips {
      * @param compareId - Column id
      */
     _setupSelectListener(compareId: ShipColumnType): void {
-        this._selectShip$[compareId].selectpicker({ title: "Ship" }).on("changed.bs.select", () => {
-            this._shipIds[compareId] = Number(this._selectShip$[compareId].val())
-            if (this._baseId !== "ship-journey") {
-                this._setupModulesSelect(compareId)
-            }
+        this._selectShip$[compareId]
+            .selectpicker({ title: "Ship" })
+            .val("default")
+            .selectpicker("refresh")
+            .on("changed.bs.select", () => {
+                this._shipIds[compareId] = Number(this._selectShip$[compareId].val())
+                if (this._baseId !== "ship-journey") {
+                    this._setupModulesSelect(compareId)
+                }
 
-            this._refreshShips(compareId)
-            if (compareId === "Base" && this._baseId !== "ship-journey") {
-                this._enableCompareSelects()
-            }
+                this._refreshShips(compareId)
+                if (compareId === "Base" && this._baseId !== "ship-journey") {
+                    this._enableCompareSelects()
+                }
 
-            if (this._baseId !== "ship-journey") {
-                this.woodCompare.enableSelects(compareId)
-            }
-        })
+                if (this._baseId !== "ship-journey") {
+                    this.woodCompare.enableSelects(compareId)
+                }
+            })
         if (this._baseId !== "ship-journey") {
             for (const type of woodType) {
                 this._selectWood$[compareId][type]
