@@ -18,6 +18,7 @@
     position: relative;
     top: -0.4rem;
     font-size: small;
+    font-stretch: condensed;
 }
 
 $background-map: $primary;
@@ -72,6 +73,18 @@ rect {
 
 .click-circle {
     cursor: pointer;
+}
+
+.svg-text {
+    text {
+        pointer-events: none;
+        stroke: none;
+        text-anchor: start;
+        dominant-baseline: mathematical;
+    }
+    .rect-background {
+        opacity: 0.2;
+    }
 }
 
 table,
@@ -319,6 +332,115 @@ svg {
     }
 }
 
+.non-trading {
+    font-style: italic;
+}
+
+.bubble {
+    fill-opacity: 0.7;
+}
+
+.both {
+    opacity: 0.4;
+    fill: $blue;
+}
+
+.here {
+    opacity: 0.4;
+    fill: $white;
+}
+
+.neg {
+    opacity: 0.4;
+    fill: $red;
+}
+
+.pos {
+    opacity: 0.4;
+    fill: $green;
+}
+
+.cooldown {
+    fill: $green-800;
+}
+
+.raider {
+    fill: $orange-600;
+}
+
+.not-capturable {
+    opacity: 0.6;
+    fill: $gray-200;
+}
+
+.capital {
+    opacity: 0.9;
+}
+
+.non-capital {
+    opacity: 0.4;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.sub-title,
+.title {
+    font-weight: 300;
+    font-stretch: condensed;
+    font-feature-settings: "c2sc", "smcp";
+    text-anchor: middle;
+    text {
+        fill: $primary-900;
+    }
+}
+
+.title {
+    font-size: 160px;
+    letter-spacing: 0.5rem;
+}
+
+.sub-title {
+    font-size: 60px;
+    letter-spacing: 0.3rem;
+}
+
+.extralarge-width {
+    min-width: 25em;
+}
+
+.large-width {
+    min-width: 18em;
+}
+
+/////////////////////////////////////7
+// tooltip
+
+.tooltip {
+    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
+
+    table {
+        margin-bottom: 0;
+    }
+}
+
+.tooltip-inner {
+    text-align: left;
+    min-width: 30rem;
+}
+
+.tooltip-inner-small {
+    min-width: 20rem !important;
+}
+
+.tooltip-inner-smaller {
+    min-width: 10rem !important;
+    p {
+        margin: 0;
+    }
+}
+
 /*
 
 
@@ -336,17 +458,7 @@ p {
 
 
 
-.extralarge-width {
-    min-width: 25em;
-}
 
-.large-width {
-    min-width: 18em;
-}
-
-#na-svg {
-    background-color: $background-colour;
-}
 
 .position {
     path {
@@ -432,77 +544,6 @@ p {
 ////
 //// Display ports
 ////
-
-.non-trading {
-    font-style: italic;
-}
-
-
-.bubble {
-    fill-opacity: 0.7;
-}
-
-.both {
-    opacity: 0.4;
-    fill: $blue;
-}
-
-.here {
-    opacity: 0.4;
-    fill: $white;
-}
-
-.neg {
-    opacity: 0.4;
-    fill: $red;
-}
-
-.pos {
-    opacity: 0.4;
-    fill: $green;
-}
-
-.cooldown {
-    fill: $green-800;
-}
-
-.raider {
-    fill: $orange-600;
-}
-
-.not-capturable {
-    opacity: 0.6;
-    fill: $gray-200;
-}
-
-.capital {
-    opacity: 0.9;
-}
-
-.non-capital {
-    opacity: 0.4;
-}
-
-.hidden {
-    visibility: hidden;
-}
-
-.county,
-.region {
-    font-feature-settings: "c2sc", "smcp";
-    fill: $secondary-900;
-    text-anchor: middle;
-}
-
-.region {
-    font-size: 160px;
-    letter-spacing: 1rem;
-}
-
-.county {
-    font-size: 60px;
-    letter-spacing: 0.6rem;
-}
 
 .port-names {
     fill: $white;
@@ -811,40 +852,6 @@ $wind-profile-colour: $overlay-text-colour;
     stroke-width: 0.5rem;
 }
 
-.tooltip {
-    font-size: smaller;
-    text-align: left;
-    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
 
-    table {
-        margin-bottom: 0;
-    }
-}
 
-.tooltip-inner {
-    min-width: 30rem;
-}
-
-.tooltip-inner-small {
-    min-width: 20rem !important;
-}
-
-.tooltip-inner-smaller {
-    min-width: 10rem !important;
-    p {
-        margin: 0;
-    }
-}
-
-.svg-text {
-    text {
-        pointer-events: none;
-        stroke: none;
-        text-anchor: start;
-        dominant-baseline: mathematical;
-    }
-    .rect-background {
-        opacity: 0.2;
-    }
-}
 */

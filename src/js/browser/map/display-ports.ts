@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/tooltip"
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
@@ -16,7 +16,8 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import htm from "htm"
-import { h, render } from "preact"
+import { h, VNode } from "preact";
+import render from "preact-render-to-string"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import dayjs from "dayjs"
@@ -53,7 +54,6 @@ import {
 import { simpleStringSort } from "common/common-node"
 import { displayClanLitHtml } from "common/common-game-tools"
 
-import JQuery from "jquery"
 import {
     PortBattlePerServer,
     PortBasic,
@@ -359,8 +359,11 @@ export default class DisplayPorts {
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
-        this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("class", "region")
-        this.#gCounty = this.#gPort.append<SVGGElement>("g").attr("class", "county")
+        this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "region").attr("class", "title")
+        this.#gCounty = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "county")
+            .attr("class", "sub-title")
         this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
         this.#gIcon = this.#gPort
             .append<SVGGElement>("g")
@@ -798,7 +801,7 @@ export default class DisplayPorts {
     }
 
     // eslint-disable-next-line complexity
-    _tooltipData(port: PortForDisplay): HtmlResult {
+    _tooltipData(port: PortForDisplay): VNode {
         const getPortBonus = (): HtmlResult => {
             return html`${portBonusType.map((bonus) => {
                 return html`${port?.portBonus?.[bonus]
@@ -929,7 +932,7 @@ export default class DisplayPorts {
                         </div>`}`
                 : html``}
         `
-        return h
+        return h as VNode
     }
 
     _getInventory(port: PortWithTrades): HtmlString {
@@ -971,23 +974,15 @@ export default class DisplayPorts {
     }
 
     _showDetails(event: Event, d: PortWithTrades): void {
-        const node$ = $(event.currentTarget as JQuery.PlainObject)
-            .tooltip("dispose")
-            .tooltip({
-                html: true,
-                placement: "auto",
-                trigger: "manual",
-                title: "Wait...",
-                sanitize: false,
-            })
-        // Inject tooltip text
-        node$.on("inserted.bs.tooltip", () => {
-            const tooltipInner = $(document.body).find(".tooltip").find(".tooltip-inner")[0]
-            tooltipInner.textContent = ""
-            render(this._tooltipData(this._getText(d)), tooltipInner)
-            node$.tooltip("update")
+        const element = event.currentTarget as Element
+        const tooltip = new BSTooltip(element, {
+            html: true,
+            placement: "auto",
+            trigger: "manual",
+            title: render(this._tooltipData(this._getText(d))),
+            sanitize: false,
         })
-        node$.tooltip("show")
+        tooltip.show()
 
         if (this.map.showTrades.show) {
             if (this.map.showTrades.listType !== "inventory") {

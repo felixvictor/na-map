@@ -40,18 +40,22 @@ $spacers: (
     5: $spacer * 2.618,
 );
 
-// Navbar
-/*
-$navbar-light-color: $secondary-700;
-$navbar-light-hover-color: $secondary-800;
-$navbar-light-active-color: $secondary-900;
-$navbar-light-disabled-color: $secondary-700;
-*/
+// Font
+$font-size-base: 1.2rem;
+$font-size-lg: map-get($spacers, 4);
+$font-size-sm: map-get($spacers, 2) * 1.2;
 
-//$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
-//$navbar-light-toggler-border-color: rgba($black, .1) !default;
-//$navbar-light-brand-color:                $navbar-light-active-color !default;
-//$navbar-light-brand-hover-color:          $navbar-light-active-color !default;
+// Tooltip
+$tooltip-font-size: smaller;
+$tooltip-max-width: 40rem;
+$tooltip-color: $body-color;
+$tooltip-bg: $primary-100;
+$tooltip-opacity: 1;
+$tooltip-padding-y: 1rem;
+$tooltip-padding-x: 1rem;
+
+$tooltip-arrow-width: 0;
+$tooltip-arrow-height: 0;
 
 /*
 // Body
@@ -71,11 +75,6 @@ $grid-gutter-width: $spacer * 2;
 //$input-group-addon-bg: $primary-100;
 //$input-border-color: $primary-400;
 //$input-border-radius: 0;
-
-// Fonts
-$font-size-base: 1.2rem;
-$font-size-lg: map-get($spacers, 4);
-$font-size-sm: map-get($spacers, 2) * 1.2;
 
 $line-height-base: map-get($spacers, 4) / $font-size-base;
 
@@ -101,17 +100,6 @@ $toast-font-size: $font-size-base;
 $toast-border-width: 0;
 $toast-border-radius: 0;
 
-// Tooltip
-$tooltip-max-width: 40em;
-$tooltip-color: $body-color;
-$tooltip-bg: $primary-100;
-$tooltip-opacity: 1;
-$tooltip-padding-y: 1rem;
-$tooltip-padding-x: 1rem;
-//$tooltip-margin:              0 !default;
-
-$tooltip-arrow-width: 0;
-$tooltip-arrow-height: 0;
 
 // Dropdown
 $dropdown-link-hover-bg: $primary-100;
