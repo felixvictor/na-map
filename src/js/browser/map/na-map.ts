@@ -305,6 +305,7 @@ class NAMap {
         this._svg = d3Select<SVGSVGElement, Event>("#na-map")
             .append<SVGSVGElement>("svg")
             .attr("id", "na-svg")
+            .attr("class", "empty-svg")
             .call(this.#zoom)
 
         this._svg.append<SVGDefsElement>("defs")

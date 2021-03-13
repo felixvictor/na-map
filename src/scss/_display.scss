@@ -59,9 +59,8 @@ text {
     stroke: none;
 }
 
-svg,
-rect,
-path {
+path,
+rect {
     fill: none;
     stroke: $white;
 }
@@ -69,6 +68,10 @@ path {
 .empty-svg {
     fill: none;
     stroke: none;
+}
+
+.click-circle {
+    cursor: pointer;
 }
 
 table,
@@ -101,9 +104,6 @@ table,
     color: $overlay-text-colour-contrast;
 }
 
-
-
-
 .text-lighter {
     color: $secondary-600;
     font-variant-numeric: normal;
@@ -117,10 +117,6 @@ table,
     font-size: larger;
     font-variant-numeric: normal;
 }
-
-
-
-
 
 .central {
     width: 0;
@@ -322,7 +318,6 @@ svg {
         fill: $primary-100;
     }
 }
-
 
 /*
 

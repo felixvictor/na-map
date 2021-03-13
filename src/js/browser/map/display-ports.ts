@@ -362,7 +362,10 @@ export default class DisplayPorts {
         this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("class", "region")
         this.#gCounty = this.#gPort.append<SVGGElement>("g").attr("class", "county")
         this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
-        this.#gIcon = this.#gPort.append<SVGGElement>("g").attr("class", "port")
+        this.#gIcon = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "port-icons")
+            .attr("class", "click-circle")
         this.#gText = this.#gPort.append<SVGGElement>("g").attr("class", "port-names")
         this.#gPZ = this.#gPort.append<SVGGElement>("g").attr("class", "pz")
     }
@@ -835,7 +838,9 @@ export default class DisplayPorts {
                     <div class="ml-auto">
                         ${port.laborHoursDiscount
                             ? html`<i class="icon icon-light icon-labour me-1" aria-hidden="true"></i
-                                  ><span class="visually-hidden">Labour hour discount level ${port.laborHoursDiscount}</span>`
+                                  ><span class="visually-hidden"
+                                      >Labour hour discount level ${port.laborHoursDiscount}</span
+                                  >`
                             : html``}
                         ${port.tradingCompany
                             ? html`<i class="icon icon-light icon-trading me-1" aria-hidden="true"></i
