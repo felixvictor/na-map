@@ -51,21 +51,24 @@ const convert = async (csvData: CSVData[]) => {
     const ports = csvData
         .map((csvPort) => {
             const port = {} as PortBonusJson
-            port.id = portNames.get(csvPort.Port) ?? 0
             port.name = cleanName(csvPort.Port)
-
-            port.portBonus = {} as PortBonus
-            const bonusEntries = ["Bonus1", "Bonus2", "Bonus3", "Bonus4", "Bonus5"].filter(
-                (bonusEntry) => csvPort[bonusEntry] !== "Empty"
-            )
-            for (const bonusEntry of bonusEntries) {
-                const bonusValue = Number(csvPort[bonusEntry].slice(-1)) as PortBonusValue
-                const bonusType = csvPort[bonusEntry]
-                    .replace("Bonus ", "")
-                    .replace(" and Rig", "")
-                    .toLowerCase()
-                    .slice(0, -2)!
-                port.portBonus[bonusType] = bonusValue
+            if (portNames.get(csvPort.Port) === undefined) {
+                console.error(`Port '${csvPort.Port}' not found!`)
+            } else {
+                port.id = portNames.get(csvPort.Port)!
+                port.portBonus = {} as PortBonus
+                const bonusEntries = ["Bonus1", "Bonus2", "Bonus3", "Bonus4", "Bonus5"].filter(
+                    (bonusEntry) => csvPort[bonusEntry] !== "Empty"
+                )
+                for (const bonusEntry of bonusEntries) {
+                    const bonusValue = Number(csvPort[bonusEntry].slice(-1)) as PortBonusValue
+                    const bonusType = csvPort[bonusEntry]
+                        .replace("Bonus ", "")
+                        .replace(" and Rig", "")
+                        .toLowerCase()
+                        .slice(0, -2)!
+                    port.portBonus[bonusType] = bonusValue
+                }
             }
 
             return port
