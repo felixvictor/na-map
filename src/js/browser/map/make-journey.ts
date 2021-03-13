@@ -552,12 +552,12 @@ export default class MakeJourney {
         // Selected ship
         this._journeySummaryShip = this._divJourneySummary.append("div").attr("class", "block small")
         this._journeySummaryTextShip = this._journeySummaryShip.append("div")
-        this._journeySummaryShip.append("div").attr("class", "summary-des").text("ship")
+        this._journeySummaryShip.append("div").attr("class", "overlay-des").text("ship")
 
         // Wind direction
         this._journeySummaryWind = this._divJourneySummary.append("div").attr("class", "block small")
         this._journeySummaryTextWind = this._journeySummaryWind.append("div")
-        this._journeySummaryWind.append("div").attr("class", "summary-des").text("wind")
+        this._journeySummaryWind.append("div").attr("class", "overlay-des").text("wind")
 
         this._divJourneySummary
             .append("div")

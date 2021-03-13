@@ -155,7 +155,7 @@ export default class ListBuildings {
             text += "</thead><tbody>"
             for (const level of currentBuilding.levels) {
                 const i = currentBuilding.levels.indexOf(level)
-                text += `<tr><td>${i + 1}</td><td class="text-left">`
+                text += `<tr><td>${i + 1}</td><td class="text-start">`
                 text += level.materials.map((material) => `${formatInt(material.amount)} ${material.item}`).join("<br>")
                 text += "</td>"
                 text += `<td>${formatInt(level.price)}</td>`

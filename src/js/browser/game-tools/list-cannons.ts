@@ -182,7 +182,7 @@ export default class ListCannons {
                 .attr("class", `nav-link${index === 0 ? " active" : ""}`)
                 .attr("id", `tab-${this._baseId}-${type}`)
                 .attr("href", `#tab-content-${this._baseId}-${type}`)
-                .attr("data-toggle", "tab")
+                .attr("data-bs-toggle", "tab")
                 .attr("role", "tab")
                 .attr("aria-controls", `${this._baseId}-${type}`)
                 .attr("aria-selected", `${index === 0 ? "true" : "false"}`)
@@ -244,7 +244,7 @@ export default class ListCannons {
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
             .classed("border-top-0", (d, i) => i === 0)
-            .classed("text-right", (d, i) => i !== 0)
+            .classed("text-end", (d, i) => i !== 0)
             .text((d) => d.data)
             .on("click", (_event, d) => {
                 this._sortRows(type, d.index)
@@ -306,7 +306,7 @@ export default class ListCannons {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-right", (d, i) => i !== 0)
+                    .classed("text-end", (d, i) => i !== 0)
                     .html((d) => {
                         return d.formattedValue
                     })

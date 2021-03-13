@@ -53,7 +53,7 @@ export default class Toast {
             .attr("aria-atomic", "true")
 
         const header = this.#toast.append("div").attr("class", "toast-header")
-        header.append("img").attr("class", "rounded mr-2").attr("src", iconSmallSrc).attr("alt", "logo")
+        header.append("img").attr("class", "rounded me-2").attr("src", iconSmallSrc).attr("alt", "logo")
         header
             .append("em")
             .attr("class", "mr-auto")
@@ -61,8 +61,8 @@ export default class Toast {
         header
             .append("button")
             .attr("type", "button")
-            .attr("class", "ml-2 mb-1 close")
-            .attr("data-dismiss", "toast")
+            .attr("class", "ms-2 mb-1 close")
+            .attr("data-bs-dismiss", "toast")
             .attr("aria-label", "Close")
             .append("span")
             .attr("aria-hidden", "true")

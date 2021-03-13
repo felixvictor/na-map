@@ -166,7 +166,7 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
         .text(buttonText)
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
-        .attr("data-dismiss", "modal")
+        .attr("data-bs-dismiss", "modal")
 }
 
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`

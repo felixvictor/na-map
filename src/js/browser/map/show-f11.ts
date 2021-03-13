@@ -146,7 +146,7 @@ export default class ShowF11 {
             .append("small")
             .html("In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.")
 
-        const buttonGroup = form.append("div").classed("float-right btn-group", true).attr("role", "group")
+        const buttonGroup = form.append("div").classed("float-end btn-group", true).attr("role", "group")
 
         const button = buttonGroup
             .append("button")

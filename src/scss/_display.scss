@@ -8,61 +8,6 @@
 /// @author   iB aka Felix Victor
 ////
 
-$background-colour: $primary-600;
-
-$dark-overlay-background-colour: $primary-800;
-$dark-overlay-background-colour-contrast: $primary-700;
-$dark-overlay-background: rgba($dark-overlay-background-colour, 0.8);
-$dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, 0.8);
-$dark-overlay-text-colour-contrast: $primary-200;
-$dark-overlay-text-colour: color-yiq($dark-overlay-background);
-
-$overlay-background-colour: $primary-200;
-$overlay-background-colour-contrast: $primary-050;
-$overlay-background: rgba($overlay-background-colour, 0.8);
-$overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
-$overlay-text-colour-contrast: $primary-700;
-$overlay-text-colour: color-yiq($overlay-background);
-
-// opentype
-
-body {
-    font-variant-alternates: styleset(ss18); // (needs also calt)
-    font-kerning: normal;
-    font-variant-caps: normal;
-    font-variant-ligatures: common-ligatures contextual; // liga calt
-    font-variant-numeric: oldstyle-nums; // onum
-}
-
-text,
-.map-tiles {
-    cursor: default;
-    user-select: none;
-}
-
-p {
-    text-align: left;
-}
-
-.input-group > label,
-.nav-item > label {
-    margin-bottom: unset;
-}
-
-table,
-.page-link {
-    font-variant-numeric: normal; // onum off
-}
-
-.fraction {
-    font-variant-numeric: diagonal-fractions;
-}
-
-.super {
-    font-variant-position: super;
-    font-feature-settings: "sups";
-}
-
 @mixin caps {
     font-variant-caps: all-small-caps;
     font-variant-numeric: oldstyle-nums;
@@ -75,6 +20,71 @@ table,
     font-size: small;
 }
 
+$background-map: $primary;
+$dark-overlay-background-colour: $primary-800;
+$dark-overlay-background-colour-contrast: $primary-700;
+$dark-overlay-background: rgba($dark-overlay-background-colour, 0.8);
+$dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, 0.8);
+$dark-overlay-text-colour-contrast: $primary-200;
+$dark-overlay-text-colour: color-contrast($dark-overlay-background);
+
+$overlay-background-colour: $primary-200;
+$overlay-background-colour-contrast: $primary-050;
+$overlay-background: rgba($overlay-background-colour, 0.8);
+$overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
+$overlay-text-colour-contrast: $primary-700;
+$overlay-text-colour: color-contrast($overlay-background);
+
+// opentype
+body {
+    font-variant-alternates: styleset(ss18); // (needs also calt)
+    font-kerning: normal;
+    font-variant-caps: normal;
+    font-variant-ligatures: common-ligatures contextual; // liga calt
+    font-variant-numeric: oldstyle-nums; // onum
+}
+
+.bg-map {
+    background-color: $background-map;
+}
+
+text,
+.map-tiles {
+    cursor: default;
+    user-select: none;
+}
+
+text {
+    fill: $white;
+    stroke: none;
+}
+
+svg,
+rect,
+path {
+    fill: none;
+    stroke: $white;
+}
+
+.empty-svg {
+    fill: none;
+    stroke: none;
+}
+
+table,
+.page-link {
+    font-variant-numeric: normal; // onum off
+}
+
+.fraction {
+    font-variant-numeric: diagonal-fractions;
+}
+
+.super {
+    font-feature-settings: "sups";
+    font-variant-position: super;
+}
+
 .des {
     @include des();
 }
@@ -84,93 +94,15 @@ table,
     @include caps();
 }
 
-.extralarge-width {
-    min-width: 25em;
+.overlay-des {
+    @include caps();
+    @include des();
+    top: 0;
+    color: $overlay-text-colour-contrast;
 }
 
-.large-width {
-    min-width: 18em;
-}
 
-#na-svg {
-    background-color: $background-colour;
-}
 
-.position {
-    path {
-        fill: $green;
-        fill-opacity: 0.6;
-    }
-}
-
-.blueprint {
-    table {
-        td + td {
-            text-align: right;
-        }
-    }
-}
-
-.buildings .requirements {
-    table {
-        thead {
-            background-color: $secondary-100;
-        }
-
-        tbody {
-            tr:nth-of-type(odd) {
-                background-color: $primary-100;
-            }
-
-            tr:nth-of-type(even) {
-                background-color: $primary-050;
-            }
-        }
-
-        .name {
-            font-style: italic;
-        }
-    }
-}
-
-#input-toggle {
-    display: flex;
-
-    .item {
-        padding-right: 1em;
-    }
-}
-
-.left-margin {
-    margin-left: 15px;
-}
-
-.box {
-    background-color: $primary-100;
-}
-
-.summary text {
-    text-anchor: start;
-}
-
-.flag-icon {
-    width: 6rem;
-    margin-right: 0.4rem;
-}
-
-.flag-icon-border-light {
-    background-clip: padding-box;
-    border: 0.3rem solid transparentize($white, 0.2);
-}
-
-.flag-icon-border-middle {
-    background-clip: padding-box;
-    border: 0.3rem solid transparentize($yellow, 0.1);
-}
-
-.icon-light {
-    background-color: $secondary-400;
-}
 
 .text-lighter {
     color: $secondary-600;
@@ -186,27 +118,9 @@ table,
     font-variant-numeric: normal;
 }
 
-.dropdown-submenu {
-    position: relative;
-}
 
-.dropdown-submenu > .dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-top: -$dropdown-spacer;
-}
 
-.area {
-    .area-label {
-        fill-opacity: 0.7;
-    }
 
-    path {
-        stroke-opacity: 0.4;
-        stroke: $white !important;
-        stroke-width: 2px;
-    }
-}
 
 .central {
     width: 0;
@@ -409,6 +323,117 @@ svg {
     }
 }
 
+
+/*
+
+
+
+
+
+p {
+    text-align: left;
+}
+
+.input-group > label,
+.nav-item > label {
+    margin-bottom: unset;
+}
+
+
+
+.extralarge-width {
+    min-width: 25em;
+}
+
+.large-width {
+    min-width: 18em;
+}
+
+#na-svg {
+    background-color: $background-colour;
+}
+
+.position {
+    path {
+        fill: $green;
+        fill-opacity: 0.6;
+    }
+}
+
+.blueprint {
+    table {
+        td + td {
+            text-align: right;
+        }
+    }
+}
+
+.buildings .requirements {
+    table {
+        thead {
+            background-color: $secondary-100;
+        }
+
+        tbody {
+            tr:nth-of-type(odd) {
+                background-color: $primary-100;
+            }
+
+            tr:nth-of-type(even) {
+                background-color: $primary-050;
+            }
+        }
+
+        .name {
+            font-style: italic;
+        }
+    }
+}
+
+#input-toggle {
+    display: flex;
+
+    .item {
+        padding-right: 1em;
+    }
+}
+
+.left-margin {
+    margin-left: 15px;
+}
+
+.box {
+    background-color: $primary-100;
+}
+
+.summary text {
+    text-anchor: start;
+}
+
+
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -$dropdown-spacer;
+}
+
+.area {
+    .area-label {
+        fill-opacity: 0.7;
+    }
+
+    path {
+        stroke-opacity: 0.4;
+        stroke: $white !important;
+        stroke-width: 2px;
+    }
+}
+
 ////
 //// Display ports
 ////
@@ -417,12 +442,6 @@ svg {
     font-style: italic;
 }
 
-.summary-des {
-    @include caps();
-    @include des();
-    top: 0;
-    color: $overlay-text-colour-contrast;
-}
 
 .bubble {
     fill-opacity: 0.7;
@@ -833,3 +852,4 @@ $wind-profile-colour: $overlay-text-colour;
         opacity: 0.2;
     }
 }
+*/

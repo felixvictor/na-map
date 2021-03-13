@@ -252,19 +252,19 @@ export default class ShowIncomeMap extends BaseModal {
     _getTooltipText(d: TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>): HtmlString {
         return `
             <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex flex-column text-left mt-1 mr-3 p-0">
+            <div class="d-flex flex-column text-start mt-1 me-3 p-0">
                 <div><span class="x-large">${d.data.id ?? ""}</span><br />${d.parent?.data?.id ?? ""}</div>
             </div>
-            <div class="d-flex flex-column text-left mt-1 p-0">
-                <div class="mr-3">
+            <div class="d-flex flex-column text-start mt-1 p-0">
+                <div class="me-3">
                     ${formatSiInt(d.data.data.value)}<br />
                     <span class="des">Port</span>
                 </div>
-                <div class="mr-3">
+                <div class="me-3">
                     ${formatPercentSig(d.data.data.value / (d.parent?.value ?? 1))}<br />
                     <span class="des">Nation</span>
                 </div>
-                <div class="mr-3">
+                <div class="me-3">
                     ${formatPercentSig(d.data.data.value / (d.parent?.parent?.value ?? 1))}<br />
                     <span class="des">World</span>
                 </div>

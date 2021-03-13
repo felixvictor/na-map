@@ -585,17 +585,17 @@ export default class DisplayPorts {
         // Number of selected ports
         this.#portSummaryNumPorts = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextNumPorts = this.#portSummaryNumPorts.append<HTMLDivElement>("div")
-        this.#portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "summary-des").html("selected<br>ports")
+        this.#portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "overlay-des").html("selected<br>ports")
 
         // Total tax income
         this.#portSummaryTaxIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextTaxIncome = this.#portSummaryTaxIncome.append<HTMLDivElement>("div")
-        this.#portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("tax<br>income")
+        this.#portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("tax<br>income")
 
         // Total net income
         this.#portSummaryNetIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextNetIncome = this.#portSummaryNetIncome.append<HTMLDivElement>("div")
-        this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("net<br>income")
+        this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("net<br>income")
     }
 
     _setupFlags(): void {
@@ -800,9 +800,9 @@ export default class DisplayPorts {
             return html`${portBonusType.map((bonus) => {
                 return html`${port?.portBonus?.[bonus]
                     ? html`<div>
-                          <i class="icon icon-light icon-${bonus} mr-1" aria-hidden="true"></i>
-                          <span class="sr-only">${bonus} bonus </span>
-                          <span class="x-large text-lighter align-top mr-1">${port.portBonus[bonus]}</span>
+                          <i class="icon icon-light icon-${bonus} me-1" aria-hidden="true"></i>
+                          <span class="visually-hidden">${bonus} bonus </span>
+                          <span class="x-large text-lighter align-top me-1">${port.portBonus[bonus]}</span>
                       </div>`
                     : html``}`
             })}`
@@ -815,18 +815,18 @@ export default class DisplayPorts {
                 <div class="d-flex align-items-center ">
                     <img
                         alt="${port.icon}"
-                        class="flag-icon mr-3 align-self-stretch ${iconBorder}"
+                        class="flag-icon me-3 align-self-stretch ${iconBorder}"
                         src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
                     />
 
-                    <div class="text-left mr-1">
+                    <div class="text-start me-1">
                         <div class="large">${port.name}</div>
                         <div class="caps">${port.county}</div>
                         <div class="caps">${port.region}</div>
                     </div>
                 </div>
 
-                ${port.portBonus ? html`<div class="d-flex mr-1">${getPortBonus()}</div>` : html``}
+                ${port.portBonus ? html`<div class="d-flex me-1">${getPortBonus()}</div>` : html``}
 
                 <div class="d-flex flex-column justify-content-end">
                     <div class="ml-auto">
@@ -834,22 +834,22 @@ export default class DisplayPorts {
                     </div>
                     <div class="ml-auto">
                         ${port.laborHoursDiscount
-                            ? html`<i class="icon icon-light icon-labour mr-1" aria-hidden="true"></i
-                                  ><span class="sr-only">Labour hour discount level ${port.laborHoursDiscount}</span>`
+                            ? html`<i class="icon icon-light icon-labour me-1" aria-hidden="true"></i
+                                  ><span class="visually-hidden">Labour hour discount level ${port.laborHoursDiscount}</span>`
                             : html``}
                         ${port.tradingCompany
-                            ? html`<i class="icon icon-light icon-trading mr-1" aria-hidden="true"></i
-                                  ><span class="sr-only">Trading company level ${port.tradingCompany}</span>`
+                            ? html`<i class="icon icon-light icon-trading me-1" aria-hidden="true"></i
+                                  ><span class="visually-hidden">Trading company level ${port.tradingCompany}</span>`
                             : html``}
                         ${port.availableForAll
-                            ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
-                                  ><span class="sr-only">Accessible to all</span>`
+                            ? html`<i class="icon icon-light icon-open me-1" aria-hidden="true"></i
+                                  ><span class="visually-hidden">Accessible to all</span>`
                             : html``}
                         ${port.shallow
                             ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
-                                  ><span class="sr-only">Shallow</span>`
+                                  ><span class="visually-hidden">Shallow</span>`
                             : html`<i class="icon icon-light icon-deep" aria-hidden="true"></i
-                                  ><span class="sr-only">Deep</span>`}
+                                  ><span class="visually-hidden">Deep</span>`}
                     </div>
                 </div>
             </div>
@@ -864,28 +864,28 @@ export default class DisplayPorts {
                       ${port.attack}
                   </div>`}
 
-            <div class="d-flex text-left mb-2">
+            <div class="d-flex text-start mb-2">
                 ${port.capital || port.icon === "FT"
                     ? html`<div>${port.portTax}<br /><span class="des">Tax rate</span></div>`
                     : html`
-                          <div class="mr-3">
+                          <div class="me-3">
                               ${port.pbTimeRange}<br />
                               <span class="des">Battle timer</span>
                           </div>
-                          <div class="mr-3">
+                          <div class="me-3">
                               ${port.brLimit}<br />
                               <span class="des">Rating</span>
                           </div>
-                          <div class="mr-3">
+                          <div class="me-3">
                               ${port.capturer}<br />
                               <span class="des">Capturer</span>
                           </div>
-                          <div class="mr-5">
+                          <div class="me-5">
                               ${port.captureTime}<br />
                               <span class="des">Capture</span>
                           </div>
 
-                          <div class="ml-auto mr-3">
+                          <div class="ml-auto me-3">
                               ${port.taxIncome} (${port.portTax})<br />
                               <span class="des">Tax income</span>
                           </div>
@@ -914,12 +914,12 @@ export default class DisplayPorts {
             ${this.showRadius === "tradePorts"
                 ? html`${port.goodsToSellInTradePort?.[0] === undefined
                       ? html``
-                      : html`<div class="alert alert-success mt-2 mb-2 text-left" role="alert">
+                      : html`<div class="alert alert-success mt-2 mb-2 text-start" role="alert">
                             <span class="caps">Buy here and sell in ${port.tradePort}</span> (net profit)<br />${port.goodsToSellInTradePort}
                         </div>`}
                   ${port.goodsToBuyInTradePort?.[0] === undefined
                       ? html``
-                      : html`<div class="alert alert-danger mt-2 mb-2 text-left" role="alert">
+                      : html`<div class="alert alert-danger mt-2 mb-2 text-start" role="alert">
                             <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit)<br />${port.goodsToBuyInTradePort}
                         </div>`}`
                 : html``}

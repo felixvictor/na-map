@@ -105,7 +105,7 @@ export default class ListIngredients {
             }
         }
 
-        text = `<h6 class='text-muted text-left'>${moduleType}</h6>`
+        text = `<h6 class='text-muted text-start'>${moduleType}</h6>`
         text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`
 
         return properties ? text : ""
@@ -119,7 +119,7 @@ export default class ListIngredients {
                         const properties = this._getProperties(recipeName)
 
                         return properties
-                            ? `<a data-toggle="tooltip" title="${properties}">${recipeName}</a>`
+                            ? `<a data-bs-toggle="tooltip" title="${properties}">${recipeName}</a>`
                             : recipeName
                     })
                     .join("<br>")}</td></tr>`
@@ -156,7 +156,7 @@ export default class ListIngredients {
         // Add new recipe list
         d3Select(`#${this._baseId}`).append("div").classed("row", true)
         d3Select(`#${this._baseId} div`).html(this._getText())
-        $('[data-toggle="tooltip"]').tooltip({
+        $('[data-bs-toggle="tooltip"]').tooltip({
             html: true,
             placement: "auto",
             sanitize: false,

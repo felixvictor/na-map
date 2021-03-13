@@ -188,7 +188,7 @@ export default class ListLoot {
     }
 
     _getModalFooter(): HtmlResult {
-        return html` <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> `
+        return html` <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> `
     }
 
     _injectModal(): void {
@@ -253,8 +253,8 @@ export default class ListLoot {
                 <thead>
                     <tr>
                         <th scope="col">${title}</th>
-                        ${chance ? html`<th scope="col" class="text-right">Chance (0 − 100)</th>` : ""}
-                        <th scope="col" class="text-right">Amount</th>
+                        ${chance ? html`<th scope="col" class="text-end">Chance (0 − 100)</th>` : ""}
+                        <th scope="col" class="text-end">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -264,11 +264,11 @@ export default class ListLoot {
                                 <tr>
                                     <td>${item.name}</td>
                                     ${chance
-                                        ? html` <td class="text-right">
+                                        ? html` <td class="text-end">
                                               ${ListLoot._printChance((item as LootLootItemsEntity).chance)}
                                           </td>`
                                         : ""}
-                                    <td class="text-right">${ListLoot._printAmount(item.amount)}</td>
+                                    <td class="text-end">${ListLoot._printAmount(item.amount)}</td>
                                 </tr>
                             `
                     )}

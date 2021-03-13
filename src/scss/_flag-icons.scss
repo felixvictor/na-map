@@ -1,0 +1,24 @@
+////
+/// This file is part of na-map.
+/// flag-icons definitions.
+///
+/// @group    scss
+/// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
+////
+
+.flag-icon {
+    width: 6rem;
+    margin-right: 0.4rem;
+}
+
+.flag-icon-border-light {
+    background-clip: padding-box;
+    border: 0.3rem solid transparentize($white, 0.2);
+}
+
+.flag-icon-border-middle {
+    background-clip: padding-box;
+    border: 0.3rem solid transparentize($yellow, 0.1);
+}

@@ -1,15 +1,12 @@
 ////
 /// This file is part of na-map.
-/// bytesize-icons definitions.
+/// icons definitions.
 ///
-/// copyright 2019
-/// license   http://www.gnu.org/licenses/gpl.html
-/// @group    main
+/// @group    scss
 /// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
 ////
-
-/// Icons
-/// https://github.com/danklammer/bytesize-icons
 
 @use "sass:math";
 
@@ -30,6 +27,10 @@ $icon-size-large: math.round($icon-size * 1.2);
 .icon-large {
     width: $icon-size-large;
     height: $icon-size-large;
+}
+
+.icon-light {
+    background-color: $secondary-400;
 }
 
 .icon-navbar {

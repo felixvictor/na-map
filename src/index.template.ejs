@@ -142,288 +142,291 @@
 </div>
 <%          */ %>
 
-<nav class="navbar navbar-expand-lg navbar-light">
-    <a class="navbar-brand" href="/">
-        <img src="<%= htmlWebpackPlugin.options.iconSmall %>" width="32" height="32" alt="Brand">
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul id="navbar-left" class="navbar-nav mr-auto d-none">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="<%= htmlWebpackPlugin.options.iconSmall %>" width="32" height="32" alt="Brand">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul id="navbar-left" class="navbar-nav me-auto d-none">
 
-            <li id="selectPortNavbar" class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Select ports on
-                </a>
-                <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
-                    <h6 class="dropdown-header">Front lines</h6>
-                    <div class="dropdown-item">
-                        <label>
-                            <select title="Select nation attacking" name="frontlines-attacking-nation-select"
-                                    id="frontlines-attacking-nation-select"></select>
-                        </label>
+                <li id="selectPortNavbar" class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Select ports on
+                    </a>
+                    <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
+                        <h6 class="dropdown-header">Front lines</h6>
+                        <div class="dropdown-item">
+                            <label>
+                                <select title="Select nation attacking" name="frontlines-attacking-nation-select"
+                                        id="frontlines-attacking-nation-select"></select>
+                            </label>
+                        </div>
+                        <div class="dropdown-item">
+                            <label>
+                                <select title="Select nation defending" name="frontlines-defending-nation-select"
+                                        id="frontlines-defending-nation-select"></select>
+                            </label>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Port owner</h6>
+                        <div class="dropdown-item">
+                            <label>
+                                <select title="Select nation" name="prop-nation-select"
+                                        id="prop-nation-select"></select>
+                            </label>
+                        </div>
+                        <div class="dropdown-item">
+                            <label>
+                                <select title="Select clan" name="prop-clan-select" id="prop-clan-select"></select>
+                            </label>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Port property</h6>
+                        <a class="dropdown-item" id="menu-prop-deep">Deep water</a>
+                        <a class="dropdown-item" id="menu-prop-shallow">Shallow water</a>
+                        <a class="dropdown-item" id="menu-prop-all">Available to all</a>
+                        <a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a>
+
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Port capture time</h6>
+                        <a class="dropdown-item" id="menu-prop-today">Today</a>
+                        <a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
+                        <a class="dropdown-item" id="menu-prop-this-week">This week</a>
+                        <a class="dropdown-item" id="menu-prop-last-week">Last week</a>
+
                     </div>
-                    <div class="dropdown-item">
-                        <label>
-                            <select title="Select nation defending" name="frontlines-defending-nation-select"
-                                    id="frontlines-defending-nation-select"></select>
-                        </label>
+                </li>
+
+                <li class="nav-item pe-2">
+                    <label><select name="port-names-select" id="port-names-select" class="selectpicker"
+                                   data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
+                                   data-live-search-placeholder="Search ..." data-virtual-scroll="true"
+                                   title="Show trade relations"></select></label>
+                </li>
+
+                <li class="nav-item pe-2">
+                    <label><select name="buy-goods-select" id="buy-goods-select" class="selectpicker"
+                                   data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
+                                   data-live-search-placeholder="Search ..." data-virtual-scroll="true"
+                                   title="Show goods’ relations"></select></label>
+                </li>
+
+                <li class="nav-item pe-2">
+                    <label><select name="inventory-select" id="inventory-select" class="d-none"></select></label>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
+                       role="button" title="Map tools" aria-label="Map tools"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="icon icon-map icon-navbar" aria-hidden="true"></i><span
+                                class="visually-hidden">Map tools</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
+                         aria-labelledby="map-tools-dropdown">
+
+                        <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
+                        <a class="dropdown-item" id="button-ingame-wind" href="#">In-game wind</a>
+                        <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span>
+                            <span
+                                    class="small text-end badge badge-pill badge-primary">shift+<span
+                                        class="caps">F11</span></span></a>
+                        <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
+                        <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
                     </div>
+                </li>
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port owner</h6>
-                    <div class="dropdown-item">
-                        <label>
-                            <select title="Select nation" name="prop-nation-select" id="prop-nation-select"></select>
-                        </label>
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="game-tools-dropdown"
+                       role="button" title="Game tools" aria-label="Game tools"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="icon icon-bar-chart icon-navbar" aria-hidden="true"></i><span
+                                class="visually-hidden">Game tools</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
+                         aria-labelledby="game-tools-dropdown">
+
+                        <h6 class="dropdown-header">Compare</h6>
+                        <a class="dropdown-item" id="button-ship-compare">Ships</a>
+                        <a class="dropdown-item" id="button-wood-compare">Woods</a>
+
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">List</h6>
+                        <a class="dropdown-item" id="button-recipe-list">Admiralty items and recipes</a>
+                        <a class="dropdown-item" id="button-building-list">Buildings</a>
+                        <a class="dropdown-item" id="button-cannon-list">Cannons</a>
+                        <a class="dropdown-item" id="button-loot-list">Loot and chests</a>
+                        <a class="dropdown-item" id="button-module-list">Modules</a>
+                        <a class="dropdown-item" id="button-pb-list">Port battles</a>
+                        <a class="dropdown-item" id="button-port-bonus-list">Port bonuses</a>
+                        <a class="dropdown-item" id="button-ingredient-list">Recipe ingredients</a>
+                        <a class="dropdown-item" id="button-ship-list">Ships</a>
+                        <a class="dropdown-item" id="button-ship-blueprint-list">Ship blueprints</a>
+                        <a class="dropdown-item" id="button-wood-list">Woods</a>
+
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Show</h6>
+                        <a class="dropdown-item" id="button-show-port-net-income">Port net income</a>
+                        <a class="dropdown-item" id="button-ownership-overview">Port ownership overview</a>
+                        <a class="dropdown-item" id="button-ownership-map">Port ownership map</a>
+
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Download</h6>
+                        <a class="dropdown-item" id="button-download-pb-calc" href="data/port-battle.xlsx"
+                           download="port-battle-calculator.xlsx">Port battle calculator</a>
                     </div>
-                    <div class="dropdown-item">
-                        <label>
-                            <select title="Select clan" name="prop-clan-select" id="prop-clan-select"></select>
-                        </label>
-                    </div>
+                </li>
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port property</h6>
-                    <a class="dropdown-item" id="menu-prop-deep">Deep water</a>
-                    <a class="dropdown-item" id="menu-prop-shallow">Shallow water</a>
-                    <a class="dropdown-item" id="menu-prop-all">Available to all</a>
-                    <a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a>
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" title="Settings"
+                       aria-label="Settings">
+                        <i class="icon icon-options icon-navbar" aria-hidden="true"></i><span
+                                class="visually-hidden">Settings</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
+                         aria-labelledby="settingsDropdown">
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Port capture time</h6>
-                    <a class="dropdown-item" id="menu-prop-today">Today</a>
-                    <a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
-                    <a class="dropdown-item" id="menu-prop-this-week">This week</a>
-                    <a class="dropdown-item" id="menu-prop-last-week">Last week</a>
+                        <h6 class="dropdown-header">Game server</h6>
+                        <div class="col-auto align-self-center radio-group ms-1" id="server-name">
+                            <% for(const server of htmlWebpackPlugin.options.servers) { %>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input"
+                                           name="server-name"
+                                           id="server-name-<%= server.id %>"
+                                           value="<%= server.id %>">
+                                    <label class="custom-control-label"
+                                           for="server-name-<%= server.id %>">
+                                        <%= server.name %>
+                                        <span class="caps">(<%= server.type %>)</span>
+                                    </label>
+                                </div>
+                            <% } %>
+                        </div>
 
-                </div>
-            </li>
-
-            <li class="nav-item pr-2">
-                <label><select name="port-names-select" id="port-names-select" class="selectpicker"
-                               data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
-                               data-live-search-placeholder="Search ..." data-virtual-scroll="true"
-                               title="Show trade relations"></select></label>
-            </li>
-
-            <li class="nav-item pr-2">
-                <label><select name="buy-goods-select" id="buy-goods-select" class="selectpicker"
-                               data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
-                               data-live-search-placeholder="Search ..." data-virtual-scroll="true"
-                               title="Show goods’ relations"></select></label>
-            </li>
-
-            <li class="nav-item pr-2">
-                <label><select name="inventory-select" id="inventory-select" class="d-none"></select></label>
-            </li>
-        </ul>
-
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
-                   role="button" title="Map tools" aria-label="Map tools"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="icon icon-map icon-navbar" aria-hidden="true"></i><span
-                            class="sr-only">Map tools</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
-                     aria-labelledby="map-tools-dropdown">
-
-                    <a class="dropdown-item" id="button-predict-wind" href="#">Predict wind</a>
-                    <a class="dropdown-item" id="button-ingame-wind" href="#">In-game wind</a>
-                    <a class="dropdown-item" id="button-go-to-f11" href="#">Go to <span class="caps">F11</span> <span
-                                class="small text-right badge badge-pill badge-primary">shift+<span
-                                    class="caps">F11</span></span></a>
-                    <a class="dropdown-item" id="button-get-position" href="#">Get position</a>
-                    <a class="dropdown-item" id="button-make-journey" href="#"> Make journey</a>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="game-tools-dropdown"
-                   role="button" title="Game tools" aria-label="Game tools"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="icon icon-bar-chart icon-navbar" aria-hidden="true"></i><span
-                            class="sr-only">Game tools</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
-                     aria-labelledby="game-tools-dropdown">
-
-                    <h6 class="dropdown-header">Compare</h6>
-                    <a class="dropdown-item" id="button-ship-compare">Ships</a>
-                    <a class="dropdown-item" id="button-wood-compare">Woods</a>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">List</h6>
-                    <a class="dropdown-item" id="button-recipe-list">Admiralty items and recipes</a>
-                    <a class="dropdown-item" id="button-building-list">Buildings</a>
-                    <a class="dropdown-item" id="button-cannon-list">Cannons</a>
-                    <a class="dropdown-item" id="button-loot-list">Loot and chests</a>
-                    <a class="dropdown-item" id="button-module-list">Modules</a>
-                    <a class="dropdown-item" id="button-pb-list">Port battles</a>
-                    <a class="dropdown-item" id="button-port-bonus-list">Port bonuses</a>
-                    <a class="dropdown-item" id="button-ingredient-list">Recipe ingredients</a>
-                    <a class="dropdown-item" id="button-ship-list">Ships</a>
-                    <a class="dropdown-item" id="button-ship-blueprint-list">Ship blueprints</a>
-                    <a class="dropdown-item" id="button-wood-list">Woods</a>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show</h6>
-                    <a class="dropdown-item" id="button-show-port-net-income">Port net income</a>
-                    <a class="dropdown-item" id="button-ownership-overview">Port ownership overview</a>
-                    <a class="dropdown-item" id="button-ownership-map">Port ownership map</a>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Download</h6>
-                    <a class="dropdown-item" id="button-download-pb-calc" href="data/port-battle.xlsx"
-                       download="port-battle-calculator.xlsx">Port battle calculator</a>
-                </div>
-            </li>
-
-            <li class="nav-item dropdown pr-2">
-                <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
-                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Settings"
-                   aria-label="Settings">
-                    <i class="icon icon-options icon-navbar" aria-hidden="true"></i><span
-                            class="sr-only">Settings</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
-                     aria-labelledby="settingsDropdown">
-
-                    <h6 class="dropdown-header">Game server</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="server-name">
-                        <% htmlWebpackPlugin.options.servers %>
-                        <% htmlWebpackPlugin.options.servers.length %>
-                        <% for(var i = 0; i < htmlWebpackPlugin.options.servers.length; i++) { %>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Show per port</h6>
+                        <div class="col-auto align-self-center radio-group ms-1" id="show-radius">
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input"
-                                       name="server-name"
-                                       id="server-name-<%= htmlWebpackPlugin.options.servers[i].id %>"
-                                       value="<%= htmlWebpackPlugin.options.servers[i].id %>">
-                                <label class="custom-control-label"
-                                       for="server-name-<%= htmlWebpackPlugin.options.servers[i].id %>">
-                                    <%= htmlWebpackPlugin.options.servers[i].name %>
-                                    <span class="caps">(<%= htmlWebpackPlugin.options.servers[i].type %>)</span>
-                                </label>
+                                       name="show-radius" id="show-radius-attack" value="attack">
+                                <label class="custom-control-label" for="show-radius-attack">Attack</label>
                             </div>
-                        <% } %>
-                    </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-radius" id="show-radius-county" value="county">
+                                <label class="custom-control-label" for="show-radius-county">County</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-radius" id="show-radius-position" value="position">
+                                <label class="custom-control-label" for="show-radius-position">Position</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-radius" id="show-radius-points" value="points">
+                                <label class="custom-control-label" for="show-radius-points">Points</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-radius" id="show-radius-tax" value="tax">
+                                <label class="custom-control-label" for="show-radius-tax">Tax income</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-radius" id="show-radius-net" value="net">
+                                <label class="custom-control-label" for="show-radius-net">Net income</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-radius" id="show-radius-off" value="off">
+                                <label class="custom-control-label" for="show-radius-off">Off</label>
+                            </div>
+                        </div>
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show per port</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="show-radius">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-attack" value="attack">
-                            <label class="custom-control-label" for="show-radius-attack">Attack</label>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Zones</h6>
+                        <div class="col-auto align-self-center radio-group ms-1" id="show-zones">
                         </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-county" value="county">
-                            <label class="custom-control-label" for="show-radius-county">County</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-position" value="position">
-                            <label class="custom-control-label" for="show-radius-position">Position</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-points" value="points">
-                            <label class="custom-control-label" for="show-radius-points">Points</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-tax" value="tax">
-                            <label class="custom-control-label" for="show-radius-tax">Tax income</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-net" value="net">
-                            <label class="custom-control-label" for="show-radius-net">Net income</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-radius" id="show-radius-off" value="off">
-                            <label class="custom-control-label" for="show-radius-off">Off</label>
-                        </div>
-                    </div>
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Zones</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="show-zones">
-                    </div>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Show trades</h6>
+                        <div class="col-auto align-self-center radio-group ms-1" id="show-trades-show">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-trades-show" id="show-trades-show-on" value="on">
+                                <label class="custom-control-label" for="show-trades-show-on">On</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-trades-show" id="show-trades-show-off" value="off">
+                                <label class="custom-control-label" for="show-trades-show-off">Off</label>
+                            </div>
+                        </div>
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show trades</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="show-trades-show">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-trades-show" id="show-trades-show-on" value="on">
-                            <label class="custom-control-label" for="show-trades-show-on">On</label>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Show grid</h6>
+                        <div class="col-auto align-self-center radio-group ms-1" id="show-grid">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-grid" id="show-grid-on" value="on">
+                                <label class="custom-control-label" for="show-grid-on">On</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input"
+                                       name="show-grid" id="show-grid-off" value="off">
+                                <label class="custom-control-label" for="show-grid-off">Off</label>
+                            </div>
                         </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-trades-show" id="show-trades-show-off" value="off">
-                            <label class="custom-control-label" for="show-trades-show-off">Off</label>
-                        </div>
-                    </div>
 
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Show grid</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="show-grid">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-grid" id="show-grid-on" value="on">
-                            <label class="custom-control-label" for="show-grid-on">On</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input"
-                                   name="show-grid" id="show-grid-off" value="off">
-                            <label class="custom-control-label" for="show-grid-off">Off</label>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-divider"></div>
-                    <h6 class="dropdown-header">Double click to</h6>
-                    <div class="col-auto align-self-center radio-group ml-1" id="double-click-action">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="double-click-action"
-                                   id="double-click-action-compass" value="compass">
-                            <label class="custom-control-label" for="double-click-action-compass">Plot a course</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" name="double-click-action"
-                                   id="double-click-action-f11" value="f11">
-                            <label class="custom-control-label" for="double-click-action-f11">Show <span
-                                        class="caps">F11</span>
-                                coordinates</label>
+                        <div class="dropdown-divider"></div>
+                        <h6 class="dropdown-header">Double click to</h6>
+                        <div class="col-auto align-self-center radio-group ms-1" id="double-click-action">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" name="double-click-action"
+                                       id="double-click-action-compass" value="compass">
+                                <label class="custom-control-label" for="double-click-action-compass">Plot a
+                                    course</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" name="double-click-action"
+                                       id="double-click-action-f11" value="f11">
+                                <label class="custom-control-label" for="double-click-action-f11">Show <span
+                                            class="caps">F11</span>
+                                    coordinates</label>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </li>
-        </ul>
+                </li>
+            </ul>
 
-        <div class="btn-group" role="group">
-            <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
-                <i class="icon icon-clear icon-navbar" aria-hidden="true"></i><span class="sr-only">Clear</span>
-            </button>
-            <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
-               href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
-                <i class="icon icon-gift icon-navbar" aria-hidden="true"></i><span class="sr-only">Donate</span>
-            </a>
-            <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
-                <i class="icon icon-info icon-navbar" aria-hidden="true"></i><span class="sr-only">About</span>
-            </button>
+            <div class="btn-group" role="group">
+                <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
+                    <i class="icon icon-clear icon-navbar" aria-hidden="true"></i><span class="visually-hidden">Clear</span>
+                </button>
+                <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
+                   href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
+                    <i class="icon icon-gift icon-navbar" aria-hidden="true"></i><span class="visually-hidden">Donate</span>
+                </a>
+                <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
+                    <i class="icon icon-info icon-navbar" aria-hidden="true"></i><span class="visually-hidden">About</span>
+                </button>
+            </div>
         </div>
     </div>
 </nav>
 
-<main role="main" class="container-fluid">
+<main role="main" class="container-fluid bg-map">
     <div id="na-map" class="central"></div>
     <div class="overlay overlay-no-grid">
         <div id="wind" class="wind-predict-column">
@@ -435,6 +438,6 @@
     <div id="modal-section"></div>
 </main>
 
-<script src="https://pagecdn.io/lib/jquery/3.5.1/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -148,7 +148,7 @@ export default class ListPortBonus {
             .data(["Port", "Nation", ...portBonusType, "Port points", "Points invested"])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
-            .classed("text-right", (d, i) => i > 1)
+            .classed("text-end", (d, i) => i > 1)
             .attr("role", "columnheader")
             .style("width", (d, i) => (i > 2 ? "3rem" : ""))
             .text((d) => capitalizeFirstLetter(d.data))
@@ -196,7 +196,7 @@ export default class ListPortBonus {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-right", (d, i) => i > 1)
+                    .classed("text-end", (d, i) => i > 1)
                     .text((d) => (d === 0 ? "" : String(d)))
             )
     }

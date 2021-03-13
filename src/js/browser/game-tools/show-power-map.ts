@@ -624,7 +624,7 @@ export default class PowerMap extends BaseModal {
         buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         this.#playButton = addButton("pause", "Pause")
 
-        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
+        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group me-3").attr("role", "group")
         const forwardButton = addButton("forward", "Year forward")
         const endButton = addButton("end", "End")
 

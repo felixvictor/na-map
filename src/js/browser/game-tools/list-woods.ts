@@ -146,7 +146,7 @@ export default class ListWoods {
             .data(["Wood", ...this._modifiers[type]])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
-            .classed("text-right", (d, i) => i !== 0)
+            .classed("text-end", (d, i) => i !== 0)
             .attr("role", "columnheader")
             .text((d) => d.data)
             .on("click", (_event, d) => {
@@ -233,7 +233,7 @@ export default class ListWoods {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-right", (d, i) => i !== 0)
+                    .classed("text-end", (d, i) => i !== 0)
                     .html((d) => {
                         return d
                     })

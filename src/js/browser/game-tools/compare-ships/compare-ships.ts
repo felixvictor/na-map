@@ -639,7 +639,7 @@ export class CompareShips {
             .attr("class", "spinner-border spinner-border-sm")
             .attr("role", "status")
             .attr("aria-hidden", "true")
-        this.#buttonMakeImage.append("span").attr("class", "sr-only").text("Loading...")
+        this.#buttonMakeImage.append("span").attr("class", "visually-hidden").text("Loading...")
     }
 
     _unsetMakeImageSpinner(): void {

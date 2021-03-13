@@ -131,7 +131,7 @@ export default class ListShipBlueprints {
         for (const type of woodType) {
             const selectId = `${this._baseId}-${type}-select`
             row.append("label").attr("for", selectId)
-            row.append("select").attr("name", selectId).attr("id", selectId).classed("pr-2", true)
+            row.append("select").attr("name", selectId).attr("id", selectId).classed("pe-2", true)
         }
 
         this._blueprintList = body.append("div").attr("id", `${this._baseId}`).classed("blueprint mt-4", true)

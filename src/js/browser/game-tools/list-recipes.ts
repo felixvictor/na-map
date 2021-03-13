@@ -85,7 +85,7 @@ export default class ListRecipes {
         body.append("select").attr("name", id).attr("id", id)
         body.append("label")
             .attr("for", id)
-            .attr("class", "text-muted pl-2")
+            .attr("class", "text-muted ps-2")
             .text("Items listed here may not be available in the game (yet).")
 
         body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")

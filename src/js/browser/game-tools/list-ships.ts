@@ -147,7 +147,7 @@ export default class ShipList {
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
             .classed("border-top-0", true)
-            .classed("text-right", (d, i) => i !== 1)
+            .classed("text-end", (d, i) => i !== 1)
             .text((d) => d.data)
             .on("click", (_event, d) => {
                 this._sortRows(d.index)
@@ -186,7 +186,7 @@ export default class ShipList {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-right", (d, i) => i !== 1)
+                    .classed("text-end", (d, i) => i !== 1)
                     .html((d) => d[1])
             )
     }

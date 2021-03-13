@@ -81,7 +81,7 @@ const setupListener = (): void => {
     })
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
-    $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
+    $(".dropdown-menu [data-bs-toggle='dropdown']").on("click", (event) => {
         event.preventDefault()
         event.stopPropagation()
 

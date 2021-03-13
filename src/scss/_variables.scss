@@ -8,22 +8,26 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
+//$enable-caret: true !default;
+$enable-rounded: false;
+$enable-shadows: true;
+//$enable-gradients: false !default;
+//$enable-transitions: true !default;
+//$enable-reduced-motion: true !default;
+//$enable-smooth-scroll: true !default;
+//$enable-grid-classes: true !default;
+//$enable-button-pointers: true !default;
+//$enable-rfs: true !default;
+//$enable-validation-icons: true !default;
+$enable-negative-margins: true;
+//$enable-deprecation-messages: true !default;
+//$enable-important-utilities: true !default;
+
 $min-contrast-ratio: 3;
 
-// Options
-$enable-rounded: false;
-// $enable-shadows:                              false !default;
-// $enable-gradients:                            false !default;
-// $enable-transitions:                          true !default;
-$enable-prefers-reduced-motion-media-query: false;
-// $enable-hover-media-query:                    false !default; // Deprecated, no longer affects any compiled CSS
-// $enable-grid-classes:                         true !default;
-// $enable-caret:                                true !default;
-// $enable-pointer-cursor-for-buttons:           true !default;
-$enable-print-styles: false;
-// $enable-responsive-font-sizes:                false !default;
-$enable-validation-icons: false;
-$enable-deprecation-messages: false;
+$body-bg: $primary-050;
+$body-color: $gray-900;
+$body-text-align: left;
 
 // Spacing
 $spacer: 1rem;
@@ -36,17 +40,24 @@ $spacers: (
     5: $spacer * 2.618,
 );
 
+// Navbar
+/*
+$navbar-light-color: $secondary-700;
+$navbar-light-hover-color: $secondary-800;
+$navbar-light-active-color: $secondary-900;
+$navbar-light-disabled-color: $secondary-700;
+*/
+
+//$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+//$navbar-light-toggler-border-color: rgba($black, .1) !default;
+//$navbar-light-brand-color:                $navbar-light-active-color !default;
+//$navbar-light-brand-hover-color:          $navbar-light-active-color !default;
+
+/*
 // Body
-$body-bg: $primary-050;
-$body-color: $gray-900;
 $border-color: $primary-300;
 $text-muted: $primary-700;
 
-// Navbar
-//$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
-//$navbar-light-hover-color:          $secondary-800; // rgba($black, .7) !default;
-//$navbar-light-active-color:         $secondary-900; // rgba($black, .9) !default;
-//$navbar-light-disabled-color:       $secondary-700; // rgba($black, .3) !default;
 
 // Links
 $link-color: $secondary-400;
@@ -137,3 +148,4 @@ $badge-padding-x: map-get($spacers, 1) / 1.618;
 $card-border-width: 0;
 $card-border-radius: 0;
 $card-bg: $primary-050;
+*/

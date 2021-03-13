@@ -243,8 +243,8 @@ export default class ShowTrades {
         label
             .append("button")
             .attr("class", "btn btn-small btn-outline-primary")
-            .attr("data-toggle", "collapse")
-            .attr("data-target", `#${cardId}`)
+            .attr("data-bs-toggle", "collapse")
+            .attr("data-bs-target", `#${cardId}`)
             .text("Info")
         this._tradeDetailsHead
             .append("div")
@@ -266,7 +266,7 @@ export default class ShowTrades {
         const profitRadioGroup = this._tradeDetailsHead
             .append("div")
             .attr("id", this._profitId)
-            .attr("class", "align-self-center radio-group pl-2")
+            .attr("class", "align-self-center radio-group ps-2")
         profitRadioGroup.append("legend").attr("class", "col-form-label").text("Sort net profit by")
 
         for (const button of this._profitRadioValues) {

@@ -160,7 +160,7 @@ export default class PredictWind {
             .attr("type", "time")
             .attr("id", this._timeInputId)
             .attr("value", dayjs.utc().format("HH:mm"))
-            .attr("data-target", `#${this._timeGroupId}`)
+            .attr("data-bs-target", `#${this._timeGroupId}`)
             .attr("aria-label", this._timeGroupId)
             .attr("required", "")
     }
