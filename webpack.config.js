@@ -399,16 +399,6 @@ const config = {
                 use: [{ loader: "babel-loader", options: babelOpt }],
             },
             {
-                test: /\.ejs$/,
-                include: dirEjs,
-                use: [
-                    {
-                        loader: "ejs-easy-loader",
-                        options: {}, // does not compile without
-                    },
-                ],
-            },
-            {
                 test: /\.scss$/,
                 use: [
                     {
