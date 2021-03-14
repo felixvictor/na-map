@@ -89,16 +89,15 @@ export default class DisplayPbZones {
     _setupRadios(): void {
         const divMain = d3Select("#show-zones")
         for (const radioItem of this._showValues) {
-            const div = divMain.append("div").attr("class", "custom-control custom-radio custom-control-inline")
+            const div = divMain.append("div").attr("class", "form-check")
             div.append("input")
                 .attr("type", "radio")
-                .attr("class", "custom-control-input")
+                .attr("class", "form-check-input")
                 .attr("name", "show-zones")
                 .attr("id", `show-zones-${radioItem.id}`)
                 .attr("value", radioItem.id)
             div.append("label")
-                .attr("type", "radio")
-                .attr("class", "custom-control-label")
+                .attr("class", "form-check-label")
                 .attr("for", `show-zones-${radioItem.id}`)
                 .text(radioItem.label)
         }

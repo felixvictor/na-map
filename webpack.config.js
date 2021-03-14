@@ -403,7 +403,7 @@ const config = {
                 include: dirEjs,
                 use: [
                     {
-                        loader: "ejs-compiled-loader",
+                        loader: "ejs-easy-loader",
                         options: {}, // does not compile without
                     },
                 ],

@@ -1,3 +1,19 @@
+<% function makeRadioGroup(data) { %>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header"><%= data.title %></h6>
+    <div class="ms-3" id="<%= data.name %>">
+        <% data.radios.forEach(function(radio) { %>
+            <div class="form-check">
+                <input type="radio" class="form-check-input"
+                       name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>" value="<%= radio.id %>">
+                <label class="form-check-label" for="<%= data.name %>-<%= radio.id %>"><%= radio.title %></label>
+            </div>
+        <% }) %>
+    </div>
+<% } %>
+
+
+
 <!doctype html>
 <html lang="<%= htmlWebpackPlugin.options.lang %>" itemscope itemtype="http://schema.org/Map">
 <head>
@@ -297,115 +313,55 @@
                     <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
                          aria-labelledby="settingsDropdown">
 
-                        <h6 class="dropdown-header">Game server</h6>
-                        <div class="col-auto align-self-center radio-group ms-1" id="server-name">
-                            <% for(const server of htmlWebpackPlugin.options.servers) { %>
-                                <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" class="custom-control-input"
-                                           name="server-name"
-                                           id="server-name-<%= server.id %>"
-                                           value="<%= server.id %>">
-                                    <label class="custom-control-label"
-                                           for="server-name-<%= server.id %>">
-                                        <%= server.name %>
-                                        <span class="caps">(<%= server.type %>)</span>
-                                    </label>
-                                </div>
-                            <% } %>
-                        </div>
+                        <% let dataRadio = {
+                            title: "Game server",
+                            name: "server-name",
+                            radios: []
+                        }%>
+                        <% for (const server of htmlWebpackPlugin.options.servers) {
+                            dataRadio.radios.push({ id: server.id, title: `${server.name} (${server.type})` })
+                        } %>
+                        <% makeRadioGroup(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Show per port</h6>
-                        <div class="col-auto align-self-center radio-group ms-1" id="show-radius">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-attack" value="attack">
-                                <label class="custom-control-label" for="show-radius-attack">Attack</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-county" value="county">
-                                <label class="custom-control-label" for="show-radius-county">County</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-position" value="position">
-                                <label class="custom-control-label" for="show-radius-position">Position</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-points" value="points">
-                                <label class="custom-control-label" for="show-radius-points">Points</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-tax" value="tax">
-                                <label class="custom-control-label" for="show-radius-tax">Tax income</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-net" value="net">
-                                <label class="custom-control-label" for="show-radius-net">Net income</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-radius" id="show-radius-off" value="off">
-                                <label class="custom-control-label" for="show-radius-off">Off</label>
-                            </div>
-                        </div>
+                        <% dataRadio = {
+                            title: "Show per port",
+                            name: "show-radius",
+                            radios: [
+                                {id: "attack", title: "Attack"},
+                                {id: "county", title: "County"},
+                                {id: "position", title: "Position"},
+                                {id: "points", title: "Points"},
+                                {id: "tax", title: "Tax income"},
+                                {id: "net", title: "Net income"},
+                                {id: "off", title: "Off"}
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
 
                         <div class="dropdown-divider"></div>
                         <h6 class="dropdown-header">Zones</h6>
-                        <div class="col-auto align-self-center radio-group ms-1" id="show-zones">
+                        <div class="ms-3" id="show-zones">
                         </div>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Show trades</h6>
-                        <div class="col-auto align-self-center radio-group ms-1" id="show-trades-show">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-trades-show" id="show-trades-show-on" value="on">
-                                <label class="custom-control-label" for="show-trades-show-on">On</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input"
-                                       name="show-trades-show" id="show-trades-show-off" value="off">
-                                <label class="custom-control-label" for="show-trades-show-off">Off</label>
-                            </div>
-                        </div>
+                        <% dataRadio = {
+                            title: "Show grid",
+                            name: "show-grid",
+                            radios: [
+                                {id: "on", title: "On"},
+                                {id: "off", title: "Off"}
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Show grid</h6>
-                        <div class="col-auto align-self-center ms-3" id="show-grid">
-                            <div class="form-check form-check-inline">
-                                <input type="radio" class="form-check-input" name="show-grid" id="show-grid-on"
-                                       value="on">
-                                <label class="form-check-label" for="show-grid-on">On</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input type="radio" class="form-check-input" name="show-grid" id="show-grid-off"
-                                       value="off">
-                                <label class="form-check-label" for="show-grid-off">Off</label>
-                            </div>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Double click to</h6>
-                        <div class="col-auto align-self-center ms-3" id="double-click-action">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="double-click-action"
-                                       id="double-click-action-compass" value="compass">
-                                <label class="custom-control-label" for="double-click-action-compass">Plot a
-                                    course</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="double-click-action"
-                                       id="double-click-action-f11" value="f11">
-                                <label class="custom-control-label" for="double-click-action-f11">Show <span
-                                            class="caps">F11</span>
-                                    coordinates</label>
-                            </div>
-                        </div>
+                        <% dataRadio = {
+                            title: "Double click to",
+                            name: "double-click-action",
+                            radios: [
+                                {id: "compass", title: "Plot a course"},
+                                {id: "f11", title: "Show F11 coordinates"}
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
                     </div>
                 </li>
             </ul>
