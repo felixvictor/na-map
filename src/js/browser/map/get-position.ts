@@ -54,7 +54,7 @@ export default class TrilateratePosition {
         this.#numbers = Array.from({ length: this.#NumberOfInputs }, (_, i) => i)
         this.#baseName = "Get position"
         this.#baseId = "get-position"
-        this.#buttonId = `button-${this.#baseId}`
+        this.#buttonId = `menu-${this.#baseId}`
 
         this.#modalId = `modal-${this.#baseId}`
         for (const inputNumber of this.#numbers) {

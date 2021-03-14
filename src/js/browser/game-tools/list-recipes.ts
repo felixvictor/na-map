@@ -44,7 +44,7 @@ export default class ListRecipes {
 
         this._baseName = "List admiralty items and recipes"
         this._baseId = "recipe-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         this._setupListener()

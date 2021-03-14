@@ -119,7 +119,7 @@ export default class MakeJourney {
 
         this._baseName = "Make journey"
         this._baseId = "make-journey"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._compassId = `compass-${this._baseId}`
         this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`
         this._modalId = `modal-${this._baseId}`

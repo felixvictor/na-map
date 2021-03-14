@@ -141,12 +141,18 @@ const load = async (): Promise<void> => {
     if (searchParams.get("v")) {
         void loadGameTools(serverId, searchParams)
     } else {
-        document
-            .querySelector("#game-tools-dropdown")
-            ?.addEventListener("click", async () => loadGameTools(serverId, searchParams), { once: true })
+        ;(document.querySelector("#game-tools-dropdown") as HTMLElement).addEventListener(
+            "show.bs.dropdown",
+            async () => loadGameTools(serverId, searchParams),
+            { once: true }
+        )
     }
 
-    document.querySelector("#map-tools-dropdown")?.addEventListener("click", async () => loadMapTools(), { once: true })
+    ;(document.querySelector("#map-tools-dropdown") as HTMLElement).addEventListener(
+        "show.bs.dropdown",
+        async () => loadMapTools(),
+        { once: true }
+    )
 }
 
 /**

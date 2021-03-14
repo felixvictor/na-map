@@ -34,7 +34,7 @@ export default class ListModules {
     constructor() {
         this._baseName = "List modules"
         this._baseId = "module-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         this._setupListener()

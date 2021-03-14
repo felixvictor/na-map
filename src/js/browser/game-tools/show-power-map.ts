@@ -531,7 +531,7 @@ export default class PowerMap extends BaseModal {
     }
 
     _initButtons(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
-        const buttonBaseId = `button-${this.#baseId}`
+        const buttonBaseId = `menu-${this.#baseId}`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const playButtonClicked = () => {

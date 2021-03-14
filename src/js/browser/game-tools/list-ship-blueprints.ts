@@ -67,7 +67,7 @@ export default class ListShipBlueprints {
     constructor() {
         this._baseName = "List ship blueprint"
         this._baseId = "ship-blueprint-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         this._defaultWood = {

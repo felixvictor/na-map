@@ -33,7 +33,7 @@ export default class ListBuildings {
     constructor() {
         this._baseName = "List buildings"
         this._baseId = "building-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         this._buildingData = []

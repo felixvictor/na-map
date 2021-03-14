@@ -40,7 +40,7 @@ export default class ShipList {
     constructor() {
         this.#baseName = "List ships"
         this.#baseId = "ship-list"
-        this.#buttonId = `button-${this.#baseId}`
+        this.#buttonId = `menu-${this.#baseId}`
         this.#modalId = `modal-${this.#baseId}`
 
         this._setupListener()

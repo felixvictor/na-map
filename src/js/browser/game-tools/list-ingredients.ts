@@ -34,7 +34,7 @@ export default class ListIngredients {
     constructor() {
         this._baseName = "List recipe ingredients"
         this._baseId = "ingredient-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         this._setupListener()

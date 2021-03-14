@@ -53,7 +53,7 @@ export default class ListPortBonus {
         this.#serverId = serverId
         this.#baseName = "List port bonuses"
         this.#baseId = "port-bonus-list"
-        this.#buttonId = `button-${this.#baseId}`
+        this.#buttonId = `menu-${this.#baseId}`
         this.#modalId = `modal-${this.#baseId}`
 
         this._setupListener()

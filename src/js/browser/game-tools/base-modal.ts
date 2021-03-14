@@ -21,7 +21,7 @@ export class BaseModal {
         this.serverId = serverId
         this.baseName = title
         this.baseId = title.toLocaleLowerCase().replaceAll(" ", "-")
-        this.buttonId = `button-${this.baseId}`
+        this.buttonId = `menu-${this.baseId}`
         this.modalId = `modal-${this.baseId}`
     }
 }

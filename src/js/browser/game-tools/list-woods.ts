@@ -50,7 +50,7 @@ export default class ListWoods {
     constructor() {
         this._baseName = "List woods"
         this._baseId = "wood-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._checkboxId = `checkbox-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 

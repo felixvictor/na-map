@@ -70,7 +70,7 @@ export default class WindRose {
 
         this._baseName = "In-game wind"
         this._baseId = "ingame-wind"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
         this._formId = `form-${this._baseId}`
         this._sliderId = `slider-${this._baseId}`

@@ -276,7 +276,7 @@ class NAMap {
         document.querySelector("#settingsDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Settings")
         })
-        document.querySelector("#button-download-pb-calc")?.addEventListener("click", () => {
+        document.querySelector("#menu-download-pb-calc")?.addEventListener("click", () => {
             registerEvent("Tools", "Download pb calculator")
         })
         document.querySelector("#reset")?.addEventListener("click", () => {

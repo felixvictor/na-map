@@ -63,7 +63,7 @@ export default class ListCannons {
     constructor() {
         this._baseName = "List cannons"
         this._baseId = "cannon-list"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._checkboxId = `checkbox-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 

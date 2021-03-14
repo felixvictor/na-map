@@ -150,7 +150,7 @@ export class CompareShips {
         this._baseId = id
 
         this._baseName = "Compare ships"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
         this._moduleId = `${this._baseId}-module`
         this._copyButtonId = `button-copy-${this._baseId}`

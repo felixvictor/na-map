@@ -357,7 +357,7 @@ export default class CompareWoods {
         this.baseFunction = baseFunction
         this._baseName = "Compare woods"
         this._baseId = `${this.baseFunction}-compare`
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
 
         if (this.baseFunction === "wood") {

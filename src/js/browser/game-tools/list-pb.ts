@@ -56,7 +56,7 @@ export default class ListPortBattles {
         this.#serverId = serverId
         this.#baseName = "List of port battles"
         this.#baseId = "pb-list"
-        this.#buttonId = `button-${this.#baseId}`
+        this.#buttonId = `menu-${this.#baseId}`
         this.#tableId = `table-${this.#baseId}`
         this.#modalId = `modal-${this.#baseId}`
 

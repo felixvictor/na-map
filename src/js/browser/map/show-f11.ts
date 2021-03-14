@@ -57,7 +57,7 @@ export default class ShowF11 {
 
         this._baseName = "Go to F11"
         this._baseId = "go-to-f11"
-        this._buttonId = `button-${this._baseId}`
+        this._buttonId = `menu-${this._baseId}`
         this._modalId = `modal-${this._baseId}`
         this._formId = `form-${this._baseId}`
         this._xInputId = `input-x-${this._baseId}`

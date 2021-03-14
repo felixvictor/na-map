@@ -56,7 +56,7 @@ export default class ListLoot {
     constructor() {
         this.#baseName = "List loot and chests"
         this.#baseId = "loot-list"
-        this.#buttonId = `button-${this.#baseId}`
+        this.#buttonId = `menu-${this.#baseId}`
         this.#modalId = `modal-${this.#baseId}`
 
         for (const type of this.#types) {
