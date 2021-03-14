@@ -482,7 +482,7 @@ export default class CompareWoods {
         for (const column of this._columns) {
             const div = row
                 .append("div")
-                .attr("class", `col-md-3 ml-auto pt-2 ${column === "Base" ? "column-base" : "column-comp"}`)
+                .attr("class", `col-md-3 ms-auto pt-2 ${column === "Base" ? "column-base" : "column-comp"}`)
             for (const type of woodType) {
                 const id = `${this.baseFunction}-${type}-${column}-select`
                 div.append("label").attr("for", id)

@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 

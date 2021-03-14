@@ -16,7 +16,7 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import htm from "htm"
-import { h, VNode } from "preact";
+import { h, VNode } from "preact"
 import render from "preact-render-to-string"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
@@ -835,10 +835,10 @@ export default class DisplayPorts {
                 ${port.portBonus ? html`<div class="d-flex me-1">${getPortBonus()}</div>` : html``}
 
                 <div class="d-flex flex-column justify-content-end">
-                    <div class="ml-auto">
+                    <div class="ms-auto">
                         ${port.portPoints ? html`<span class="x-large text-lighter">${port.portPoints}</span>` : html``}
                     </div>
-                    <div class="ml-auto">
+                    <div class="ms-auto">
                         ${port.laborHoursDiscount
                             ? html`<i class="icon icon-light icon-labour me-1" aria-hidden="true"></i
                                   ><span class="visually-hidden"
@@ -893,7 +893,7 @@ export default class DisplayPorts {
                               <span class="des">Capture</span>
                           </div>
 
-                          <div class="ml-auto me-3">
+                          <div class="ms-auto me-3">
                               ${port.taxIncome} (${port.portTax})<br />
                               <span class="des">Tax income</span>
                           </div>
@@ -975,14 +975,13 @@ export default class DisplayPorts {
 
     _showDetails(event: Event, d: PortWithTrades): void {
         const element = event.currentTarget as Element
-        const tooltip = new BSTooltip(element, {
+        new BSTooltip(element, {
             html: true,
             placement: "auto",
             trigger: "manual",
             title: render(this._tooltipData(this._getText(d))),
             sanitize: false,
-        })
-        tooltip.show()
+        }).show()
 
         if (this.map.showTrades.show) {
             if (this.map.showTrades.listType !== "inventory") {

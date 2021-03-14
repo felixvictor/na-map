@@ -8,9 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/collapse"
-import "bootstrap/js/dist/tooltip"
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import "bootstrap-select"
 import { extent as d3Extent } from "d3-array"
@@ -21,7 +20,6 @@ import { nations, NationShortName } from "common/common"
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
 import { defaultFontSize, Extent, Point, roundToThousands } from "common/common-math"
 
-import JQuery from "jquery"
 import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "common/gen-json"
 import { ZoomTransform } from "d3-zoom"
 import { HtmlString } from "common/interface"
@@ -245,6 +243,7 @@ export default class ShowTrades {
             .attr("class", "btn btn-small btn-outline-primary")
             .attr("data-bs-toggle", "collapse")
             .attr("data-bs-target", `#${cardId}`)
+            .attr("aria-expanded", "false")
             .text("Info")
         this._tradeDetailsHead
             .append("div")
@@ -513,27 +512,25 @@ export default class ShowTrades {
      * {@link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0}
      */
     _updateGraph(): void {
-        const showDetails = (self: SVGElement, event: Event, d: Trade): void => {
-            const trade = d3Select(self)
-            const title = this._getTradeFullData(d)
-
-            $(trade.node() as JQuery.PlainObject)
-                .tooltip({
-                    html: true,
-                    placement: "auto",
-                    template:
-                        '<div class="tooltip" role="tooltip">' +
-                        '<div class="tooltip-block tooltip-inner tooltip-inner-small">' +
-                        "</div></div>",
-                    title,
-                    trigger: "manual",
-                    sanitize: false,
-                })
-                .tooltip("show")
+        const showDetails = (event: Event, d: Trade): void => {
+            const element = event.currentTarget as Element
+            new BSTooltip(element, {
+                html: true,
+                placement: "auto",
+                template:
+                    '<div class="tooltip" role="tooltip">' +
+                    '<div class="tooltip-block tooltip-inner tooltip-inner-small">' +
+                    "</div></div>",
+                trigger: "manual",
+                title: this._getTradeFullData(d),
+                sanitize: false,
+            }).show()
         }
 
-        const hideDetails = (self: SVGPathElement): void => {
-            $(d3Select(self).node() as JQuery.PlainObject).tooltip("dispose")
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const hideDetails = (event: Event): void => {
+            const element = event.currentTarget as Element
+            BSTooltip.getInstance(element).dispose()
         }
 
         const arcPath = (leftHand: boolean, d: Trade): string => {
@@ -581,11 +578,11 @@ export default class ShowTrades {
                         this._getXCoord(d.source.id) < this._getXCoord(d.target.id) ? "url(#trade-arrow)" : ""
                     )
                     .attr("id", (d) => ShowTrades._getId(d))
-                    .on("click", function (event: Event, d: Trade) {
-                        showDetails(this, event, d)
+                    .on("click", (event: Event, d: Trade) => {
+                        showDetails(event, d)
                     })
-                    .on("mouseleave", function () {
-                        hideDetails(this)
+                    .on("mouseleave", (event: Event) => {
+                        hideDetails(event)
                     })
             )
             .attr("d", (d) => arcPath(this._getXCoord(d.source.id) < this._getXCoord(d.target.id), d))

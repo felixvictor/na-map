@@ -22,6 +22,7 @@ const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
 const dirLib = path.resolve(dirSrc, "lib")
 
+const dirEjs = path.resolve(dirSrc, "ejs")
 const dirFlags = path.resolve(dirSrc, "images", "flags")
 const dirFonts = path.resolve(dirSrc, "fonts")
 const dirIcons = path.resolve(dirSrc, "icons")
@@ -227,7 +228,7 @@ const htmlOpt = {
     minify: htmlMinifyOpt,
     scriptLoading: "defer",
     servers,
-    template: path.resolve(__dirname, dirSrc, "index.template.ejs"),
+    template: path.resolve(__dirname, dirEjs, "index.ejs"),
     title: PACKAGE.description,
 }
 
@@ -396,6 +397,16 @@ const config = {
                 test: /\.(ts|js)$/,
                 include: dirJsSrc,
                 use: [{ loader: "babel-loader", options: babelOpt }],
+            },
+            {
+                test: /\.ejs$/,
+                include: dirEjs,
+                use: [
+                    {
+                        loader: "ejs-compiled-loader",
+                        options: {}, // does not compile without
+                    },
+                ],
             },
             {
                 test: /\.scss$/,

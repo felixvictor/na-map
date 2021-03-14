@@ -8,9 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import "bootstrap/js/dist/modal"
-import "bootstrap/js/dist/tooltip"
+
+
 import { select as d3Select } from "d3-selection"
 
 import { registerEvent } from "../analytics"

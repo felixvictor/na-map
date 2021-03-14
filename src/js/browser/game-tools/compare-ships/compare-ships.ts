@@ -825,7 +825,7 @@ export class CompareShips {
             const div = row
                 .append("div")
                 .attr("id", `${this._baseId}-${columnId.toLowerCase()}`)
-                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
+                .attr("class", `col-md-4 ms-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
 
             const shipSelectId = this._getShipSelectId(columnId)
 
