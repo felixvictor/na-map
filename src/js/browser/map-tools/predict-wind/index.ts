@@ -42,8 +42,6 @@ export default class PredictWind {
         this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
         this.#menuId = `menu-${this.#baseId}`
 
-        this._setupSvg()
-        this._setupArrow()
         this._setupListener()
     }
 
@@ -75,6 +73,8 @@ export default class PredictWind {
         if (this.#modal) {
             this.#modal.show()
         } else {
+            this._setupSvg()
+            this._setupArrow()
             this.#modal = new PredictWindModal(this.#baseName)
             this.#modal.getModalNode().addEventListener("hidden.bs.modal", () => {
                 this._useUserInput()

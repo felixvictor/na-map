@@ -631,6 +631,7 @@ export default class DisplayPorts {
             circleCapital.setAttribute("cx", String(this.#iconSize / 2))
             circleCapital.setAttribute("cy", String(this.#iconSize / 2))
             circleCapital.setAttribute("r", "16")
+            circleCapital.setAttribute("class", "circle-highlight")
 
             return circleCapital
         }
@@ -818,7 +819,7 @@ export default class DisplayPorts {
 
         const h = html`
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center ">
+                <div class="d-flex align-items-center">
                     <img
                         alt="${port.icon}"
                         class="flag-icon me-3 align-self-stretch ${iconBorder}"

@@ -311,6 +311,14 @@ table,
     }
 }
 
+// capital ports
+.circle-highlight {
+    fill: none;
+    stroke: $white;
+    stroke-opacity: 0.8;
+    stroke-width: 0.4rem;
+}
+
 svg {
     .axis {
         pointer-events: none;
@@ -634,13 +642,6 @@ p {
     @extend .raid-join-circle;
 }
 
-// capital ports
-pattern > circle {
-    fill: none;
-    stroke: $white;
-    stroke-opacity: 0.8;
-    stroke-width: 0.4rem;
-}
 
 ///
 // svg classes
