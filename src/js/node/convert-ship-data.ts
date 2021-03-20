@@ -13,7 +13,7 @@ import path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file"
 import { roundToThousands, speedConstA, speedConstB } from "../common/common-math"
 import { cleanName, sortBy } from "../common/common-node"

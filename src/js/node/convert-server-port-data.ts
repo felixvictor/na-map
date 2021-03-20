@@ -15,7 +15,7 @@ import d3Array from "d3-array"
 const { group: d3Group } = d3Array
 
 import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
 import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"

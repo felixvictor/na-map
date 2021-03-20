@@ -15,7 +15,7 @@ import Excel from "exceljs"
 import sass from "sass"
 
 import { range } from "../common/common"
-import { commonPaths, serverStartDate } from "../common/common-dir"
+import { commonPaths, currentServerStartDate } from "../common/common-dir"
 import { executeCommand, readJson } from "../common/common-file"
 import { sortBy } from "../common/common-node"
 
@@ -489,7 +489,7 @@ function fillSheet(sheet: Excel.Worksheet, ships: ShipData[], ports: PortBR[]): 
  * Create excel spreadsheet
  */
 const createPortBattleSheets = async (): Promise<void> => {
-    const date = new Date(serverStartDate)
+    const date = new Date(currentServerStartDate)
 
     workbook = new Excel.Workbook()
 

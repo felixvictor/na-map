@@ -235,7 +235,9 @@ export const printSmallCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    element:
+        | Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+        | Selection<SVGGElement, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments

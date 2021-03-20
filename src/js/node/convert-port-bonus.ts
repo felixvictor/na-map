@@ -12,7 +12,7 @@ import * as fs from "fs"
 import path from "path"
 import { default as csvParser } from "csv-parser"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { cleanName, sortBy } from "../common/common-node"
 import { serverIds } from "../common/servers"

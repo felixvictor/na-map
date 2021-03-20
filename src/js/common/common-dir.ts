@@ -9,12 +9,7 @@
  */
 
 import path from "path"
-
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc.js"
-dayjs.extend(utc)
-
-import { serverMaintenanceHour } from "./common-var"
+import { currentServerDateMonth, currentServerDateYear } from "common/common"
 
 // https://stackoverflow.com/a/50052194
 const appRoot = process.env.PWD ?? ""
@@ -57,22 +52,5 @@ export const commonPaths = {
     fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json"),
     fileWood: path.resolve(dirGenGeneric, "woods.json"),
 }
-/**
- * Get server start (date and time)
- */
-const getServerStartDateTime = (): dayjs.Dayjs => {
-    let serverStart = dayjs().utc().hour(serverMaintenanceHour).minute(0).second(0)
 
-    // adjust reference server time if needed
-    if (dayjs.utc().isBefore(serverStart)) {
-        serverStart = dayjs.utc(serverStart).subtract(1, "day")
-    }
-
-    return serverStart
-}
-
-export const serverStartDateTime = getServerStartDateTime().format("YYYY-MM-DD HH:mm")
-export const serverStartDate = getServerStartDateTime().format("YYYY-MM-DD")
-const serverDateYear = String(dayjs(serverStartDate).year())
-const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0")
-export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth)
+export const baseAPIFilename = path.resolve(commonPaths.dirAPI, currentServerDateYear, currentServerDateMonth)

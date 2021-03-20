@@ -12,7 +12,7 @@ import path from "path"
 import polylabel from "polylabel"
 
 import { capitalToCounty } from "../common/common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { cleanName, sortBy } from "../common/common-node"
 import {

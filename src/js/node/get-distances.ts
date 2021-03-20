@@ -13,7 +13,7 @@ import path from "path"
 import Deque from "collections/deque"
 import { default as PNG } from "pngjs"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
 import { simpleNumberSort } from "../common/common-node"

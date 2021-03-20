@@ -17,7 +17,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
 
 import { findNationByName, findNationByNationShortName } from "../common/common"
-import { commonPaths, serverStartDateTime } from "../common/common-dir"
+import { commonPaths, currentServerStartDateTime } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
 import { cleanName, simpleStringSort } from "../common/common-node"
 import { flagValidity, portBattleCooldown } from "../common/common-var"
@@ -123,14 +123,14 @@ const getTweetsSince = async (sinceDateTime: dayjs.Dayjs): Promise<void> => {
  * Get all available tweets from the 2 last days
  */
 const getTweetsFull = async (): Promise<void> => {
-    await getTweetsSince(dayjs.utc(serverStartDateTime).subtract(2, "day"))
+    await getTweetsSince(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))
 }
 
 /**
  * Get tweets since maintenance
  */
 const getTweetsSinceMaintenance = async (): Promise<void> => {
-    await getTweetsSince(dayjs.utc(serverStartDateTime))
+    await getTweetsSince(dayjs.utc(currentServerStartDateTime))
 }
 
 /**
