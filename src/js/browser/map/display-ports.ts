@@ -369,8 +369,14 @@ export default class DisplayPorts {
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-icons")
             .attr("class", "click-circle")
-        this.#gText = this.#gPort.append<SVGGElement>("g").attr("class", "port-names")
-        this.#gPZ = this.#gPort.append<SVGGElement>("g").attr("class", "pz")
+        this.#gText = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "port-names")
+            .attr("class", "port-names svg-text-light")
+        this.#gPZ = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "patrol-zone")
+            .attr("class", "svg-text-dark-yellow svg-text-center")
     }
 
     _setupCounties(): void {
@@ -545,11 +551,11 @@ export default class DisplayPorts {
         const { radius, name, shallow, shipClass } = patrolZones[index]
         const swordSize = radius * 1.6
         const [x, y] = patrolZones[index].coordinates
-        const dyFactor = 1.2
+        const dyFactor = 1.3
         const dy = Math.round(radius / dyFactor)
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
-        this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius).attr("opacity", 0.7)
+        this.#gPZ.append("circle").attr("class", "svg-background-yellow").attr("cx", x).attr("cy", y).attr("r", radius)
         this.#gPZ
             .append("image")
             .attr("height", swordSize)

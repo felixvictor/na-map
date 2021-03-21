@@ -55,15 +55,154 @@ text,
     user-select: none;
 }
 
-text {
-    fill: $white;
-    stroke: none;
+svg {
+    stroke-width: 0.1rem;
+    overflow: auto;
 }
 
-path,
-rect {
-    fill: none;
-    stroke: $white;
+.svg-text-light {
+    text {
+        fill: $white;
+        stroke: none;
+    }
+}
+
+.svg-stroke-light {
+    circle,
+    line,
+    path,
+    rect {
+        fill: none;
+        stroke: $white;
+    }
+}
+
+.svg-text-dark {
+    text {
+        fill: $overlay-text-colour-contrast;
+        stroke: none;
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+}
+
+.svg-stroke-dark {
+    circle,
+    line,
+    path,
+    rect {
+        fill: none;
+        stroke: $overlay-text-colour-contrast;
+    }
+}
+
+.svg-background-yellow {
+    opacity: 0.7;
+    fill: $yellow-300;
+}
+
+.svg-text-dark-yellow {
+    text {
+        fill: $yellow-900;
+    }
+}
+.svg-text-center {
+    text {
+        dominant-baseline: central;
+        text-anchor: middle;
+    }
+}
+
+.xf11,
+.xingame-wind,
+.xjourney,
+.xwind-predict {
+    svg {
+        overflow: auto;
+    }
+
+    circle {
+        fill-opacity: 0.2;
+    }
+
+    path {
+        fill: none;
+        stroke-width: 0.3rem;
+    }
+
+    text {
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+
+    line {
+        stroke-width: 0.1rem;
+    }
+}
+
+.xingame-wind,
+.xwind-predict {
+    circle {
+        fill: color-yiq($overlay-background);
+    }
+
+    path {
+        stroke: color-yiq($overlay-background);
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        font-size: smaller;
+        fill: $overlay-text-colour-contrast !important;
+    }
+}
+
+.xf11,
+.xjourney {
+    circle {
+        fill: color-yiq($dark-overlay-background);
+    }
+
+    path {
+        stroke: color-yiq($dark-overlay-background);
+    }
+
+    rect {
+        fill: $dark-overlay-background;
+    }
+
+    text {
+        fill: $dark-overlay-text-colour;
+
+        .des {
+            fill: $dark-overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $dark-overlay-text-colour;
+    }
+
+    .text-light-separation {
+        fill: $dark-overlay-text-colour-contrast !important;
+    }
 }
 
 .empty-svg {
@@ -552,10 +691,6 @@ p {
 ////
 //// Display ports
 ////
-
-.port-names {
-    fill: $white;
-}
 
 .port {
     cursor: pointer;
