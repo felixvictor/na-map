@@ -21,6 +21,11 @@
     font-stretch: condensed;
 }
 
+@mixin svg-text-center {
+    dominant-baseline: central;
+    text-anchor: middle;
+}
+
 $background-map: $primary;
 $dark-overlay-background-colour: $primary-800;
 $dark-overlay-background-colour-contrast: $primary-700;
@@ -77,6 +82,15 @@ svg {
     }
 }
 
+.svg-stroke-thick {
+    stroke-width: 0.4rem;
+}
+
+.svg-dark {
+    fill: $overlay-text-colour-contrast;
+    stroke: none;
+}
+
 .svg-text-dark {
     text {
         fill: $overlay-text-colour-contrast;
@@ -96,6 +110,40 @@ svg {
     }
 }
 
+.compass {
+    circle {
+        fill: $overlay-background-colour;
+    }
+}
+
+.svg-background-light {
+    path {
+        stroke: $overlay-text-colour-contrast;
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+        @include svg-text-center();
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        font-size: smaller;
+        fill: $overlay-text-colour-contrast !important;
+    }
+}
+
 .svg-background-yellow {
     opacity: 0.7;
     fill: $yellow-300;
@@ -108,8 +156,7 @@ svg {
 }
 .svg-text-center {
     text {
-        dominant-baseline: central;
-        text-anchor: middle;
+        @include svg-text-center();
     }
 }
 

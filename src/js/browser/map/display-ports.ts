@@ -71,6 +71,7 @@ import RadioButton from "util/radio-button"
 import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
+import { serverMaintenanceHour } from "common/common-var";
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -545,7 +546,7 @@ export default class DisplayPorts {
             { name: "La Mona", coordinates: [6180, 4100], radius: 170, shallow: false, shipClass: { min: 7, max: 4 } },
         ] as PatrolZone[]
 
-        const start = dayjs.utc("2021-01-17").hour(10)
+        const start = dayjs.utc("2021-01-17").hour(serverMaintenanceHour)
         const index = dayjs.utc().diff(start, "day") % patrolZones.length
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
         const { radius, name, shallow, shipClass } = patrolZones[index]

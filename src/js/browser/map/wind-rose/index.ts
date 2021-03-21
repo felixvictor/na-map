@@ -21,29 +21,32 @@ import { HtmlString } from "common/interface"
 
 import WindRoseModal from "./modal"
 import WindRoseCookie from "./cookie"
+import Toast from "util/toast"
 
 export default class WindRose {
     #div!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #modal: WindRoseModal | undefined = undefined
     #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     #windPath: Selection<SVGPathElement, unknown, HTMLElement, unknown> | undefined = undefined
+    #portSummarySel = d3Select("#port-summary")
 
     readonly #baseId: HtmlString
     readonly #baseName = "In-game wind"
 
-    readonly #menuId: HtmlString
-    readonly #line: Line<[number, number]>
-    readonly #windArrowWidth: number
-    readonly #intervalSeconds: number
-    readonly #cookie: WindRoseCookie
+    #compassRadius!: number
     #currentWindDegrees: number
     #height!: number
-    #yCompass!: number
+    #intervalId!: number
+    #length!: number
     #width!: number
     #xCompass!: number
-    #compassRadius!: number
-    #length!: number
-    #intervalId!: number
+    #yCompass!: number
+    readonly #arrowId = "wind-arrow"
+    readonly #arrowWidth = 4
+    readonly #cookie: WindRoseCookie
+    readonly #intervalSeconds: number
+    readonly #line: Line<[number, number]>
+    readonly #menuId: HtmlString
 
     constructor() {
         this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
@@ -53,7 +56,6 @@ export default class WindRose {
             .x((d) => d[0])
             .y((d) => d[1])
 
-        this.#windArrowWidth = 4
         this.#intervalSeconds = 40
 
         /**
@@ -61,10 +63,12 @@ export default class WindRose {
          */
         this.#cookie = new WindRoseCookie(this.#baseId)
         this.#currentWindDegrees = this.#cookie.get()
-        console.log("WindRose constructor", this.#currentWindDegrees)
 
+        this._setupArrow()
         this._setupListener()
-        if (!Number.isNaN(this.#currentWindDegrees)) {
+        if (Number.isNaN(this.#currentWindDegrees)) {
+            void new Toast("Hint", "Get the wind direction:<br>Use <em>In-game wind</em> under <em>Map tools</em>.")
+        } else {
             this._initShowCurrentWind()
         }
     }
@@ -80,6 +84,24 @@ export default class WindRose {
                 this._useUserInput()
             })
         }
+    }
+
+    _setupArrow(): void {
+        const width = this.#arrowWidth
+        const doubleWidth = this.#arrowWidth * 2
+
+        d3Select("#na-svg defs")
+            .append("marker")
+            .attr("id", this.#arrowId)
+            .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
+            .attr("refX", width)
+            .attr("refY", 0)
+            .attr("markerWidth", width)
+            .attr("markerHeight", width)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("class", "svg-dark")
+            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
     }
 
     _setupListener(): void {
@@ -104,16 +126,26 @@ export default class WindRose {
         }
     }
 
+    _toggle(show: boolean): void {
+        this.#portSummarySel.classed("port-summary-no-wind", !show).classed("port-summary-wind", show)
+    }
+
+    _show(): void {
+        this._toggle(true)
+    }
+
+    _hide(): void {
+        this._toggle(false)
+    }
+
     _setupSvg(): void {
-        const portSummary = d3Select("#port-summary")
+        this._show()
 
-        portSummary.classed("port-summary-no-wind", false).classed("port-summary-wind", true)
-
-        this.#div = portSummary
+        this.#div = this.#portSummarySel
             .insert("div", ":first-child")
             .attr("id", this.#baseId)
             .attr("class", "block p-0")
-        this.#svg = this.#div.append("svg").attr("class", "ingame-wind small")
+        this.#svg = this.#div.append("svg").attr("class", "small svg-text-dark svg-text-center svg-stroke-dark")
     }
 
     _initShowCurrentWind(): void {
@@ -170,11 +202,15 @@ export default class WindRose {
             .attr("y", this.#yCompass)
         printSmallCompassRose({ element: compassElement, radius: this.#compassRadius })
 
-        this.#windPath = this.#svg.append("path").attr("marker-end", "url(#wind-arrow)")
+        this.#windPath = this.#svg
+            .append("path")
+            .attr("class", "svg-stroke-thick")
+            .attr("marker-end", "url(#wind-arrow)")
     }
 
     clearMap(): void {
         window.clearInterval(this.#intervalId)
+        this._hide()
         if (this.#div) {
             this.#div.remove()
         }

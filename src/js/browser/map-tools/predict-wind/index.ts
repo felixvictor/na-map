@@ -36,7 +36,7 @@ export default class PredictWind {
     readonly #height = 300
     readonly #menuId: HtmlString
     readonly #width = 260
-    readonly #windArrowWidth = 3
+    readonly #arrowId = "wind-arrow"
 
     constructor() {
         this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
@@ -49,24 +49,6 @@ export default class PredictWind {
         this.#svg = d3Select("#wind svg")
     }
 
-    _setupArrow(): void {
-        const width = this.#windArrowWidth
-        const doubleWidth = this.#windArrowWidth * 2
-
-        d3Select("#na-svg defs")
-            .append("marker")
-            .attr("id", "wind-arrow")
-            .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
-            .attr("refX", width)
-            .attr("refY", 0)
-            .attr("markerWidth", width)
-            .attr("markerHeight", width)
-            .attr("orient", "auto")
-            .append("path")
-            .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
-            .attr("class", "wind-predict-arrow-head")
-    }
-
     _menuClicked(): void {
         registerEvent("Menu", this.#baseName)
 
@@ -74,7 +56,6 @@ export default class PredictWind {
             this.#modal.show()
         } else {
             this._setupSvg()
-            this._setupArrow()
             this.#modal = new PredictWindModal(this.#baseName)
             this.#modal.getModalNode().addEventListener("hidden.bs.modal", () => {
                 this._useUserInput()
@@ -147,11 +128,15 @@ export default class PredictWind {
 
         // Compass rose
         const compassElem = this.#svg.append("svg").attr("class", "compass").attr("x", xCompass).attr("y", yCompass)
-        // @ts-expect-error
         printCompassRose({ element: compassElem, radius })
 
         // Wind direction
-        this.#svg.append("path").datum(lineData).attr("d", line).attr("marker-end", "url(#wind-arrow)")
+        this.#svg
+            .append("path")
+            .attr("class", "svg-stroke-thick")
+            .datum(lineData)
+            .attr("d", line)
+            .attr("marker-end", `url(#${this.#arrowId})`)
     }
 
     _printText(predictedWindDegrees: number, predictTime: string, currentWind: string, currentTime: string): void {

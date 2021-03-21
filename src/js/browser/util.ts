@@ -22,7 +22,6 @@ import {
 
 import JQuery from "jquery"
 import { Selection } from "d3-selection"
-import { Segment } from "./map/make-journey"
 
 /**
  * Display formatted compass
@@ -155,7 +154,9 @@ export const printCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<SVGGElement, Segment, HTMLElement, unknown>
+    element:
+        | Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+        | Selection<SVGGElement, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
@@ -175,6 +176,7 @@ export const printCompassRose = ({
 
     // Cardinal and intercardinal winds
     const label = element
+        .append("g")
         .selectAll("g")
         .data(data)
         .join((enter) =>
@@ -258,6 +260,7 @@ export const printSmallCompassRose = ({
     const x2InterCard = 4
     const x2Card = 6
     element
+        .append("g")
         .selectAll("line")
         .data(data)
         .join((enter) =>

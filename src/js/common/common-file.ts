@@ -13,8 +13,9 @@ import { default as fs, promises as pfs } from "fs"
 import path from "path"
 import { promisify } from "util"
 
+import { currentServerStartDate } from "./common"
 import { apiBaseFiles } from "./common-var"
-import { baseAPIFilename, currentServerStartDate } from "./common-dir"
+import { baseAPIFilename } from "./common-dir"
 import { serverIds } from "./servers"
 
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/globals.d.ts

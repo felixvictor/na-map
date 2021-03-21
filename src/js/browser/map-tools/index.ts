@@ -9,7 +9,6 @@
  */
 
 import PredictWind from "./predict-wind"
-import WindRose from "./wind-rose"
 
 import "../../../scss/map-tools.scss"
 
@@ -18,7 +17,6 @@ import "../../../scss/map-tools.scss"
  */
 const init = (): void => {
     void new PredictWind()
-    void new WindRose()
 }
 
 export { init }

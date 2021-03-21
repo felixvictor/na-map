@@ -9,7 +9,7 @@
  */
 
 import path from "path"
-import { currentServerDateMonth, currentServerDateYear } from "common/common"
+import { currentServerDateMonth, currentServerDateYear } from "./common"
 
 // https://stackoverflow.com/a/50052194
 const appRoot = process.env.PWD ?? ""

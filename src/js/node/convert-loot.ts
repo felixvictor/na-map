@@ -10,7 +10,8 @@
 
 import path from "path"
 
-import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
+import { currentServerStartDate as serverDate } from "../common/common"
+import { baseAPIFilename, commonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { getOrdinal } from "../common/common-math"
 import { cleanName, sortBy } from "../common/common-node"

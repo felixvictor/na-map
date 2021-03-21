@@ -13,7 +13,8 @@ import path from "path"
 import d3Array from "d3-array"
 const { group: d3Group } = d3Array
 
-import { baseAPIFilename, commonPaths, currentServerStartDate as serverDate } from "../common/common-dir"
+import { currentServerStartDate as serverDate } from "../common/common"
+import { baseAPIFilename, commonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
 import { serverIds } from "../common/servers"

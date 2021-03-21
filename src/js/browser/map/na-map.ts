@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select"
@@ -24,16 +23,17 @@ import { displayClan } from "../util"
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 
 import Cookie from "util/cookie"
-import RadioButton from "util/radio-button"
 import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
+import MakeJourney from "./make-journey"
+import PowerMap from "../game-tools/show-power-map"
+import RadioButton from "util/radio-button"
 import SelectPorts from "./select-ports"
 import ShowF11 from "./show-f11"
 import ShowTrades from "./show-trades"
-import MakeJourney from "./make-journey"
 import TrilateratePosition from "./get-position"
-import PowerMap from "../game-tools/show-power-map"
+import WindRose from "./wind-rose"
 
 export type Tile = [number, number, number]
 
@@ -71,6 +71,7 @@ class NAMap {
     #y1 = 0
     #gMap = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
+    #windRose!: WindRose
 
     readonly rem = defaultFontSize // Font size in px
     serverName: string
@@ -244,6 +245,7 @@ class NAMap {
 
         this._init()
         this._journey = new MakeJourney(this.rem)
+        this.#windRose = new WindRose()
         void new TrilateratePosition(this._ports)
         void new PowerMap(this, this.serverName, this.coord)
 
@@ -410,6 +412,7 @@ class NAMap {
         this._ports.clearMap()
         this._portSelect.clearMap()
         this.showTrades.clearMap()
+        this.#windRose.clearMap()
         $(".selectpicker").val("default").selectpicker("refresh")
     }
 
