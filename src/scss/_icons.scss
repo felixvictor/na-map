@@ -57,6 +57,8 @@ $icon-list: back bar-chart calendar chevron-bottom chevron-left chevron-right ch
 
 @each $icon in $icon-list {
     .icon-#{$icon} {
-        mask-image: url("#{$icon-dir}/icon-#{$icon}.svg");
+        // vendor prefix to avoid double entries (Firefox can also accept -webkit-mask-image)
+        //noinspection Stylelint
+        -webkit-mask-image: url("#{$icon-dir}/icon-#{$icon}.svg");
     }
 }
