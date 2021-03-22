@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/modal"
-
 import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout"
 import { range as d3Range } from "d3-array"
 import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
@@ -18,15 +16,10 @@ import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 import { zoomIdentity as d3ZoomIdentity } from "d3-zoom"
 
-import "round-slider/src/roundslider"
-import "../../../scss/roundslider.scss"
-import { RoundSliderPos } from "round-slider"
-
-import { registerEvent } from "../analytics"
-import { degreesPerSecond, insertBaseModal, pluralise } from "common/common-browser"
+import { registerEvent } from "../../analytics"
+import { degreesPerSecond, pluralise } from "common/common-browser"
 import { formatF11 } from "common/common-format"
 import {
-    compassDirections,
     convertInvCoordX,
     convertInvCoordY,
     Coordinate,
@@ -36,11 +29,11 @@ import {
     Point,
     speedFactor,
 } from "common/common-math"
-import { displayCompass, displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../util"
+import { displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } from "../../util"
 
 import { HtmlString } from "common/interface"
 
-import { CompareShips } from "../game-tools/compare-ships"
+import MakeJourneyModal from "./modal"
 
 interface Journey {
     shipName: string
@@ -61,70 +54,51 @@ export interface Segment {
  * MakeJourney
  */
 export default class MakeJourney {
-    private readonly _fontSize: number
-    private readonly _compassRadius: number
-    private readonly _courseArrowWidth: number
-    private readonly _line: Line<[number, number]>
-    private readonly _labelPadding: number
-    private readonly _degreesPerMinute: number
-    private readonly _degreesSegment: number
-    private readonly _minOWSpeed: number
-    private readonly _owSpeedFactor: number
-    private readonly _speedScale: ScaleLinear<number, number>
-    private readonly _defaultShipName: string
-    private readonly _defaultShipSpeed: number
-    private readonly _defaultStartWindDegrees: number
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _compassId: HtmlString
-    private readonly _deleteLastLegButtonId: HtmlString
-    private readonly _modalId: HtmlString
-    private readonly _sliderId: HtmlString
-    private readonly _shipId: string
-    private _g!: Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _journey!: Journey
-    private _shipCompare!: CompareShips
-    private _compass!: Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _compassG!: Selection<SVGGElement, Segment, HTMLElement, unknown>
-    private _divJourneySummary!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryShip!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryTextShip!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _journeySummaryTextWind!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _gJourneyPath!: Selection<SVGPathElement, Segment, HTMLElement, unknown>
-    private _drag!: DragBehavior<SVGCircleElement, DragEvent, Segment | SubjectPosition>
+    #compass = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    #divJourneySummary = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #drag = {} as DragBehavior<SVGCircleElement, DragEvent, Segment | SubjectPosition>
+    #g = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gCompass = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #gJourneyPath = {} as Selection<SVGPathElement, unknown, HTMLElement, unknown>
+    #journey = {} as Journey
+    #journeySummaryShip = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #journeySummaryTextShip = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #journeySummaryTextWind = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #journeySummaryWind = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #modal: MakeJourneyModal | undefined = undefined
+
+    readonly #arrowId = "journey-arrow"
+    readonly #arrowWidth = 5
+    readonly #baseId: HtmlString
+    readonly #baseName = "Make journey"
+    readonly #compassId: HtmlString
+    readonly #compassRadius = 90
+    readonly #defaultShipName = "None"
+    readonly #defaultShipSpeed = 19
+    readonly #defaultStartWindDegrees = 0
+    readonly #degreesPerMinute = degreesPerSecond / 60
+    readonly #degreesSegment = 15
+    readonly #deleteLastLegButtonId: HtmlString
+    readonly #fontSize: number
+    readonly #labelPadding = 20
+    readonly #line: Line<Point>
+    readonly #menuId: HtmlString
+    readonly #minOWSpeed = 2
+    readonly #owSpeedFactor = 2
+    readonly #speedScale: ScaleLinear<number, number>
 
     constructor(fontSize: number) {
-        this._fontSize = fontSize
+        this.#fontSize = fontSize
 
-        this._compassRadius = 90
-        this._courseArrowWidth = 5
-        this._line = d3Line()
+        this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#menuId = `menu-${this.#baseId}`
+        this.#compassId = `compass-${this.#baseId}`
+        this.#deleteLastLegButtonId = `button-delete-leg-${this.#baseId}`
+
+        this.#line = d3Line<Point>()
             .x((d) => d[0])
             .y((d) => d[1])
-
-        this._labelPadding = 20
-
-        this._degreesPerMinute = degreesPerSecond / 60
-        this._degreesSegment = 15
-        this._minOWSpeed = 2
-        this._owSpeedFactor = 2
-
-        this._speedScale = d3ScaleLinear().domain(d3Range(0, degreesFullCircle, this._degreesSegment))
-
-        this._defaultShipName = "None"
-        this._defaultShipSpeed = 19
-        this._defaultStartWindDegrees = 0
-
-        this._baseName = "Make journey"
-        this._baseId = "make-journey"
-        this._buttonId = `menu-${this._baseId}`
-        this._compassId = `compass-${this._baseId}`
-        this._deleteLastLegButtonId = `button-delete-leg-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
-        this._sliderId = `slider-${this._baseId}`
-        this._shipId = "ship-journey"
+        this.#speedScale = d3ScaleLinear().domain(d3Range(0, degreesFullCircle, this.#degreesSegment))
 
         this._setupSummary()
         this._setupDrag()
@@ -162,7 +136,7 @@ export default class MakeJourney {
             // @ts-expect-error
             const newY = d.position[1] + Number(event.dy)
             if (d.index === 0) {
-                this._compass.attr("x", newX).attr("y", newY)
+                this.#compass.attr("x", newX).attr("y", newY)
             }
 
             d3Select(self).attr("cx", event.x).attr("cy", event.y)
@@ -175,7 +149,7 @@ export default class MakeJourney {
             this._printJourney()
         }
 
-        this._drag = d3Drag<SVGCircleElement, DragEvent, Segment>()
+        this.#drag = d3Drag<SVGCircleElement, DragEvent, Segment>()
             .on("start", function (this) {
                 dragStart(this)
             })
@@ -189,17 +163,14 @@ export default class MakeJourney {
     }
 
     _setupSvg(): void {
-        const width = this._courseArrowWidth
-        const doubleWidth = this._courseArrowWidth * 2
+        const width = this.#arrowWidth
+        const doubleWidth = this.#arrowWidth * 2
 
-        this._g = d3Select<SVGGElement, Segment>("#ports")
-            .append("g")
-            .attr("id", "journey")
-            .attr("class", "svg-background-dark")
+        this.#g = d3Select("#ports").append("g").attr("id", "journey").attr("class", "svg-background-dark")
 
         d3Select("#na-svg defs")
             .append("marker")
-            .attr("id", "journey-arrow")
+            .attr("id", this.#arrowId)
             .attr("viewBox", `0 -${width} ${doubleWidth} ${doubleWidth}`)
             .attr("refX", width)
             .attr("refY", 0)
@@ -207,15 +178,15 @@ export default class MakeJourney {
             .attr("markerHeight", width)
             .attr("orient", "auto")
             .append("path")
-            .attr("class", "journey-arrow-head")
+            .attr("class", "svg-light")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
     }
 
     _initJourneyData(): void {
-        this._journey = {
-            shipName: this._defaultShipName,
-            startWindDegrees: this._defaultStartWindDegrees,
-            currentWindDegrees: this._defaultStartWindDegrees,
+        this.#journey = {
+            shipName: this.#defaultShipName,
+            startWindDegrees: this.#defaultStartWindDegrees,
+            currentWindDegrees: this.#defaultStartWindDegrees,
             totalDistance: 0,
             totalMinutes: 0,
             segments: [{ position: [0, 0], label: "" }],
@@ -223,144 +194,72 @@ export default class MakeJourney {
     }
 
     _resetJourneyData(): void {
-        this._journey.startWindDegrees = this._getStartWind()
-        this._journey.currentWindDegrees = this._journey.startWindDegrees
-        this._journey.totalDistance = 0
-        this._journey.totalMinutes = 0
+        this.#journey.startWindDegrees = this.#modal?.getWind() ?? this.#defaultStartWindDegrees
+        this.#journey.currentWindDegrees = this.#journey.startWindDegrees
+        this.#journey.totalDistance = 0
+        this.#journey.totalMinutes = 0
     }
 
-    _navbarClick(): void {
-        registerEvent("Menu", "MakeJourney")
+    _menuClicked(): void {
+        registerEvent("Menu", this.#baseName)
 
-        this._journeySelected()
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            this.#modal = new MakeJourneyModal(this.#baseName)
+            this.#modal.getModalNode().addEventListener("hidden.bs.modal", () => {
+                this._useUserInput()
+            })
+        }
     }
 
     /**
      * Setup menu item listener
      */
     _setupListener(): void {
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("mouseup", () => {
-            this._navbarClick()
+        ;(document.querySelector(`#${this.#menuId}`) as HTMLElement).addEventListener("click", () => {
+            this._menuClicked()
         })
-        document.querySelector(`#${this._deleteLastLegButtonId}`)?.addEventListener("mouseup", () => {
+        ;(document.querySelector(`#${this.#deleteLastLegButtonId}`) as HTMLElement).addEventListener("click", () => {
             this._deleteLastLeg()
         })
     }
 
-    _setupWindInput(): void {
-        // workaround from https://github.com/soundar24/roundSlider/issues/71
-        // eslint-disable-next-line prefer-destructuring
-        const _getTooltipPos: () => RoundSliderPos = $.fn.roundSlider.prototype._getTooltipPos
-        $.fn.roundSlider.prototype._getTooltipPos = function (): RoundSliderPos {
-            if (!this.tooltip.is(":visible")) {
-                $("body").append(this.tooltip)
-            }
-
-            const pos = _getTooltipPos.call(this)
-            this.container.append(this.tooltip)
-            return pos
-        }
-
-        // @ts-expect-error
-        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
-
-        $(`#${this._sliderId}`).roundSlider({
-            sliderType: "default",
-            handleSize: "+1",
-            startAngle: 90,
-            width: 20,
-            radius: 110,
-            min: 0,
-            max: 359,
-            step: 360 / compassDirections.length,
-            editableTooltip: false,
-            tooltipFormat: "tooltip",
-            create() {
-                // @ts-expect-error
-                this.control.css("display", "block")
-            },
-        })
-    }
-
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-sm" })
-
-        const body = d3Select(`#${this._modalId} .modal-body`)
-        const formGroup = body.append("form").append("div").attr("class", "form-group")
-
-        const slider = formGroup.append("div").attr("class", "alert alert-primary").attr("role", "alert")
-        slider.append("label").attr("for", this._sliderId).text("Current in-game wind")
-        slider.append("div").attr("id", this._sliderId).attr("class", "rslider")
-
-        const shipId = `${this._shipId}-Base-select`
-        const ship = formGroup.append("div").attr("class", "alert alert-primary").attr("role", "alert")
-        const div = ship.append("div").attr("class", "d-flex flex-column")
-        div.append("label").attr("for", shipId).text("Ship (optional)")
-        div.append("select").attr("name", shipId).attr("id", shipId)
-    }
-
-    /**
-     * Init modal
-     */
-    _initModal(): void {
-        this._injectModal()
-        this._setupWindInput()
-
-        this._shipCompare = new CompareShips(this._shipId)
-        void this._shipCompare.CompareShipsInit()
-    }
-
     _useUserInput(): void {
+        console.log("_useUserInput", this.#modal?.getWind() ?? this.#defaultStartWindDegrees)
         this._resetJourneyData()
-        this._journey.startWindDegrees = this._getStartWind()
+        this.#journey.startWindDegrees = this.#modal?.getWind() ?? this.#defaultStartWindDegrees
         this._setShipName()
         this._printSummary()
         this._printJourney()
     }
 
-    /**
-     * Action when selected
-     */
-    _journeySelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this._modalId}`)
-            .modal("show")
-            .one("hidden.bs.modal", () => {
-                this._useUserInput()
-            })
-    }
-
     _printCompass(): void {
-        const x = this._journey.segments[0].position[0]
-        const y = this._journey.segments[0].position[1]
+        const x = this.#journey.segments[0].position[0]
+        const y = this.#journey.segments[0].position[1]
 
-        this._compass = this._g
-            .append<SVGGElement>("svg")
-            .attr("id", this._compassId)
+        this.#compass = this.#g
+            .append("svg")
+            .attr("id", this.#compassId)
             .attr("class", "compass")
             .attr("x", x)
             .attr("y", y)
 
-        this._compassG = this._compass.append("g")
-        printCompassRose({ element: this._compassG, radius: this._compassRadius })
+        this.#gCompass = this.#compass.append("g")
+        printCompassRose({ element: this.#gCompass, radius: this.#compassRadius })
     }
 
     _removeCompass(): void {
-        this._compass.remove()
+        this.#compass.remove()
     }
 
     _getSpeedAtDegrees(degrees: number): number {
-        return Math.max(this._speedScale(degrees) ?? 0, this._minOWSpeed)
+        return Math.max(this.#speedScale(degrees) ?? 0, this.#minOWSpeed)
     }
 
     _calculateDistanceForSection(degreesCourse: number, degreesCurrentWind: number): number {
         const degreesForSpeedCalc = (degreesFullCircle - degreesCourse + degreesCurrentWind) % degreesFullCircle
-        const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this._owSpeedFactor
+        const speedCurrentSection = this._getSpeedAtDegrees(degreesForSpeedCalc) * this.#owSpeedFactor
         /*
         console.log(
             { degreesCourse },
@@ -373,24 +272,11 @@ export default class MakeJourney {
         return speedCurrentSection * speedFactor
     }
 
-    _getStartWind(): number {
-        const select$ = $(`#${this._sliderId}`)
-        const currentUserWind = Number(select$.roundSlider("getValue"))
-        // Current wind in correctionValueDegrees
-        return select$.length > 0 ? currentUserWind : 0
-    }
-
     _setShipSpeed(): void {
-        let speedDegrees: number[]
+        const speedDegrees =
+            this.#modal?.getSpeedDegrees() ?? Array.from({ length: 24 }, () => this.#defaultShipSpeed / 2)
 
-        if (this._journey.shipName === this._defaultShipName) {
-            // Dummy ship speed
-            speedDegrees = Array.from({ length: 24 }, () => this._defaultShipSpeed / 2)
-        } else {
-            ;({ speedDegrees } = this._shipCompare.singleShipData)
-        }
-
-        this._speedScale.range(speedDegrees)
+        this.#speedScale.range(speedDegrees)
         // console.log(this._speedScale.range());
     }
 
@@ -416,38 +302,36 @@ export default class MakeJourney {
                 distanceRemaining = 0
             }
 
-            currentWindDegrees = (degreesFullCircle + currentWindDegrees - this._degreesPerMinute) % degreesFullCircle
+            currentWindDegrees = (degreesFullCircle + currentWindDegrees - this.#degreesPerMinute) % degreesFullCircle
 
             // console.log({ distanceCurrentSection }, { totalMinutesSegment });
         }
 
-        this._journey.currentWindDegrees = currentWindDegrees
+        this.#journey.currentWindDegrees = currentWindDegrees
 
         return totalMinutesSegment
     }
 
     _setShipName(): void {
-        if (this._shipCompare?.singleShipData?.name) {
-            this._journey.shipName = `${this._shipCompare.singleShipData.name}`
-        } else {
-            this._journey.shipName = this._defaultShipName
-        }
+        const shipName = this.#modal!.getShipName()
+
+        this.#journey.shipName = shipName ? shipName : this.#defaultShipName
     }
 
     /**
      * Remove label text boxes
      */
     _removeLabels(): void {
-        const label = this._g.selectAll("g.journey g.label")
+        const label = this.#g.selectAll("#journey g.label")
         label.select("text").remove()
         label.select("rect").remove()
     }
 
     _correctJourney(): void {
-        const defaultTranslate = this._labelPadding
-        const fontSize = this._fontSize
+        const defaultTranslate = this.#labelPadding
+        const fontSize = this.#fontSize
         const textTransform = d3ZoomIdentity.translate(defaultTranslate, defaultTranslate)
-        const textPadding = this._labelPadding * 1.3
+        const textPadding = this.#labelPadding * 1.3
         const circleRadius = 10
         const pathWidth = 5
 
@@ -490,18 +374,18 @@ export default class MakeJourney {
             }
 
             // Hide last circle
-            if (i === this._journey.segments.length - 1) {
+            if (i === this.#journey.segments.length - 1) {
                 circle.attr("r", circleRadius).attr("class", "drag-hidden")
             }
         }
 
         // Correct text boxes
-        this._g.selectAll<SVGGElement, Segment>("#journey g.label").each(function (this, d, i) {
+        this.#g.selectAll<SVGGElement, Segment>("#journey g.label").each(function (this, d, i) {
             correctTextBox(this, d, i)
         })
         // Correct journey stroke width
-        if (this._gJourneyPath) {
-            this._gJourneyPath.style("stroke-width", `${pathWidth}px`)
+        if (this.#gJourneyPath) {
+            this.#gJourneyPath.style("stroke-width", `${pathWidth}px`)
         }
     }
 
@@ -511,7 +395,7 @@ export default class MakeJourney {
     _printLabels(): void {
         // Component used to render each label (take only single longest line)
         const textLabel = layoutTextLabel()
-            .padding(this._labelPadding)
+            .padding(this.#labelPadding)
             .value((d: Segment): string => {
                 const lines = d.label.split("|")
                 // Find longest line (number of characters)
@@ -534,7 +418,7 @@ export default class MakeJourney {
                     // measure the label and add the required padding
                     const numberLines = d.label.split("|").length
                     const bbText = nodes[i].querySelectorAll("text")[0].getBBox()
-                    return [bbText.width + this._labelPadding * 2, bbText.height * numberLines + this._labelPadding * 2]
+                    return [bbText.width + this.#labelPadding * 2, bbText.height * numberLines + this.#labelPadding * 2]
                 }
             )
             .position((d: Segment) => d.position)
@@ -542,38 +426,38 @@ export default class MakeJourney {
 
         // Render
         // @ts-expect-error
-        this._g.datum(this._journey.segments.map((segment) => segment)).call(labels)
+        this.#g.datum(this.#journey.segments.map((segment) => segment)).call(labels)
     }
 
     _setupSummary(): void {
         // Main box
-        this._divJourneySummary = d3Select("main #summary-column")
+        this.#divJourneySummary = d3Select("main #summary-column")
             .append("div")
             .attr("id", "journey-summary")
             .attr("class", "journey-summary d-none")
 
         // Selected ship
-        this._journeySummaryShip = this._divJourneySummary.append("div").attr("class", "block small")
-        this._journeySummaryTextShip = this._journeySummaryShip.append("div")
-        this._journeySummaryShip.append("div").attr("class", "overlay-des").text("ship")
+        this.#journeySummaryShip = this.#divJourneySummary.append("div").attr("class", "block small")
+        this.#journeySummaryTextShip = this.#journeySummaryShip.append("div")
+        this.#journeySummaryShip.append("div").attr("class", "overlay-des").text("ship")
 
         // Wind direction
-        this._journeySummaryWind = this._divJourneySummary.append("div").attr("class", "block small")
-        this._journeySummaryTextWind = this._journeySummaryWind.append("div")
-        this._journeySummaryWind.append("div").attr("class", "overlay-des").text("wind")
+        this.#journeySummaryWind = this.#divJourneySummary.append("div").attr("class", "block small")
+        this.#journeySummaryTextWind = this.#journeySummaryWind.append("div")
+        this.#journeySummaryWind.append("div").attr("class", "overlay-des").text("wind")
 
-        this._divJourneySummary
+        this.#divJourneySummary
             .append("div")
             .attr("class", "block")
             .append("button")
-            .attr("id", this._deleteLastLegButtonId)
+            .attr("id", this.#deleteLastLegButtonId)
             .attr("class", "btn btn-outline-primary btn-sm")
             .attr("role", "button")
             .text("Clear last leg")
     }
 
     _displaySummary(showJourneySummary: boolean): void {
-        this._divJourneySummary.classed("d-none", !showJourneySummary)
+        this.#divJourneySummary.classed("d-none", !showJourneySummary)
         d3Select("#port-summary").classed("d-none", showJourneySummary)
     }
 
@@ -586,11 +470,11 @@ export default class MakeJourney {
     }
 
     _printSummaryShip(): void {
-        this._journeySummaryTextShip.text(this._journey.shipName)
+        this.#journeySummaryTextShip.text(this.#journey.shipName)
     }
 
     _printSummaryWind(): void {
-        this._journeySummaryTextWind.html(`From ${displayCompassAndDegrees(this._journey.startWindDegrees)}`)
+        this.#journeySummaryTextWind.html(`From ${displayCompassAndDegrees(this.#journey.startWindDegrees)}`)
     }
 
     _printSummary(): void {
@@ -599,16 +483,15 @@ export default class MakeJourney {
     }
 
     _printLines(): void {
-        if (this._gJourneyPath) {
-            this._gJourneyPath
+        if (this.#gJourneyPath) {
+            this.#gJourneyPath
                 .datum(
-                    this._journey.segments.length > 1
-                        ? this._journey.segments.map((segment) => segment.position)
-                        : [[0, 0]]
+                    this.#journey.segments.length > 1
+                        ? this.#journey.segments.map((segment) => segment.position)
+                        : [[0, 0] as Point]
                 )
                 .attr("marker-end", "url(#journey-arrow)")
-                // @ts-expect-error
-                .attr("d", this._line)
+                .attr("d", this.#line)
         }
     }
 
@@ -623,18 +506,18 @@ export default class MakeJourney {
 
         if (addTotal) {
             textDistance += `\u2056 total ${Math.round(
-                this._journey.totalDistance
-            )}\u2009k ${MakeJourney._getHumanisedDuration(this._journey.totalMinutes)}`
+                this.#journey.totalDistance
+            )}\u2009k ${MakeJourney._getHumanisedDuration(this.#journey.totalMinutes)}`
         }
 
         return textDistance
     }
 
-    _setSegmentLabel(index = this._journey.segments.length - 1): void {
-        const pt1 = { x: this._journey.segments[index].position[0], y: this._journey.segments[index].position[1] }
+    _setSegmentLabel(index = this.#journey.segments.length - 1): void {
+        const pt1 = { x: this.#journey.segments[index].position[0], y: this.#journey.segments[index].position[1] }
         const pt2 = {
-            x: this._journey.segments[index - 1].position[0],
-            y: this._journey.segments[index - 1].position[1],
+            x: this.#journey.segments[index - 1].position[0],
+            y: this.#journey.segments[index - 1].position[1],
         }
 
         const courseDegrees = rotationAngleInDegrees(pt1, pt2)
@@ -643,17 +526,17 @@ export default class MakeJourney {
 
         const minutes = this._calculateMinutesForSegment(
             courseDegrees,
-            this._journey.currentWindDegrees,
+            this.#journey.currentWindDegrees,
             distanceK * 1000
         )
-        // console.log("*** start", this._journey.currentWindDegrees, { distanceK }, { courseCompass });
-        this._journey.totalDistance += distanceK
-        this._journey.totalMinutes += minutes
+        // console.log("*** start", this.#journey.currentWindDegrees, { distanceK }, { courseCompass });
+        this.#journey.totalDistance += distanceK
+        this.#journey.totalMinutes += minutes
         const textDirection = this._getTextDirection(courseCompass, courseDegrees, pt1)
         const textDistance = this._getTextDistance(distanceK, minutes, index > 1)
 
-        this._journey.segments[index].label = `${textDirection}|${textDistance}`
-        // console.log("*** end", this._journey);
+        this.#journey.segments[index].label = `${textDirection}|${textDistance}`
+        // console.log("*** end", this.#journey);
     }
 
     _printSegment(): void {
@@ -661,32 +544,30 @@ export default class MakeJourney {
         this._setSegmentLabel()
         this._printLabels()
         this._correctJourney()
-        // @ts-expect-error
-        this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
+        this.#g.selectAll<SVGCircleElement, DragEvent>("#journey g.label circle").call(this.#drag)
     }
 
     _printJourney(): void {
         this._printLines()
         this._resetJourneyData()
-        for (const [i] of this._journey.segments.entries()) {
-            if (i < this._journey.segments.length - 1) {
+        for (const [i] of this.#journey.segments.entries()) {
+            if (i < this.#journey.segments.length - 1) {
                 this._setSegmentLabel(i + 1)
             }
         }
 
         this._printLabels()
         this._correctJourney()
-        // @ts-expect-error
-        this._g.selectAll<SVGGElement, Segment>("g.journey g.label circle").call(this._drag)
+        this.#g.selectAll<SVGCircleElement, DragEvent>("#journey g.label circle").call(this.#drag)
     }
 
     _deleteLastLeg(): void {
-        this._journey.segments.pop()
-        if (this._journey.segments.length > 0) {
+        this.#journey.segments.pop()
+        if (this.#journey.segments.length > 0) {
             this._printJourney()
         } else {
-            this._g.selectAll("g.journey g.label").remove()
-            this._gJourneyPath.remove()
+            this.#g.selectAll("#journey g.label").remove()
+            this.#gJourneyPath.remove()
             this._removeCompass()
             this._hideSummary()
             this._initJourneyData()
@@ -697,19 +578,19 @@ export default class MakeJourney {
         this._showSummary()
         this._printSummary()
         this._printCompass()
-        this._gJourneyPath = this._g.append("path")
+        this.#gJourneyPath = this.#g.append("path")
     }
 
     setSummaryPosition(topMargin: number, rightMargin: number): void {
-        this._divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
+        this.#divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
     }
 
     plotCourse(x: number, y: number): void {
-        if (this._journey.segments[0].position[0] > 0) {
-            this._journey.segments.push({ position: [x, y], label: "", index: this._journey.segments.length })
+        if (this.#journey.segments[0].position[0] > 0) {
+            this.#journey.segments.push({ position: [x, y], label: "", index: this.#journey.segments.length })
             this._printSegment()
         } else {
-            this._journey.segments[0] = { position: [x, y], label: "", index: 0 }
+            this.#journey.segments[0] = { position: [x, y], label: "", index: 0 }
             this._initJourney()
         }
     }

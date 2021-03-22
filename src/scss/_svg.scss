@@ -68,6 +68,11 @@ svg {
     stroke-width: 0.4rem;
 }
 
+.svg-light {
+    fill: $dark-overlay-text-colour-contrast;
+    stroke: none;
+}
+
 .svg-dark {
     fill: $overlay-text-colour-contrast;
     stroke: none;
