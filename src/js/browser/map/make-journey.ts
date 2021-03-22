@@ -192,7 +192,10 @@ export default class MakeJourney {
         const width = this._courseArrowWidth
         const doubleWidth = this._courseArrowWidth * 2
 
-        this._g = d3Select<SVGGElement, Segment>("#ports").append("g").attr("class", "journey")
+        this._g = d3Select<SVGGElement, Segment>("#ports")
+            .append("g")
+            .attr("id", "journey")
+            .attr("class", "svg-background-dark")
 
         d3Select("#na-svg defs")
             .append("marker")
@@ -441,10 +444,10 @@ export default class MakeJourney {
     }
 
     _correctJourney(): void {
-        const defaultTranslate = 20
+        const defaultTranslate = this._labelPadding
         const fontSize = this._fontSize
         const textTransform = d3ZoomIdentity.translate(defaultTranslate, defaultTranslate)
-        const textPadding = this._labelPadding
+        const textPadding = this._labelPadding * 1.3
         const circleRadius = 10
         const pathWidth = 5
 
@@ -460,7 +463,7 @@ export default class MakeJourney {
             const node = d3Select(self)
             const text = node.select("text")
             const lines = d.label.split("|")
-            const lineHeight = fontSize * 1.3
+            const lineHeight = fontSize * 1.4
             text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
             for (const [j, line] of lines.entries()) {
                 const tspan = text.append("tspan").html(line)
@@ -476,7 +479,7 @@ export default class MakeJourney {
             node.select("rect").attr("width", width).attr("height", height)
 
             // Enlarge circles
-            const circle = node.select("circle").attr("r", circleRadius).attr("class", "")
+            const circle = node.select("circle").attr("r", circleRadius).attr("class", "click-circle drag-circle")
 
             // Move circles down and visually above text box
             node.append(() => circle.remove().node())
@@ -493,7 +496,7 @@ export default class MakeJourney {
         }
 
         // Correct text boxes
-        this._g.selectAll<SVGGElement, Segment>("g.journey g.label").each(function (this, d, i) {
+        this._g.selectAll<SVGGElement, Segment>("#journey g.label").each(function (this, d, i) {
             correctTextBox(this, d, i)
         })
         // Correct journey stroke width

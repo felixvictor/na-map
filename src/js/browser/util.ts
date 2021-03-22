@@ -199,7 +199,7 @@ export const printCompassRose = ({
     label
         .filter((_d, i) => i % 3 === 0)
         .append("text")
-        .attr("transform", (d) => {
+            .attr("transform", (d) => {
             let rotate = Math.round((xScale(d) ?? 0) + xScale.bandwidth() / 2)
             let translate: string
 

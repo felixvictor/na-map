@@ -1,0 +1,303 @@
+////
+/// This file is part of na-map.
+/// svg.
+///
+/// @group    scss
+/// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
+////
+
+@mixin svg-text-center {
+    dominant-baseline: central;
+    text-anchor: middle;
+}
+
+svg {
+    stroke-width: 0.1rem;
+    overflow: auto;
+    text {
+        pointer-events: none;
+        stroke: none;
+        text-anchor: start;
+        dominant-baseline: mathematical;
+    }
+}
+
+.empty-svg {
+    fill: none;
+    stroke: none;
+}
+
+.svg-text-light {
+    text {
+        fill: $white;
+        stroke: none;
+    }
+}
+
+.svg-text-dark-yellow {
+    text {
+        fill: $yellow-900;
+    }
+}
+
+.svg-text-center {
+    text {
+        @include svg-text-center();
+    }
+}
+
+.svg-text {
+    .rect-background {
+        opacity: 0.2;
+    }
+}
+
+.svg-stroke-light {
+    circle,
+    line,
+    path,
+    rect {
+        fill: none;
+        stroke: $white;
+    }
+}
+
+.svg-stroke-thick {
+    stroke-width: 0.4rem;
+}
+
+.svg-dark {
+    fill: $overlay-text-colour-contrast;
+    stroke: none;
+}
+
+.svg-text-dark {
+    text {
+        fill: $overlay-text-colour-contrast;
+        stroke: none;
+        @include svg-text-center();
+    }
+}
+
+.svg-stroke-dark {
+    circle,
+    line,
+    path,
+    rect {
+        fill: none;
+        stroke: $overlay-text-colour-contrast;
+    }
+}
+
+.compass {
+    circle {
+        fill: $overlay-background-colour;
+    }
+}
+
+.svg-background-light {
+    path {
+        stroke: $overlay-text-colour-contrast;
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        font-size: smaller;
+        fill: $overlay-text-colour-contrast !important;
+    }
+}
+
+.svg-background-dark {
+    path {
+        stroke: $dark-overlay-text-colour-contrast;
+    }
+
+    rect {
+        fill: $dark-overlay-background;
+    }
+
+    text {
+        fill: $dark-overlay-text-colour;
+        .des {
+            fill: $dark-overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $dark-overlay-text-colour;
+    }
+}
+
+.svg-background-yellow {
+    opacity: 0.7;
+    fill: $yellow-300;
+}
+
+.xf11,
+.xingame-wind,
+.xjourney,
+.xwind-predict {
+    svg {
+        overflow: auto;
+    }
+
+    circle {
+        fill-opacity: 0.2;
+    }
+
+    path {
+        fill: none;
+        stroke-width: 0.3rem;
+    }
+
+    text {
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+
+    line {
+        stroke-width: 0.1rem;
+    }
+}
+
+.xingame-wind,
+.xwind-predict {
+    circle {
+        fill: color-yiq($overlay-background);
+    }
+
+    path {
+        stroke: color-yiq($overlay-background);
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        font-size: smaller;
+        fill: $overlay-text-colour-contrast !important;
+    }
+}
+
+.xf11,
+.xjourney {
+    circle {
+        fill: color-contrast($dark-overlay-background);
+    }
+
+    path {
+        stroke: color-contrast($dark-overlay-background);
+    }
+
+    rect {
+        fill: $dark-overlay-background;
+    }
+
+    text {
+        fill: $dark-overlay-text-colour;
+
+        .des {
+            fill: $dark-overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $dark-overlay-text-colour;
+    }
+
+    .text-light-separation {
+        fill: $dark-overlay-text-colour-contrast !important;
+    }
+}
+
+.click-circle {
+    cursor: pointer;
+}
+
+.drag-circle {
+    fill: $dark-overlay-text-colour-contrast;
+    stroke: $dark-overlay-text-colour-contrast !important;
+}
+
+.drag-hidden {
+    fill-opacity: 0;
+    stroke: none !important;
+}
+
+.drag-hidden.drag-active {
+    stroke-width: 0;
+}
+
+.trade-link {
+    fill: none;
+    stroke: $dark-overlay-text-colour;
+}
+
+.highlight {
+    stroke: $green-light;
+}
+
+.trade-label {
+    fill: $overlay-text-colour;
+    text-anchor: middle;
+}
+
+.trade-head {
+    fill: $overlay-text-colour;
+}
+
+.trades {
+    path,
+    .link {
+        fill: none;
+    }
+}
+
+.axis {
+    pointer-events: none;
+    .domain {
+        display: none;
+    }
+
+    line {
+        stroke: $primary-500;
+    }
+
+    text {
+        font-style: italic;
+        fill: $primary-100;
+    }
+}

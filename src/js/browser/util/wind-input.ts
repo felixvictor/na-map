@@ -63,7 +63,7 @@ export default class WindInput {
         const form = this.#mainElement.append("form").attr("id", this.#formId)
 
         const formGroupA = form.append("div").attr("class", "form-group")
-        const slider = formGroupA.append("div").classed("alert alert-primary", true)
+        const slider = formGroupA.append("div").classed("alert alert-primary text-center", true)
         slider
             .append("label")
             .attr("for", this.#sliderId)
