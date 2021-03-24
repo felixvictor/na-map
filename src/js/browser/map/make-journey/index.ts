@@ -34,8 +34,9 @@ import { displayCompassAndDegrees, printCompassRose, rotationAngleInDegrees } fr
 import { HtmlString } from "common/interface"
 
 import MakeJourneyModal from "./modal"
+import MakeJourneySummary from "./summary"
 
-interface Journey {
+export interface Journey {
     shipName: string
     startWindDegrees: number
     currentWindDegrees: number
@@ -55,17 +56,13 @@ export interface Segment {
  */
 export default class MakeJourney {
     #compass = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
-    #divJourneySummary = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #drag = {} as DragBehavior<SVGCircleElement, DragEvent, Segment | SubjectPosition>
     #g = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #gCompass = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #gJourneyPath = {} as Selection<SVGPathElement, unknown, HTMLElement, unknown>
     #journey = {} as Journey
-    #journeySummaryShip = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #journeySummaryTextShip = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #journeySummaryTextWind = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #journeySummaryWind = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #modal: MakeJourneyModal | undefined = undefined
+    #summary: MakeJourneySummary
 
     readonly #arrowId = "journey-arrow"
     readonly #arrowWidth = 5
@@ -100,10 +97,11 @@ export default class MakeJourney {
             .y((d) => d[1])
         this.#speedScale = d3ScaleLinear().domain(d3Range(0, degreesFullCircle, this.#degreesSegment))
 
-        this._setupSummary()
         this._setupDrag()
         this._setupSvg()
         this._initJourneyData()
+
+        this.#summary = new MakeJourneySummary(this.#deleteLastLegButtonId)
         this._setupListener()
     }
 
@@ -146,7 +144,7 @@ export default class MakeJourney {
 
         const dragEnd = (self: SVGCircleElement): void => {
             d3Select(self).classed("drag-active", false)
-            this._printJourney()
+            this._printWholeJourney()
         }
 
         this.#drag = d3Drag<SVGCircleElement, DragEvent, Segment>()
@@ -226,12 +224,10 @@ export default class MakeJourney {
     }
 
     _useUserInput(): void {
-        console.log("_useUserInput", this.#modal?.getWind() ?? this.#defaultStartWindDegrees)
-        this._resetJourneyData()
-        this.#journey.startWindDegrees = this.#modal?.getWind() ?? this.#defaultStartWindDegrees
+        console.log("_useUserInput")
         this._setShipName()
+        this._printWholeJourney()
         this._printSummary()
-        this._printJourney()
     }
 
     _printCompass(): void {
@@ -429,57 +425,8 @@ export default class MakeJourney {
         this.#g.datum(this.#journey.segments.map((segment) => segment)).call(labels)
     }
 
-    _setupSummary(): void {
-        // Main box
-        this.#divJourneySummary = d3Select("main #summary-column")
-            .append("div")
-            .attr("id", "journey-summary")
-            .attr("class", "journey-summary d-none")
-
-        // Selected ship
-        this.#journeySummaryShip = this.#divJourneySummary.append("div").attr("class", "block small")
-        this.#journeySummaryTextShip = this.#journeySummaryShip.append("div")
-        this.#journeySummaryShip.append("div").attr("class", "overlay-des").text("ship")
-
-        // Wind direction
-        this.#journeySummaryWind = this.#divJourneySummary.append("div").attr("class", "block small")
-        this.#journeySummaryTextWind = this.#journeySummaryWind.append("div")
-        this.#journeySummaryWind.append("div").attr("class", "overlay-des").text("wind")
-
-        this.#divJourneySummary
-            .append("div")
-            .attr("class", "block")
-            .append("button")
-            .attr("id", this.#deleteLastLegButtonId)
-            .attr("class", "btn btn-outline-primary btn-sm")
-            .attr("role", "button")
-            .text("Clear last leg")
-    }
-
-    _displaySummary(showJourneySummary: boolean): void {
-        this.#divJourneySummary.classed("d-none", !showJourneySummary)
-        d3Select("#port-summary").classed("d-none", showJourneySummary)
-    }
-
-    _showSummary(): void {
-        this._displaySummary(true)
-    }
-
-    _hideSummary(): void {
-        this._displaySummary(false)
-    }
-
-    _printSummaryShip(): void {
-        this.#journeySummaryTextShip.text(this.#journey.shipName)
-    }
-
-    _printSummaryWind(): void {
-        this.#journeySummaryTextWind.html(`From ${displayCompassAndDegrees(this.#journey.startWindDegrees)}`)
-    }
-
     _printSummary(): void {
-        this._printSummaryWind()
-        this._printSummaryShip()
+        this.#summary.print(this.#journey)
     }
 
     _printLines(): void {
@@ -513,7 +460,7 @@ export default class MakeJourney {
         return textDistance
     }
 
-    _setSegmentLabel(index = this.#journey.segments.length - 1): void {
+    _calculateSegmentLabel(index: number): void {
         const pt1 = { x: this.#journey.segments[index].position[0], y: this.#journey.segments[index].position[1] }
         const pt2 = {
             x: this.#journey.segments[index - 1].position[0],
@@ -539,56 +486,63 @@ export default class MakeJourney {
         // console.log("*** end", this.#journey);
     }
 
-    _printSegment(): void {
+    _setSegmentLabels(onlyLastSegment: boolean): void {
+        if (onlyLastSegment) {
+            this._calculateSegmentLabel(this.#journey.segments.length - 1)
+        } else {
+            for (const [index] of this.#journey.segments.entries()) {
+                if (index < this.#journey.segments.length - 1) {
+                    this._calculateSegmentLabel(index + 1)
+                }
+            }
+        }
+    }
+
+    _print(onlyLastSegment: boolean): void {
         this._printLines()
-        this._setSegmentLabel()
+        this._setSegmentLabels(onlyLastSegment)
         this._printLabels()
         this._correctJourney()
         this.#g.selectAll<SVGCircleElement, DragEvent>("#journey g.label circle").call(this.#drag)
     }
 
-    _printJourney(): void {
-        this._printLines()
-        this._resetJourneyData()
-        for (const [i] of this.#journey.segments.entries()) {
-            if (i < this.#journey.segments.length - 1) {
-                this._setSegmentLabel(i + 1)
-            }
-        }
+    _printAdditionalSegment(): void {
+        this._print(true)
+    }
 
-        this._printLabels()
-        this._correctJourney()
-        this.#g.selectAll<SVGCircleElement, DragEvent>("#journey g.label circle").call(this.#drag)
+    _printWholeJourney(): void {
+        this._resetJourneyData()
+        this._print(false)
     }
 
     _deleteLastLeg(): void {
         this.#journey.segments.pop()
         if (this.#journey.segments.length > 0) {
-            this._printJourney()
+            this._printWholeJourney()
         } else {
+            this.#summary.hide()
             this.#g.selectAll("#journey g.label").remove()
             this.#gJourneyPath.remove()
             this._removeCompass()
-            this._hideSummary()
             this._initJourneyData()
         }
     }
 
     _initJourney(): void {
-        this._showSummary()
+        this.#summary.show()
         this._printSummary()
         this._printCompass()
         this.#gJourneyPath = this.#g.append("path")
     }
 
     setSummaryPosition(topMargin: number, rightMargin: number): void {
-        this.#divJourneySummary.style("top", `${topMargin}px`).style("right", `${rightMargin}px`)
+        this.#summary.setPosition(topMargin, rightMargin)
     }
 
     plotCourse(x: number, y: number): void {
         if (this.#journey.segments[0].position[0] > 0) {
             this.#journey.segments.push({ position: [x, y], label: "", index: this.#journey.segments.length })
-            this._printSegment()
+            this._printAdditionalSegment()
         } else {
             this.#journey.segments[0] = { position: [x, y], label: "", index: 0 }
             this._initJourney()

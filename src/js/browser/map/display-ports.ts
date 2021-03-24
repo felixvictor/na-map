@@ -373,11 +373,11 @@ export default class DisplayPorts {
         this.#gText = this.#gPort
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-names")
-            .attr("class", "port-names svg-text-light")
+            .attr("class", "svg-text-center svg-text-light")
         this.#gPZ = this.#gPort
             .append<SVGGElement>("g")
             .attr("data-ui-component", "patrol-zone")
-            .attr("class", "svg-text-dark-yellow svg-text-center")
+            .attr("class", "svg-text-center svg-text-dark-yellow ")
     }
 
     _setupCounties(): void {
