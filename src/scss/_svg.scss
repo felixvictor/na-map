@@ -258,12 +258,16 @@ svg {
 }
 
 .drag-hidden {
+    fill: $dark-overlay-text-colour-contrast;
     fill-opacity: 0;
     stroke: none !important;
 }
 
-.drag-hidden.drag-active {
-    stroke-width: 0;
+.drag-active {
+    filter: none;
+    stroke: $orange !important;
+    stroke-width: 4rem;
+    stroke-opacity: 0.4;
 }
 
 .trade-link {

@@ -8,13 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { layoutTextLabel, layoutAnnealing, layoutLabel } from "@d3fc/d3fc-label-layout"
 import { range as d3Range } from "d3-array"
 import { drag as d3Drag, DragBehavior, SubjectPosition } from "d3-drag"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
-import { zoomIdentity as d3ZoomIdentity } from "d3-zoom"
 
 import { registerEvent } from "../../analytics"
 import { degreesPerSecond, pluralise } from "common/common-browser"
@@ -35,6 +33,7 @@ import { HtmlString } from "common/interface"
 
 import MakeJourneyModal from "./modal"
 import MakeJourneySummary from "./summary"
+import MakeJourneyLabelPrinter from "./label"
 
 export interface Journey {
     shipName: string
@@ -60,12 +59,14 @@ export default class MakeJourney {
     #g = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #gCompass = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #gJourneyPath = {} as Selection<SVGPathElement, unknown, HTMLElement, unknown>
+    #gLabels = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
     #journey = {} as Journey
+    #label: MakeJourneyLabelPrinter
     #modal: MakeJourneyModal | undefined = undefined
     #summary: MakeJourneySummary
 
     readonly #arrowId = "journey-arrow"
-    readonly #arrowWidth = 5
+    readonly #arrowWidth = 10
     readonly #baseId: HtmlString
     readonly #baseName = "Make journey"
     readonly #compassId: HtmlString
@@ -76,20 +77,18 @@ export default class MakeJourney {
     readonly #degreesPerMinute = degreesPerSecond / 60
     readonly #degreesSegment = 15
     readonly #deleteLastLegButtonId: HtmlString
-    readonly #fontSize: number
-    readonly #labelPadding = 20
     readonly #line: Line<Point>
     readonly #menuId: HtmlString
     readonly #minOWSpeed = 2
     readonly #owSpeedFactor = 2
+    readonly #shadowId: HtmlString
     readonly #speedScale: ScaleLinear<number, number>
 
     constructor(fontSize: number) {
-        this.#fontSize = fontSize
-
         this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
         this.#menuId = `menu-${this.#baseId}`
         this.#compassId = `compass-${this.#baseId}`
+        this.#shadowId = `filter-${this.#baseId}`
         this.#deleteLastLegButtonId = `button-delete-leg-${this.#baseId}`
 
         this.#line = d3Line<Point>()
@@ -101,6 +100,7 @@ export default class MakeJourney {
         this._setupSvg()
         this._initJourneyData()
 
+        this.#label = new MakeJourneyLabelPrinter(this.#gLabels, this.#gJourneyPath, fontSize, this.#shadowId)
         this.#summary = new MakeJourneySummary(this.#deleteLastLegButtonId)
         this._setupListener()
     }
@@ -165,6 +165,8 @@ export default class MakeJourney {
         const doubleWidth = this.#arrowWidth * 2
 
         this.#g = d3Select("#ports").append("g").attr("id", "journey").attr("class", "svg-background-dark")
+        this.#gJourneyPath = this.#g.append("path")
+        this.#gLabels = this.#g.append("g").attr("class", "labels")
 
         d3Select("#na-svg defs")
             .append("marker")
@@ -235,7 +237,7 @@ export default class MakeJourney {
         const y = this.#journey.segments[0].position[1]
 
         this.#compass = this.#g
-            .append("svg")
+            .insert("svg", "path")
             .attr("id", this.#compassId)
             .attr("class", "compass")
             .attr("x", x)
@@ -323,108 +325,6 @@ export default class MakeJourney {
         label.select("rect").remove()
     }
 
-    _correctJourney(): void {
-        const defaultTranslate = this.#labelPadding
-        const fontSize = this.#fontSize
-        const textTransform = d3ZoomIdentity.translate(defaultTranslate, defaultTranslate)
-        const textPadding = this.#labelPadding * 1.3
-        const circleRadius = 10
-        const pathWidth = 5
-
-        /** Correct Text Box
-         *  - split text into lines
-         *  - correct box width
-         *  - enlarge circles
-         *  - remove last circle
-         * {@link https://stackoverflow.com/a/13275930}
-         */
-        const correctTextBox = (self: SVGGElement, d: Segment, i: number): void => {
-            // Split text into lines
-            const node = d3Select(self)
-            const text = node.select("text")
-            const lines = d.label.split("|")
-            const lineHeight = fontSize * 1.4
-            text.text("").attr("dy", 0).attr("transform", textTransform.toString()).style("font-size", `${fontSize}px`)
-            for (const [j, line] of lines.entries()) {
-                const tspan = text.append("tspan").html(line)
-                if (j > 0) {
-                    tspan.attr("x", 0).attr("dy", lineHeight)
-                }
-            }
-
-            // Correct box width
-            const bbText = (text.node() as SVGTextElement).getBBox()
-            const width = d.label ? bbText.width + textPadding * 2 : 0
-            const height = d.label ? bbText.height + textPadding : 0
-            node.select("rect").attr("width", width).attr("height", height)
-
-            // Enlarge circles
-            const circle = node.select("circle").attr("r", circleRadius).attr("class", "click-circle drag-circle")
-
-            // Move circles down and visually above text box
-            node.append(() => circle.remove().node())
-
-            // Enlarge and hide first circle
-            if (i === 0) {
-                circle.attr("r", circleRadius * 4).attr("class", "drag-hidden")
-            }
-
-            // Hide last circle
-            if (i === this.#journey.segments.length - 1) {
-                circle.attr("r", circleRadius).attr("class", "drag-hidden")
-            }
-        }
-
-        // Correct text boxes
-        this.#g.selectAll<SVGGElement, Segment>("#journey g.label").each(function (this, d, i) {
-            correctTextBox(this, d, i)
-        })
-        // Correct journey stroke width
-        if (this.#gJourneyPath) {
-            this.#gJourneyPath.style("stroke-width", `${pathWidth}px`)
-        }
-    }
-
-    /**
-     * Print labels
-     */
-    _printLabels(): void {
-        // Component used to render each label (take only single longest line)
-        const textLabel = layoutTextLabel()
-            .padding(this.#labelPadding)
-            .value((d: Segment): string => {
-                const lines = d.label.split("|")
-                // Find longest line (number of characters)
-                // eslint-disable-next-line unicorn/no-array-reduce
-                const index = lines.reduce((p, c, i, a) => (a[p].length > c.length ? p : i), 0)
-                return lines[index]
-            })
-
-        // Strategy that combines simulated annealing with removal of overlapping labels
-        const strategy = layoutAnnealing()
-
-        // Create the layout that positions the labels
-        const labels = layoutLabel(strategy)
-            .size(
-                (
-                    d: Segment,
-                    i: number,
-                    nodes: Array<SVGSVGElement | SVGGElement> | ArrayLike<SVGSVGElement | SVGGElement>
-                ): Point => {
-                    // measure the label and add the required padding
-                    const numberLines = d.label.split("|").length
-                    const bbText = nodes[i].querySelectorAll("text")[0].getBBox()
-                    return [bbText.width + this.#labelPadding * 2, bbText.height * numberLines + this.#labelPadding * 2]
-                }
-            )
-            .position((d: Segment) => d.position)
-            .component(textLabel)
-
-        // Render
-        // @ts-expect-error
-        this.#g.datum(this.#journey.segments.map((segment) => segment)).call(labels)
-    }
-
     _printSummary(): void {
         this.#summary.print(this.#journey)
     }
@@ -438,6 +338,7 @@ export default class MakeJourney {
                         : [[0, 0] as Point]
                 )
                 .attr("marker-end", "url(#journey-arrow)")
+                .attr("filter", `url(#${this.#shadowId})`)
                 .attr("d", this.#line)
         }
     }
@@ -501,9 +402,8 @@ export default class MakeJourney {
     _print(onlyLastSegment: boolean): void {
         this._printLines()
         this._setSegmentLabels(onlyLastSegment)
-        this._printLabels()
-        this._correctJourney()
-        this.#g.selectAll<SVGCircleElement, DragEvent>("#journey g.label circle").call(this.#drag)
+        this.#label.print(this.#journey.segments)
+        this.#g.selectAll<SVGCircleElement, DragEvent>("#journey g.labels g.label circle").call(this.#drag)
     }
 
     _printAdditionalSegment(): void {
@@ -521,7 +421,7 @@ export default class MakeJourney {
             this._printWholeJourney()
         } else {
             this.#summary.hide()
-            this.#g.selectAll("#journey g.label").remove()
+            this.#g.selectAll("#journey g.labels g.label").remove()
             this.#gJourneyPath.remove()
             this._removeCompass()
             this._initJourneyData()
@@ -532,7 +432,6 @@ export default class MakeJourney {
         this.#summary.show()
         this._printSummary()
         this._printCompass()
-        this.#gJourneyPath = this.#g.append("path")
     }
 
     setSummaryPosition(topMargin: number, rightMargin: number): void {
