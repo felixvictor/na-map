@@ -26,7 +26,7 @@ import { HtmlString } from "common/interface"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
-import SelectPorts from "./select-ports"
+import SelectPorts from "js/browser/map/select-ports"
 import { loadJsonFile } from "common/common-browser"
 
 interface Node {

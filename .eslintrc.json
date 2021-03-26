@@ -83,7 +83,6 @@
         },
         {
             "files": ["*.js", "*.[cm]js", "*.jsx"],
-            "parser": "babel-eslint",
             "env": {
                 "es2020": true,
                 "node": true

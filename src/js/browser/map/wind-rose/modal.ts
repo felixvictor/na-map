@@ -19,7 +19,7 @@ export default class WindRoseModal extends Modal {
     #windInput = {} as WindInput
 
     constructor(title: string) {
-        super(title, "sm", "Close")
+        super(title, "sm")
 
         this.#timeGroupId = `input-group-${this.baseId}`
         this.#timeInputId = `input-${this.baseId}`

@@ -335,7 +335,7 @@ const config = {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery",
-            Popper: ["popper.js", "default"],
+            "bootstrap.Dropdown": "bootstrap/js/dist/dropdown",
         }),
         new CopyPlugin({
             patterns: [

@@ -8,9 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/dropdown"
-
 import "bootstrap-select"
 
 import dayjs, { Dayjs } from "dayjs"
@@ -23,7 +20,7 @@ dayjs.extend(isBetween)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
-import { registerEvent } from "../analytics"
+import { registerEvent } from "../../analytics"
 import { Nation, nations, NationShortName, TupleKeyMap, validNationShortName } from "common/common"
 import { initMultiDropdownNavbar, loadJsonFile } from "common/common-browser"
 import { formatInt, formatSiCurrency } from "common/common-format"
@@ -43,9 +40,9 @@ import {
 } from "common/gen-json"
 import { HtmlString } from "common/interface"
 
-import { NAMap } from "./na-map"
-import DisplayPorts from "./display-ports"
-import DisplayPbZones from "./display-pb-zones"
+import { NAMap } from "../na-map"
+import DisplayPorts from "../display-ports"
+import DisplayPbZones from "../display-pb-zones"
 
 type goodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>
 type PortDepth = "deep" | "shallow"
@@ -154,7 +151,7 @@ export default class SelectPorts {
             this._frontlinesData = await loadJsonFile<FrontlinesPerServer>(`${this._map.serverName}-frontlines.json`)
 
             const distances = (
-                await import(/* webpackChunkName: "data-distances" */ "../../../lib/gen-generic/distances.json")
+                await import(/* webpackChunkName: "data-distances" */ "../../../../lib/gen-generic/distances.json")
             ).default as Distance[]
             this._distances = new Map(
                 distances.map(([fromPortId, toPortId, distance]) => [

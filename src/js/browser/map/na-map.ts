@@ -8,14 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/modal"
-
 import "bootstrap-select"
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, ZoomBehavior, ZoomTransform, D3ZoomEvent } from "d3-zoom"
 
 import { registerEvent } from "../analytics"
-import { appDescription, appTitle, appVersion, insertBaseModal } from "common/common-browser"
+import { appDescription, appTitle, appVersion } from "common/common-browser"
 import { defaultFontSize, Extent, nearestPow2 } from "common/common-math"
 import { mapSize } from "common/common-var"
 import { displayClan } from "../util"
@@ -23,6 +21,8 @@ import { displayClan } from "../util"
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 
 import Cookie from "util/cookie"
+import Modal from "util/modal"
+
 import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
@@ -72,6 +72,7 @@ class NAMap {
     #gMap = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #windRose!: WindRose
+    #modal: Modal | undefined = undefined
 
     readonly rem = defaultFontSize // Font size in px
     serverName: string
@@ -174,21 +175,6 @@ class NAMap {
         this._setSvgSize()
         this._setupTiler()
         this._setupListener()
-    }
-
-    static _initModal(id: string): void {
-        insertBaseModal({
-            id,
-            title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`,
-            size: "modal-lg",
-        })
-
-        const body = d3Select(`#${id} .modal-body`)
-        body.html(
-            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                    <p>Designed by iB aka Felix Victor, <em>Bastards</em> clan ${displayClan("(BSTD)")}</a>.</p>
-                    <div class="alert alert-secondary" role="alert"><h5 class="alert-heading">Did you know?</h5><p class="mb-0">My clan mate, Aquillas, wrote a most comprehensive <a href="https://drive.google.com/file/d/1K6xCXtCUd68PPzvNjBxD5ffgE_69VEoc/view">user guide</a>.</p></div>`
-        )
     }
 
     static _stopProperty(event: Event): void {
@@ -416,16 +402,23 @@ class NAMap {
         $(".selectpicker").val("default").selectpicker("refresh")
     }
 
+    _initModal(): void {
+        this.#modal = new Modal(`${appTitle} <span class="text-primary small">v${appVersion}</span>`, "lg")
+        const body = this.#modal.getModalBody()
+
+        body.html(
+            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+                    <p>Designed by iB aka Felix Victor, <em>Bastards</em> clan ${displayClan("(BSTD)")}</a>.</p>
+                    <div class="alert alert-secondary" role="alert"><h5 class="alert-heading">Did you know?</h5><p class="mb-0">My clan mate, Aquillas, wrote a most comprehensive <a href="https://drive.google.com/file/d/1K6xCXtCUd68PPzvNjBxD5ffgE_69VEoc/view">user guide</a>.</p></div>`
+        )
+    }
+
     _showAbout(): void {
-        const modalId = "modal-about"
-
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${modalId}`)) {
-            NAMap._initModal(modalId)
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            this._initModal()
         }
-
-        // Show modal
-        $(`#${modalId}`).modal("show")
     }
 
     _doDoubleClickAction(event: Event): void {

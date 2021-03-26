@@ -25,7 +25,7 @@ export default class Modal {
     #modalSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #bodySel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
-    constructor(title: string, size: string, buttonText: string) {
+    constructor(title: string, size: string, buttonText = "Close") {
         this.#baseName = title
         this.baseId = title.toLocaleLowerCase().replaceAll(" ", "-")
         this.#buttonId = `menu-${this.baseId}`

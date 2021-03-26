@@ -19,7 +19,7 @@ export default class MakeJourneyModal extends Modal {
     #windInput = {} as WindInput
 
     constructor(title: string) {
-        super(title, "sm", "Close")
+        super(title, "sm")
 
         this._init()
     }
