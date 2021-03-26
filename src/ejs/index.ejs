@@ -1,3 +1,11 @@
+<% String.prototype.replaceAll = function(str1, str2, ignore) { %>
+<%     return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2); %>
+<% } %>
+
+<% function getBaseId(title) { %>
+<%    return title.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", ""); %>
+<% } %>
+
 <% function makeRadioGroup(data) { %>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header"><%= data.title %></h6>
@@ -12,6 +20,17 @@
     </div>
 <% } %>
 
+<% function makeSelects(data) { %>
+    <% data.forEach(function(select) { %>
+        <% const id = getBaseId(select.title) %>
+        <li class="nav-item pe-2">
+            <label><select name="port-select-<%= id %>" id="port-select-<%= id %>" class="selectpicker"
+                           data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
+                           data-live-search-placeholder="Search ..." data-virtual-scroll="true"
+                           title="<%= select.title %>"></select></label>
+        </li>
+    <% }) %>
+<% } %>
 
 
 <!doctype html>
@@ -221,19 +240,11 @@
                     </div>
                 </li>
 
-                <li class="nav-item pe-2">
-                    <label><select name="port-names-select" id="port-names-select" class="selectpicker"
-                                   data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
-                                   data-live-search-placeholder="Search ..." data-virtual-scroll="true"
-                                   title="Show trade relations"></select></label>
-                </li>
-
-                <li class="nav-item pe-2">
-                    <label><select name="buy-goods-select" id="buy-goods-select" class="selectpicker"
-                                   data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
-                                   data-live-search-placeholder="Search ..." data-virtual-scroll="true"
-                                   title="Show goods’ relations"></select></label>
-                </li>
+                <% let dataSelects = [
+                        {title: "Show trade relations"},
+                        {title: "Show goods’ relations"}
+                ]%>
+                <% makeSelects(dataSelects) %>
 
                 <li class="nav-item pe-2">
                     <label><select name="inventory-select" id="inventory-select" class="d-none"></select></label>

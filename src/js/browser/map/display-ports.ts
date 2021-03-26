@@ -25,6 +25,10 @@ import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
+dayjs.extend(customParseFormat)
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+dayjs.locale("en-gb")
 
 import { capitalizeFirstLetter, nations, NationShortName } from "common/common"
 import {
@@ -71,12 +75,9 @@ import RadioButton from "util/radio-button"
 import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
-import { serverMaintenanceHour } from "common/common-var";
+import { serverMaintenanceHour } from "common/common-var"
 
-dayjs.extend(customParseFormat)
-dayjs.extend(relativeTime)
-dayjs.extend(utc)
-dayjs.locale("en-gb")
+
 
 const html = htm.bind(h)
 

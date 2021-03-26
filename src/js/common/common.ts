@@ -15,7 +15,7 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 import { serverMaintenanceHour } from "./common-var"
 
-import { ArrayIndex } from "./interface"
+import { ArrayIndex, HtmlString } from "./interface"
 
 export const woodFamily = ["regular", "seasoned", "exceptional"]!
 export type WoodFamily = typeof woodFamily[number]
@@ -314,3 +314,6 @@ export const currentServerStartDateTime = getCurrentServerStart().format("YYYY-M
 export const currentServerStartDate = getCurrentServerStart().format("YYYY-MM-DD")
 export const currentServerDateYear = String(dayjs(currentServerStartDate).year())
 export const currentServerDateMonth = String(dayjs(currentServerStartDate).month() + 1).padStart(2, "0")
+
+export const getBaseId = (title: string): HtmlString =>
+    title.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", "")
