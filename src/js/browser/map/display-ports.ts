@@ -77,8 +77,6 @@ import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 import { serverMaintenanceHour } from "common/common-var"
 
-
-
 const html = htm.bind(h)
 
 type PortCircleStringF = (d: PortWithTrades) => string
@@ -88,6 +86,11 @@ interface Area {
     name: string
     centroid: Point
     angle: number
+}
+
+interface CurrentPort {
+    id: number
+    coord: Coordinate
 }
 
 interface PortForDisplay {
@@ -144,16 +147,16 @@ interface MinMax<amount> {
 }
 
 export default class DisplayPorts {
-    circleType = ""
-    currentPort!: { id: number; coord: Coordinate }
-    portData!: PortWithTrades[]
-    portDataDefault!: PortWithTrades[]
-    showCurrentGood: boolean
-    showRadius: string
-    showTradePortPartners: boolean
-    tradeItem!: Map<number, TradeItem>
-    tradePortId!: number
-    zoomLevel: ZoomLevel = "initial"
+    #circleType = ""
+    #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
+    #portData = {} as PortWithTrades[]
+    #portDataDefault!: PortWithTrades[]
+    #showCurrentGood = false
+    #showRadius = ""
+    #showTradePortPartners = false
+    #tradeItem = {} as Map<number, TradeItem>
+    #tradePortId = 0
+    #zoomLevel: ZoomLevel = "initial"
     #attackRadius!: ScaleLinear<number, number>
     #colourScaleCounty!: ScaleOrdinal<string, string>
     #colourScaleHostility!: ScaleLinear<string, string>
@@ -210,12 +213,6 @@ export default class DisplayPorts {
         this.#scale = this.#minScale
         this.#f11 = this.map.f11
 
-        this.showCurrentGood = false
-        this.showTradePortPartners = false
-
-        // Shroud Cay
-        this.currentPort = { id: 366, coord: { x: 4396, y: 2494 } }
-
         /**
          * Possible values for show radius (first is default value)
          */
@@ -247,14 +244,14 @@ export default class DisplayPorts {
 
     _setupData(data: ReadData): void {
         // Combine port data with port battle data
-        this.portDataDefault = data.ports.map((port: PortBasic) => {
+        this.#portDataDefault = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
             const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) ?? ({} as PortBattlePerServer)
             const combinedData = { ...port, ...serverData, ...pbData } as PortWithTrades
 
             return combinedData
         })
-        this.portData = this.portDataDefault
+        this.#portData = this.#portDataDefault
 
         this._setupScales()
         this._setupListener()
@@ -684,14 +681,14 @@ export default class DisplayPorts {
     }
 
     _getPortName(id: number): string {
-        return id ? this.portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
+        return id ? this.#portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
     // eslint-disable-next-line complexity
     _getText(portProperties: PortWithTrades): PortForDisplay {
         /*
         const getCoord = (portId: number): Coordinate => {
-            const port = this.portDataDefault.find((port) => port.id === portId)!
+            const port = this.#portDataDefault.find((port) => port.id === portId)!
             return { x: port.coordinates[0], y: port.coordinates[1] }
         }
 
@@ -1206,13 +1203,13 @@ export default class DisplayPorts {
     }
 
     _updateSummary(): void {
-        const numberPorts = Object.keys(this.portData).length
+        const numberPorts = Object.keys(this.#portData).length
         let taxTotal = 0
         let netTotal = 0
 
         if (numberPorts) {
-            taxTotal = d3Sum(this.portData, (d) => d.taxIncome)
-            netTotal = d3Sum(this.portData, (d) => d.netIncome)
+            taxTotal = d3Sum(this.#portData, (d) => d.taxIncome)
+            netTotal = d3Sum(this.#portData, (d) => d.netIncome)
         }
 
         this.#portSummaryTextNumPorts.text(`${numberPorts}`)
@@ -1316,9 +1313,9 @@ export default class DisplayPorts {
 
     _filterVisible(): void {
         if (this.showRadius === "position") {
-            this.#portDataFiltered = this.portData
+            this.#portDataFiltered = this.#portData
         } else {
-            this.#portDataFiltered = this.portData.filter(
+            this.#portDataFiltered = this.#portData.filter(
                 (port) =>
                     port.coordinates[0] >= this.#lowerBound[0] &&
                     port.coordinates[0] <= this.#upperBound[0] &&
@@ -1365,9 +1362,85 @@ export default class DisplayPorts {
 
     clearMap(scale?: number): void {
         this._showSummary()
-        this.portData = this.portDataDefault
+        this.#portData = this.#portDataDefault
         this.circleType = ""
         this.setShowRadiusSetting()
         this.update(scale)
+    }
+
+    get circleType(): string {
+        return this.#circleType
+    }
+
+    set circleType(newCircleType: string) {
+        this.#circleType = newCircleType
+    }
+
+    get currentPort(): CurrentPort {
+        return this.#currentPort
+    }
+
+    set currentPort(newCurrentPort: CurrentPort) {
+        this.#currentPort = newCurrentPort
+    }
+
+    get portData(): PortWithTrades[] {
+        return this.#portData
+    }
+
+    set portData(newPortData: PortWithTrades[]) {
+        this.#portData = newPortData
+    }
+
+    get portDataDefault(): PortWithTrades[] {
+        return this.#portDataDefault
+    }
+
+    get showCurrentGood(): boolean {
+        return this.#showCurrentGood
+    }
+
+    set showCurrentGood(newShowCurrentGood: boolean) {
+        this.#showCurrentGood = newShowCurrentGood
+    }
+
+    get showRadius(): string {
+        return this.#showRadius
+    }
+
+    set showRadius(newShowRadius: string) {
+        this.#showRadius = newShowRadius
+    }
+
+    get tradeItem(): Map<number, TradeItem> {
+        return this.#tradeItem
+    }
+
+    set tradeItem(newTradeItem: Map<number, TradeItem>) {
+        this.#tradeItem = newTradeItem
+    }
+
+    get showTradePortPartners(): boolean {
+        return this.#showCurrentGood
+    }
+
+    set showTradePortPartners(newShowTradePortPartners: boolean) {
+        this.#showTradePortPartners = newShowTradePortPartners
+    }
+
+    get tradePortId(): number {
+        return this.#tradePortId
+    }
+
+    set tradePortId(newTradePortId: number) {
+        this.#tradePortId = newTradePortId
+    }
+
+    get zoomLevel(): ZoomLevel {
+        return this.#zoomLevel
+    }
+
+    set zoomLevel(newZoomLevel: ZoomLevel) {
+        this.#zoomLevel = newZoomLevel
     }
 }

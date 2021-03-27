@@ -116,6 +116,7 @@ export const nationColourList = [
  * @param id - nav-item id
  */
 export const initMultiDropdownNavbar = (id: string): void => {
+    /*
     $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", (event) => {
         const element = $(event.currentTarget)
         element.next(".dropdown-menu").toggleClass("show")
@@ -131,6 +132,8 @@ export const initMultiDropdownNavbar = (id: string): void => {
         // hide any open menus when parent closes
         $(event.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
     })
+
+     */
 }
 
 /**

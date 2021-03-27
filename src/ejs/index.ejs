@@ -195,21 +195,6 @@
                         Select ports on
                     </a>
                     <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
-                        <h6 class="dropdown-header">Front lines</h6>
-                        <div class="dropdown-item">
-                            <label>
-                                <select title="Select nation attacking" name="frontlines-attacking-nation-select"
-                                        id="frontlines-attacking-nation-select"></select>
-                            </label>
-                        </div>
-                        <div class="dropdown-item">
-                            <label>
-                                <select title="Select nation defending" name="frontlines-defending-nation-select"
-                                        id="frontlines-defending-nation-select"></select>
-                            </label>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
                         <h6 class="dropdown-header">Port owner</h6>
                         <div class="dropdown-item">
                             <label>
@@ -247,7 +232,7 @@
                 <% makeSelects(dataSelects) %>
 
                 <li class="nav-item pe-2">
-                    <label><select name="inventory-select" id="inventory-select" class="d-none"></select></label>
+                    <label><select name="port-select-show-good-availability" id="port-select-show-good-availability" class="d-none"></select></label>
                 </li>
             </ul>
 
@@ -354,6 +339,16 @@
                         <h6 class="dropdown-header">Zones</h6>
                         <div class="ms-3" id="show-zones">
                         </div>
+
+                        <% dataRadio = {
+                            title: "Show Trades",
+                            name: "show-trades",
+                            radios: [
+                                {id: "on", title: "On"},
+                                {id: "off", title: "Off"}
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
 
                         <% dataRadio = {
                             title: "Show grid",

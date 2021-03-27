@@ -17,17 +17,20 @@ import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-sca
 import { select as d3Select, Selection } from "d3-selection"
 
 import { nations, NationShortName } from "common/common"
+import { loadJsonFile } from "common/common-browser"
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
 import { defaultFontSize, Extent, Point, roundToThousands } from "common/common-math"
 
-import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "common/gen-json"
-import { ZoomTransform } from "d3-zoom"
-import { HtmlString } from "common/interface"
-
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
-import SelectPorts from "js/browser/map/select-ports"
-import { loadJsonFile } from "common/common-browser"
+import DisplayPorts from "../display-ports"
+
+import { NAMap } from "../na-map"
+import SelectPortsSelectInventory from "../select-ports/inventory"
+
+import { ZoomTransform } from "d3-zoom"
+import { PortBasic, PortBattlePerServer, PortWithTrades, Trade, TradeItem } from "common/gen-json"
+import { HtmlString } from "common/interface"
 
 interface Node {
     name: string
@@ -42,10 +45,14 @@ interface Node {
  */
 export default class ShowTrades {
     show: boolean
+
+    #inventorySelect = {} as SelectPortsSelectInventory
     #lowerBound = {} as Point
+    #map: NAMap
+    #ports: DisplayPorts
     #upperBound = {} as Point
+
     private readonly _serverName: string
-    private readonly _portSelect: SelectPorts
     private _isDataLoaded: boolean
     private readonly _minScale: number
     private _scale: number
@@ -81,11 +88,12 @@ export default class ShowTrades {
     private _portDataFiltered!: Set<number>
     private _tradeItem!: Map<number, string>
 
-    constructor(serverName: string, portSelect: SelectPorts, minScale: number, viewport: Extent) {
-        this._serverName = serverName
-        this._portSelect = portSelect
+    constructor(ports: DisplayPorts, map: NAMap) {
+        this.#ports = ports
+        this.#map = map
+        this._serverName = this.#map.serverName
 
-        this._minScale = minScale
+        this._minScale = this.#map.minMapScale
         this._scale = this._minScale
         this._fontSize = defaultFontSize
 
@@ -100,7 +108,7 @@ export default class ShowTrades {
         this._nationSelectId = `${this._baseId}-nation-select`
         this._listType = "tradeList"
 
-        this._showId = "show-trades-show"
+        this._showId = "show-trades"
 
         /**
          * Possible values for show trade radio buttons (first is default value)
@@ -137,11 +145,9 @@ export default class ShowTrades {
         this._setupProfitRadios()
         this._setupListener()
         this._setupList()
-        this.setBounds(viewport)
+        this.setBounds(this.#map.extent)
 
-        if (this.show) {
-            this._portSelect.setupInventorySelect(this.show)
-        }
+        this.#inventorySelect = new SelectPortsSelectInventory(ports, map)
 
         /**
          * Get profit value from cookie or use default value
@@ -349,7 +355,7 @@ export default class ShowTrades {
         this._showCookie.set(show)
 
         await this.showOrHide()
-        this._portSelect.setupInventorySelect(this.show)
+        this.#inventorySelect.injectSelect(this.show)
         this._filterTradesBySelectedNations()
         this._sortLinkData()
         this.update()
@@ -357,7 +363,7 @@ export default class ShowTrades {
 
     async _loadData(): Promise<void> {
         const pbData = await loadJsonFile<PortBattlePerServer[]>(`${this._serverName}-pb.json`)
-        const portData = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        const portData = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         // Combine port data with port battle data
         this._portData = portData.map((port) => {
@@ -529,8 +535,12 @@ export default class ShowTrades {
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const hideDetails = (event: Event): void => {
-            const element = event.currentTarget as Element
-            BSTooltip.getInstance(element).dispose()
+            const element = event.currentTarget
+            const tooltip = BSTooltip.getInstance(element as Element)
+
+            if (tooltip) {
+                tooltip.dispose()
+            }
         }
 
         const arcPath = (leftHand: boolean, d: Trade): string => {
@@ -556,7 +566,7 @@ export default class ShowTrades {
             return `M${x1},${y1}A${dr},${dr} ${xRotation},${largeArc},${sweep} ${x2},${y2}`
         }
 
-        const data = this._portSelect.isInventorySelected ? [] : this._linkDataFiltered
+        const data = this.#inventorySelect.isInventorySelected ? [] : this._linkDataFiltered
         const extent = d3Extent(this._linkDataFiltered, (d: Trade): number => d.profit ?? 0) as number[]
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this._scale, 15 / this._scale])
@@ -775,11 +785,7 @@ export default class ShowTrades {
     clearMap(): void {
         this.listType = "tradeList"
 
-        if (this.show) {
-            this._linkData = this._linkDataDefault
-        } else {
-            this._linkData = []
-        }
+        this._linkData = this.show ? this._linkDataDefault : []
 
         this.update()
     }

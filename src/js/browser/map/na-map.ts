@@ -226,7 +226,7 @@ class NAMap {
         this._grid = new DisplayGrid(this)
 
         this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
-        this.showTrades = new ShowTrades(this.serverName, this._portSelect, this.minMapScale, this.#extent)
+        this.showTrades = new ShowTrades(this._ports, this)
         await this.showTrades.showOrHide()
 
         this._init()
@@ -624,6 +624,10 @@ class NAMap {
         } else {
             this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y)
         }
+    }
+
+    get extent(): Extent {
+        return this.#extent
     }
 }
 
