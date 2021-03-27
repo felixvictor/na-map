@@ -225,7 +225,7 @@ class NAMap {
         this._pbZone = new DisplayPbZones(this._ports, this.serverName)
         this._grid = new DisplayGrid(this)
 
-        this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
+        this._portSelect = new SelectPorts(this._ports)
         this.showTrades = new ShowTrades(this._ports, this)
         await this.showTrades.showOrHide()
 

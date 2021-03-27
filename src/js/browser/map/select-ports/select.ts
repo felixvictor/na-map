@@ -16,14 +16,17 @@ export default class SelectPortsSelect {
     #baseId: HtmlString
     #selectBaseId = "port-select"
     #selectId: HtmlString
-    selectSel: HTMLSelectElement
+    #selectSel: HTMLSelectElement
+    #select$: JQuery<HTMLSelectElement>
 
     constructor(title: string) {
         this.baseName = title
         this.#baseId = getBaseId(title)
         this.#selectId = `${this.#selectBaseId}-${this.#baseId}`
-        this.selectSel = document.querySelector<HTMLSelectElement>(`#${this.#selectId}`) as HTMLSelectElement
-        console.log("SelectPortsSelect", this.#selectId, this.selectSel)
+        this.#selectSel = document.querySelector<HTMLSelectElement>(`#${this.#selectId}`) as HTMLSelectElement
+        this.#select$ = $(this.#selectSel)
+
+        console.log("SelectPortsSelect constructor", this.#selectId, this.selectSel)
     }
 
     _resetOtherSelects(): void {
@@ -40,5 +43,13 @@ export default class SelectPortsSelect {
                 $(selectSelector).val("default").selectpicker("refresh")
             }
         }
+    }
+
+    get selectSel(): HTMLSelectElement {
+        return this.#selectSel
+    }
+
+    get select$(): JQuery<HTMLSelectElement> {
+        return this.#select$
     }
 }

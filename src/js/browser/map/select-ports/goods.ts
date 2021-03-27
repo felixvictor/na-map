@@ -22,11 +22,11 @@ export default class SelectPortsSelectGoods extends SelectPortsSelect {
         this.#ports = ports
 
         this._setupListener()
-        $(this.selectSel).selectpicker()
+        this.select$.selectpicker()
     }
 
     _setupListener(): void {
-        $(this.selectSel).one("show.bs.select", () => {
+        this.select$.one("show.bs.select", () => {
             this._injectSelect()
         })
         this.selectSel.addEventListener("change", async (event) => {
@@ -58,7 +58,7 @@ export default class SelectPortsSelectGoods extends SelectPortsSelect {
         const sortedGoods = [...selectGoods].sort((a, b) => a[1].localeCompare(b[1]))
         const options = `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
         this.selectSel.insertAdjacentHTML("beforeend", options)
-        $(this.selectSel).selectpicker("refresh")
+        this.select$.selectpicker("refresh")
     }
 
     _selectSelected(): void {

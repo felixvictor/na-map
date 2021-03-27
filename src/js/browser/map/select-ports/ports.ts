@@ -42,12 +42,12 @@ export default class SelectPortsSelectPorts extends SelectPortsSelect {
         this.#numberPorts = this.#ports.portData.length
 
         this._setupListener()
-        $(this.selectSel).selectpicker()
+        this.select$.selectpicker()
     }
 
     _setupListener(): void {
         console.log("_setupListener", this.baseName, this.selectSel)
-        $(this.selectSel).one("show.bs.select", () => {
+        this.select$.one("show.bs.select", () => {
             this._injectSelect()
         })
         this.selectSel.addEventListener("change", async (event) => {
@@ -82,7 +82,7 @@ export default class SelectPortsSelectPorts extends SelectPortsSelect {
             .join("")}`
 
         this.selectSel.insertAdjacentHTML("beforeend", options)
-        $(this.selectSel).selectpicker("refresh")
+        this.select$.selectpicker("refresh")
     }
 
     async _loadData(): Promise<void> {

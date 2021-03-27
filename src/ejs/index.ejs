@@ -7,11 +7,10 @@
 <% } %>
 
 <% function makeRadioGroup(data) { %>
-    <div class="dropdown-divider"></div>
     <h6 class="dropdown-header"><%= data.title %></h6>
     <div class="ms-3" id="<%= data.name %>">
         <% data.radios.forEach(function(radio) { %>
-            <div class="form-check">
+            <div class="form-check form-check-inline">
                 <input type="radio" class="form-check-input"
                        name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>" value="<%= radio.id %>">
                 <label class="form-check-label" for="<%= data.name %>-<%= radio.id %>"><%= radio.title %></label>
@@ -198,13 +197,14 @@
                         <h6 class="dropdown-header">Port owner</h6>
                         <div class="dropdown-item">
                             <label>
-                                <select title="Select nation" name="prop-nation-select"
-                                        id="prop-nation-select"></select>
+                                <select title="Select nation" name="port-select-select-nation"
+                                        id="port-select-select-nation"></select>
                             </label>
                         </div>
                         <div class="dropdown-item">
                             <label>
-                                <select title="Select clan" name="prop-clan-select" id="prop-clan-select"></select>
+                                <select title="Select clan" name="port-select-select-clan"
+                                        id="port-select-select-clan"></select>
                             </label>
                         </div>
 
@@ -221,7 +221,6 @@
                         <a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
                         <a class="dropdown-item" id="menu-prop-this-week">This week</a>
                         <a class="dropdown-item" id="menu-prop-last-week">Last week</a>
-
                     </div>
                 </li>
 
@@ -307,7 +306,7 @@
                         <i class="icon icon-options icon-navbar" aria-hidden="true"></i><span
                                 class="visually-hidden">Settings</span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right extralarge-width" id="settingsMenu"
+                    <div class="dropdown-menu dropdown-menu-end extra-large-width" id="settingsMenu"
                          aria-labelledby="settingsDropdown">
 
                         <% let dataRadio = {
@@ -320,6 +319,7 @@
                         } %>
                         <% makeRadioGroup(dataRadio) %>
 
+                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Show per port",
                             name: "show-radius",
@@ -340,6 +340,7 @@
                         <div class="ms-3" id="show-zones">
                         </div>
 
+                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Show Trades",
                             name: "show-trades",
@@ -350,6 +351,7 @@
                         }%>
                         <% makeRadioGroup(dataRadio) %>
 
+                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Show grid",
                             name: "show-grid",
@@ -360,6 +362,7 @@
                         }%>
                         <% makeRadioGroup(dataRadio) %>
 
+                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Double click to",
                             name: "double-click-action",

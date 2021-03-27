@@ -133,7 +133,7 @@ export default class SelectPortsSelectInventory extends SelectPortsSelect {
 
             this.selectSel.insertAdjacentHTML("beforeend", options)
             this.selectSel.classList.add("selectpicker")
-            $(this.selectSel).selectpicker({
+            this.select$.selectpicker({
                 dropupAuto: false,
                 liveSearch: true,
                 liveSearchNormalize: true,

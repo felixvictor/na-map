@@ -16,6 +16,7 @@ import { validNationShortName } from "common/common"
 import DisplayPorts from "../display-ports"
 
 export default class SelectPortsSelectNation extends SelectPortsSelect {
+    #nation = ""
     #ports: DisplayPorts
 
     constructor(ports: DisplayPorts) {
@@ -23,46 +24,44 @@ export default class SelectPortsSelectNation extends SelectPortsSelect {
 
         this.#ports = ports
 
-        this._setupListener()
-        $(this.selectSel).selectpicker()
-    }
-
-    _setupListener(): void {
-        $(this.selectSel).one("show.bs.select", () => {
-            this._injectSelect()
-        })
-        this.selectSel.addEventListener("change", async (event) => {
-            registerEvent("Menu", this.baseName)
-
-            this._resetOtherSelects()
-            this._selectSelected()
-            // event.preventDefault()
-        })
+        this._injectSelect()
     }
 
     _injectSelect(): void {
         const options = getNationOptions(true)
-
+console.log("SelectPortsSelectNation options", options)
         this.selectSel.insertAdjacentHTML("beforeend", options)
         this.selectSel.classList.add("selectpicker")
-        $(this.selectSel).selectpicker({
+        this.select$.selectpicker({
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
         })
     }
 
-    _selectSelected(): void {
-        this._nation = this.selectSel.options[this.selectSel.selectedIndex].value ?? ""
+    _selectSelected(): boolean {
+        this.#nation = this.selectSel.options[this.selectSel.selectedIndex].value ?? ""
 
-        if (validNationShortName(this._nation)) {
-            this.#ports.portData = this.#ports.portDataDefault.filter((port) => port.nation === this._nation)
+        if (validNationShortName(this.#nation)) {
+            this.#ports.portData = this.#ports.portDataDefault.filter((port) => port.nation === this.#nation)
             this.#ports.showRadius = ""
             this.#ports.update()
-            this._setupClanSelect()
-            $(this._propClanSelector!).selectpicker("refresh")
-        } else {
-            this._nation = "NT"
+            return true
         }
+
+        this.#nation = "NT"
+        return false
+    }
+
+    changeEvent(event: Event): boolean {
+        registerEvent("Menu", this.baseName)
+
+        this._resetOtherSelects()
+        return this._selectSelected()
+        // event.preventDefault()
+    }
+
+    get nation(): string {
+        return this.#nation
     }
 }

@@ -21,40 +21,27 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { initMultiDropdownNavbar } from "common/common-browser"
-import { simpleStringSort } from "common/common-node"
 import { serverMaintenanceHour } from "common/common-var"
 
-import { NAMap } from "../na-map"
 import DisplayPorts from "../display-ports"
-import DisplayPbZones from "../display-pb-zones"
 import SelectPortsSelectGoods from "./goods"
 import SelectPortsSelectPorts from "./ports"
+import SelectPortsNationClan from "./nation-clan"
 
 type PortDepth = "deep" | "shallow"
 
 export default class SelectPorts {
-    isInventorySelected: boolean
-    private _ports: DisplayPorts
-    private readonly _map: NAMap
-    private readonly _pbZone: DisplayPbZones
+    #nationClan: SelectPortsNationClan
+    #ports: DisplayPorts
 
-    constructor(ports: DisplayPorts, pbZone: DisplayPbZones, map: NAMap) {
-        this._ports = ports
-        this._pbZone = pbZone
-        this._map = map
+    constructor(ports: DisplayPorts) {
+        this.#ports = ports
 
-        const portSelect = new SelectPortsSelectPorts(ports)
-        const goodSelect = new SelectPortsSelectGoods(ports)
+        void new SelectPortsSelectPorts(ports)
+        void new SelectPortsSelectGoods(ports)
+        this.#nationClan = new SelectPortsNationClan(ports)
 
-
-        this.isInventorySelected = false
-
-        this._setupSelects()
         this._setupListener()
-    }
-
-    _setupSelects(): void {
-        this._setupClanSelect()
     }
 
     _setupListener(): void {
@@ -70,7 +57,6 @@ export default class SelectPorts {
         document.querySelector("#menu-prop-non-capturable")?.addEventListener("click", () => {
             this._nonCapSelected()
         })
-
         document.querySelector("#menu-prop-today")?.addEventListener("click", () => {
             this._capturedToday()
         })
@@ -87,83 +73,39 @@ export default class SelectPorts {
         initMultiDropdownNavbar("selectPortNavbar")
     }
 
-    _setupClanSelect(): void {
-        const clanList = new Set<string>()
-        for (const d of this._ports.portData.filter((d) => d?.capturer !== "")) {
-            clanList.add(d.capturer!)
-        }
-
-        if (this._propClanSelector) {
-            // noinspection InnerHTMLJS
-            this._propClanSelector.innerHTML = ""
-            let options = ""
-
-            if (clanList.size === 0) {
-                this._propClanSelector.disabled = true
-            } else {
-                this._propClanSelector.disabled = false
-                options = `${[...clanList]
-                    .sort(simpleStringSort)
-                    .map((clan) => `<option value="${clan}" class="caps">${clan}</option>`)
-                    .join("")}`
-            }
-
-            this._propClanSelector.insertAdjacentHTML("beforeend", options)
-            this._propClanSelector.classList.add("selectpicker")
-            $(this._propClanSelector).selectpicker({
-                dropupAuto: false,
-                liveSearch: false,
-                virtualScroll: true,
-            })
-        }
-    }
-
-    _clanSelected(): void {
-        const clan = this._propClanSelector?.options[this._propClanSelector.selectedIndex].value
-
-        if (clan) {
-            this._ports.portData = this._ports.portDataDefault.filter((port) => port.capturer === clan)
-        } else if (this._nation) {
-            this._ports.portData = this._ports.portDataDefault.filter((port) => port.nation === this._nation)
-        }
-
-        this._ports.showRadius = ""
-        this._ports.update()
-    }
-
     _depthSelected(depth: PortDepth): void {
-        const portData = this._ports.portDataDefault.filter((d) => (depth === "shallow" ? d.shallow : !d.shallow))
+        const portData = this.#ports.portDataDefault.filter((d) => (depth === "shallow" ? d.shallow : !d.shallow))
 
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
+        this.#ports.portData = portData
+        this.#ports.showRadius = ""
+        this.#ports.update()
     }
 
     _allSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => d.availableForAll)
+        const portData = this.#ports.portDataDefault.filter((d) => d.availableForAll)
 
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
+        this.#ports.portData = portData
+        this.#ports.showRadius = ""
+        this.#ports.update()
     }
 
     _nonCapSelected(): void {
-        const portData = this._ports.portDataDefault.filter((d) => !d.capturable)
+        const portData = this.#ports.portDataDefault.filter((d) => !d.capturable)
 
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
+        this.#ports.portData = portData
+        this.#ports.showRadius = ""
+        this.#ports.update()
     }
 
     _filterCaptured(begin: Dayjs, end: Dayjs): void {
         // console.log("Between %s and %s", begin.format("dddd D MMMM YYYY H:mm"), end.format("dddd D MMMM YYYY H:mm"));
-        const portData = this._ports.portDataDefault.filter((port) =>
+        const portData = this.#ports.portDataDefault.filter((port) =>
             dayjs(port.captured, "YYYY-MM-DD HH:mm").isBetween(begin, end, "hour", "(]")
         )
 
-        this._ports.portData = portData
-        this._ports.showRadius = ""
-        this._ports.update()
+        this.#ports.portData = portData
+        this.#ports.showRadius = ""
+        this.#ports.update()
     }
 
     _capturedToday(): void {
@@ -207,8 +149,6 @@ export default class SelectPorts {
     }
 
     clearMap(): void {
-        this.isInventorySelected = false
-        this._setupClanSelect()
-        $(this._propClanSelector!).selectpicker("refresh")
+        this.#nationClan.refreshSelect()
     }
 }
