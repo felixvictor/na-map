@@ -29,12 +29,11 @@ export default class SelectPortsSelectGoods extends SelectPortsSelect {
         this.select$.one("show.bs.select", () => {
             this._injectSelect()
         })
-        this.selectSel.addEventListener("change", async (event) => {
+        this.selectSel.addEventListener("change", async () => {
             registerEvent("Menu", this.baseName)
 
             this._resetOtherSelects()
             this._selectSelected()
-            // event.preventDefault()
         })
     }
 

@@ -14,6 +14,7 @@ import { simpleStringSort } from "common/common-node"
 import DisplayPorts from "js/browser/map/display-ports"
 
 export default class SelectPortsSelectClan extends SelectPortsSelect {
+    #button: HTMLButtonElement
     #ports: DisplayPorts
 
     constructor(ports: DisplayPorts) {
@@ -22,12 +23,14 @@ export default class SelectPortsSelectClan extends SelectPortsSelect {
         this.#ports = ports
 
         this._injectSelect()
+        this.#button = this.selectSel.parentNode?.querySelector("button") as HTMLButtonElement
     }
 
     _injectSelect(): void {
         const clanList = new Set<string>()
-        for (const d of this.#ports.portData.filter((d) => d?.capturer !== "")) {
-            clanList.add(d.capturer!)
+        for (const d of this.#ports.portData.filter((d) => d.capturer)) {
+            // @ts-expect-error
+            clanList.add(d.capturer)
         }
 
         if (this.selectSel) {
@@ -55,29 +58,36 @@ export default class SelectPortsSelectClan extends SelectPortsSelect {
         }
     }
 
+    _capsOn(): void {
+        this.#button.classList.add("caps")
+    }
+
+    _capsOff(): void {
+        this.#button.classList.remove("caps")
+    }
+
     _selectSelected(): void {
         const clan = this.selectSel.options[this.selectSel.selectedIndex].value
-console.log("clan selectSelected", clan)
+
+        this._capsOn()
         if (clan) {
             this.#ports.portData = this.#ports.portDataDefault.filter((port) => port.capturer === clan)
-        } else if (this._nation) {
-            this.#ports.portData = this.#ports.portDataDefault.filter((port) => port.nation === this._nation)
         }
 
         this.#ports.showRadius = ""
         this.#ports.update()
     }
 
-    changeEvent(event: Event): void {
+    changeEvent(): void {
         registerEvent("Menu", this.baseName)
 
         this._resetOtherSelects()
         this._selectSelected()
-        // event.preventDefault()
     }
 
     refreshSelect(): void {
         this._injectSelect()
+        this._capsOff()
         this.select$.selectpicker("refresh")
     }
 }

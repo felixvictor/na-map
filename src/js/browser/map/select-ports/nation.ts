@@ -29,7 +29,7 @@ export default class SelectPortsSelectNation extends SelectPortsSelect {
 
     _injectSelect(): void {
         const options = getNationOptions(true)
-console.log("SelectPortsSelectNation options", options)
+
         this.selectSel.insertAdjacentHTML("beforeend", options)
         this.selectSel.classList.add("selectpicker")
         this.select$.selectpicker({
@@ -53,12 +53,11 @@ console.log("SelectPortsSelectNation options", options)
         return false
     }
 
-    changeEvent(event: Event): boolean {
+    changeEvent(): boolean {
         registerEvent("Menu", this.baseName)
 
         this._resetOtherSelects()
         return this._selectSelected()
-        // event.preventDefault()
     }
 
     get nation(): string {

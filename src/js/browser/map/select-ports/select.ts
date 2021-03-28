@@ -19,6 +19,9 @@ export default class SelectPortsSelect {
     #selectSel: HTMLSelectElement
     #select$: JQuery<HTMLSelectElement>
 
+    #clanSelectId: string
+    #nationSelectId: string
+
     constructor(title: string) {
         this.baseName = title
         this.#baseId = getBaseId(title)
@@ -26,21 +29,20 @@ export default class SelectPortsSelect {
         this.#selectSel = document.querySelector<HTMLSelectElement>(`#${this.#selectId}`) as HTMLSelectElement
         this.#select$ = $(this.#selectSel)
 
-        console.log("SelectPortsSelect constructor", this.#selectId, this.selectSel)
+        this.#clanSelectId = `${this.#selectBaseId}-select-clan`
+        this.#nationSelectId = `${this.#selectBaseId}-select-nation`
     }
 
     _resetOtherSelects(): void {
-        const selectSelectors = document.querySelectorAll(`select[id^=${this.#selectBaseId}]`)
-        console.log("_resetOtherSelects", selectSelectors)
-        for (const selectSelector of selectSelectors) {
-            console.log(selectSelector, selectSelector.id.endsWith("goods-relations"))
+        const otherSelectSels = document.querySelectorAll(`select[id^=${this.#selectBaseId}]`)
+        for (const otherSelectSel of otherSelectSels) {
+            console.log(otherSelectSel, otherSelectSel.id.endsWith("goods-relations"))
             if (
-                !selectSelector.isEqualNode(this.selectSel)
-                // && !(selectSelector === this._propClanSelector && this.selectSel === this._propNationSelector)
-                // && !(selectSelector === this._propNationSelector && this.selectSel === this._propClanSelector)
+                !otherSelectSel.isEqualNode(this.selectSel) &&
+                !(this.selectSel.id === this.#nationSelectId && otherSelectSel.id === this.#clanSelectId) &&
+                !(this.selectSel.id === this.#clanSelectId && otherSelectSel.id === this.#nationSelectId)
             ) {
-                console.log("refresh", selectSelector)
-                $(selectSelector).val("default").selectpicker("refresh")
+                $(otherSelectSel).val("default").selectpicker("refresh")
             }
         }
     }

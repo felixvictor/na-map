@@ -186,10 +186,10 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul id="navbar-left" class="navbar-nav me-auto d-none">
+            <div id="navbar-left" class="navbar-nav me-auto d-none">
 
                 <div id="selectPortNavbar">
-                    <li class="nav-item dropdown pe-2">
+                    <div class="nav-item dropdown pe-2">
                         <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
                             Select ports on
@@ -219,7 +219,7 @@
                             <a class="dropdown-item" id="menu-prop-this-week">This week</a>
                             <a class="dropdown-item" id="menu-prop-last-week">Last week</a>
                         </div>
-                    </li>
+                    </div>
                 </div>
 
                 <% let dataSelects = [
@@ -228,10 +228,10 @@
                 ]%>
                 <% makeSelects(dataSelects) %>
 
-                <li class="nav-item pe-2">
+                <div class="nav-item pe-2">
                     <label><select name="port-select-show-good-availability" id="port-select-show-good-availability" class="d-none"></select></label>
-                </li>
-            </ul>
+                </div>
+            </div>
 
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown pe-2">

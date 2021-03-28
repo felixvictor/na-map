@@ -112,49 +112,22 @@ export const nationColourList = [
 
 /**
  * Enable nested dropdowns in navbar
- * {@link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar}
- * @param id - nav-item id
- */
-export const initMultiDropdownNavbar = (id: string): void => {
-    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", (event) => {
-        console.log("click", event.currentTarget)
-        const element = $(event.currentTarget)
-        element.next(".dropdown-menu").toggleClass("show")
-        element.parent("li").toggleClass("show")
-        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", (event2) => {
-            $(event2.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
-        })
-
-        return false
-    })
-
-    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", (event) => {
-        // hide any open menus when parent closes
-        $(event.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
-    })
-}
-
-/**
- * Enable nested dropdowns in navbar
  * {@link https://stackoverflow.com/a/66470962}
  */
-export const initMultiDropdownNavbarNew = (id: string): void => {
+export const initMultiDropdownNavbar = (id: string): void => {
     const CLASS_NAME = "has-child-dropdown-show"
     const mainElement = document.querySelector(`#${id}`) as HTMLElement
 
     // @ts-expect-error
     bootstrap.Dropdown.prototype.toggle = (function (_original) {
-        console.log("bootstrap.Dropdown.prototype.toggle")
         return function () {
             for (const e of document.querySelectorAll(`.${CLASS_NAME}`)) {
-                console.log("bootstrap.Dropdown.prototype.toggle class name", e)
                 e.classList.remove(CLASS_NAME)
             }
 
             // @ts-expect-error
             let dd = this._element.closest(".dropdown").parentNode.closest(".dropdown")
             for (; dd && dd !== document; dd = dd.parentNode.closest(".dropdown")) {
-                console.log("bootstrap.Dropdown.prototype.toggle closest", dd)
                 dd.classList.add(CLASS_NAME)
             }
 
@@ -164,18 +137,8 @@ export const initMultiDropdownNavbarNew = (id: string): void => {
         // @ts-expect-error
     })(bootstrap.Dropdown.prototype.toggle)
 
-    for (const dd of mainElement.querySelectorAll(`.dropdown`)) {
-        console.log("listener hide.bs.dropdown", dd)
+    for (const dd of mainElement.querySelectorAll(".dropdown")) {
         dd.addEventListener("hide.bs.dropdown", function (this: HTMLElement, e: Event) {
-            console.log(
-                "hide.bs.dropdown",
-                e,
-                // @ts-expect-error
-                e.clickEvent,
-                this.classList.contains(CLASS_NAME),
-                // @ts-expect-error
-                e.clickEvent?.composedPath().some((el) => el.classList?.contains("dropdown-toggle"))
-            )
             if (this.classList.contains(CLASS_NAME)) {
                 this.classList.remove(CLASS_NAME)
                 e.preventDefault()

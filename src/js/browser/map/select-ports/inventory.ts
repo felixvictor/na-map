@@ -36,12 +36,11 @@ export default class SelectPortsSelectInventory extends SelectPortsSelect {
     }
 
     _setupListener(): void {
-        this.selectSel.addEventListener("change", async (event) => {
+        this.selectSel.addEventListener("change", async () => {
             registerEvent("Menu", this.baseName)
 
             this._resetOtherSelects()
             this._selectSelected()
-            // event.preventDefault()
         })
     }
 
