@@ -20,7 +20,7 @@ dayjs.extend(isBetween)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
-import { initMultiDropdownNavbar } from "common/common-browser"
+import { initMultiDropdownNavbar, initMultiDropdownNavbarNew } from "common/common-browser";
 import { serverMaintenanceHour } from "common/common-var"
 
 import DisplayPorts from "../display-ports"
@@ -70,7 +70,7 @@ export default class SelectPorts {
             this._capturedLastWeek()
         })
 
-        initMultiDropdownNavbar("selectPortNavbar")
+        initMultiDropdownNavbarNew("selectPortNavbar")
     }
 
     _depthSelected(depth: PortDepth): void {

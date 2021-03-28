@@ -135,6 +135,63 @@ export const initMultiDropdownNavbar = (id: string): void => {
 }
 
 /**
+ * Enable nested dropdowns in navbar
+ * {@link https://stackoverflow.com/a/66470962}
+ */
+export const initMultiDropdownNavbarNew = (id: string): void => {
+    const CLASS_NAME = "has-child-dropdown-show"
+    const mainElement = document.querySelector(`#${id}`) as HTMLElement
+
+    // @ts-expect-error
+    bootstrap.Dropdown.prototype.toggle = (function (_original) {
+        console.log("bootstrap.Dropdown.prototype.toggle")
+        return function () {
+            for (const e of document.querySelectorAll(`.${CLASS_NAME}`)) {
+                console.log("bootstrap.Dropdown.prototype.toggle class name", e)
+                e.classList.remove(CLASS_NAME)
+            }
+
+            // @ts-expect-error
+            let dd = this._element.closest(".dropdown").parentNode.closest(".dropdown")
+            for (; dd && dd !== document; dd = dd.parentNode.closest(".dropdown")) {
+                console.log("bootstrap.Dropdown.prototype.toggle closest", dd)
+                dd.classList.add(CLASS_NAME)
+            }
+
+            // @ts-expect-error
+            return _original.call(this)
+        }
+        // @ts-expect-error
+    })(bootstrap.Dropdown.prototype.toggle)
+
+    for (const dd of mainElement.querySelectorAll(`.dropdown`)) {
+        console.log("listener hide.bs.dropdown", dd)
+        dd.addEventListener("hide.bs.dropdown", function (this: HTMLElement, e: Event) {
+            console.log(
+                "hide.bs.dropdown",
+                e,
+                // @ts-expect-error
+                e.clickEvent,
+                this.classList.contains(CLASS_NAME),
+                // @ts-expect-error
+                e.clickEvent?.composedPath().some((el) => el.classList?.contains("dropdown-toggle"))
+            )
+            if (this.classList.contains(CLASS_NAME)) {
+                this.classList.remove(CLASS_NAME)
+                e.preventDefault()
+            }
+
+            // @ts-expect-error
+            if (e.clickEvent?.composedPath().some((el) => el.classList?.contains("dropdown-toggle"))) {
+                e.preventDefault()
+            }
+
+            e.stopPropagation() // do not need pop in multi level mode
+        })
+    }
+}
+
+/**
  * Insert bootstrap modal
  * @param id - Modal id
  * @param title - Modal title

@@ -20,14 +20,23 @@ export default class SelectPortsNationClan {
     constructor(ports: DisplayPorts) {
         this.#ports = ports
 
-        this.#clanSelect = new SelectPortsSelectClan(ports)
         this.#nationSelect = new SelectPortsSelectNation(ports)
+        this.#clanSelect = new SelectPortsSelectClan(ports)
 
         this._setupListener()
     }
 
     _setupListener(): void {
+        this.#clanSelect.selectSel.addEventListener("click", async (event) => {
+            console.log("SelectPortsNationClan click")
+            this.#clanSelect.changeEvent(event)
+        })
+        this.#clanSelect.selectSel.addEventListener("changed.bs.select", async (event) => {
+            console.log("SelectPortsNationClan changed.bs.select")
+            this.#clanSelect.changeEvent(event)
+        })
         this.#clanSelect.selectSel.addEventListener("change", async (event) => {
+            console.log("SelectPortsNationClan change")
             this.#clanSelect.changeEvent(event)
         })
         this.#clanSelect.selectSel.addEventListener("change", async (event) => {

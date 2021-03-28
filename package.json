@@ -53,7 +53,7 @@
         "size:map": "du -s -BK src/images/map/",
         "size:public": "find public/ -iname '*.mjs' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
         "size:css": "find public/ -iname '*.css' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
-        "start": "webpack serve --config webpack.config.js --mode=development --color",
+        "start": "webpack serve --config webpack.config.js --mode=development --color --hot",
         "watch": "webpack       --config webpack.config.js --mode=development --color --watch"
     },
     "husky": {
