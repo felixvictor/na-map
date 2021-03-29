@@ -36,7 +36,6 @@ export default class SelectPortsSelect {
     _resetOtherSelects(): void {
         const otherSelectSels = document.querySelectorAll(`select[id^=${this.#selectBaseId}]`)
         for (const otherSelectSel of otherSelectSels) {
-            console.log(otherSelectSel, otherSelectSel.id.endsWith("goods-relations"))
             if (
                 !otherSelectSel.isEqualNode(this.selectSel) &&
                 !(this.selectSel.id === this.#nationSelectId && otherSelectSel.id === this.#clanSelectId) &&

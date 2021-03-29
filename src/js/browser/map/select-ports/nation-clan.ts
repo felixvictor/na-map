@@ -27,13 +27,11 @@ export default class SelectPortsNationClan {
     }
 
     _setupListener(): void {
-        this.#clanSelect.selectSel.addEventListener("change", async (event) => {
-            console.log("SelectPortsClan change")
-            this.#clanSelect.changeEvent(event)
+        this.#clanSelect.selectSel.addEventListener("change", async () => {
+            this.#clanSelect.changeEvent()
         })
-        this.#nationSelect.selectSel.addEventListener("change", async (event) => {
-            console.log("SelectPortsNation change")
-            const needClanRefresh = this.#nationSelect.changeEvent(event)
+        this.#nationSelect.selectSel.addEventListener("change", async () => {
+            const needClanRefresh = this.#nationSelect.changeEvent()
             if (needClanRefresh) {
                 this.refreshSelect()
             }

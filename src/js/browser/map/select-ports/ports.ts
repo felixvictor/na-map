@@ -46,7 +46,6 @@ export default class SelectPortsSelectPorts extends SelectPortsSelect {
     }
 
     _setupListener(): void {
-        console.log("_setupListener", this.baseName, this.selectSel)
         this.select$.one("show.bs.select", () => {
             this._injectSelect()
         })
