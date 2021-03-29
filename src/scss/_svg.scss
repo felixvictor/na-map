@@ -54,6 +54,10 @@ svg {
     }
 }
 
+.svg-text-tiny {
+    font-size: 15%;
+}
+
 .svg-stroke-light {
     circle,
     line,
@@ -154,6 +158,36 @@ svg {
 .svg-background-yellow {
     opacity: 0.7;
     fill: $yellow-300;
+}
+
+.path-stroke-primary-light {
+    stroke: $primary-300;
+}
+
+.path-fill-secondary-dark {
+    fill: $secondary-500;
+}
+
+.path-fill-primary-dark {
+    fill: $primary-700;
+}
+
+.path-fill-red {
+    fill: $red-600;
+}
+
+.path-fill-dark {
+    fill: $primary-900;
+}
+
+.path-background-primary-light {
+    fill-opacity: 0.3;
+    fill: $primary-300;
+}
+
+.path-background-red {
+    fill-opacity: 0.3;
+    fill: $red-600;
 }
 
 .xf11,
