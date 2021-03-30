@@ -171,7 +171,7 @@ export default class DisplayPbZones {
                     // Spawn points
                     if (this.#serverType === "PVP") {
                         g.append("path")
-                            .attr("class", "path-fill-secondary-dark")
+                            .attr("class", "path-fill-primary-light")
                             .attr("d", (d) =>
                                 d.spawnPoints
                                     .map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5))
