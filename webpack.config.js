@@ -17,6 +17,7 @@ const sass = require("sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 const { SubresourceIntegrityPlugin } = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
+const { extendDefaultPlugins } = require("svgo")
 
 const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
@@ -165,54 +166,16 @@ const sassLoaderOpt = {
     },
 }
 
-const svgoOpt = {
-    plugins: [
-        { cleanupAttrs: true },
-        { removeDoctype: true },
-        { removeXMLProcInst: true },
-        { removeComments: true },
-        { removeMetadata: true },
-        { removeTitle: true },
-        { removeDesc: true },
-        { removeUselessDefs: true },
-        { removeXMLNS: false },
-        { removeEditorsNSData: true },
-        { removeEmptyAttrs: true },
-        { removeHiddenElems: true },
-        { removeEmptyText: true },
-        { removeEmptyContainers: true },
-        { removeViewBox: false },
-        { cleanupEnableBackground: true },
-        { minifyStyles: true },
-        { convertStyleToAttrs: true },
-        { convertColors: true },
-        { convertPathData: true },
-        { convertTransform: true },
-        { removeUnknownsAndDefaults: true },
-        { removeNonInheritableGroupAttrs: true },
-        { removeUselessStrokeAndFill: true },
-        { removeUnusedNS: true },
-        { cleanupIDs: true },
-        { cleanupNumericValues: true },
-        { cleanupListOfValues: false },
-        { moveElemsAttrsToGroup: true },
-        { moveGroupAttrsToElems: true },
-        { collapseGroups: true },
-        { removeRasterImages: false },
-        { mergePaths: true },
-        { convertShapeToPath: true },
-        { sortAttrs: false },
-        { transformsWithOnePath: false },
-        { removeDimensions: false },
-        { removeAttrs: false },
-        { removeElementsByAttr: true },
-        { removeStyleElement: true },
-        { addClassesToSVGElement: false },
-        { addAttributesToSVGElement: false },
-        { removeStyleElement: false },
-        { removeScriptElement: false },
-    ],
-}
+const svgoOpt = extendDefaultPlugins([
+    {
+        name: "removeScriptElement",
+        active: true,
+    },
+    {
+        name: "removeViewBox",
+        active: true,
+    },
+])
 
 // noinspection JSIncompatibleTypesComparison
 const htmlOpt = {
@@ -463,9 +426,9 @@ const config = {
                         options: getSvgLoaderOpt("images/flags/"),
                     },
                     {
-                        loader: "image-webpack-loader",
+                        loader: "svgo-loader",
                         options: {
-                            svgo: svgoOpt,
+                            plugins: svgoOpt,
                         },
                     },
                     {
@@ -493,9 +456,9 @@ const config = {
                         options: getSvgLoaderOpt("icons/"),
                     },
                     {
-                        loader: "image-webpack-loader",
+                        loader: "svgo-loader",
                         options: {
-                            svgo: svgoOpt,
+                            plugins: svgoOpt,
                         },
                     },
                     {
