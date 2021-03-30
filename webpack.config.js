@@ -173,7 +173,7 @@ const svgoOpt = extendDefaultPlugins([
     },
     {
         name: "removeViewBox",
-        active: true,
+        active: false,
     },
 ])
 
