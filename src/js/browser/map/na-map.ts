@@ -218,16 +218,16 @@ class NAMap {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        this.f11 = new ShowF11(this, this.coord)
         this._ports = new DisplayPorts(this)
         await this._ports.init()
-
         this._pbZone = new DisplayPbZones(this._ports, this.serverName)
-        this._grid = new DisplayGrid(this)
 
+        this._grid = new DisplayGrid(this)
         this._portSelect = new SelectPorts(this._ports)
+
         this.showTrades = new ShowTrades(this._ports, this)
         await this.showTrades.showOrHide()
+        this.f11 = new ShowF11(this, this.coord)
 
         this._init()
         this._journey = new MakeJourney(this.rem)

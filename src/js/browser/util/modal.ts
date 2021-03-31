@@ -13,6 +13,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
 
 export default class Modal {
+    readonly #baseId: HtmlString
     readonly #baseName: string
     readonly #buttonId: HtmlString
     readonly #buttonText: string
@@ -20,14 +21,13 @@ export default class Modal {
     readonly #modalId: HtmlString
     readonly #size: HtmlString
 
-    readonly baseId: HtmlString
-
-    #modalSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #bodySel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #footerSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #modalSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor(title: string, size: string, buttonText = "Close") {
         this.#baseName = title
-        this.baseId = title.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#baseId = title.toLocaleLowerCase().replaceAll(" ", "-")
         this.#buttonId = `menu-${this.baseId}`
         this.#buttonText = buttonText
         this.#modalId = `modal-${this.baseId}`
@@ -66,13 +66,17 @@ export default class Modal {
 
         this.#bodySel = content.append("div").attr("class", "modal-body")
 
-        const footer = content.append("footer").attr("class", "modal-footer")
-        footer
+        this.#footerSel = content.append<HTMLDivElement>("footer").attr("class", "modal-footer")
+        this.#footerSel
             .append("button")
             .attr("type", "button")
             .attr("class", "btn btn-secondary")
             .attr("data-bs-dismiss", "modal")
             .text(this.#buttonText)
+    }
+
+    hide(): void {
+        this.#modal.hide()
     }
 
     show(): void {
@@ -85,5 +89,17 @@ export default class Modal {
 
     getModalBody(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
         return this.#bodySel
+    }
+
+    removeFooter(): void {
+        this.#footerSel.remove()
+    }
+
+    get baseId(): HtmlString {
+        return this.#baseId
+    }
+
+    get modalId(): HtmlString {
+        return this.#modalId
     }
 }

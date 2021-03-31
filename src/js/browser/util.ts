@@ -290,10 +290,10 @@ export const displayClan = (clan: string): string => `<span class="caps">${clan}
 /**
  * Copy to clipboard (fallback solution)
  * @param   text - String
- * @param modal$ - Modal
+ * @param modalSel - Modal
  * @returns Success
  */
-const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
+const copyToClipboardFallback = (text: string, modalSel: HTMLDivElement): boolean => {
     // console.log("copyToClipboardFallback");
     if (document.queryCommandSupported?.("copy")) {
         const input = document.createElement("input")
@@ -303,7 +303,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
         input.style.position = "absolute"
         input.style.left = "-1000px"
         input.style.top = "-1000px"
-        modal$.append(input)
+        modalSel.append(input)
         input.select()
 
         try {
@@ -341,11 +341,11 @@ const writeClipboard = async (text: string): Promise<boolean> => {
 /**
  * Copy to clipboard (clipboard API)
  * @param text - String
- * @param modal$ - Modal
+ * @param modalSel - Modal
  */
-export const copyToClipboard = (text: string, modal$: JQuery): void => {
+export const copyToClipboard = (text: string, modalSel: HTMLDivElement): void => {
     if (!navigator.clipboard) {
-        copyToClipboardFallback(text, modal$)
+        copyToClipboardFallback(text, modalSel)
     }
 
     void writeClipboard(text)
@@ -355,16 +355,16 @@ export const copyToClipboard = (text: string, modal$: JQuery): void => {
  * Copy F11 coordinates to clipboard
  * @param x - X Coordinate
  * @param z - Z Coordinate
- * @param modal$ - Modal
+ * @param modalSel - Modal
  */
-export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void => {
+export const copyF11ToClipboard = (x: number, z: number, modalSel: HTMLDivElement): void => {
     if (Number.isFinite(x) && Number.isFinite(z)) {
         const F11Url = new URL(window.location.href)
 
         F11Url.searchParams.set("x", String(x))
         F11Url.searchParams.set("z", String(z))
 
-        copyToClipboard(F11Url.href, modal$)
+        copyToClipboard(F11Url.href, modalSel)
     }
 }
 

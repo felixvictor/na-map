@@ -74,7 +74,7 @@ import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
 import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"
-import ShowF11 from "./show-f11"
+import ShowF11 from "js/browser/map/show-f11"
 import { serverMaintenanceHour } from "common/common-var"
 
 const html = htm.bind(h)
