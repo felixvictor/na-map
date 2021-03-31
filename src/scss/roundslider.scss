@@ -15,14 +15,14 @@
 .rs-tooltip-text {
     font-family: inherit;
     font-size: 1.8em;
+    line-height: 1.1;
     color: $primary-700;
 }
 
 .rs-handle {
     position: relative;
-    width: 48px !important;
+    width: 32px !important;
     background: $primary-900;
-    border: 3px solid $primary-400;
     border-radius: 0;
 
     &::after,
@@ -38,15 +38,14 @@
     }
 
     &::after {
-        margin-top: -20px;
-        border-width: 20px;
+        margin-top: -24px;
+        border-width: 24px;
         border-left-color: $primary-900;
     }
 
     &::before {
         margin-top: -24px;
         border-width: 24px;
-        border-left-color: $primary-400;
     }
 }
 
@@ -56,8 +55,4 @@
 
 .rs-control .rs-handle {
     background-color: $primary-900;
-}
-
-.rs-border {
-    border-color: $primary-400;
 }
