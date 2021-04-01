@@ -17,7 +17,8 @@ const sass = require("sass")
 const SitemapPlugin = require("sitemap-webpack-plugin").default
 const { SubresourceIntegrityPlugin } = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
-const { extendDefaultPlugins } = require("svgo")
+const svgToMiniDataURI = require("mini-svg-data-uri")
+const { extendDefaultPlugins, optimize } = require("svgo")
 
 const dirOutput = path.resolve(__dirname, "public")
 const dirSrc = path.resolve(__dirname, "src")
@@ -233,13 +234,6 @@ const MiniCssExtractPluginOpt = {
     esModule: true,
 }
 
-const getSvgLoaderOpt = (path) => ({
-    esModule: false,
-    limit: 1000,
-    name: "[name].[ext]",
-    outputPath: path,
-})
-
 const config = {
     devServer: {
         host: "localhost",
@@ -372,13 +366,6 @@ const config = {
                         options: MiniCssExtractPluginOpt,
                     },
                     {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: "url(ata:image",
-                            replace: "url(data:image",
-                        },
-                    },
-                    {
                         loader: "css-loader",
                         options: cssLoaderOpt,
                     },
@@ -423,60 +410,42 @@ const config = {
             {
                 test: /\.svg$/,
                 include: dirFlags,
-                use: [
-                    {
-                        loader: "svg-url-loader",
-                        options: getSvgLoaderOpt("images/flags/"),
+                type: "asset/inline",
+                generator: {
+                    dataUrl: (content) => {
+                        let svg = content.toString()
+
+                        // Replace with custom colours
+                        svg = svg.replace('fill="#fff" fill-opacity="0"/>', `fill="${primary700}" fill-opacity="0.3"/>`)
+                        svg = svg.replace('fill="#fff" fill-opacity="1"/>', `fill="${primary200}" fill-opacity="1"/>`)
+
+                        // svgo
+                        svg = optimize(svg, svgoOpt).data
+
+                        // Compress
+                        return svgToMiniDataURI(svg)
                     },
-                    {
-                        loader: "svgo-loader",
-                        options: svgoOpt,
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="#fff" fill-opacity="0"/>',
-                            replace: `fill="${primary700}" fill-opacity="0.3"/>`,
-                        },
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="#fff" fill-opacity="1"/>',
-                            replace: `fill="${primary200}" fill-opacity="1"/>`,
-                        },
-                    },
-                ],
-                type: "javascript/auto",
+                },
             },
             {
                 test: /\.svg$/,
                 include: dirIcons,
-                use: [
-                    {
-                        loader: "svg-url-loader",
-                        options: getSvgLoaderOpt("icons/"),
+                type: "asset/inline",
+                generator: {
+                    dataUrl: (content) => {
+                        let svg = content.toString()
+
+                        // Replace with custom colours
+                        svg = svg.replace('fill="$themeColour"', `fill="${themeColour}"`)
+                        svg = svg.replace('fill="$darkYellow"', `fill="${colourYellowDark}"`)
+
+                        // svgo
+                        svg = optimize(svg, svgoOpt).data
+
+                        // Compress
+                        return svgToMiniDataURI(svg)
                     },
-                    {
-                        loader: "svgo-loader",
-                        options: svgoOpt,
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="$themeColour"',
-                            replace: `fill="${themeColour}"`,
-                        },
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="$darkYellow"',
-                            replace: `fill="${colourYellowDark}"`,
-                        },
-                    },
-                ],
-                type: "javascript/auto",
+                },
             },
         ],
     },
