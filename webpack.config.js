@@ -166,16 +166,19 @@ const sassLoaderOpt = {
     },
 }
 
-const svgoOpt = extendDefaultPlugins([
-    {
-        name: "removeScriptElement",
-        active: true,
-    },
-    {
-        name: "removeViewBox",
-        active: false,
-    },
-])
+const svgoOpt = {
+    multipass: true,
+    plugins: extendDefaultPlugins([
+        {
+            name: "removeScriptElement",
+            active: true,
+        },
+        {
+            name: "removeViewBox",
+            active: false,
+        },
+    ]),
+}
 
 // noinspection JSIncompatibleTypesComparison
 const htmlOpt = {
@@ -427,9 +430,7 @@ const config = {
                     },
                     {
                         loader: "svgo-loader",
-                        options: {
-                            plugins: svgoOpt,
-                        },
+                        options: svgoOpt,
                     },
                     {
                         loader: "string-replace-loader",
@@ -446,6 +447,7 @@ const config = {
                         },
                     },
                 ],
+                type: "javascript/auto",
             },
             {
                 test: /\.svg$/,
@@ -457,9 +459,7 @@ const config = {
                     },
                     {
                         loader: "svgo-loader",
-                        options: {
-                            plugins: svgoOpt,
-                        },
+                        options: svgoOpt,
                     },
                     {
                         loader: "string-replace-loader",
@@ -476,6 +476,7 @@ const config = {
                         },
                     },
                 ],
+                type: "javascript/auto",
             },
         ],
     },
