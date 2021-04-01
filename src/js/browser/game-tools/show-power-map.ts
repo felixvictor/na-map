@@ -143,7 +143,6 @@ export default class PowerMap extends BaseModal {
     async _setupListener(): Promise<void> {
         let firstClick = true
 
-        await this._loadAndSetupData()
         ;(document.querySelector(`#${this.buttonId}`) as HTMLButtonElement).addEventListener("click", async () => {
             if (firstClick) {
                 firstClick = false
