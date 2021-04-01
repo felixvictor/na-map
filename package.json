@@ -170,7 +170,6 @@
         "exceljs": "^4.2.1",
         "favicons": "^6.2.1",
         "favicons-webpack-plugin": "^5.0.2",
-        "file-loader": "^6.2.0",
         "git": "^0.1.5",
         "html-webpack-plugin": "^5.3.1",
         "husky": "4",

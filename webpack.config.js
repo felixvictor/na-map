@@ -399,12 +399,9 @@ const config = {
             {
                 test: regExpFont,
                 include: dirFonts,
-                use: {
-                    loader: "file-loader",
-                    options: {
-                        name: "[name].[ext]",
-                        outputPath: "fonts/",
-                    },
+                type: "asset/resource",
+                generator: {
+                    filename: "fonts/[name][ext]",
                 },
             },
             {
