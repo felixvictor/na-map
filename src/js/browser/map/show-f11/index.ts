@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../../analytics"
@@ -63,7 +62,6 @@ export default class ShowF11 {
             this.#modal = new F11Modal(this.#baseName)
 
             this.#modal.formSel.addEventListener("submit", (event) => {
-                console.log("event submit")
                 this.#modal!.hide()
                 event.preventDefault()
                 this._useUserInput()

@@ -299,7 +299,7 @@ export interface PortWithTrades extends Port {
     buyInTradePort: boolean
     goodsToSellInTradePort: TradeGoodProfit[]
     sellInTradePort: boolean
-    distance: number
+    distance?: number
     isSource: boolean
     ownPort: boolean
     enemyPort: boolean

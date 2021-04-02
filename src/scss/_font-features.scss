@@ -20,6 +20,10 @@ table {
     font-variant-numeric: oldstyle-nums tabular-nums; // onum tnum
 }
 
+input {
+    font-variant-numeric: inherit;
+}
+
 .text-table {
     font-variant-numeric: oldstyle-nums proportional-nums; // onum tnum
 }
