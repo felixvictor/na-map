@@ -65,52 +65,42 @@ export default class F11Modal extends Modal {
             .attr("role", "form")
         this.#formSel = form.node()!
 
-        form.append("div").classed("alert alert-primary", true).text("Use F11 in open world.")
-
-        const inputGroup1 = form.append("div").classed("form-group", true).append("div").classed("input-group", true)
-        inputGroup1.append("label").attr("for", this.#xInputId)
-        inputGroup1
+        const formGroup1 = form.append("div").attr("class", "form-floating")
+        formGroup1
             .append("input")
-            .classed("form-control", true)
+            .attr("class", "form-control")
             .attr("id", this.#xInputId)
             .attr("type", "number")
             .attr("required", "")
-            .attr("placeholder", "X coordinate")
+            .attr("placeholder", "X coordinate in k")
             .attr("min", "-819")
             .attr("max", "819")
             .attr("step", "1")
             .attr("tabindex", "1")
+        formGroup1
+            .append("label")
+            .attr("for", this.#xInputId)
+            .text("X coordinate in k")
 
-        inputGroup1
-            .append("div")
-            .classed("input-group-append", true)
-            .append("span")
-            .classed("input-group-text", true)
-            .text("k")
-
-        const inputGroup2 = form.append("div").classed("form-group", true).append("div").classed("input-group", true)
-        inputGroup2.append("label").attr("for", this.#zInputId)
-        inputGroup2
+        const formGroup2 = form.append("div").attr("class", "form-floating")
+        formGroup2
             .append("input")
-            .classed("form-control", true)
+            .attr("class", "form-control")
             .attr("id", this.#zInputId)
             .attr("type", "number")
             .attr("required", "")
-            .attr("placeholder", "Z coordinate")
+            .attr("placeholder", "Z coordinate in k")
             .attr("step", "1")
             .attr("min", "-819")
             .attr("max", "819")
             .attr("tabindex", "2")
-        inputGroup2
-            .append("div")
-            .classed("input-group-append", true)
-            .append("span")
-            .classed("input-group-text", true)
-            .text("k")
+        formGroup2
+            .append("label")
+            .attr("for", this.#zInputId)
+            .text("Z coordinate in k")
 
         form.append("div")
-            .classed("alert alert-primary", true)
-            .append("small")
+            .attr("class", "form-text mt-1 mb-3")
             .html("In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.")
 
         const buttonGroup = form.append("div").classed("float-end btn-group", true).attr("role", "group")
