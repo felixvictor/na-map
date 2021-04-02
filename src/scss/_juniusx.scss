@@ -21,6 +21,7 @@ $font-list: (300 normal light condensed), (400 normal regular normal), (400 norm
     @font-face {
         font-family: "#{$font-family}";
         font-style: $font-style;
+        //noinspection Stylelint
         font-weight: map.get($font-weights, $font-weight-name);
         font-stretch: $font-stretch;
         src: url("#{$font-path}#{$font-name}-#{$font-style}-#{$font-weight-name}-#{$font-stretch}.woff2")
@@ -35,9 +36,10 @@ $font-list: (300 normal light condensed), (400 normal regular normal), (400 norm
 $font-name: "Junicode";
 $font-family: "JuniusX";
 $font-path: "../fonts/#{$font-name}/";
+
 $font-weight: 400;
-$font-weight-name: regular;
 $font-style: italic;
+$font-weight-name: regular;
 $font-stretch: normal;
 
 @font-face {

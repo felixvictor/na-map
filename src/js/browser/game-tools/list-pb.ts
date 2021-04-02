@@ -142,7 +142,7 @@ export default class ListPortBattles {
 
         const body = d3Select(`#${this.#modalId} .modal-body`)
 
-        this.#table = body.append("table").attr("class", "table table-sm small na-table")
+        this.#table = body.append("table").attr("class", "table table-sm small na-table text-table")
         this._initTable()
         this._updateTable()
         this._sortRows(0, false)

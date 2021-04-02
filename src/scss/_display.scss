@@ -8,18 +8,7 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
-@mixin caps {
-    font-variant-caps: all-small-caps;
-    font-variant-numeric: oldstyle-nums;
-    letter-spacing: 0.08em;
-}
-
-@mixin des {
-    position: relative;
-    top: -0.4rem;
-    font-size: small;
-    font-stretch: condensed;
-}
+@import "mixins";
 
 $background-map: $primary;
 $dark-overlay-background-colour: $primary-800;
@@ -36,15 +25,6 @@ $overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
 $overlay-text-colour-contrast: $primary-700;
 $overlay-text-colour: color-contrast($overlay-background);
 
-// opentype
-body {
-    font-variant-alternates: styleset(ss18); // (needs also calt)
-    font-kerning: normal;
-    font-variant-caps: normal;
-    font-variant-ligatures: common-ligatures contextual; // liga calt
-    font-variant-numeric: oldstyle-nums; // onum
-}
-
 .bg-map {
     background-color: $background-map;
 }
@@ -53,20 +33,6 @@ text,
 .map-tiles {
     cursor: default;
     user-select: none;
-}
-
-table,
-.page-link {
-    font-variant-numeric: normal; // onum off
-}
-
-.fraction {
-    font-variant-numeric: diagonal-fractions;
-}
-
-.super {
-    font-feature-settings: "sups";
-    font-variant-position: super;
 }
 
 .des {
@@ -87,7 +53,6 @@ table,
 
 .text-lighter {
     color: $secondary-600;
-    font-variant-numeric: normal;
 }
 
 .x-large {
@@ -96,7 +61,6 @@ table,
 
 .large {
     font-size: larger;
-    font-variant-numeric: normal;
 }
 
 .tooltip-block {
@@ -111,7 +75,6 @@ table,
     stroke-opacity: 0.8;
     stroke-width: 0.4rem;
 }
-
 
 .non-trading {
     font-style: italic;
@@ -219,6 +182,20 @@ table,
     min-width: 10rem !important;
     p {
         margin: 0;
+    }
+}
+
+/////////////////////////////////////7
+// table
+
+tr:nth-of-type(even) {
+    background-color: $primary-050;
+}
+
+.sort-table {
+    thead th {
+        cursor: s-resize;
+        border-bottom-color: $white;
     }
 }
 

@@ -21,29 +21,6 @@
 
 @import "config";
 
-.na-table {
-    thead {
-        background-color: $secondary-050;
-    }
-
-    thead th {
-        cursor: s-resize;
-        border-bottom-color: $white;
-    }
-
-    tbody {
-        tr:nth-of-type(odd) {
-            background-color: $primary-050;
-        }
-    }
-}
-
-.no-sort {
-    thead th {
-        cursor: default;
-    }
-}
-
 .thead-group {
     th {
         font-style: initial !important;
@@ -177,13 +154,11 @@ table tr {
 
 .column-base {
     background-color: $primary-050;
-    font-variant-numeric: normal; // onum off
 }
 
 .column-comp {
     background-color: $secondary-050;
     border-left: $white solid medium;
-    font-variant-numeric: normal; // onum off
 }
 
 .ship-base {
