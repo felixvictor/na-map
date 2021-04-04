@@ -28,8 +28,6 @@ import ListWoods from "./list-woods"
 import ShowIncomeMap from "./show-income-map"
 import ShowPortOwnerships from "./show-port-ownerships"
 
-//import "../../../scss/game-tools.scss"
-
 /**
  * Init
  * @param serverId - Server id

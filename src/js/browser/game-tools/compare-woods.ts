@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select"
@@ -406,7 +405,7 @@ export default class CompareWoods {
             this._columnsCompare = ["C1", "C2"]
         }
 
-        this._columns = this._columnsCompare.slice()
+        this._columns = [...this._columnsCompare]
         this._columns.unshift("Base")
     }
 

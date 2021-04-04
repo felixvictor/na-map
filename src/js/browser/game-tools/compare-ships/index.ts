@@ -8,6 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+const shipColumnType = ["Base", "C1", "C2"]
+export type ShipColumnType = typeof shipColumnType[number]
+
 export { Ship } from "./ship"
 export { ShipBase } from "./ship-base"
 export { ShipComparison } from "./ship-comparison"

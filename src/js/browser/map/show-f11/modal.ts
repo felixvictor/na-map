@@ -44,7 +44,7 @@ export default class F11Modal extends Modal {
         this.#zInputSel = document.querySelector<HTMLInputElement>(`#${this.#zInputId}`) as HTMLInputElement
 
         // Copy coordinates to clipboard (ctrl-c key event)
-        document.querySelector(`#${this.modalId}`)?.addEventListener("keydown", (event: Event): void => {
+        document.querySelector(`#${this.id}`)?.addEventListener("keydown", (event: Event): void => {
             if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
                 this._copyCoordClicked(event)
             }
@@ -56,7 +56,7 @@ export default class F11Modal extends Modal {
     }
 
     _injectModal(): void {
-        const body = super.getModalBody()
+        const body = super.getBodySel()
         super.removeFooter()
         console.log("injectModal", body)
         const form = body

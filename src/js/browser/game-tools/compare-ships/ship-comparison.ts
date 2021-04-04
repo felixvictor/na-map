@@ -32,8 +32,8 @@ import { colourWhite, pluralise, segmentRadians } from "common/common-browser"
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor } from "common/common-game-tools"
 
 import { ShipData } from "common/gen-json"
-import { DragData, ShipDisplayData } from "./types"
 import { HtmlString } from "common/interface"
+import { DragData, ShipDisplayData } from "compare-ships"
 
 export class ShipComparison extends Ship {
     // Ship data of the ship to be compared to

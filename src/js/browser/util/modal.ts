@@ -22,7 +22,7 @@ export default class Modal {
     readonly #size: HtmlString
 
     #bodySel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #footerSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #footerSel = {} as Selection<HTMLElement, unknown, HTMLElement, unknown>
     #modalSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor(title: string, size: string, buttonText = "Close") {
@@ -66,7 +66,7 @@ export default class Modal {
 
         this.#bodySel = content.append("div").attr("class", "modal-body")
 
-        this.#footerSel = content.append<HTMLDivElement>("footer").attr("class", "modal-footer")
+        this.#footerSel = content.append<HTMLElement>("footer").attr("class", "modal-footer")
         this.#footerSel
             .append("button")
             .attr("type", "button")
@@ -87,8 +87,12 @@ export default class Modal {
         return this.#modalSel.node() as HTMLDivElement
     }
 
-    getModalBody(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+    getBodySel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
         return this.#bodySel
+    }
+
+    getFooter(): Selection<HTMLElement, unknown, HTMLElement, unknown> {
+        return this.#footerSel
     }
 
     removeFooter(): void {
@@ -99,7 +103,7 @@ export default class Modal {
         return this.#baseId
     }
 
-    get modalId(): HtmlString {
+    get id(): HtmlString {
         return this.#modalId
     }
 }

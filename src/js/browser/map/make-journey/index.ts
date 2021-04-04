@@ -226,7 +226,6 @@ export default class MakeJourney {
     }
 
     _useUserInput(): void {
-        console.log("_useUserInput")
         this._setShipName()
         this._printWholeJourney()
         this._printSummary()

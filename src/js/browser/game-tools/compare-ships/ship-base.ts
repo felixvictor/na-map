@@ -35,7 +35,7 @@ import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor }
 import { default as shipIcon } from "icons/icon-ship.svg"
 
 import { ShipData } from "common/gen-json"
-import { DragData, ShipDisplayData } from "./types"
+import { DragData, ShipDisplayData } from "compare-ships"
 
 /**
  * Base ship for comparison (displayed on the left side)

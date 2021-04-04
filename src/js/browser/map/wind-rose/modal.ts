@@ -32,7 +32,7 @@ export default class WindRoseModal extends Modal {
     }
 
     _injectModal(): void {
-        const body = super.getModalBody()
+        const body = super.getBodySel()
 
         // Add wind input slider
         this.#windInput = new WindInput(body, this.baseId)

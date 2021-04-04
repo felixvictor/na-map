@@ -49,7 +49,7 @@ export default class GetPositionModal extends Modal {
     }
 
     _injectModal(): void {
-        const body = super.getModalBody()
+        const body = super.getBodySel()
 
         const form = body.append("form")
         const dataList = form.append("datalist").attr("id", "defaultDistances")

@@ -1106,7 +1106,7 @@ export default class DisplayPorts {
             r = (d): number => this.#portRadius(d.portPoints) ?? 0
         } else if (this.showRadius === "position") {
             cssClass = (): string => "bubble here"
-            r = (d): number => d.distance
+            r = (d): number => d.distance ?? 0
         } else if (this.showRadius === "attack") {
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
