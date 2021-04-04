@@ -128,4 +128,7 @@ declare module "compare-ships" {
     type ColumnNestedArray<T> = {
         [K in ShipColumnType]: ArrayIndex<T>
     }
+    type ColumnObject<T> = {
+        [K in ShipColumnType]: T
+    }
 }

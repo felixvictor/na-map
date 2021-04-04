@@ -11,13 +11,6 @@
 import { group as d3Group, max as d3Max, min as d3Min } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { select as d3Select } from "d3-selection"
-
-import dayjs from "dayjs"
-import customParseFormat from "dayjs/plugin/customParseFormat.js"
-import utc from "dayjs/plugin/utc.js"
-dayjs.extend(customParseFormat)
-dayjs.extend(utc)
 
 import { registerEvent } from "../../analytics"
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, getElementWidth } from "common/common-browser"
@@ -30,6 +23,7 @@ import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-data"
 import CompareWoods from "../compare-woods"
 import { ShipBase } from "./ship-base"
 import { ShipComparison } from "./ship-comparison"
+import SaveImage from "./save-image"
 import CompareShipsModal from "./modal"
 
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "common/gen-json"
@@ -39,6 +33,7 @@ import {
     Amount,
     ColumnArray,
     ColumnNestedArray,
+    ColumnObject,
     ModuleType,
     SelectedData,
 } from "compare-ships"
@@ -138,24 +133,6 @@ export class CompareShips {
         select$.ssssssssssssssssssssssssssssssssselectpicker("render")
     }
 
-    static _saveCanvasAsImage(uri: string): void {
-        const date = dayjs.utc().format("YYYY-MM-DD HH-mm-ss")
-        const fileName = `na-map ship compare ${date}.png`
-        const link = document.createElement("a")
-
-        link.href = uri
-        link.download = fileName
-
-        // Firefox requires the link to be in the body
-        document.body.append(link)
-
-        // simulate click
-        link.click()
-
-        // remove the link when done
-        link.remove()
-    }
-
     _getShipId(columnId: ShipColumnType): number {
         return this._shipIds[columnId]
     }
@@ -213,7 +190,10 @@ export class CompareShips {
         // console.log("moduleIds", { columnId }, { type }, { moduleIds });
 
         this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element))
-        CompareShips._setSelect(this.#modal!.getSelectModule$(columnId, type), this._selectedUpgradeIdsPerType[columnId][type])
+        CompareShips._setSelect(
+            this.#modal!.getSelectModule$(columnId, type),
+            this._selectedUpgradeIdsPerType[columnId][type]
+        )
         this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type])
     }
 
@@ -344,134 +324,6 @@ export class CompareShips {
             .range([10, this.innerRadius, this.outerRadius])
     }
 
-    _getShipName(id: number): string {
-        return this.#shipData.find((ship) => ship.id === id)?.name ?? ""
-    }
-
-    _getSelectedData(columnId: ShipColumnType): SelectedData {
-        const selectedData = {
-            moduleData: new Map<string, string>(),
-            ship: "",
-            wood: [] as string[],
-        }
-        if (this._shipIds[columnId]) {
-            selectedData.ship = this._getShipName(this._shipIds[columnId])
-            for (const type of woodType) {
-                selectedData.wood.push(
-                    this.woodCompare.getWoodName(type, Number(this._selectWood$[columnId][type].val()))
-                )
-            }
-
-            if (this._selectedUpgradeIdsPerType[columnId]) {
-                for (const type of [...this.#modal!.moduleTypes]) {
-                    const text = [] as string[]
-                    for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
-                        const property = this.#modal!.getModuleProperty(id)
-                        text.push(property?.name.replace(" Bonus", "") ?? "")
-                    }
-
-                    selectedData.moduleData.set(type, text.join(", "))
-                }
-            }
-        }
-
-        return selectedData
-    }
-
-    _printSelectedData(clonedDocument: Document, selectedData: SelectedData, columnId: ShipColumnType): void {
-        const labels = clonedDocument.querySelectorAll<HTMLElement>(`#${this.#baseId}-${columnId.toLowerCase()} label`)
-        const parent = labels[0].parentNode as HTMLElement
-        const labelHeight = labels[0].offsetHeight
-        for (const label of labels) {
-            label.remove()
-        }
-
-        const mainDiv = d3Select(parent)
-            .insert("div", ":first-child")
-            .style("height", `${labelHeight * 5}px`)
-
-        if (selectedData.ship) {
-            mainDiv.append("div").style("margin-bottom", "5px").style("line-height", "1.1").text(selectedData.ship)
-        }
-
-        if (selectedData.wood[0] !== "") {
-            mainDiv
-                .append("div")
-                .style("font-size", "smaller")
-                .style("margin-bottom", "5px")
-                .style("line-height", "1.1")
-                .text(selectedData.wood.join(" | "))
-        }
-
-        for (const [key, value] of selectedData.moduleData) {
-            if (value !== "") {
-                mainDiv
-                    .append("div")
-                    .style("font-size", "small")
-                    .style("margin-bottom", "5px")
-                    .style("line-height", "1.1")
-                    .html(`<em>${key}</em>: ${value}`)
-            }
-        }
-    }
-
-    _replaceSelectsWithText(clonedDocument: Document): void {
-        for (const columnId of this.#columnIds) {
-            const selectedData = this._getSelectedData(columnId)
-            this._printSelectedData(clonedDocument, selectedData, columnId)
-        }
-    }
-
-    _setMakeImageSpinner(): void {
-        const { buttonMakeImage } = this.#modal!
-
-        buttonMakeImage.select("i").remove()
-        buttonMakeImage.attr("class", "btn btn-primary").property("disabled", true)
-        buttonMakeImage
-            .append("span")
-            .attr("class", "spinner-border spinner-border-sm")
-            .attr("role", "status")
-            .attr("aria-hidden", "true")
-        buttonMakeImage.append("span").attr("class", "visually-hidden").text("Loading...")
-    }
-
-    _unsetMakeImageSpinner(): void {
-        const { buttonMakeImage } = this.#modal!
-
-        buttonMakeImage.selectAll("span").remove()
-        buttonMakeImage.attr("class", "btn btn-outline-secondary icon-outline-button").property("disabled", false)
-        buttonMakeImage.append("i").attr("class", "icon icon-image")
-    }
-
-    async _makeImage(event: Event): Promise<void> {
-        event.preventDefault()
-
-        this._setMakeImageSpinner()
-
-        const html2canvas = await import(/* webpackChunkName: "html2canvas" */ "html2canvas")
-        const element = this.#modal!.getModalNode()
-        if (element) {
-            const canvas = await html2canvas.default(element, {
-                allowTaint: true,
-                foreignObjectRendering: true,
-                ignoreElements: (element) =>
-                    element.classList.contains("central") ||
-                    element.classList.contains("overlay") ||
-                    element.classList.contains("navbar"),
-                logging: true,
-                onclone: (clonedDocument) => {
-                    this._replaceSelectsWithText(clonedDocument)
-                },
-                x: 0,
-                y: 0,
-            })
-
-            CompareShips._saveCanvasAsImage(canvas.toDataURL())
-        }
-
-        this._unsetMakeImageSpinner()
-    }
-
     _initCloneListeners(): void {
         for (const columnId of this.#columnIds) {
             // Clone left
@@ -557,6 +409,53 @@ export class CompareShips {
         }
     }
 
+    _getSelectedModules(columnId: ShipColumnType): Map<string, string> {
+        const modules = new Map<string, string>()
+
+        if (this._selectedUpgradeIdsPerType[columnId]) {
+            for (const type of [...this.#modal!.moduleTypes]) {
+                const text = [] as string[]
+                for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
+                    const property = this.#modal!.getModuleProperty(id)
+                    text.push(property?.name.replace(" Bonus", "") ?? "")
+                }
+
+                modules.set(type, text.join(", "))
+            }
+        }
+
+        return modules
+    }
+
+    _getSelectedWoodText(columnId: ShipColumnType): string[] {
+        const woods = [] as string[]
+        for (const type of woodType) {
+            woods.push(this.woodCompare.getWoodName(type, Number(this._selectWood$[columnId][type].val())))
+        }
+
+        return woods
+    }
+
+    _getShipName(id: number): string {
+        return this.#shipData.find((ship) => ship.id === id)?.name ?? ""
+    }
+
+    _getSelectedData(): ColumnObject<SelectedData> {
+        const selectedData = {} as ColumnObject<SelectedData>
+
+        for (const columnId of this.#columnIds) {
+            if (this._shipIds[columnId]) {
+                selectedData[columnId] = {
+                    ship: this._getShipName(this._shipIds[columnId]),
+                    moduleData: this._getSelectedModules(columnId),
+                    wood: this._getSelectedWoodText(columnId),
+                }
+            }
+        }
+
+        return selectedData
+    }
+
     async _menuClicked(): Promise<void> {
         registerEvent("Menu", this.#baseName)
 
@@ -587,7 +486,9 @@ export class CompareShips {
             // Make image
             document.querySelector(`#${this.#modal.imageButtonId}`)?.addEventListener("click", async (event) => {
                 registerEvent("Menu", "Ship compare image")
-                await this._makeImage(event)
+                event.preventDefault()
+                const saveImage = new SaveImage(this.#baseId, this._getSelectedData(), this.#modal!.getModalNode())
+                await saveImage.init()
             })
         }
 
@@ -633,7 +534,6 @@ export class CompareShips {
                         const moduleIds = this._getModuleIds(columnId, type)
                         const typeIndex = [...this.#modal!.moduleTypes].indexOf(type)
 
-                        // eslint-disable-next-line max-depth
                         if (moduleIds?.length) {
                             const param = `${columnIndex}${typeIndex}`
 
