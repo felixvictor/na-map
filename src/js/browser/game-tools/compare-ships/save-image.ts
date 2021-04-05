@@ -15,17 +15,17 @@ import utc from "dayjs/plugin/utc.js"
 dayjs.extend(utc)
 
 import { ShipColumnType } from "./index"
-import { ColumnObject, SelectedData } from "compare-ships"
+import { ShipColumnTypeList, SelectedData } from "compare-ships"
 import { select as d3Select } from "d3-selection"
 import { showCursorDefault, showCursorWait } from "common/common-browser"
 import { HtmlString } from "common/interface"
 
 export default class SaveImage {
     #baseId: HtmlString
-    #data: ColumnObject<SelectedData>
+    #data: ShipColumnTypeList<SelectedData>
     #modalSel: HTMLDivElement
 
-    constructor(id: HtmlString, data: ColumnObject<SelectedData>, modalSel: HTMLDivElement) {
+    constructor(id: HtmlString, data: ShipColumnTypeList<SelectedData>, modalSel: HTMLDivElement) {
         this.#baseId = id
         this.#data = data
         this.#modalSel = modalSel

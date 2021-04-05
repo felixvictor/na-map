@@ -15,10 +15,9 @@ import { min as d3Min, max as d3Max } from "d3-array"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { woodType, WoodType, WoodTypeList } from "common/common"
+import { simpleStringSort, sortBy, woodType, WoodType, WoodTypeList } from "common/common"
 import { insertBaseModal } from "common/common-browser"
 import { formatFloat, formatPercent, formatSignFloat } from "common/common-format"
-import { simpleStringSort, sortBy } from "common/common-node"
 
 import JQuery from "jquery"
 import { WoodData, WoodTrimOrFrame } from "common/gen-json"
@@ -75,7 +74,7 @@ class Wood {
     }
 }
 
-class WoodBase extends Wood {
+export class WoodBase extends Wood {
     private readonly _woodData = {} as SelectedWood
     constructor(compareId: WoodColumnType, woodData: SelectedWood, woodCompare: CompareWoods) {
         super(compareId, woodCompare)
@@ -163,7 +162,7 @@ class WoodBase extends Wood {
     }
 }
 
-class WoodComparison extends Wood {
+export class WoodComparison extends Wood {
     private readonly _baseData: SelectedWood
     private readonly _compareData: SelectedWood
 
@@ -410,7 +409,7 @@ export default class CompareWoods {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json"))
+        this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../../../lib/gen-generic/woods.json"))
             .default as WoodData
         this._setupData()
     }
@@ -499,7 +498,7 @@ export default class CompareWoods {
         for (const compareId of this._columns) {
             for (const type of woodType) {
                 const select$ = $(`#${this.baseFunction}-${type}-${compareId}-select`)
-                this._setupWoodSelects(compareId, type, select$)
+                this.setupWoodSelects(compareId, type, select$)
                 this._setupSelectListener(compareId, type, select$)
             }
         }
@@ -513,7 +512,7 @@ export default class CompareWoods {
         this._woodIdsSelected[compareId][type] = woodId
     }
 
-    _setupWoodSelects(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
+    setupWoodSelects(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         this._setWoodsSelected(compareId, type, this._defaultWoodId[type])
         select$.append(this._options[type])
         if (this.baseFunction !== "wood" || (compareId !== "Base" && this.baseFunction === "wood")) {
@@ -537,7 +536,7 @@ export default class CompareWoods {
         }
     }
 
-    _woodSelected(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
+    woodSelected(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         const woodId = Number(select$.val())
 
         this._setWoodsSelected(compareId, type, woodId)
@@ -571,7 +570,7 @@ export default class CompareWoods {
     _setupSelectListener(compareId: WoodColumnType, type: WoodType, select$: JQuery): void {
         select$
             .on("change", () => {
-                this._woodSelected(compareId, type, select$)
+                this.woodSelected(compareId, type, select$)
             })
             .selectpicker({ title: `Select ${type}` })
     }

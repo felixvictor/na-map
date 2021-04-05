@@ -22,6 +22,7 @@ import { NAMap } from "../na-map"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
+import { getIdFromBaseName } from "common/common-browser"
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
@@ -42,7 +43,7 @@ export default class ShowF11 {
         this.#map = map
         this.#coord = coord
 
-        this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
 
         this._setupSvg()

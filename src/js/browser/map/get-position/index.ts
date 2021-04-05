@@ -9,7 +9,7 @@
  */
 
 import { registerEvent } from "../../analytics"
-import { circleRadiusFactor } from "common/common-browser"
+import { circleRadiusFactor, getIdFromBaseName } from "common/common-browser"
 import { convertInvCoordX, convertInvCoordY } from "common/common-math"
 import { copyF11ToClipboard } from "../../util"
 import { trilaterate, Vector } from "util/transliterate"
@@ -38,7 +38,7 @@ export default class TrilateratePosition {
     constructor(ports: DisplayPorts) {
         this.#ports = ports
 
-        this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
 
         this._setupListener()

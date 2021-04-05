@@ -15,7 +15,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 
 import { registerEvent } from "../../analytics"
-import { degreesPerSecond, pluralise } from "common/common-browser"
+import { degreesPerSecond, getIdFromBaseName, pluralise } from "common/common-browser"
 import { formatF11 } from "common/common-format"
 import {
     convertInvCoordX,
@@ -85,7 +85,7 @@ export default class MakeJourney {
     readonly #speedScale: ScaleLinear<number, number>
 
     constructor(fontSize: number) {
-        this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
         this.#compassId = `compass-${this.#baseId}`
         this.#shadowId = `filter-${this.#baseId}`

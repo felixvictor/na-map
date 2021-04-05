@@ -11,6 +11,7 @@
 import { default as BSModal } from "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
+import { getIdFromBaseName } from "common/common-browser"
 
 export default class Modal {
     readonly #baseId: HtmlString
@@ -27,7 +28,7 @@ export default class Modal {
 
     constructor(title: string, size: string, buttonText = "Close") {
         this.#baseName = title
-        this.#baseId = title.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#baseId = getIdFromBaseName(this.#baseName)
         this.#buttonId = `menu-${this.baseId}`
         this.#buttonText = buttonText
         this.#modalId = `modal-${this.baseId}`

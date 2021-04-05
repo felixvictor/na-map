@@ -9,6 +9,7 @@
  */
 
 import { HtmlString } from "common/interface"
+import { getIdFromBaseName } from "common/common-browser"
 
 export class BaseModal {
     readonly serverId: string
@@ -20,7 +21,7 @@ export class BaseModal {
     constructor(serverId: string, title: string) {
         this.serverId = serverId
         this.baseName = title
-        this.baseId = title.toLocaleLowerCase().replaceAll(" ", "-")
+        this.baseId = getIdFromBaseName(this.baseName)
         this.buttonId = `menu-${this.baseId}`
         this.modalId = `modal-${this.baseId}`
     }

@@ -34,7 +34,7 @@ import ShowPortOwnerships from "./show-port-ownerships"
  * @param urlParams - Search Parameters
  */
 const init = (serverId: string, urlParams: URLSearchParams): void => {
-    const shipCompare = new CompareShips("ship-compare")
+    const shipCompare = new CompareShips()
 
     const checkShipCompareData = (): void => {
         if (urlParams.has("cmp") && urlParams.has("v")) {

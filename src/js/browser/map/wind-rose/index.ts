@@ -12,7 +12,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { Line, line as d3Line } from "d3-shape"
 
 import { registerEvent } from "../../analytics"
-import { degreesPerSecond } from "common/common-browser"
+import { degreesPerSecond, getIdFromBaseName } from "common/common-browser"
 import { degreesToRadians } from "common/common-math"
 
 import { printSmallCompassRose } from "../../util"
@@ -49,7 +49,7 @@ export default class WindRose {
     readonly #menuId: HtmlString
 
     constructor() {
-        this.#baseId = this.#baseName.toLocaleLowerCase().replaceAll(" ", "-")
+        this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
 
         this.#line = d3Line()
