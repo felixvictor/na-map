@@ -10,10 +10,10 @@
 
 import path from "path"
 
-import { currentServerStartDate as serverDate } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
+import { currentServerStartDate as serverDate, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { cleanName, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItemGeneric, APIRecipeResource } from "./api-item"
@@ -246,6 +246,7 @@ const getPrices = (buildings: Building[]): Price => {
 }
 
 const convertBuildings = async (): Promise<void> => {
+    const commonPaths = getCommonPaths()
     let buildings = getBuildings()
 
     const prices = getPrices(buildings)

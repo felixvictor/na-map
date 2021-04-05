@@ -11,11 +11,13 @@
 import path from "path"
 import convert, { ElementCompact } from "xml-js"
 
-import { commonPaths } from "../common/common-dir"
+import { getCommonPaths } from "../common/common-dir"
 import { readTextFile, saveJsonAsync } from "../common/common-file"
 
 import { Repair, RepairAmount } from "../common/gen-json"
 import { TextEntity, XmlRepair } from "./xml"
+
+const commonPaths = getCommonPaths()
 
 /**
  * Change string from snake case to camelCase

@@ -10,10 +10,11 @@
 import * as fs from "fs";
 import path from "path";
 import convert from "xml-js";
-import { commonPaths } from "../common/common-dir";
+import { getCommonPaths } from "../common/common-dir";
 import { readTextFile, saveJsonAsync } from "../common/common-file";
 import { round } from "../common/common-math";
 import { cannonEntityType, cannonType, peneDistance } from "../common/common";
+const commonPaths = getCommonPaths();
 const countDecimals = (value) => {
     if (value === undefined) {
         return 0;

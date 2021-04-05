@@ -18,9 +18,9 @@ import { registerEvent } from "../analytics"
 import { insertBaseModal } from "common/common-browser"
 import { formatInt } from "common/common-format"
 import { getCurrencyAmount } from "common/common-game-tools"
-import { sortBy } from "common/common-node"
 
 import { Building, BuildingResult } from "common/gen-json"
+import { sortBy } from "common/common"
 
 export default class ListBuildings {
     private readonly _baseName: string
@@ -43,7 +43,7 @@ export default class ListBuildings {
 
     async _loadAndSetupData(): Promise<void> {
         this._buildingData = (
-            await import(/* webpackChunkName: "data-buildings" */ "../../../lib/gen-generic/buildings.json")
+            await import(/* webpackChunkName: "data-buildings" */ "../../../../lib/gen-generic/buildings.json")
         ).default as Building[]
     }
 

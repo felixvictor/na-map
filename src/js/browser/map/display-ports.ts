@@ -30,7 +30,7 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
-import { capitalizeFirstLetter, nations, NationShortName } from "common/common"
+import { capitalizeFirstLetter, nations, NationShortName, simpleStringSort } from "common/common"
 import {
     colourGreenDark,
     colourLight,
@@ -55,7 +55,6 @@ import {
     roundToThousands,
     ϕ,
 } from "common/common-math"
-import { simpleStringSort } from "common/common-node"
 import { displayClanLitHtml } from "common/common-game-tools"
 
 import {
@@ -279,7 +278,7 @@ export default class DisplayPorts {
         this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
 
         const readData = {} as ReadData
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<PortJsonData>(dataSources, readData)
 

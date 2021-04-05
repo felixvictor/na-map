@@ -16,10 +16,10 @@ import { registerEvent } from "../analytics"
 import { insertBaseModal } from "common/common-browser"
 import { formatFloatFixed, formatInt } from "common/common-format"
 import { beautifyShipName } from "common/common-game-tools"
-import { sortBy } from "common/common-node"
 
 import { ShipData } from "common/gen-json"
 import { HeaderMap, HtmlString } from "common/interface"
+import { sortBy } from "common/common"
 
 type ShipListData = Array<[number | string, string]>
 
@@ -48,7 +48,7 @@ export default class ShipList {
 
     async _loadAndSetupData(): Promise<void> {
         const shipData = (
-            await import(/* webpackChunkName: "data-ships" */ "../../../lib/gen-generic/ships.json")
+            await import(/* webpackChunkName: "data-ships" */ "../../../../lib/gen-generic/ships.json")
         ).default // @ts-expect-error
             .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
 

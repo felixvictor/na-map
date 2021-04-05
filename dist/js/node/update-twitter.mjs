@@ -13,14 +13,15 @@ import filterXSS from "xss";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
-import { findNationByName, findNationByNationShortName } from "../common/common";
-import { commonPaths, serverStartDateTime } from "../common/common-dir";
-import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file";
-import { cleanName, simpleStringSort } from "../common/common-node";
-import { flagValidity, portBattleCooldown } from "../common/common-var";
-import { serverIds } from "../common/servers";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
+import { currentServerStartDateTime, findNationByName, findNationByNationShortName, simpleStringSort, } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
+import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file";
+import { cleanName } from "../common/common-node";
+import { flagValidity, portBattleCooldown } from "../common/common-var";
+import { serverIds } from "../common/servers";
+const commonPaths = getCommonPaths();
 const consumerKey = process.argv[2];
 const consumerSecret = process.argv[3];
 const accessToken = process.argv[4];
@@ -72,10 +73,10 @@ const getTweetsSince = async (sinceDateTime) => {
     }
 };
 const getTweetsFull = async () => {
-    await getTweetsSince(dayjs.utc(serverStartDateTime).subtract(2, "day"));
+    await getTweetsSince(dayjs.utc(currentServerStartDateTime).subtract(2, "day"));
 };
 const getTweetsSinceMaintenance = async () => {
-    await getTweetsSince(dayjs.utc(serverStartDateTime));
+    await getTweetsSince(dayjs.utc(currentServerStartDateTime));
 };
 const getTweetsSinceRefresh = async () => {
     await getTwitterData(queryFrom);

@@ -14,10 +14,9 @@ import css, { Declaration, Rule } from "css"
 import Excel from "exceljs"
 import sass from "sass"
 
-import { currentServerStartDate, range } from "../common/common"
-import { commonPaths } from "../common/common-dir"
+import { currentServerStartDate, range, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { executeCommand, readJson } from "../common/common-file"
-import { sortBy } from "../common/common-node"
 
 import { PortBasic, ShipData } from "../common/gen-json"
 
@@ -28,6 +27,8 @@ interface PortBR {
     name: string
     br: number
 }
+
+const commonPaths = getCommonPaths()
 
 const shallowWaterFrigates = new Set(["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"])
 const minDeepWaterBR = 80

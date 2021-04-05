@@ -11,12 +11,14 @@ import * as fs from "fs";
 import path from "path";
 import Deque from "collections/deque";
 import { default as PNG } from "pngjs";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { convertCoordX, convertCoordY } from "../common/common-math";
-import { simpleNumberSort } from "../common/common-node";
+import { baseAPIFilename, simpleNumberSort } from "../common/common-node";
 import { distanceMapSize, mapSize } from "../common/common-var";
 import { serverIds } from "../common/servers";
+const commonPaths = getCommonPaths();
 class Port {
     constructor() {
         this.apiPorts = [];

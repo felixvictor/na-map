@@ -10,12 +10,11 @@
 
 import "bootstrap-select"
 
-import { sortBy } from "common/common-node"
-
 import Modal from "util/modal"
 
 import { PortWithTrades } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { sortBy } from "common/common"
 
 export default class GetPositionModal extends Modal {
     readonly #ids: number[]

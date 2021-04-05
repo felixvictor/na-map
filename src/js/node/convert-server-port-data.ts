@@ -20,11 +20,12 @@ import {
     nations,
     nationShortName,
     NationShortName,
+    sortBy,
 } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
-import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName, simpleNumberSort } from "../common/common-node"
 import { serverTwitterNames } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
@@ -49,6 +50,7 @@ let apiItems: APIItemGeneric[]
 let apiPorts: APIPort[]
 let apiShops: APIShop[]
 
+const commonPaths = getCommonPaths()
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`)
 const distancesOrig: Distance[] = readJson(distancesFile)
 let distances: Map<number, number>

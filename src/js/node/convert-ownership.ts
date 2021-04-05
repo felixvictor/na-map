@@ -17,10 +17,10 @@ const { group: d3Group } = d3Array
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
-import { capitalToCounty, nations, NationShortName } from "../common/common"
-import { commonPaths } from "../common/common-dir"
+import { capitalToCounty, nations, NationShortName, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { saveJsonAsync } from "../common/common-file"
-import { cleanName, sortBy } from "../common/common-node"
+import { cleanName } from "../common/common-node"
 import { ServerId, serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
@@ -28,6 +28,7 @@ import { NationList, Ownership, OwnershipNation } from "../common/gen-json"
 import { PowerMapList } from "../common/interface"
 import { Group, Line, Segment } from "timelines-chart"
 
+const commonPaths = getCommonPaths()
 const fileExtension = ".json.xz"
 
 type ServerIdList<T> = {

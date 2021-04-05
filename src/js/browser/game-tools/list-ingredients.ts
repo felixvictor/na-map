@@ -18,11 +18,11 @@ import { select as d3Select } from "d3-selection"
 import { registerEvent } from "../analytics"
 import { insertBaseModal } from "common/common-browser"
 import { formatSignInt, formatSignPercent } from "common/common-format"
-import { sortBy } from "common/common-node"
 import { chunkify } from "../util"
 
 import { Module, RecipeIngredientEntity } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { sortBy } from "common/common"
 
 export default class ListIngredients {
     private readonly _baseName: string
@@ -42,10 +42,10 @@ export default class ListIngredients {
 
     async _loadAndSetupData(): Promise<void> {
         this._moduleData = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
+            await import(/* webpackChunkName: "data-modules" */ "../../../../lib/gen-generic/modules.json")
         ).default as Module[]
         this._ingredientData = (
-            await import(/* webpackChunkName: "data-recipes" */ "../../../lib/gen-generic/recipes.json")
+            await import(/* webpackChunkName: "data-recipes" */ "../../../../lib/gen-generic/recipes.json")
         ).default.ingredient as RecipeIngredientEntity[]
     }
 

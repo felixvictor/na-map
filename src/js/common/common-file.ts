@@ -15,8 +15,8 @@ import { promisify } from "util"
 
 import { currentServerStartDate } from "./common"
 import { apiBaseFiles } from "./common-var"
-import { baseAPIFilename } from "./common-dir"
 import { serverIds } from "./servers"
+import { baseAPIFilename } from "./common-node"
 
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/globals.d.ts
 interface ErrnoException extends Error {

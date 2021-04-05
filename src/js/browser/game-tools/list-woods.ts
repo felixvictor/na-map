@@ -14,10 +14,17 @@ import "bootstrap/js/dist/modal"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { capitalizeFirstLetter, WoodFamily, woodFamily, woodType, WoodType, WoodTypeList } from "common/common"
+import {
+    capitalizeFirstLetter,
+    simpleStringSort,
+    WoodFamily,
+    woodFamily,
+    woodType,
+    WoodType,
+    WoodTypeList,
+} from "common/common"
 import { insertBaseModal } from "common/common-browser"
 import { formatFloatFixed, formatPP } from "common/common-format"
-import { simpleStringSort } from "common/common-node"
 
 import { WoodData, WoodProperty, WoodTrimOrFrame } from "common/gen-json"
 import { HtmlString } from "common/interface"
@@ -73,7 +80,7 @@ export default class ListWoods {
 
     async _loadData(): Promise<void> {
         this._woodDataDefault = (
-            await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json")
+            await import(/* webpackChunkName: "data-woods" */ "../../../../lib/gen-generic/woods.json")
         ).default as WoodData
     }
 

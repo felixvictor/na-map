@@ -19,12 +19,12 @@ import { insertBaseModal } from "common/common-browser"
 import { formatInt, formatSignPercent } from "common/common-format"
 import { getCurrencyAmount } from "common/common-game-tools"
 import { getOrdinal } from "common/common-math"
-import { sortBy } from "common/common-node"
 import { servers } from "common/servers"
 
 import JQuery from "jquery"
 import { Module, RecipeEntity, RecipeGroup } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { sortBy } from "common/common"
 
 const replacer = (match: string, p1: number, p2: number): string =>
     `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`
@@ -52,10 +52,10 @@ export default class ListRecipes {
 
     async _loadAndSetupData(): Promise<void> {
         this._moduleData = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
+            await import(/* webpackChunkName: "data-modules" */ "../../../../lib/gen-generic/modules.json")
         ).default as Module[]
         this._recipeData = (
-            await import(/* webpackChunkName: "data-recipes" */ "../../../lib/gen-generic/recipes.json")
+            await import(/* webpackChunkName: "data-recipes" */ "../../../../lib/gen-generic/recipes.json")
         ).default.recipe as RecipeGroup[]
         this._recipes = new Map<number, RecipeEntity>(
             this._recipeData.flatMap((group) => group.recipes.map((recipe: RecipeEntity) => [recipe.id, recipe]))

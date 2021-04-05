@@ -8,9 +8,10 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import path from "path";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate, sortBy } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { cleanName, sortBy } from "../common/common-node";
+import { baseAPIFilename, cleanName } from "../common/common-node";
 import { serverIds } from "../common/servers";
 const idWorkshop = 450;
 const idAcademy = 879;
@@ -170,6 +171,7 @@ const getPrices = (buildings) => {
     return prices;
 };
 const convertBuildings = async () => {
+    const commonPaths = getCommonPaths();
     let buildings = getBuildings();
     const prices = getPrices(buildings);
     await saveJsonAsync(commonPaths.filePrices, prices);

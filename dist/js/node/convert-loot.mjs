@@ -8,10 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import path from "path";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate, sortBy } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { getOrdinal } from "../common/common-math";
-import { cleanName, sortBy } from "../common/common-node";
+import { baseAPIFilename, cleanName } from "../common/common-node";
 import { serverIds } from "../common/servers";
 const secondsPerHour = 3600;
 let apiItems;
@@ -51,6 +52,7 @@ const getChestItems = (lootItems) => lootItems.map((item) => ({
 }));
 const getChestItemsFromChestLootTable = (chestLootTableId) => apiItems.filter((item) => Number(item.Id) === chestLootTableId).flatMap((item) => getChestItems(item.Items ?? []));
 const convertLoot = async () => {
+    const commonPaths = getCommonPaths();
     const data = {};
     const loot = getLootItems(["ShipLootTableItem"]);
     data.loot = loot

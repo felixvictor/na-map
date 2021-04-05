@@ -18,12 +18,12 @@ import { registerEvent } from "../analytics"
 import { insertBaseModal } from "common/common-browser"
 import { formatPP, formatSignInt, formatSignPercent } from "common/common-format"
 import { getOrdinal } from "common/common-math"
-import { sortBy } from "common/common-node"
 import { chunkify } from "../util"
 
 import JQuery from "jquery"
 import { Module, ModuleEntity } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { sortBy } from "common/common"
 
 export default class ListModules {
     private readonly _baseName: string
@@ -42,7 +42,7 @@ export default class ListModules {
 
     async _loadAndSetupData(): Promise<void> {
         this._moduleData = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../lib/gen-generic/modules.json")
+            await import(/* webpackChunkName: "data-modules" */ "../../../../lib/gen-generic/modules.json")
         ).default as Module[]
     }
 

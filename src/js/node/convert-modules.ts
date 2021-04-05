@@ -13,9 +13,9 @@ import path from "path"
 import d3Array from "d3-array"
 const { group: d3Group } = d3Array
 
-import { capitalizeFirstLetter, currentServerStartDate as serverDate, woodType } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
-import { cleanName, sortBy } from "../common/common-node"
+import { capitalizeFirstLetter, currentServerStartDate as serverDate, sortBy, woodType } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverIds } from "../common/servers"
 
@@ -32,6 +32,8 @@ import { ModifierName } from "../common/interface"
 type APIModifierName = string
 
 let apiItems: APIItemGeneric[]
+
+const commonPaths = getCommonPaths()
 
 // noinspection SpellCheckingInspection
 const notUsedExceptionalWoodIds = new Set([

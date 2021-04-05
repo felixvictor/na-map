@@ -15,10 +15,9 @@ import "bootstrap-select"
 import { select as d3Select, Selection } from "d3-selection"
 
 import { registerEvent } from "../analytics"
-import { woodType, WoodType, WoodTypeList } from "common/common"
+import { sortBy, woodType, WoodType, WoodTypeList } from "common/common"
 import { insertBaseModal } from "common/common-browser"
 import { formatInt } from "common/common-format"
-import { sortBy } from "common/common-node"
 
 import JQuery from "jquery"
 import { Price, ShipBlueprint, WoodData } from "common/gen-json"
@@ -80,9 +79,9 @@ export default class ListShipBlueprints {
 
     async _loadAndSetupData(): Promise<void> {
         this._blueprintData = (
-            await import(/* webpackChunkName: "data-ship-blueprints" */ "../../../lib/gen-generic/ship-blueprints.json")
+            await import(/* webpackChunkName: "data-ship-blueprints" */ "../../../../lib/gen-generic/ship-blueprints.json")
         ).default as ShipBlueprint[]
-        this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../../lib/gen-generic/woods.json"))
+        this._woodData = (await import(/* webpackChunkName: "data-woods" */ "../../../../lib/gen-generic/woods.json"))
             .default as WoodData
 
         /**
@@ -91,7 +90,7 @@ export default class ListShipBlueprints {
          * - values: extractionCost
          */
         const costs = (
-            await import(/* webpackChunkName: "data-ship-blueprints" */ "../../../lib/gen-generic/prices.json")
+            await import(/* webpackChunkName: "data-ship-blueprints" */ "../../../../lib/gen-generic/prices.json")
         ).default as Price
         this._extractionCosts = new Map<string, StandardCost>(
             costs.standard.map((cost) => [cost.name, { reales: cost.reales, labour: cost?.labour ?? 0 }])

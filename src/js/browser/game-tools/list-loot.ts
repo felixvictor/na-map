@@ -17,7 +17,6 @@ import htm from "htm"
 import { registerEvent } from "../analytics"
 import { formatInt } from "common/common-format"
 import { getBaseModalHTML } from "common/common-game-tools"
-import { sortBy } from "common/common-node"
 
 import JQuery from "jquery"
 import {
@@ -31,7 +30,7 @@ import {
 } from "common/gen-json"
 import { lootType, LootType } from "common/types"
 import { HtmlResult, HtmlString } from "common/interface"
-import { WoodType } from "common/common"
+import { sortBy, WoodType } from "common/common"
 
 const html = htm.bind(h)
 
@@ -77,7 +76,7 @@ export default class ListLoot {
     }
 
     async _loadAndSetupData(): Promise<void> {
-        const sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../../lib/gen-generic/loot.json"))
+        const sourceData = (await import(/* webpackChunkName: "data-loot" */ "../../../../lib/gen-generic/loot.json"))
             .default as Loot
         console.log(sourceData)
         for (const type of this.#types) {

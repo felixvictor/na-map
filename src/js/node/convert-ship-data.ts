@@ -13,17 +13,18 @@ import path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
-import { currentServerStartDate as serverDate } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
+import { currentServerStartDate as serverDate, isEmpty, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file"
 import { roundToThousands, speedConstA, speedConstB } from "../common/common-math"
-import { cleanName, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIShip, APIShipBlueprint, Limit, Specs } from "./api-item"
 import { Cannon, ShipBlueprint, ShipData, ShipGunDeck, ShipGuns } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
-import { isEmpty } from "../common/common"
+
+const commonPaths = getCommonPaths()
 
 type ElementMap = Map<string, { [key: string]: string; group: string; element: string }>
 interface SubFileStructure {
@@ -373,11 +374,9 @@ const convertGenericShipData = (): ShipData[] => {
                 const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2
 
                 guns.total += gunsPerDeck
-                if (guns.gunsPerDeck[deckIndex].maxCarroLb) {
-                    guns.broadside.carronades += (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
-                } else {
-                    guns.broadside.carronades += cannonBroadside
-                }
+                guns.broadside.carronades += guns.gunsPerDeck[deckIndex].maxCarroLb
+                    ? (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
+                    : cannonBroadside
 
                 guns.broadside.cannons += cannonBroadside
             }

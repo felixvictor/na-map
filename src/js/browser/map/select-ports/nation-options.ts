@@ -8,8 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { Nation, nations } from "common/common"
-import { sortBy } from "common/common-node"
+import { Nation, nations, sortBy } from "common/common"
 
 export const getNationOptions = (neutralPortsIncluded = true): string =>
     `${nations

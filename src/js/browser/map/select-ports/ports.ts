@@ -12,12 +12,11 @@ import SelectPortsSelect from "./select"
 
 import { registerEvent } from "../../analytics"
 import { Coordinate, Distance, getDistance, Point } from "common/common-math"
-import { sortBy } from "common/common-node"
 import DisplayPorts from "../display-ports"
 
 import { Port, PortIntersection, PortWithTrades, TradeGoodProfit, TradeProfit } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import { NationShortName, TupleKeyMap } from "common/common"
+import { NationShortName, sortBy, TupleKeyMap } from "common/common"
 
 interface SelectPort {
     [index: string]: PortIntersection
@@ -86,7 +85,7 @@ export default class SelectPortsSelectPorts extends SelectPortsSelect {
     async _loadData(): Promise<void> {
         if (!this.#dataLoaded) {
             const distances = (
-                await import(/* webpackChunkName: "data-distances" */ "../../../../lib/gen-generic/distances.json")
+                await import(/* webpackChunkName: "data-distances" */ "../../../../../lib/gen-generic/distances.json")
             ).default as Distance[]
             this.#distances = new Map(
                 distances.map(([fromPortId, toPortId, distance]) => [

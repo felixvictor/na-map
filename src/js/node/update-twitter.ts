@@ -15,18 +15,24 @@ import filterXSS from "xss"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import utc from "dayjs/plugin/utc.js"
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
 
-import { currentServerStartDateTime, findNationByName, findNationByNationShortName } from "../common/common"
-import { commonPaths } from "../common/common-dir"
+import {
+    currentServerStartDateTime,
+    findNationByName,
+    findNationByNationShortName,
+    simpleStringSort,
+} from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
-import { cleanName, simpleStringSort } from "../common/common-node"
+import { cleanName } from "../common/common-node"
 import { flagValidity, portBattleCooldown } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 
-dayjs.extend(customParseFormat)
-dayjs.extend(utc)
+const commonPaths = getCommonPaths()
 
 const consumerKey = process.argv[2]
 const consumerSecret = process.argv[3]

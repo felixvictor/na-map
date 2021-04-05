@@ -10,12 +10,13 @@
 import * as fs from "fs";
 import path from "path";
 import convert from "xml-js";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate, isEmpty, sortBy } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file";
 import { roundToThousands, speedConstA, speedConstB } from "../common/common-math";
-import { cleanName, sortBy } from "../common/common-node";
+import { baseAPIFilename, cleanName } from "../common/common-node";
 import { serverIds } from "../common/servers";
-import { isEmpty } from "../common/common";
+const commonPaths = getCommonPaths();
 const middleMastThicknessRatio = 0.75;
 const topMastThicknessRatio = 0.5;
 const plankingRatio = 0.2134;
@@ -268,12 +269,9 @@ const convertGenericShipData = () => {
             const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount;
             const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2;
             guns.total += gunsPerDeck;
-            if (guns.gunsPerDeck[deckIndex].maxCarroLb) {
-                guns.broadside.carronades += (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2;
-            }
-            else {
-                guns.broadside.carronades += cannonBroadside;
-            }
+            guns.broadside.carronades += guns.gunsPerDeck[deckIndex].maxCarroLb
+                ? (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
+                : cannonBroadside;
             guns.broadside.cannons += cannonBroadside;
         }
         addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex);

@@ -10,8 +10,8 @@
 
 import SelectPortsSelect from "./select"
 import { registerEvent } from "../../analytics"
-import { simpleStringSort } from "common/common-node"
 import DisplayPorts from "js/browser/map/display-ports"
+import { simpleStringSort } from "common/common"
 
 export default class SelectPortsSelectClan extends SelectPortsSelect {
     #button: HTMLButtonElement

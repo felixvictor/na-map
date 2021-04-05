@@ -13,7 +13,7 @@
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
-import { BaseModalPure, DataSource } from "./interface"
+import { BaseModalPure, DataSource, HtmlString } from "./interface"
 import { NationListAlternative } from "common/gen-json"
 import { findNationByNationShortName } from "common/common"
 
@@ -297,3 +297,5 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
 
     return Math.floor(width)
 }
+
+export const getIdFromBaseName = (baseName: string): HtmlString => baseName.toLocaleLowerCase().replaceAll(" ", "-")

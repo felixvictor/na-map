@@ -14,10 +14,10 @@ import Deque from "collections/deque"
 import { default as PNG } from "pngjs"
 
 import { currentServerStartDate as serverDate } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { simpleNumberSort } from "../common/common-node"
+import { baseAPIFilename, simpleNumberSort } from "../common/common-node"
 import { distanceMapSize, mapSize } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
@@ -29,6 +29,8 @@ type SpotType = number
 
 // type (spotLand, spotWater, port id)
 type GridMap = SpotType[]
+
+const commonPaths = getCommonPaths()
 
 class Port {
     apiPorts: APIPort[] = []

@@ -9,10 +9,9 @@
  */
 
 import { registerEvent } from "../../analytics"
-import { sortBy } from "common/common-node"
 import { HtmlString } from "common/interface"
 import { formatInt, formatSiCurrency } from "common/common-format"
-import { NationShortName } from "common/common"
+import { NationShortName, sortBy } from "common/common"
 import { InventoryEntity } from "common/gen-json"
 
 import SelectPortsSelect from "./select"

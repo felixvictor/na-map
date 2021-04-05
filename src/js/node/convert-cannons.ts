@@ -13,13 +13,15 @@ import path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
-import { commonPaths } from "../common/common-dir"
+import { getCommonPaths } from "../common/common-dir"
 import { readTextFile, saveJsonAsync } from "../common/common-file"
 import { round } from "../common/common-math"
 
 import { cannonEntityType, CannonEntityType, CannonType, cannonType, peneDistance } from "../common/common"
 import { Cannon, CannonEntity, CannonPenetration, CannonValue } from "../common/gen-json"
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
+
+const commonPaths = getCommonPaths()
 
 const countDecimals = (value: number | undefined): number => {
     if (value === undefined) {

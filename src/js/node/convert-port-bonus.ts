@@ -12,10 +12,10 @@ import * as fs from "fs"
 import path from "path"
 import { default as csvParser } from "csv-parser"
 
-import { currentServerStartDate as serverDate } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
+import { currentServerStartDate as serverDate, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
-import { cleanName, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
@@ -31,6 +31,7 @@ interface CSVData {
     Bonus5: string
 }
 
+const commonPaths = getCommonPaths()
 let apiPorts = [] as APIPort[]
 let portNames: Map<string, number> = {} as Map<string, number>
 

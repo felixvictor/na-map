@@ -20,15 +20,15 @@ const TerserPlugin = require("terser-webpack-plugin")
 const svgToMiniDataURI = require("mini-svg-data-uri")
 const { extendDefaultPlugins, optimize } = require("svgo")
 
-const dirOutput = path.resolve(__dirname, "public")
-const dirSrc = path.resolve(__dirname, "src")
-const dirLib = path.resolve(dirSrc, "lib")
+const { getCommonPaths } = require("./dist/js/common/common-dir.cjs")
+const commonPaths = getCommonPaths(__dirname)
+const { dirLib, dirOutput, dirSrc } = commonPaths
 
 const dirEjs = path.resolve(dirSrc, "ejs")
 const dirFlags = path.resolve(dirSrc, "images", "flags")
 const dirFonts = path.resolve(dirSrc, "fonts")
 const dirIcons = path.resolve(dirSrc, "icons")
-const dirJsSrc = path.resolve(dirSrc, "js")
+const dirJs = path.resolve(dirSrc, "js")
 const dirMap = path.resolve(dirSrc, "images", "map")
 const dirPrefixIcons = path.join("images", "icons")
 
@@ -243,7 +243,7 @@ const config = {
 
     devtool: false,
 
-    entry: [path.resolve(dirJsSrc, "browser/main.ts")],
+    entry: [path.resolve(dirJs, "browser/main.ts")],
 
     externals: {
         jquery: "jQuery",
@@ -355,7 +355,7 @@ const config = {
         rules: [
             {
                 test: /\.(ts|js)$/,
-                include: dirJsSrc,
+                include: dirJs,
                 use: [{ loader: "babel-loader", options: babelOpt }],
             },
             {

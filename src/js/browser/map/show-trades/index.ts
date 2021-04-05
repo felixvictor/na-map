@@ -363,7 +363,7 @@ export default class ShowTrades {
 
     async _loadData(): Promise<void> {
         const pbData = await loadJsonFile<PortBattlePerServer[]>(`${this._serverName}-pb.json`)
-        const portData = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
+        const portData = (await import(/* webpackChunkName: "data-ports" */ "../../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         // Combine port data with port battle data
         this._portData = portData.map((port) => {

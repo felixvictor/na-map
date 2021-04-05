@@ -10,11 +10,11 @@
 
 import path from "path"
 
-import { currentServerStartDate as serverDate } from "../common/common"
-import { baseAPIFilename, commonPaths } from "../common/common-dir"
+import { currentServerStartDate as serverDate, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { getOrdinal } from "../common/common-math"
-import { cleanName, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import {
@@ -86,6 +86,7 @@ const getChestItemsFromChestLootTable = (chestLootTableId: number): LootChestIte
     apiItems.filter((item) => Number(item.Id) === chestLootTableId).flatMap((item) => getChestItems(item.Items ?? []))
 
 const convertLoot = async (): Promise<void> => {
+    const commonPaths = getCommonPaths()
     const data = {} as Loot
 
     // Loot

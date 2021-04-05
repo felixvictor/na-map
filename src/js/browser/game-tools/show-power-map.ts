@@ -125,7 +125,7 @@ export default class PowerMap extends BaseModal {
         ]
         const readData = {} as JsonData
 
-        this.#portData = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        this.#portData = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<JsonData>(dataSources, readData)
 
