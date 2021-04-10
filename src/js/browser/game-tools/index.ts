@@ -12,7 +12,6 @@ import { registerEvent } from "../analytics"
 import { appVersion } from "common/common-browser"
 
 import { CompareShips } from "./compare-ships"
-import CompareWoods from "./compare-woods"
 import ListBuildings from "./list-buildings"
 import ListCannons from "./list-cannons"
 import ListIngredients from "./list-ingredients"
@@ -27,6 +26,7 @@ import ListWoods from "./list-woods"
 
 import ShowIncomeMap from "./show-income-map"
 import ShowPortOwnerships from "./show-port-ownerships"
+import { CompareWoods } from "./compare-woods"
 
 /**
  * Init
@@ -49,7 +49,7 @@ const init = (serverId: string, urlParams: URLSearchParams): void => {
 
     checkShipCompareData()
 
-    void new CompareWoods("wood")
+    void new CompareWoods()
     void new ListWoods()
     void new ListBuildings()
     void new ListCannons()

@@ -43,6 +43,14 @@ export default class Select {
         select$.selectpicker(options)
     }
 
+    static disable(select$: JQuery<HTMLSelectElement>): void {
+        select$.prop("disabled", true)
+    }
+
+    static enable(select$: JQuery<HTMLSelectElement>): void {
+        select$.removeAttr("disabled").selectpicker("refresh")
+    }
+
     static render(select$: JQuery<HTMLSelectElement>): void {
         select$.selectpicker("render")
     }

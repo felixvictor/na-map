@@ -1,8 +1,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Make journey modal.
- * @module    map-tools/make-journey/modal
+ * @file      Ship compare modal.
+ * @module    map-tools/compare-ships/modal
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html

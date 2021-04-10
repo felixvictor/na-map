@@ -19,7 +19,6 @@ import {
 } from "d3-shape"
 import "d3-transition"
 
-import { isEmpty } from "common/common"
 import { pluralise, segmentRadians } from "common/common-browser"
 import { formatFloat, formatInt, formatSignFloat, formatSignInt } from "common/common-format"
 import { degreesToCompass, getOrdinal } from "common/common-math"
@@ -123,7 +122,7 @@ export class ShipBase extends Ship {
 
     _updateCompareWindProfiles(): void {
         for (const otherCompareId of this._shipCompare.columnsCompare) {
-            if (!isEmpty(this._shipCompare.selectedShips[otherCompareId])) {
+            if (this._shipCompare.selectedShips[otherCompareId]) {
                 ;(this._shipCompare.selectedShips[otherCompareId] as ShipComparison).updateWindProfileRotation()
             }
         }

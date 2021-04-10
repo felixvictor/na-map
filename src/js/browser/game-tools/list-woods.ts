@@ -17,17 +17,14 @@ import { registerEvent } from "../analytics"
 import {
     capitalizeFirstLetter,
     simpleStringSort,
-    WoodFamily,
-    woodFamily,
-    woodType,
-    WoodType,
-    WoodTypeList,
 } from "common/common"
 import { insertBaseModal } from "common/common-browser"
 import { formatFloatFixed, formatPP } from "common/common-format"
 
-import { WoodData, WoodProperty, WoodTrimOrFrame } from "common/gen-json"
+import { WoodJsonData, WoodProperty, WoodTrimOrFrame } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { woodFamily, WoodFamily, WoodType, woodType } from "./compare-woods"
+import { WoodTypeList } from "compare-woods"
 
 /**
  *
@@ -45,8 +42,8 @@ export default class ListWoods {
         Selection<HTMLTableElement, unknown, HTMLElement, unknown>
     >
 
-    private _woodData: WoodData = {} as WoodData
-    private _woodDataDefault: WoodData = {} as WoodData
+    private _woodData: WoodJsonData = {} as WoodJsonData
+    private _woodDataDefault: WoodJsonData = {} as WoodJsonData
     private readonly _baseId: HtmlString
     private readonly _baseName: string
     private readonly _buttonId: HtmlString
@@ -81,7 +78,7 @@ export default class ListWoods {
     async _loadData(): Promise<void> {
         this._woodDataDefault = (
             await import(/* webpackChunkName: "data-woods" */ "../../../../lib/gen-generic/woods.json")
-        ).default as WoodData
+        ).default as WoodJsonData
     }
 
     _setupData(): void {

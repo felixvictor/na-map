@@ -15,22 +15,7 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
 import { serverMaintenanceHour } from "./common-var"
-import { ArrayIndex, HtmlString } from "./interface"
-
-export const woodFamily = ["regular", "seasoned", "exceptional"]!
-export type WoodFamily = typeof woodFamily[number]
-
-export const woodType = ["frame", "trim"]!
-export type WoodType = typeof woodType[number]
-export type WoodTypeList<T> = {
-    [K in WoodType]: T
-}
-export type WoodTypeArray<T> = {
-    [K in WoodType]: T[]
-}
-export type WoodTypeNestedArray<T> = {
-    [K1 in WoodType]: ArrayIndex<T>
-}
+import { HtmlString } from "./interface"
 
 export const cannonType = ["medium", "long", "carronade"]!
 export type CannonType = typeof cannonType[number]
@@ -200,9 +185,8 @@ export const validNationShortName = (nationShortName: string): boolean =>
  * @param   object - Object
  * @returns True if object is empty
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const isEmpty = (object: object): boolean =>
-    Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object
+export const isEmpty = (object: Record<string, unknown> | undefined): boolean =>
+    object !== undefined && Object.getOwnPropertyNames(object).length === 0
 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}

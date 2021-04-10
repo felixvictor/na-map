@@ -2,19 +2,21 @@
  * This file is part of na-map.
  *
  * @file      Compare ships file - select wood.
- * @module    game-tools/compare-ships/compare-ships/select-wood
+ * @module    game-tools/compare-ships/select-wood
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import CompareWoods from "../compare-woods"
-import Select from "util/select"
-import { ShipColumnType } from "./index"
-import { woodType, WoodType, WoodTypeList } from "common/common"
-import { ShipColumnTypeList } from "compare-ships"
-import { HtmlString } from "common/interface"
 import { select as d3Select } from "d3-selection"
+
+import { HtmlString } from "common/interface"
+import { ShipColumnTypeList } from "compare-ships"
+import { ShipColumnType } from "./index"
+import { WoodTypeList } from "compare-woods"
+
+import Select from "util/select"
+import { CompareWoods, woodType, WoodType } from "../compare-woods"
 
 export default class SelectWood extends Select {
     #select$ = {} as ShipColumnTypeList<WoodTypeList<JQuery<HTMLSelectElement>>>
@@ -64,7 +66,7 @@ export default class SelectWood extends Select {
     }
 
     _injectSelects(columnId: string): void {
-        const mainDiv = d3Select(`#${super.baseId}-${columnId.toLowerCase()}`)
+        const mainDiv = d3Select(`#${super.baseId}-${columnId}`)
         console.log("wood _injectSelects", mainDiv)
 
         const div = mainDiv.append("div").attr("class", "input-group justify-content-between mb-1")

@@ -85,17 +85,12 @@ export default class SelectShip extends Select {
 
     enableSelect(columnId: string): void {
         console.log("enableSelect", columnId)
-        this.#select$[columnId].removeAttr("disabled")
-        Select.refresh(this.#select$[columnId])
+        Select.enable(this.#select$[columnId])
     }
 
     _injectSelects(id: HtmlString, columnId: string): void {
-        const select = d3Select(`#${super.baseId}-${columnId.toLowerCase()} .input-group label select`)
-        console.log(
-            "ship _injectSelects",
-            `#${super.baseId}-${columnId.toLowerCase()} .input-group label select`,
-            select.node()
-        )
+        const select = d3Select(`#${super.baseId}-${columnId} .input-group label select`)
+        console.log("ship _injectSelects", `#${super.baseId}-${columnId} .input-group label select`, select.node())
 
         select.attr("name", id).attr("id", this.getSelectId(columnId))
     }
@@ -107,6 +102,8 @@ export default class SelectShip extends Select {
         this.#select$[columnId] = $(`#${id}`)
         const options = this._getShipOptions()
         this.#select$[columnId].append(options)
-        this.#select$[columnId].prop("disabled", columnId !== "base")
+        if (columnId !== "base") {
+            Select.disable(this.#select$[columnId])
+        }
     }
 }

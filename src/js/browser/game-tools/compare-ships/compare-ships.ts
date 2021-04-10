@@ -14,18 +14,17 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
 import { registerEvent } from "../../analytics"
 import { appVersion, colourGreenDark, colourRedDark, colourWhite, getElementWidth } from "common/common-browser"
-import { isEmpty, woodType } from "common/common"
 import { hashids, hullRepairsPercent, repairTime, rigRepairsPercent } from "common/common-game-tools"
 import { copyToClipboard } from "../../util"
 
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-data"
 import CompareShipsModal from "./modal"
-import CompareWoods from "../compare-woods"
 import SaveImage from "./save-image"
 import Select from "util/select"
 import SelectModule from "./select-module"
 import SelectShip from "./select-ship"
 import SelectWood from "./select-wood"
+import { CompareWoods, woodType } from "../compare-woods"
 import { ShipBase } from "./ship-base"
 import { ShipComparison } from "./ship-comparison"
 
@@ -57,13 +56,14 @@ export class CompareShips {
     readonly #columnIds: ShipColumnType[]
     readonly #woodId = "wood-ship"
 
+    selectedShips = {} as ShipColumnTypeList<ShipBase | ShipComparison | undefined>
+
     colorScale!: ScaleLinear<string, string>
     readonly colourScaleSpeedDiff: ScaleLinear<string, string>
     readonly columnsCompare: ShipColumnType[]
     innerRadius!: number
     outerRadius!: number
     radiusSpeedScale!: ScaleLinear<number, number>
-    selectedShips!: Index<ShipBase | ShipComparison>
     singleShipData!: ShipData
     shipMassScale!: ScaleLinear<number, number>
     svgHeight!: number
@@ -84,8 +84,8 @@ export class CompareShips {
 
     constructor(id = "compare-ships") {
         this.#baseId = id
-        this.#baseName = this.#baseId === "compare-ships" ? "Compare ships" : this.#baseId
 
+        this.#baseName = this.#baseId === "compare-ships" ? "Compare ships" : this.#baseId
         this.#menuId = `menu-${this.#baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
@@ -96,7 +96,9 @@ export class CompareShips {
         this.#columnIds = [...this.columnsCompare]
         this.#columnIds.unshift("base")
 
-        this.selectedShips = { Base: {} as ShipBase, C1: {} as ShipComparison, C2: {} as ShipComparison }
+        for (const columnId of this.#columnIds) {
+            this.selectedShips[columnId] = undefined
+        }
 
         this._setupArrow()
         if (this.#baseId !== "ship-journey") {
@@ -256,7 +258,7 @@ export class CompareShips {
         this._setupData()
         if (this.#baseId !== "ship-journey") {
             this.woodCompare = new CompareWoods(this.#woodId)
-            await this.woodCompare.woodInit()
+            await this.woodCompare.init()
         }
     }
 
@@ -328,6 +330,7 @@ export class CompareShips {
         Select.construct(shipSel$, { title: "Ship" })
         Select.resetToDefault(shipSel$)
         shipSel$.on("changed.bs.select", () => {
+            console.log("changed.bs.select", shipSel$, shipSel$.val())
             this._shipIds[columnId] = Number(shipSel$.val())
             if (this.#baseId !== "ship-journey") {
                 this.#selectModule.setup(columnId)
@@ -761,7 +764,7 @@ export class CompareShips {
     }
 
     _updateDifferenceProfileNeeded(id: ShipColumnType): void {
-        if (id !== "base" && !isEmpty(this.selectedShips[id])) {
+        if (id !== "base" && this.selectedShips[id]) {
             ;(this.selectedShips[id] as ShipComparison).updateDifferenceProfile()
         }
     }
@@ -796,7 +799,7 @@ export class CompareShips {
                 this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this))
                 for (const otherCompareId of this.columnsCompare) {
                     this.#selectShip.enableSelect(otherCompareId)
-                    if (!isEmpty(this.selectedShips[otherCompareId])) {
+                    if (this.selectedShips[otherCompareId]) {
                         this._setSelectedShip(
                             otherCompareId,
                             new ShipComparison(

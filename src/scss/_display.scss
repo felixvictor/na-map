@@ -199,6 +199,37 @@ tr:nth-of-type(even) {
     }
 }
 
+
+/////////////////////////////////////7
+// bar
+
+.rate {
+    display: flex;
+
+    .bar {
+        position: relative;
+        top: 0;
+        float: left;
+        height: $spacer;
+    }
+
+    .basis {
+        @include colour($primary-600);
+    }
+
+    .pos {
+        @include colour($green-dark);
+    }
+
+    .neg {
+        @include colour($red-dark);
+    }
+
+    .diff {
+        opacity: 0.5;
+    }
+}
+
 /*
 
 

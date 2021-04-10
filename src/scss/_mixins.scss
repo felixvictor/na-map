@@ -20,3 +20,11 @@
     font-size: small;
     font-stretch: condensed;
 }
+
+/// Defines background colour and a contrasting text colour
+/// @param {color} $colour - Colour
+/// @output `color` and `background-color`
+@mixin colour($colour) {
+    color: color-contrast($colour);
+    background-color: $colour;
+}

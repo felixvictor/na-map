@@ -24,7 +24,7 @@ import {
     ModuleConvertEntity,
     ModuleEntity,
     ModulePropertiesEntity,
-    WoodData,
+    WoodJsonData,
     WoodTrimOrFrame,
 } from "../common/gen-json"
 import { ModifierName } from "../common/interface"
@@ -73,7 +73,7 @@ const exceptionalWoodIds = new Set([
 export const convertModulesAndWoodData = async (): Promise<void> => {
     const modules = new Map()
 
-    const woods = {} as WoodData
+    const woods = {} as WoodJsonData
     woods.trim = []
     woods.frame = []
 
