@@ -8,8 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { getBaseIdOutput, getBaseIdSelects } from "common/common-browser"
 import { WoodColumnType } from "../compare-woods"
-
 import Modal from "util/modal"
 
 export default class CompareWoodsModal extends Modal {
@@ -31,12 +31,13 @@ export default class CompareWoodsModal extends Modal {
         const body = super.getBodySel()
 
         const row = body.append("div").attr("class", "container-fluid").append("div").attr("class", "row wood")
-        for (const column of this.#columnIds) {
-            const div = row
+        for (const columnId of this.#columnIds) {
+            const columnDiv = row
                 .append("div")
-                .attr("class", `col-md-3 ms-auto pt-2 ${column === "base" ? "column-base" : "column-comp"}`)
+                .attr("class", `col-md-3 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
 
-            div.append("div").attr("id", `${super.baseId}-${column}`)
+            columnDiv.append("div").attr("id", `${getBaseIdSelects(super.baseId)}-${columnId}`)
+            columnDiv.append("div").attr("id", `${getBaseIdOutput(super.baseId)}-${columnId}`)
         }
     }
 }

@@ -45,17 +45,32 @@ export class CompareWoods {
         this._setupData()
     }
 
+    get select(): SelectWood {
+        return this.#select
+    }
+
+    get woodData(): WoodData {
+        return this.#woodData
+    }
+
     async init(): Promise<void> {
         this.#woodData = new WoodData(this.#baseId)
         await this.#woodData.init()
+        this.#select = new SelectWood(this.#baseId, this.#woodData)
+        for (const columnId of this.#columnIds) {
+            this.#select.setup(columnId)
+            if (this.#baseId === "compare-woods") {
+                this._setupSelectListener(columnId)
+            }
+        }
     }
 
     _setupData(): void {
         if (this.#baseId === "compare-woods") {
             this.#columnIdsCompare = ["c1", "c2", "c3"]
-        } else if (this.#baseId === "wood-journey") {
+        } else if (this.#baseId === "ship-journey") {
             this.#columnIdsCompare = []
-        } else {
+        } else if (this.#baseId === "compare-ships") {
             this.#columnIdsCompare = ["c1", "c2"]
         }
 
@@ -75,13 +90,8 @@ export class CompareWoods {
         if (this.#modal) {
             this.#modal.show()
         } else {
-            await this.init()
             this.#modal = new CompareWoodsModal(this.#baseName, this.#columnIds)
-            this.#select = new SelectWood(this.#baseId, this.#woodData)
-            for (const columnId of this.#columnIds) {
-                this.#select.setup(columnId)
-                this._setupSelectListener(columnId)
-            }
+            await this.init()
         }
     }
 
@@ -134,7 +144,6 @@ export class CompareWoods {
             select$.on("change", () => {
                 this.woodSelected(columnId, type, select$)
             })
-            SelectWood.construct(select$, { title: `Select ${type}` })
         }
     }
 

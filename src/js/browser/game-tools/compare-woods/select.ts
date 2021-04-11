@@ -18,6 +18,7 @@ import { WoodColumnType, WoodType, woodType } from "./index"
 
 import Select from "util/select"
 import { WoodData } from "./data"
+import { getBaseIdSelects } from "common/common-browser"
 
 export default class SelectWood extends Select {
     #select$ = {} as WoodColumnTypeList<WoodTypeList<JQuery<HTMLSelectElement>>>
@@ -66,11 +67,9 @@ export default class SelectWood extends Select {
     }
 
     _injectSelects(columnId: string): void {
-        const textDivId = `#${super.baseId}-${columnId}`
-        const textDivSel = d3Select(textDivId).node() as HTMLDivElement
-        const parent = d3Select(textDivSel.parentNode as HTMLDivElement)
+        const selectsDiv = d3Select(`#${getBaseIdSelects(super.baseId)}-${columnId}`)
 
-        const div = parent.insert("div", textDivId).attr("class", "input-group justify-content-between mb-1")
+        const div = selectsDiv.append("div").attr("class", "input-group justify-content-between mb-1")
         for (const type of woodType) {
             const id = this.getSelectId(columnId, type)
             div.append("label").append("select").attr("name", id).attr("id", id).attr("class", "selectpicker")
@@ -83,10 +82,15 @@ export default class SelectWood extends Select {
         for (const type of woodType) {
             this.#select$[columnId][type] = $(`#${this.getSelectId(columnId, type)}`)
             this._setupSelects(columnId, type, this.#select$[columnId][type])
+            SelectWood.construct(this.#select$[columnId][type], { title: `Select ${type}` })
         }
     }
 
     getSelectId(columnId: WoodColumnType, type: WoodType): HtmlString {
         return `${super.baseId}-${columnId}-${type}-select`
+    }
+
+    getSelect$(columnId: WoodColumnType, type: WoodType): JQuery<HTMLSelectElement> {
+        return this.#select$[columnId][type]
     }
 }

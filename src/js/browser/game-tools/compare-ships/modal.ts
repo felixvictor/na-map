@@ -14,6 +14,7 @@ import { HtmlString } from "common/interface"
 import { ShipColumnType } from "./index"
 
 import Modal from "util/modal"
+import { getBaseIdOutput, getBaseIdSelects } from "common/common-browser"
 
 export default class CompareShipsModal extends Modal {
     #buttonMakeImage = {} as Selection<HTMLButtonElement, unknown, HTMLElement, unknown>
@@ -69,16 +70,30 @@ export default class CompareShipsModal extends Modal {
         const row = body.append("div").attr("class", "container-fluid").append("div").attr("class", "row")
 
         for (const columnId of this.#columnIds) {
+            /*
+        for (const columnId of this.#columnIds) {
             const div = row
                 .append("div")
-                .attr("id", `${super.baseId}-${columnId.toLowerCase()}`)
+                .attr("class", `col-md-3 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
+
+            div.append("div").attr("id", `${getBaseIdSelects(super.baseId)}-${columnId}`)
+            div.append("div").attr("id", `${getBaseIdOutput(super.baseId)}-${columnId}`)
+        }
+             */
+
+            const columnDiv = row
+                .append("div")
+                .attr("id", `${super.baseId}-${columnId}`)
                 .attr("class", `col-md-4 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
 
-            const divShip = div.append("div").attr("class", "input-group justify-content-between flex-nowrap mb-1")
+            const selectsDiv = columnDiv.append("div").attr("id", `${getBaseIdSelects(super.baseId)}-${columnId}`)
+            const shipSelectDiv = selectsDiv
+                .append("div")
+                .attr("class", "input-group justify-content-between flex-nowrap mb-1")
 
             // Add clone icon except for first column
             if (columnId !== this.#columnIds[0]) {
-                divShip
+                shipSelectDiv
                     .append("button")
                     .attr("class", "btn btn-default icon-outline-button")
                     .attr("id", `${this.#cloneLeftButtonId}-${columnId}`)
@@ -88,11 +103,11 @@ export default class CompareShipsModal extends Modal {
                     .attr("class", "icon icon-clone-left")
             }
 
-            divShip.append("label").append("select").attr("class", "selectpicker")
+            shipSelectDiv.append("label").append("select").attr("class", "selectpicker")
 
             // Add clone icon except for last right column
             if (columnId !== this.#lastColumnId) {
-                divShip
+                shipSelectDiv
                     .append("button")
                     .attr("class", "btn btn-default icon-outline-button")
                     .attr("id", `${this.#cloneRightButtonId}-${columnId}`)
@@ -102,8 +117,9 @@ export default class CompareShipsModal extends Modal {
                     .attr("class", "icon icon-clone-right")
             }
 
-            div.append("div")
-                .attr("id", `${super.baseId}-${columnId}`)
+            columnDiv
+                .append("div")
+                .attr("id", `${getBaseIdOutput(super.baseId)}-${columnId}`)
                 .attr("class", `${columnId === "base" ? "ship-base" : "ship-compare"} compress`)
         }
 

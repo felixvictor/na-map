@@ -80,7 +80,7 @@ export class WoodData {
                 frame: this.findWoodId("frame", "Fir"),
                 trim: this.findWoodId("trim", "Crew Space"),
             }
-        } else if (this.#baseId === "wood-journey") {
+        } else if (this.#baseId === "ship-journey") {
             this.#defaultWoodId = {
                 frame: this.findWoodId("frame", "Oak"),
                 trim: this.findWoodId("trim", "Oak"),

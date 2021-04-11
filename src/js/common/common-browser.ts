@@ -299,3 +299,6 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
 }
 
 export const getIdFromBaseName = (baseName: string): HtmlString => baseName.toLocaleLowerCase().replaceAll(" ", "-")
+
+export const getBaseIdSelects = (id: HtmlString): HtmlString => `${id}-selects`
+export const getBaseIdOutput = (id: HtmlString): HtmlString => `${id}-output`

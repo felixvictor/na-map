@@ -54,7 +54,6 @@ export class CompareShips {
     readonly #baseId: HtmlString
     readonly #menuId: HtmlString
     readonly #columnIds: ShipColumnType[]
-    readonly #woodId = "wood-ship"
 
     selectedShips = {} as ShipColumnTypeList<ShipBase | ShipComparison | undefined>
 
@@ -257,7 +256,7 @@ export class CompareShips {
         ).default as ShipData[]
         this._setupData()
         if (this.#baseId !== "ship-journey") {
-            this.woodCompare = new CompareWoods(this.#woodId)
+            this.woodCompare = new CompareWoods(this.#baseId)
             await this.woodCompare.init()
         }
     }
@@ -320,15 +319,11 @@ export class CompareShips {
         }
     }
 
-    /**
-     * Listener for the select
-     * @param columnId - Column id
-     */
-    _setupShipSelectListener(columnId: ShipColumnType): void {
+    _setupShipAndWoodSelectListener(columnId: ShipColumnType): void {
         const shipSel$ = this.#selectShip.getSelect$(columnId)
 
         Select.construct(shipSel$, { title: "Ship" })
-        Select.resetToDefault(shipSel$)
+        Select.reset(shipSel$)
         shipSel$.on("changed.bs.select", () => {
             console.log("changed.bs.select", shipSel$, shipSel$.val())
             this._shipIds[columnId] = Number(shipSel$.val())
@@ -344,7 +339,7 @@ export class CompareShips {
             }
 
             if (this.#baseId !== "ship-journey") {
-                this.woodCompare.enableSelects(columnId)
+                this.woodCompare.select.enableSelects(columnId)
             }
         })
 
@@ -362,7 +357,7 @@ export class CompareShips {
 
     _initSelectListeners(): void {
         for (const columnId of this.#columnIds) {
-            this._setupShipSelectListener(columnId)
+            this._setupShipAndWoodSelectListener(columnId)
         }
     }
 
@@ -406,7 +401,7 @@ export class CompareShips {
 
     _initSelects(): void {
         this.#selectShip = new SelectShip(this.#baseId, this.#shipData)
-        this.#selectWood = new SelectWood(this.#woodId, this.woodCompare)
+        this.#selectWood = new SelectWood(this.#baseId, this.woodCompare)
         this.#selectModule = new SelectModule(this.#baseId, this.#moduleDataDefault)
 
         for (const columnId of this.#columnIds) {
@@ -649,12 +644,17 @@ export class CompareShips {
                 // Add modifier amount for both frame and trim
                 for (const type of woodType) {
                     const t1 = this.woodCompare
+                    console.log("_addModulesAndWoodData", t1)
                     const t2 = this.woodCompare.instances
+                    console.log("_addModulesAndWoodData", t2)
                     const t3 = this.woodCompare.instances[compareId]
+                    console.log("_addModulesAndWoodData", t3)
                     const t4 = this.woodCompare.instances[compareId][dataLink]
+                    console.log("_addModulesAndWoodData", t4)
                     const t5 = this.woodCompare.instances[compareId][dataLink][type]
+                    console.log("_addModulesAndWoodData", t5)
                     const t6 = this.woodCompare.instances[compareId][dataLink][type].properties
-                    console.log("_addModulesAndWoodData", t1, t2, t3, t4, t5, t6)
+                    console.log("_addModulesAndWoodData", t6)
                     for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
                         if (this._moduleAndWoodChanges.has(property.modifier)) {
                             this._setModifier(property)
@@ -876,7 +876,7 @@ export class CompareShips {
             this._setShip(columnId, ids[i])
             i += 1
 
-            this.woodCompare.enableSelects(columnId)
+            this.woodCompare.select.enableSelects(columnId)
             this.#selectModule.setup(columnId)
             this.#selectModule.resetSelects(columnId, this._getShipClass(columnId))
 

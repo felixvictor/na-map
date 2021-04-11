@@ -10,6 +10,8 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
+import { getBaseIdOutput } from "common/common-browser"
+
 import { HtmlString } from "common/interface"
 import { WoodColumnType, WoodType } from "./index"
 import { Amount, SelectedWood } from "compare-woods"
@@ -30,7 +32,7 @@ export class Wood {
         this.#columnId = columnId
         this.#woodData = woodData
 
-        this.#divId = `#${this.#baseId}-${this.#columnId}`
+        this.#divId = `#${getBaseIdOutput(this.#baseId)}-${columnId}`
         this._setupMainDiv()
 
         this._g = d3Select(this.#divId).select("g")

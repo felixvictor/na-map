@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select } from "d3-selection"
-
 import { HtmlString } from "common/interface"
 import { ShipColumnTypeList } from "compare-ships"
 import { ShipColumnType } from "./index"
@@ -28,18 +26,13 @@ export default class SelectWood extends Select {
         this.#woodCompare = woodCompare
     }
 
-    _setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
-        Select.setSelect(this.#select$[columnId][type], woodId)
-        this.#woodCompare.woodSelected(columnId, type, this.#select$[columnId][type])
-    }
-
     cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this.#woodCompare.enableSelects(newColumnId)
+        this.#woodCompare.select.enableSelects(newColumnId)
 
         if (this.#select$[currentColumnId].frame.val() !== "") {
             for (const type of woodType) {
                 const woodId = this.getId(currentColumnId, type)
-                this._setWood(newColumnId, type, woodId)
+                this.setWood(newColumnId, type, woodId)
             }
         }
     }
@@ -47,42 +40,22 @@ export default class SelectWood extends Select {
     getSelectedText(columnId: ShipColumnType): string[] {
         const woods = [] as string[]
         for (const type of woodType) {
-            woods.push(this.#woodCompare.getWoodName(type, Number(this.#select$[columnId][type].val())))
+            woods.push(this.#woodCompare.woodData.getWoodName(type, Number(this.#select$[columnId][type].val())))
         }
 
         return woods
     }
 
-    getSelectId(columnId: ShipColumnType, type: string): HtmlString {
-        return `${super.baseId}-${columnId}-${type}-select`
-    }
-
     getSelect$(columnId: ShipColumnType, type: WoodType): JQuery<HTMLSelectElement> {
-        return this.#select$[columnId][type]
+        return this.#woodCompare.select.getSelect$(columnId, type)
     }
 
     getId(columnId: ShipColumnType, type: WoodType): number {
-        return Number(this.#select$[columnId][type].val())
-    }
-
-    _injectSelects(columnId: string): void {
-        const mainDiv = d3Select(`#${super.baseId}-${columnId}`)
-        console.log("wood _injectSelects", mainDiv)
-
-        const div = mainDiv.append("div").attr("class", "input-group justify-content-between mb-1")
-        for (const type of woodType) {
-            const id = this.getSelectId(columnId, type)
-            div.append("label").append("select").attr("name", id).attr("id", id).attr("class", "selectpicker")
-        }
+        return Number(this.#woodCompare.select.getSelect$(columnId, type).val())
     }
 
     setup(columnId: ShipColumnType): void {
-        this.#select$[columnId] = {} as WoodTypeList<JQuery<HTMLSelectElement>>
-        this._injectSelects(columnId)
-        for (const type of woodType) {
-            this.#select$[columnId][type] = $(`#${this.getSelectId(columnId, type)}`)
-            this.#woodCompare.setupWoodSelects(columnId, type, this.#select$[columnId][type])
-        }
+        this.#woodCompare.select.setup(columnId)
     }
 
     setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
