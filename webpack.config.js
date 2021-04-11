@@ -471,21 +471,8 @@ if (isProduction) {
     config.optimization.minimize = true
     config.optimization.minimizer = [
         new CssMinimizerPlugin({
-            sourceMap: false,
-            minify: async (data) => {
-                const csso = require("csso")
-
-                const [[filename, input]] = Object.entries(data)
-                const minifiedCss = csso.minify(input, {
-                    comments: false,
-                    filename,
-                    sourceMap: false,
-                })
-
-                return {
-                    css: minifiedCss.css,
-                }
-            },
+            minimizerOptions: [{ comments: false, sourceMap: false }],
+            minify: [CssMinimizerPlugin.cssoMinify],
         }),
         new TerserPlugin({
             parallel: true,
