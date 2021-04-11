@@ -8,9 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "round-slider/src/roundslider"
-import "scss/roundslider.scss"
-
 import { displayCompass } from "../util"
 import { compassDirections, compassToDegrees, degreesToCompass } from "common/common-math"
 
