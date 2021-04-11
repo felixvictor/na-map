@@ -47,7 +47,6 @@ export class Wood {
     _setupMainDiv(): void {
         d3Select(`${this.#divId} div`).remove()
         this.#div = d3Select(this.#divId).append("div")
-        console.log("_setupMainDiv", this.#divId, this.#div.node(), this.#div)
     }
 
     getProperty(data: SelectedWood, type: WoodType, propertyName: string): Amount {

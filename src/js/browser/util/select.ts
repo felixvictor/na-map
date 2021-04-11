@@ -59,7 +59,7 @@ export default class Select {
         select$.selectpicker("refresh")
     }
 
-    static resetToDefault(select$: JQuery<HTMLSelectElement>): void {
-        select$.val("default").selectpicker("refresh")
+    static reset(select$: JQuery<HTMLSelectElement>, value: string | number | string[] = "default"): void {
+        select$.val(value).selectpicker("refresh")
     }
 }

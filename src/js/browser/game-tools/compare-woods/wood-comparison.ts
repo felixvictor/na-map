@@ -41,7 +41,7 @@ export class WoodComparison extends Wood {
         const diff = Number.parseFloat((a - b).toFixed(decimals))
         const value = isPercentage ? formatPercent(a / 100, decimals) : formatFloat(a)
 
-        return `${value} <span class="badge badge-white">${formatSignFloat(diff)}</span>`
+        return `${value} <span class="badge bg-white text-dark">${formatSignFloat(diff)}</span>`
     }
 
     _getBasePropertySum(propertyName: string): Amount {

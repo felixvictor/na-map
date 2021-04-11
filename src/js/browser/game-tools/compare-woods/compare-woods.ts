@@ -43,9 +43,6 @@ export class CompareWoods {
         }
 
         this._setupData()
-
-        // DEBUG --------------------------------------
-        void this._menuClicked()
     }
 
     async init(): Promise<void> {
@@ -135,7 +132,6 @@ export class CompareWoods {
         for (const type of woodType) {
             const select$ = $<HTMLSelectElement>(`#${this.#select.getSelectId(columnId, type)}`)
             select$.on("change", () => {
-                console.log("change", columnId, type, select$)
                 this.woodSelected(columnId, type, select$)
             })
             SelectWood.construct(select$, { title: `Select ${type}` })

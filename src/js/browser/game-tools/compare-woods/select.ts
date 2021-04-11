@@ -39,7 +39,7 @@ export default class SelectWood extends Select {
         const otherType: WoodType = type === "frame" ? "trim" : "frame"
 
         if (this.#woodIdsSelected[columnId][otherType] === this.#woodData.defaultWoodId[otherType]) {
-            Select.resetToDefault(this.#select$[columnId][type])
+            Select.reset(this.#select$[columnId][otherType], this.#woodData.defaultWoodId[otherType])
         }
     }
 

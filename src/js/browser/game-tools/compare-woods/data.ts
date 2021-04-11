@@ -93,14 +93,6 @@ export class WoodData {
         }
     }
 
-    async _loadAndSetupData(): Promise<void> {
-        this.#woodJsonData = (
-            await import(/* webpackChunkName: "data-woods" */ "../../../../../lib/gen-generic/woods.json")
-        ).default as WoodJsonData
-        this._setupData()
-        this._setupOption()
-    }
-
     _setupOption(): void {
         this.#frameSelectData = this.#woodJsonData.frame.sort(sortBy(["name"]))
         this.#trimSelectData = this.#woodJsonData.trim.sort(sortBy(["name"]))
@@ -122,7 +114,6 @@ export class WoodData {
                     (trim) => trim.properties.find((modifier) => modifier.modifier === propertyName)?.amount ?? 0
                 ),
             ]
-
             const minFrames = d3Min(frames) ?? 0
             const maxFrames = d3Max(frames) ?? 0
             const minTrims = d3Min(trims) ?? 0
@@ -137,6 +128,14 @@ export class WoodData {
     _setupSelectData(): void {
         this._setupOption()
         this._setupMinMax()
+    }
+
+    async _loadAndSetupData(): Promise<void> {
+        this.#woodJsonData = (
+            await import(/* webpackChunkName: "data-woods" */ "../../../../../lib/gen-generic/woods.json")
+        ).default as WoodJsonData
+        this._setupData()
+        this._setupSelectData()
     }
 
     async init(): Promise<void> {
