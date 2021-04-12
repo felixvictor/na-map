@@ -25,8 +25,6 @@ export class Wood {
     readonly #divId: HtmlString
     readonly #woodData: WoodData
 
-    private readonly _g: Selection<SVGGElement, unknown, HTMLElement, unknown> // XXXXXX ???????? XXXXXXXX
-
     constructor(id: HtmlString, columnId: WoodColumnType, woodData: WoodData) {
         this.#baseId = id
         this.#columnId = columnId
@@ -34,8 +32,6 @@ export class Wood {
 
         this.#divId = `#${getBaseIdOutput(this.#baseId)}-${columnId}`
         this._setupMainDiv()
-
-        this._g = d3Select(this.#divId).select("g")
     }
 
     get div(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
@@ -52,6 +48,7 @@ export class Wood {
     }
 
     getProperty(data: SelectedWood, type: WoodType, propertyName: string): Amount {
+        console.log("getProperty", data, type, propertyName)
         const property = data[type]?.properties.find((prop) => prop.modifier === propertyName)
 
         const amount = property?.amount ?? 0

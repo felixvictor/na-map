@@ -14,7 +14,7 @@ import { simpleStringSort, sortBy } from "common/common"
 
 import { WoodJsonData, WoodTrimOrFrame } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import { MinMax, WoodTypeList } from "compare-woods"
+import { MinMax, WoodDataMap, WoodTypeList } from "compare-woods"
 import { WoodType } from "./index"
 
 export class WoodData {
@@ -26,6 +26,7 @@ export class WoodData {
     #propertyNames = {} as Set<string>
     #trimSelectData = {} as WoodTrimOrFrame[]
     #woodJsonData = {} as WoodJsonData
+    #woods = {} as WoodDataMap
 
     constructor(id: HtmlString) {
         this.#baseId = id
@@ -48,7 +49,7 @@ export class WoodData {
     }
 
     findWoodId(type: WoodType, woodName: string): number {
-        return this.#woodJsonData[type].find((wood) => wood.name === woodName)?.id ?? 0
+        return [...this.#woods.entries()].find(([, value]) => value.type === type && value.name === woodName)?.[0] ?? 0
     }
 
     getMaxProperty(key: string): number {
@@ -59,12 +60,12 @@ export class WoodData {
         return this.#minMaxProperty.get(key)?.min ?? 1
     }
 
-    getWoodName(type: WoodType, woodId: number): string {
-        return this.#woodJsonData[type].find((wood) => wood.id === woodId)?.name ?? ""
+    getWoodName(woodId: number): string {
+        return this.#woods.get(woodId)?.name ?? ""
     }
 
-    getWoodTypeData(type: WoodType, woodId: number): WoodTrimOrFrame {
-        return this.#woodJsonData[type].find((wood) => wood.id === woodId) ?? ({} as WoodTrimOrFrame)
+    getWoodTypeData(woodId: number): WoodTrimOrFrame {
+        return this.#woods.get(woodId) ?? ({} as WoodTrimOrFrame)
     }
 
     _setupData(): void {
@@ -74,6 +75,12 @@ export class WoodData {
                 ...this.#woodJsonData.trim.flatMap((trim) => trim.properties.map((property) => property.modifier)),
             ].sort(simpleStringSort)
         )
+
+        this.#woods = new Map<number, WoodTrimOrFrame>([
+            ...new Map<number, WoodTrimOrFrame>(this.#woodJsonData.frame.map((wood) => [wood.id, wood])),
+            ...new Map<number, WoodTrimOrFrame>(this.#woodJsonData.trim.map((wood) => [wood.id, wood])),
+        ])
+        console.log(this.#woods)
 
         if (this.#baseId === "compare-woods") {
             this.#defaultWoodId = {

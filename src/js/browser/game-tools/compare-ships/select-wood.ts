@@ -9,15 +9,12 @@
  */
 
 import { HtmlString } from "common/interface"
-import { ShipColumnTypeList } from "compare-ships"
 import { ShipColumnType } from "./index"
-import { WoodTypeList } from "compare-woods"
 
 import Select from "util/select"
 import { CompareWoods, woodType, WoodType } from "../compare-woods"
 
 export default class SelectWood extends Select {
-    #select$ = {} as ShipColumnTypeList<WoodTypeList<JQuery<HTMLSelectElement>>>
     readonly #woodCompare: CompareWoods
 
     constructor(id: HtmlString, woodCompare: CompareWoods) {
@@ -29,9 +26,9 @@ export default class SelectWood extends Select {
     cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
         this.#woodCompare.select.enableSelects(newColumnId)
 
-        if (this.#select$[currentColumnId].frame.val() !== "") {
+        if (this.getSelectedId(currentColumnId, "frame")) {
             for (const type of woodType) {
-                const woodId = this.getId(currentColumnId, type)
+                const woodId = this.getSelectedId(currentColumnId, type)
                 this.setWood(newColumnId, type, woodId)
             }
         }
@@ -40,7 +37,8 @@ export default class SelectWood extends Select {
     getSelectedText(columnId: ShipColumnType): string[] {
         const woods = [] as string[]
         for (const type of woodType) {
-            woods.push(this.#woodCompare.woodData.getWoodName(type, Number(this.#select$[columnId][type].val())))
+            const woodId = this.getSelectedId(columnId, type)
+            woods.push(this.#woodCompare.woodData.getWoodName(woodId))
         }
 
         return woods
@@ -50,8 +48,8 @@ export default class SelectWood extends Select {
         return this.#woodCompare.select.getSelect$(columnId, type)
     }
 
-    getId(columnId: ShipColumnType, type: WoodType): number {
-        return Number(this.#woodCompare.select.getSelect$(columnId, type).val())
+    getSelectedId(columnId: ShipColumnType, type: WoodType): number {
+        return this.#woodCompare.select.getSelectedId(columnId, type)
     }
 
     setup(columnId: ShipColumnType): void {
@@ -59,7 +57,9 @@ export default class SelectWood extends Select {
     }
 
     setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
-        Select.setSelect(this.#select$[columnId][type], woodId)
-        this.#woodCompare.woodSelected(columnId, type, this.#select$[columnId][type])
+        const select$ = this.getSelect$(columnId, type)
+
+        Select.setSelect(select$, woodId)
+        this.#woodCompare.woodSelected(columnId, type, select$)
     }
 }

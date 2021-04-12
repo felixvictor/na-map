@@ -90,6 +90,12 @@ export default class SelectWood extends Select {
         return `${super.baseId}-${columnId}-${type}-select`
     }
 
+    getSelectedId(columnId: WoodColumnType, type: WoodType): number {
+        const select$ = this.#select$[columnId][type]
+
+        return Number(select$.val())
+    }
+
     getSelect$(columnId: WoodColumnType, type: WoodType): JQuery<HTMLSelectElement> {
         return this.#select$[columnId][type]
     }

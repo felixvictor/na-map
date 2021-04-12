@@ -459,7 +459,7 @@ export class CompareShips {
             if (shipId) {
                 data.push(shipId)
                 for (const type of woodType) {
-                    const woodId = this.#selectWood.getId(columnId, type)
+                    const woodId = this.#selectWood.getSelectedId(columnId, type)
                     data.push(woodId)
                 }
             }

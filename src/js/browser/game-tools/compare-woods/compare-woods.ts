@@ -13,7 +13,7 @@ import JQuery from "jquery"
 import { registerEvent } from "../../analytics"
 
 import { HtmlString } from "common/interface"
-import { DataLink, SelectedWood, WoodColumnTypeList, WoodTypeList } from "compare-woods"
+import { SelectedWood, WoodColumnTypeList, WoodTypeList } from "compare-woods"
 import { WoodColumnType, woodType, WoodType } from "./index"
 
 import CompareWoodsModal from "./modal"
@@ -149,8 +149,8 @@ export class CompareWoods {
 
     _getWoodData(id: WoodColumnType): SelectedWood {
         return {
-            frame: this.#woodData.getWoodTypeData("frame", this.#select.woodIdsSelected[id].frame),
-            trim: this.#woodData.getWoodTypeData("trim", this.#select.woodIdsSelected[id].trim),
+            frame: this.#woodData.getWoodTypeData(this.#select.getSelectedId(id, "frame")),
+            trim: this.#woodData.getWoodTypeData(this.#select.getSelectedId(id, "trim")),
         }
     }
 

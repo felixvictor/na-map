@@ -40,6 +40,8 @@ declare module "compare-woods" {
     interface WoodBaseAmount {
         amount: number
         isPercentage: boolean
+        min: number
+        max: number
     }
 
     interface WoodCompareAmount {
@@ -52,5 +54,5 @@ declare module "compare-woods" {
         [K in WoodColumnType]: T
     }
 
-    type DataLink = "_woodData" | "_compareData"
+    type WoodDataMap = Map<number, WoodTrimOrFrame>
 }

@@ -48,11 +48,11 @@ export class WoodBase extends Wood {
             }`
             text += '<span class="rate">'
             if (value.amount > 0) {
-                const right = (value.amount / super.woodData.getMaxProperty(key)) * middle
+                const right = (value.amount / value.max) * middle
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`
                 text += `<span class="bar pos diff" style="width:${right}%;"></span>`
             } else if (value.amount < 0) {
-                const right = (value.amount / super.woodData.getMinProperty(key)) * middle
+                const right = (value.amount / value.min) * middle
                 const left = middle - right
                 text += `<span class="bar neutral" style="width:${left}%;"></span>`
                 text += `<span class="bar neg diff" style="width:${right}%;"></span>`
@@ -61,14 +61,6 @@ export class WoodBase extends Wood {
             }
 
             text += "</span></td></tr>"
-            /*
-            console.log(
-                key,
-                value,
-                this.woodCompare.minMaxProperty.get(key).min,
-                this.woodCompare.minMaxProperty.get(key).max
-            );
-            */
         }
 
         text += "</tbody></table>"
@@ -87,6 +79,8 @@ export class WoodBase extends Wood {
             wood.properties.set(propertyName, {
                 amount: property.amount,
                 isPercentage: property.isPercentage,
+                min: super.woodData.getMinProperty(propertyName),
+                max: super.woodData.getMaxProperty(propertyName),
             })
         }
 
