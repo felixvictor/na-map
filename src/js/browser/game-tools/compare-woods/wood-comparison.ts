@@ -11,11 +11,13 @@
 import { formatFloat, formatPercent, formatSignFloat } from "common/common-format"
 
 import { HtmlString } from "common/interface"
-import { Amount, SelectedWood, WoodCompareAmount, WoodDisplayCompareData } from "compare-woods"
+import { Amount, SelectedWood, WoodCompareAmount } from "compare-woods"
 import { WoodColumnType } from "./index"
 
 import { Wood } from "./wood"
 import { WoodData } from "./data"
+
+type PropertyMap = Map<string, WoodCompareAmount>
 
 export class WoodComparison extends Wood {
     readonly #selectedBaseWoodData: SelectedWood
@@ -44,9 +46,9 @@ export class WoodComparison extends Wood {
         return `${value} <span class="badge bg-white text-dark">${formatSignFloat(diff)}</span>`
     }
 
-    _getBasePropertySum(propertyName: string): Amount {
-        const basePropertyFrame = super.getProperty(this.#selectedBaseWoodData, "frame", propertyName)
-        const basePropertyTrim = super.getProperty(this.#selectedBaseWoodData, "trim", propertyName)
+    _getBasePropertySum(modifierName: string): Amount {
+        const basePropertyFrame = super.getProperty(this.#selectedBaseWoodData, "frame", modifierName)
+        const basePropertyTrim = super.getProperty(this.#selectedBaseWoodData, "trim", modifierName)
 
         return {
             amount: basePropertyFrame.amount + basePropertyTrim.amount,
@@ -54,9 +56,9 @@ export class WoodComparison extends Wood {
         }
     }
 
-    _getComparePropertySum(propertyName: string): Amount {
-        const comparePropertyFrame = super.getProperty(this.#selectedCompareWoodData, "frame", propertyName)
-        const comparePropertyTrim = super.getProperty(this.#selectedCompareWoodData, "trim", propertyName)
+    _getComparePropertySum(modifierName: string): Amount {
+        const comparePropertyFrame = super.getProperty(this.#selectedCompareWoodData, "frame", modifierName)
+        const comparePropertyTrim = super.getProperty(this.#selectedCompareWoodData, "trim", modifierName)
 
         return {
             amount: comparePropertyFrame.amount + comparePropertyTrim.amount,
@@ -65,7 +67,7 @@ export class WoodComparison extends Wood {
     }
 
     // noinspection FunctionTooLongJS
-    _getText(wood: WoodDisplayCompareData): HtmlString {
+    _getText(properties: PropertyMap): HtmlString {
         const middle = 100 / 2
         let base = 0
         let diff = 0
@@ -73,7 +75,7 @@ export class WoodComparison extends Wood {
         let diffColour = ""
         let text = '<table class="table table-striped small wood mt-4"><thead>'
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
-        for (const [key, value] of wood.properties) {
+        for (const [key, value] of properties) {
             text += `<tr><td>${key}</td><td>${WoodComparison._getDiff(value.compare, value.base, value.isPercentage)}`
             text += '<span class="rate">'
             if (value.compare >= 0) {
@@ -95,12 +97,8 @@ export class WoodComparison extends Wood {
                 }
 
                 text += `<span class="bar neutral" style="width:${middle}%;"></span>`
-                text += `<span class="bar pos diff" style="width:${
-                    (base / super.woodData.getMaxProperty(key)) * middle
-                }%;"></span>`
-                text += `<span class="bar ${diffColour}" style="width:${
-                    (diff / super.woodData.getMaxProperty(key)) * middle
-                }%;"></span>`
+                text += `<span class="bar pos diff" style="width:${(base / value.max) * middle}%;"></span>`
+                text += `<span class="bar ${diffColour}" style="width:${(diff / value.max) * middle}%;"></span>`
             } else if (value.compare < 0) {
                 if (value.base < 0) {
                     if (value.compare >= value.base) {
@@ -122,15 +120,9 @@ export class WoodComparison extends Wood {
                     diffColour = "neg"
                 }
 
-                text += `<span class="bar neutral" style="width:${
-                    middle + (neutral / super.woodData.getMinProperty(key)) * middle
-                }%;"></span>`
-                text += `<span class="bar ${diffColour}" style="width:${
-                    (diff / super.woodData.getMinProperty(key)) * middle
-                }%;"></span>`
-                text += `<span class="bar neg diff" style="width:${
-                    (base / super.woodData.getMinProperty(key)) * middle
-                }%;"></span>`
+                text += `<span class="bar neutral" style="width:${middle + (neutral / value.min) * middle}%;"></span>`
+                text += `<span class="bar ${diffColour}" style="width:${(diff / value.min) * middle}%;"></span>`
+                text += `<span class="bar neg diff" style="width:${(base / value.min) * middle}%;"></span>`
             } else {
                 text += '<span class="bar neutral"></span>'
             }
@@ -143,22 +135,20 @@ export class WoodComparison extends Wood {
     }
 
     _printTextComparison(): void {
-        const wood = {
-            frame: this.#selectedCompareWoodData.frame.name,
-            trim: this.#selectedCompareWoodData.trim.name,
-            properties: new Map<string, WoodCompareAmount>(),
-        } as WoodDisplayCompareData
+        const properties = new Map() as PropertyMap
 
-        for (const propertyName of super.woodData.propertyNames) {
-            const basePropertySum = this._getBasePropertySum(propertyName)
-            const comparePropertySum = this._getComparePropertySum(propertyName)
-            wood.properties.set(propertyName, {
+        for (const modifierName of super.woodData.modifierNames) {
+            const basePropertySum = this._getBasePropertySum(modifierName)
+            const comparePropertySum = this._getComparePropertySum(modifierName)
+            properties.set(modifierName, {
                 base: basePropertySum.amount,
                 compare: comparePropertySum.amount,
                 isPercentage: basePropertySum.isPercentage,
+                min: super.woodData.getMinProperty(modifierName),
+                max: super.woodData.getMaxProperty(modifierName),
             })
         }
 
-        super.div.html(this._getText(wood))
+        super.div.html(this._getText(properties))
     }
 }

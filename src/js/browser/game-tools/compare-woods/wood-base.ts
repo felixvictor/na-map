@@ -11,11 +11,13 @@
 import { formatFloat, formatPercent } from "common/common-format"
 
 import { HtmlString } from "common/interface"
-import { Amount, SelectedWood, WoodBaseAmount, WoodDisplayBaseData } from "compare-woods"
+import { Amount, SelectedWood, WoodBaseAmount } from "compare-woods"
 import { WoodColumnType } from "./index"
 
 import { Wood } from "./wood"
 import { WoodData } from "./data"
+
+type PropertyMap = Map<string, WoodBaseAmount>
 
 export class WoodBase extends Wood {
     readonly #selectedWoodData: SelectedWood
@@ -28,9 +30,9 @@ export class WoodBase extends Wood {
         this._printText()
     }
 
-    _getPropertySum(propertyName: string): Amount {
-        const propertyFrame = super.getProperty(this.#selectedWoodData, "frame", propertyName)
-        const propertyTrim = super.getProperty(this.#selectedWoodData, "trim", propertyName)
+    _getPropertySum(modifierName: string): Amount {
+        const propertyFrame = super.getProperty(this.#selectedWoodData, "frame", modifierName)
+        const propertyTrim = super.getProperty(this.#selectedWoodData, "trim", modifierName)
 
         return {
             amount: propertyFrame.amount + propertyTrim.amount,
@@ -38,11 +40,11 @@ export class WoodBase extends Wood {
         }
     }
 
-    _getText(wood: WoodDisplayBaseData): HtmlString {
+    _getText(properties: PropertyMap): HtmlString {
         const middle = 100 / 2
         let text = '<table class="table table-striped small wood mt-4"><thead>'
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
-        for (const [key, value] of wood.properties) {
+        for (const [key, value] of properties) {
             text += `<tr><td>${key}</td><td>${
                 value.isPercentage ? formatPercent(value.amount / 100) : formatFloat(value.amount)
             }`
@@ -68,22 +70,18 @@ export class WoodBase extends Wood {
     }
 
     _printText(): void {
-        const wood = {
-            frame: this.#selectedWoodData.frame.name,
-            trim: this.#selectedWoodData.trim.name,
-            properties: new Map<string, WoodBaseAmount>(),
-        } as WoodDisplayBaseData
+        const properties = new Map() as PropertyMap
 
-        for (const propertyName of super.woodData.propertyNames) {
-            const property = this._getPropertySum(propertyName)
-            wood.properties.set(propertyName, {
+        for (const modifierName of super.woodData.modifierNames) {
+            const property = this._getPropertySum(modifierName)
+            properties.set(modifierName, {
                 amount: property.amount,
                 isPercentage: property.isPercentage,
-                min: super.woodData.getMinProperty(propertyName),
-                max: super.woodData.getMaxProperty(propertyName),
+                min: super.woodData.getMinProperty(modifierName),
+                max: super.woodData.getMaxProperty(modifierName),
             })
         }
 
-        super.div.html(this._getText(wood))
+        super.div.html(this._getText(properties))
     }
 }

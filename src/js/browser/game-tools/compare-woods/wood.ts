@@ -47,9 +47,8 @@ export class Wood {
         this.#div = d3Select(this.#divId).append("div")
     }
 
-    getProperty(data: SelectedWood, type: WoodType, propertyName: string): Amount {
-        console.log("getProperty", data, type, propertyName)
-        const property = data[type]?.properties.find((prop) => prop.modifier === propertyName)
+    getProperty(data: SelectedWood, type: WoodType, modifierName: string): Amount {
+        const property = data[type]?.properties.find((prop) => prop.modifier === modifierName)
 
         const amount = property?.amount ?? 0
         const isPercentage = property?.isPercentage ?? false

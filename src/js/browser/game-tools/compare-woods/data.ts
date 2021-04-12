@@ -20,12 +20,9 @@ import { WoodType } from "./index"
 export class WoodData {
     #baseId: HtmlString
     #defaultWoodId = {} as WoodTypeList<number>
-    #frameSelectData = {} as WoodTrimOrFrame[]
     #minMaxProperty: Map<string, MinMax> = new Map()
     #options = {} as WoodTypeList<HtmlString>
-    #propertyNames = {} as Set<string>
-    #trimSelectData = {} as WoodTrimOrFrame[]
-    #woodJsonData = {} as WoodJsonData
+    #modifierNames = {} as Set<string>
     #woods = {} as WoodDataMap
 
     constructor(id: HtmlString) {
@@ -36,16 +33,12 @@ export class WoodData {
         return this.#defaultWoodId
     }
 
-    get propertyNames(): Set<string> {
-        return this.#propertyNames
+    get modifierNames(): Set<string> {
+        return this.#modifierNames
     }
 
     get options(): WoodTypeList<HtmlString> {
         return this.#options
-    }
-
-    get woodJsonData(): WoodJsonData {
-        return this.#woodJsonData
     }
 
     findWoodId(type: WoodType, woodName: string): number {
@@ -68,19 +61,18 @@ export class WoodData {
         return this.#woods.get(woodId) ?? ({} as WoodTrimOrFrame)
     }
 
-    _setupData(): void {
-        this.#propertyNames = new Set<string>(
+    _setupData(woodJsonData: WoodJsonData): void {
+        this.#modifierNames = new Set<string>(
             [
-                ...this.#woodJsonData.frame.flatMap((frame) => frame.properties.map((property) => property.modifier)),
-                ...this.#woodJsonData.trim.flatMap((trim) => trim.properties.map((property) => property.modifier)),
+                ...woodJsonData.frame.flatMap((frame) => frame.properties.map((property) => property.modifier)),
+                ...woodJsonData.trim.flatMap((trim) => trim.properties.map((property) => property.modifier)),
             ].sort(simpleStringSort)
         )
 
         this.#woods = new Map<number, WoodTrimOrFrame>([
-            ...new Map<number, WoodTrimOrFrame>(this.#woodJsonData.frame.map((wood) => [wood.id, wood])),
-            ...new Map<number, WoodTrimOrFrame>(this.#woodJsonData.trim.map((wood) => [wood.id, wood])),
+            ...new Map<number, WoodTrimOrFrame>(woodJsonData.frame.map((wood) => [wood.id, wood])),
+            ...new Map<number, WoodTrimOrFrame>(woodJsonData.trim.map((wood) => [wood.id, wood])),
         ])
-        console.log(this.#woods)
 
         if (this.#baseId === "compare-woods") {
             this.#defaultWoodId = {
@@ -100,49 +92,53 @@ export class WoodData {
         }
     }
 
-    _setupOption(): void {
-        this.#frameSelectData = this.#woodJsonData.frame.sort(sortBy(["name"]))
-        this.#trimSelectData = this.#woodJsonData.trim.sort(sortBy(["name"]))
+    _setupOption(woodJsonData: WoodJsonData): void {
         this.#options = {
-            frame: this.#frameSelectData.map((wood) => `<option value="${wood.id}">${wood.name}</option>`).toString(),
-            trim: this.#trimSelectData.map((wood) => `<option value="${wood.id}">${wood.name}</option>`).toString(),
+            frame: woodJsonData.frame
+                .sort(sortBy(["name"]))
+                .map((wood) => `<option value="${wood.id}">${wood.name}</option>`)
+                .toString(),
+            trim: woodJsonData.trim
+                .sort(sortBy(["name"]))
+                .map((wood) => `<option value="${wood.id}">${wood.name}</option>`)
+                .toString(),
         }
     }
 
-    _setupMinMax(): void {
-        for (const propertyName of this.#propertyNames) {
+    _setupMinMax(woodJsonData: WoodJsonData): void {
+        for (const modifierName of this.#modifierNames) {
             const frames = [
-                ...this.#woodJsonData.frame.map(
-                    (frame) => frame.properties.find((modifier) => modifier.modifier === propertyName)?.amount ?? 0
+                ...woodJsonData.frame.map(
+                    (frame) => frame.properties.find((modifier) => modifier.modifier === modifierName)?.amount ?? 0
                 ),
             ]
             const trims = [
-                ...this.#woodJsonData.trim.map(
-                    (trim) => trim.properties.find((modifier) => modifier.modifier === propertyName)?.amount ?? 0
+                ...woodJsonData.trim.map(
+                    (trim) => trim.properties.find((modifier) => modifier.modifier === modifierName)?.amount ?? 0
                 ),
             ]
             const minFrames = d3Min(frames) ?? 0
             const maxFrames = d3Max(frames) ?? 0
             const minTrims = d3Min(trims) ?? 0
             const maxTrims = d3Max(trims) ?? 0
-            this.#minMaxProperty.set(propertyName, {
+            this.#minMaxProperty.set(modifierName, {
                 min: Math.min(0, minFrames + minTrims),
                 max: maxFrames + maxTrims,
             })
         }
     }
 
-    _setupSelectData(): void {
-        this._setupOption()
-        this._setupMinMax()
+    _setupSelectData(woodJsonData: WoodJsonData): void {
+        this._setupOption(woodJsonData)
+        this._setupMinMax(woodJsonData)
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this.#woodJsonData = (
+        const woodJsonData = (
             await import(/* webpackChunkName: "data-woods" */ "../../../../../lib/gen-generic/woods.json")
         ).default as WoodJsonData
-        this._setupData()
-        this._setupSelectData()
+        this._setupData(woodJsonData)
+        this._setupSelectData(woodJsonData)
     }
 
     async init(): Promise<void> {

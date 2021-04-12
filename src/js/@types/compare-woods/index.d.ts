@@ -25,18 +25,6 @@ declare module "compare-woods" {
 
     type SelectedWood = WoodTypeList<WoodTrimOrFrame>
 
-    interface WoodDisplayBaseData {
-        frame: string
-        trim: string
-        properties: Map<string, WoodBaseAmount>
-    }
-
-    interface WoodDisplayCompareData {
-        frame: string
-        trim: string
-        properties: Map<string, WoodCompareAmount>
-    }
-
     interface WoodBaseAmount {
         amount: number
         isPercentage: boolean
@@ -48,6 +36,8 @@ declare module "compare-woods" {
         base: number
         compare: number
         isPercentage: boolean
+        min: number
+        max: number
     }
 
     type WoodColumnTypeList<T> = {
