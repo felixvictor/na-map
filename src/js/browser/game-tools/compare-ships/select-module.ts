@@ -153,7 +153,7 @@ export default class SelectModule extends Select {
             .sort(sortBy(["key"]))
 
         let options: string
-        const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
+        const moduleTypeWithSingleOption = new Set(["Permanent", "Column trim"])
         // eslint-disable-next-line unicorn/prefer-ternary
         if (modules.length > 1) {
             // Get options with sub types as optgroups
@@ -243,7 +243,7 @@ export default class SelectModule extends Select {
                     liveSearch: true,
                     liveSearchNormalize: true,
                     liveSearchPlaceholder: "Search ...",
-                    maxOptions: type.startsWith("Ship trim") ? 6 : 5,
+                    maxOptions: type.startsWith("Column trim") ? 6 : 5,
                     selectedTextFormat: "count > 1",
                     title: `${type}`,
                     width: "150px",

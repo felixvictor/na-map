@@ -114,7 +114,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
-        ["NONE SHIP_MATERIAL", "Ship material"],
+        ["NONE SHIP_MATERIAL", "Column material"],
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acceleration"],
@@ -167,7 +167,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE HANDBOOK_DEFENSE_BONUS", "Melee defense"],
         ["NONE HANDBOOK_MORALE_BONUS", "Morale"],
         ["NONE HOLE_DECREASE_RATE,RAM_DECREASE_RATE", "Leak repair"],
-        ["NONE LADDERS_MELEE_PENALTY_REDUCE", "Ship height penalty reduction"],
+        ["NONE LADDERS_MELEE_PENALTY_REDUCE", "Column height penalty reduction"],
         ["NONE MARINES_FIREPOWER_MODIFIER", "Marines firepower"],
         ["NONE MARINES_LEVEL", "Marines level"],
         ["NONE MARINES_MELEE_MODIFIER", "Marines melee attack"],
@@ -216,11 +216,11 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE PERK_SHIP_EXTRA_DOBULE_CHARGE_UNITS", "Additional double charges"], // typo
         ["NONE PERK_SHIP_EXTRA_DOUBLE_CHARGE_UNITS", "Additional double charges"],
         ["NONE PERK_SHIP_EXTRA_DOUBLE_SHOT_UNITS", "Additional double shots"],
-        ["NONE PERK_SHIP_MASTER_CLASS_TYPE", "Ship master class type"],
-        ["NONE PERK_SHIP_MASTER_RELOAD_TIME_MODIFIER", "Ship master reload time modifier"],
+        ["NONE PERK_SHIP_MASTER_CLASS_TYPE", "Column master class type"],
+        ["NONE PERK_SHIP_MASTER_RELOAD_TIME_MODIFIER", "Column master reload time modifier"],
         ["NONE PERK_SHIP_MASTER_REPAIR_COUNT_ADD_MODIFIER", "Additional repairs"],
-        ["NONE PERK_SHIP_MASTER_SPEED_ADD_MODIFIER", "Ship master speed add modifier"],
-        ["NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Ship purchase price"],
+        ["NONE PERK_SHIP_MASTER_SPEED_ADD_MODIFIER", "Column master speed add modifier"],
+        ["NONE PERK_SOLD_SHIP_PRICE_MODIFIER", "Column purchase price"],
         ["NONE PERK_START_ALL_GUNS_LOADED", "Guns loaded at start"],
         ["NONE PREPARATION_BONUS_PER_ROUND", "Preparation"],
         ["NONE RHEA_TURN_SPEED", "Yard turn speed"],
@@ -394,13 +394,13 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         let { moduleLevel, moduleType, permanentType, sortingGroup, usageType } = module
 
         if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
-            type = "Ship trim"
+            type = "Column trim"
         } else if (moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
             type = "Permanent"
         } else if (usageType === "All" && !sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Perk"
         } else if (moduleType === "Regular") {
-            type = "Ship knowledge"
+            type = "Column knowledge"
         } else {
             type = "Not used"
         }
@@ -410,7 +410,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             sortingGroup = "survival"
         }
 
-        if (type === "Ship trim") {
+        if (type === "Column trim") {
             const result = bonusRegex.exec(module.name)
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
         } else {
@@ -507,7 +507,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                     "Expert Surgeon",
                     "Frigate Master",
                     "Gifted",
-                    "Light Ship Master",
+                    "Light Column Master",
                     "Lineship Master",
                     "Press Gang",
                     "Signaling",

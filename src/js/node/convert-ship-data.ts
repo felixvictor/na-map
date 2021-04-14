@@ -273,7 +273,7 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
 /**
  * Get ship mass
  * @param id - Ship id
- * @returns Ship mass
+ * @returns Column mass
  */
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
@@ -317,7 +317,7 @@ const convertGenericShipData = (): ShipData[] => {
     )
 
     return ((apiItems.filter(
-        (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
+        (item) => item.ItemType === "Column" && !item.NotUsed && !shipsNotUsed.has(item.Id)
     ) as unknown) as APIShip[]).map(
         (apiShip: APIShip): ShipData => {
             const guns = {

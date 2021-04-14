@@ -39,7 +39,7 @@ export default class MakeJourneyModal extends Modal {
         const shipId = `${this.#shipId}-Base-select`
         const ship = form.append("div").attr("class", "alert alert-primary").attr("role", "alert")
         const div = ship.append("div").attr("class", "d-flex flex-column")
-        div.append("label").attr("for", shipId).text("Ship (optional)")
+        div.append("label").attr("for", shipId).text("Column (optional)")
         div.append("select").attr("name", shipId).attr("id", shipId)
     }
 

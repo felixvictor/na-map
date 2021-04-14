@@ -26,9 +26,9 @@ import { drawSvgCircle, drawSvgVLine, rotationAngleInDegrees } from "../../util"
 
 import { Selection } from "d3-selection"
 
-import { Ship } from "./ship"
+import { Column } from "./column"
 import { CompareShips } from "./compare-ships"
-import { ShipComparison } from "./ship-comparison"
+import { ColumnCompare } from "js/browser/game-tools/compare-ships/column-compare"
 
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor } from "common/common-game-tools"
 import { default as shipIcon } from "icons/icon-ship.svg"
@@ -39,7 +39,7 @@ import { DragData, ShipDisplayData } from "compare-ships"
 /**
  * Base ship for comparison (displayed on the left side)
  */
-export class ShipBase extends Ship {
+export class ColumnBase extends Column {
     readonly shipData: ShipData
     private _speedScale!: ScaleLinear<number, number>
     private _shipRotate!: number
@@ -123,7 +123,7 @@ export class ShipBase extends Ship {
     _updateCompareWindProfiles(): void {
         for (const otherCompareId of this._shipCompare.columnsCompare) {
             if (this._shipCompare.selectedShips[otherCompareId]) {
-                ;(this._shipCompare.selectedShips[otherCompareId] as ShipComparison).updateWindProfileRotation()
+                ;(this._shipCompare.selectedShips[otherCompareId] as ColumnCompare).updateWindProfileRotation()
             }
         }
     }
@@ -343,7 +343,7 @@ export class ShipBase extends Ship {
      * Print text
      */
     _printText(): void {
-        const cannonsPerDeck = Ship.getCannonsPerDeck(this.shipData.guns)
+        const cannonsPerDeck = Column.getCannonsPerDeck(this.shipData.guns)
         const hullRepairsNeeded = Math.round(
             (this.shipData.sides.armour * this.shipData.repairAmount!.armour) / hullRepairsVolume
         )
@@ -452,17 +452,17 @@ export class ShipBase extends Ship {
         ship.repairWeight = formatInt((hullRepairsNeeded + rigRepairsNeeded + rumRepairsNeeded * 0.1) * repairsSetSize)
 
         if (ship.gunsFront) {
-            ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`
+            ship.gunsFront += `\u00A0${Column.pd(ship.limitFront)}`
         } else {
             ship.gunsFront = "\u2013"
         }
 
         if (ship.gunsBack) {
-            ship.gunsBack += `\u00A0${Ship.pd(ship.limitBack)}`
+            ship.gunsBack += `\u00A0${Column.pd(ship.limitBack)}`
         } else {
             ship.gunsBack = "\u2013"
         }
 
-        $(`${this.select}`).find("div").append(Ship.getText(ship))
+        $(`${this.select}`).find("div").append(Column.getText(ship))
     }
 }

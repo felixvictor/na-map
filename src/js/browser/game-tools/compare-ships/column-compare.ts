@@ -25,7 +25,7 @@ import { default as shipIcon } from "icons/icon-ship.svg"
 
 import { Selection } from "d3-selection"
 
-import { Ship } from "./ship"
+import { Column } from "./column"
 import { CompareShips } from "./compare-ships"
 
 import { colourWhite, pluralise, segmentRadians } from "common/common-browser"
@@ -35,7 +35,7 @@ import { ShipData } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { DragData, ShipDisplayData } from "compare-ships"
 
-export class ShipComparison extends Ship {
+export class ColumnCompare extends Column {
     // Ship data of the ship to be compared to
     readonly shipCompareData: ShipData
     // Base ship data
@@ -448,7 +448,7 @@ export class ShipComparison extends Ship {
                 this.shipCompareData.guns.broadside.cannons,
                 this._shipBaseData.guns.broadside.cannons
             )}`,
-            cannonsPerDeck: Ship.getCannonsPerDeck(this.shipCompareData.guns),
+            cannonsPerDeck: Column.getCannonsPerDeck(this.shipCompareData.guns),
             carroBroadside: `${this.shipCompareData.guns.broadside.carronades}\u00A0${getDiff(
                 this.shipCompareData.guns.broadside.carronades,
                 this._shipBaseData.guns.broadside.carronades
@@ -632,17 +632,17 @@ export class ShipComparison extends Ship {
         )}`
 
         if (ship.gunsFront) {
-            ship.gunsFront += `\u00A0${Ship.pd(ship.limitFront)}`
+            ship.gunsFront += `\u00A0${Column.pd(ship.limitFront)}`
         } else {
             ship.gunsFront = "\u2013"
         }
 
         if (ship.gunsBack) {
-            ship.gunsBack += `\u00A0${Ship.pd(ship.limitBack)}`
+            ship.gunsBack += `\u00A0${Column.pd(ship.limitBack)}`
         } else {
             ship.gunsBack = "\u2013"
         }
 
-        $(`${this.select}`).find("div").append(Ship.getText(ship))
+        $(`${this.select}`).find("div").append(Column.getText(ship))
     }
 }

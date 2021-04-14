@@ -14,11 +14,12 @@ import { arc as d3Arc, pie as d3Pie } from "d3-shape"
 import { numberSegments } from "common/common-browser"
 
 import { CompareShips } from "./compare-ships"
-import { ShipDisplayData } from "./types"
+
 import { ShipGunDeck, ShipGuns } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { ShipDisplayData } from "compare-ships"
 
-export class Ship {
+export class Column {
     readonly ticksSpeed: number[]
     readonly ticksSpeedLabels: string[]
     // Class instance of the ship to be compared to
@@ -66,11 +67,11 @@ export class Ship {
      * @returns Formatted string [0] limits and [1] possibly empty lines at the bottom
      */
     static getCannonsPerDeck(guns: ShipGuns): [string, string] {
-        let s = `${guns.gunsPerDeck[0].amount}\u00A0${Ship.pd(guns.gunsPerDeck[0])}`
+        let s = `${guns.gunsPerDeck[0].amount}\u00A0${Column.pd(guns.gunsPerDeck[0])}`
         let br = ""
         for (let i = 1; i < 4; i += 1) {
             if (guns.gunsPerDeck[i].amount) {
-                s = `${guns.gunsPerDeck[i].amount}\u00A0${Ship.pd(guns.gunsPerDeck[i])}\u202F<br>${s}`
+                s = `${guns.gunsPerDeck[i].amount}\u00A0${Column.pd(guns.gunsPerDeck[i])}\u202F<br>${s}`
             } else {
                 br = `${br}<br>`
             }
@@ -131,7 +132,7 @@ export class Ship {
         let text = ""
 
         text += displayFirstColumn(ship.shipRating)
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("battleRating", "Battle rating")
         text += displayColumn("guns", "Cannons")
         text += displayColumn("upgradeXP", "Knowledge XP")
@@ -139,25 +140,25 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn(ship.decks)
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("cannonsPerDeck", "Gun decks")
         text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width")
         text += "</div></div></div>"
 
         text += displayFirstColumn("Broadside (lb)")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("cannonBroadside", "Cannons")
         text += displayColumn("carroBroadside", "Carronades")
         text += "</div></div></div>"
 
         text += displayFirstColumn("Chasers")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("gunsFront", "Bow")
         text += displayColumn("gunsBack", "Stern")
         text += "</div></div></div>"
 
         text += displayFirstColumn("Speed")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("maxSpeed", "Maximum")
         text += displayColumn("halfturnTime", "Rudder half time")
         text += displayColumn("acceleration", "Acceleration")
@@ -167,7 +168,7 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>')
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("sideArmor", "Sides")
         text += displayColumn("structure", "Hull")
         text += displayColumn("frontArmor", "Bow")
@@ -175,7 +176,7 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>')
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("sails", "Sails")
         text += displayColumn("mastBottomArmor", "Bottom")
         text += displayColumn("mastMiddleArmor", "Middle")
@@ -183,7 +184,7 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn("Crew")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("minCrew", "Minimum", 4)
         text += displayColumn("sailingCrew", "Sailing", 4)
         text += displayColumn("maxCrew", "Maximum", 4)
@@ -192,7 +193,7 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn("Gunnery")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("reload", "Reload %", 4)
         text += displayColumn("dispersionHorizontal", "Horizontal dispersion %", 4)
         text += displayColumn("dispersionVertical", "Vertical dispersion %", 4)
@@ -202,7 +203,7 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn("Boarding")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("morale", "Morale", 4)
         text += displayColumn("attack", "Attack", 4)
         text += displayColumn("defense", "Defense", 4)
@@ -215,33 +216,33 @@ export class Ship {
         text += "</div></div></div>"
 
         text += displayFirstColumn("Resistance")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("leakResistance", "Leak %")
         text += displayColumn("splinterResistance", "Splinter %")
         text += "</div></div></div>"
 
         text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>')
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("hullRepairsNeeded", "Hull", 4)
         text += displayColumn("rigRepairsNeeded", "Rig", 4)
         text += displayColumn("rumRepairsNeeded", "Rum", 4)
         text += "</div></div></div>"
 
         text += displayFirstColumn("Repair")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("hullRepairAmount", "Hull %", 4)
         text += displayColumn("rigRepairAmount", "Rig %", 4)
         text += displayColumn("repairTime", "Time (sec)", 4)
         text += "</div></div></div>"
 
         text += displayFirstColumn("Hold")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("holdSize", "Cargo slots")
         text += displayColumn("maxWeight", "Tons")
         text += "</div></div></div>"
 
         text += displayFirstColumn("Weight")
-        text += Ship.displaySecondBlock()
+        text += Column.displaySecondBlock()
         text += displayColumn("cannonWeight", "Cannons", 4)
         text += displayColumn("carroWeight", "Carronades", 4)
         text += displayColumn("repairWeight", "Repair Set", 4)

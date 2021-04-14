@@ -25,8 +25,8 @@ import SelectModule from "./select-module"
 import SelectShip from "./select-ship"
 import SelectWood from "./select-wood"
 import { CompareWoods, woodType } from "../compare-woods"
-import { ShipBase } from "./ship-base"
-import { ShipComparison } from "./ship-comparison"
+import { ColumnBase } from "./column-base"
+import { ColumnCompare } from "./column-compare"
 import ModulesAndWoodData from "./module-wood-data"
 
 import { Module, ShipData, ShipRepairTime } from "common/gen-json"
@@ -57,7 +57,7 @@ export class CompareShips {
     innerRadius!: number
     outerRadius!: number
     radiusSpeedScale!: ScaleLinear<number, number>
-    selectedShips = {} as ShipColumnTypeList<ShipBase | ShipComparison | undefined>
+    selectedShips = {} as ShipColumnTypeList<ColumnBase | ColumnCompare | undefined>
     shipMassScale!: ScaleLinear<number, number>
     singleShipData!: ShipData
     svgHeight!: number
@@ -345,45 +345,6 @@ export class CompareShips {
         }
     }
 
-    async menuClicked(): Promise<void> {
-        registerEvent("Menu", this.#baseName)
-
-        if (this.#modal) {
-            this.#modal.show()
-        } else {
-            await this.loadAndSetupData()
-            this.#modal = new CompareShipsModal(
-                this.#baseName,
-                this.#columnIds,
-                this.columnsCompare[this.columnsCompare.length - 1]
-            )
-            this.initSelects()
-            this._initSelectListeners()
-            this._initCloneListeners()
-
-            console.log(this.#modal.copyButtonId, this.#modal.imageButtonId)
-            // Copy data to clipboard (ctrl-c key event)
-            this.#modal.getModalNode().addEventListener("keydown", (event: Event): void => {
-                if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
-                    this._copyDataClicked(event)
-                }
-            })
-            // Copy data to clipboard (click event)
-            document.querySelector(`#${this.#modal.copyButtonId}`)?.addEventListener("click", (event) => {
-                this._copyDataClicked(event)
-            })
-            // Make image
-            document.querySelector(`#${this.#modal.imageButtonId}`)?.addEventListener("click", async (event) => {
-                registerEvent("Menu", "Ship compare image")
-                event.preventDefault()
-                const saveImage = new SaveImage(this.#baseId, this._getSelectedData(), this.#modal!.getModalNode())
-                await saveImage.init()
-            })
-        }
-
-        this._setGraphicsParameters()
-    }
-
     _getShipAndWoodIds(): number[] {
         const data: number[] = []
 
@@ -482,7 +443,7 @@ export class CompareShips {
 
     _updateDifferenceProfileNeeded(id: ShipColumnType): void {
         if (id !== "base" && this.selectedShips[id]) {
-            ;(this.selectedShips[id] as ShipComparison).updateDifferenceProfile()
+            ;(this.selectedShips[id] as ColumnCompare).updateDifferenceProfile()
         }
     }
 
@@ -502,46 +463,6 @@ export class CompareShips {
         }
     }
 
-    /**
-     * Refresh ship data
-     * @param compareId - Column id
-     */
-    refreshShips(compareId: ShipColumnType): void {
-        if (this.#baseId === "ship-journey") {
-            this.singleShipData = this.#shipData.find((ship) => ship.id === this.#shipIds.get(compareId))!
-        } else {
-            this.#modulesAndWoodData.modulesSelected(compareId)
-            const singleShipData = this._getShipData(compareId)
-            if (compareId === "base") {
-                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this))
-                for (const otherCompareId of this.columnsCompare) {
-                    this.#selectShip.enableSelect(otherCompareId)
-                    if (this.selectedShips[otherCompareId]) {
-                        this._setSelectedShip(
-                            otherCompareId,
-                            new ShipComparison(
-                                otherCompareId,
-                                singleShipData,
-                                (this.selectedShips[otherCompareId] as ShipComparison).shipCompareData,
-                                this
-                            )
-                        )
-                    }
-                }
-            } else {
-                this._setSelectedShip(
-                    compareId,
-                    new ShipComparison(compareId, (this.selectedShips.Base as ShipBase).shipData, singleShipData, this)
-                )
-            }
-
-            this._updateSailingProfile(compareId)
-        }
-    }
-
-    /**
-     * Enable compare selects
-     */
     _enableCompareSelects(): void {
         for (const compareId of this.columnsCompare) {
             this.#selectShip.enableSelect(compareId)
@@ -552,7 +473,79 @@ export class CompareShips {
         return this.#shipData.find((ship) => ship.id === this.#shipIds.get(columnId))?.class ?? 0
     }
 
-    _setSelectedShip(columnId: ShipColumnType, ship: ShipBase | ShipComparison): void {
+    _setSelectedShip(columnId: ShipColumnType, ship: ColumnBase | ColumnCompare): void {
         this.selectedShips[columnId] = ship
+    }
+
+    async menuClicked(): Promise<void> {
+        registerEvent("Menu", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this.loadAndSetupData()
+            this.#modal = new CompareShipsModal(
+                this.#baseName,
+                this.#columnIds,
+                this.columnsCompare[this.columnsCompare.length - 1]
+            )
+            this.initSelects()
+            this._initSelectListeners()
+            this._initCloneListeners()
+
+            console.log(this.#modal.copyButtonId, this.#modal.imageButtonId)
+            // Copy data to clipboard (ctrl-c key event)
+            this.#modal.getModalNode().addEventListener("keydown", (event: Event): void => {
+                if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
+                    this._copyDataClicked(event)
+                }
+            })
+            // Copy data to clipboard (click event)
+            document.querySelector(`#${this.#modal.copyButtonId}`)?.addEventListener("click", (event) => {
+                this._copyDataClicked(event)
+            })
+            // Make image
+            document.querySelector(`#${this.#modal.imageButtonId}`)?.addEventListener("click", async (event) => {
+                registerEvent("Menu", "Ship compare image")
+                event.preventDefault()
+                const saveImage = new SaveImage(this.#baseId, this._getSelectedData(), this.#modal!.getModalNode())
+                await saveImage.init()
+            })
+        }
+
+        this._setGraphicsParameters()
+    }
+
+    refreshShips(compareId: ShipColumnType): void {
+        if (this.#baseId === "ship-journey") {
+            this.singleShipData = this.#shipData.find((ship) => ship.id === this.#shipIds.get(compareId))!
+        } else {
+            this.#modulesAndWoodData.modulesSelected(compareId)
+            const singleShipData = this._getShipData(compareId)
+            if (compareId === "base") {
+                this._setSelectedShip(compareId, new ColumnBase(compareId, singleShipData, this))
+                for (const otherCompareId of this.columnsCompare) {
+                    this.#selectShip.enableSelect(otherCompareId)
+                    if (this.selectedShips[otherCompareId]) {
+                        this._setSelectedShip(
+                            otherCompareId,
+                            new ColumnCompare(
+                                otherCompareId,
+                                singleShipData,
+                                (this.selectedShips[otherCompareId] as ColumnCompare).shipCompareData,
+                                this
+                            )
+                        )
+                    }
+                }
+            } else {
+                this._setSelectedShip(
+                    compareId,
+                    new ColumnCompare(compareId, (this.selectedShips.Base as ColumnBase).shipData, singleShipData, this)
+                )
+            }
+
+            this._updateSailingProfile(compareId)
+        }
     }
 }

@@ -671,7 +671,7 @@ export interface APIShip {
     CanBeSoldToShop: boolean
     ResetStockOnServerStart: boolean
     SellPriceCoefficient: number
-    ItemType: "Ship"
+    ItemType: "Column"
     MongoID: string
     BaseDurability: number
     QualityPrices: number[]

@@ -49,7 +49,7 @@ export default class ListWoods {
     private readonly _buttonId: HtmlString
     private readonly _checkboxId: HtmlString
     private readonly _modalId: HtmlString
-    private readonly _modifiersNotUsed = new Set(["Ship material", "Boarding morale"])
+    private readonly _modifiersNotUsed = new Set(["Column material", "Boarding morale"])
 
     constructor() {
         this._baseName = "List woods"
