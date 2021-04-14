@@ -8,10 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { registerEvent } from "../analytics"
-import { appVersion } from "common/common-browser"
-
-import { CompareShips } from "./compare-ships"
+import { checkShipCompareData } from "./compare-ships"
 import ListBuildings from "./list-buildings"
 import ListCannons from "./list-cannons"
 import ListIngredients from "./list-ingredients"
@@ -34,20 +31,7 @@ import { CompareWoods } from "./compare-woods"
  * @param urlParams - Search Parameters
  */
 const init = (serverId: string, urlParams: URLSearchParams): void => {
-    const shipCompare = new CompareShips()
-
-    const checkShipCompareData = (): void => {
-        if (urlParams.has("cmp") && urlParams.has("v")) {
-            const version = urlParams.get("v")
-            // Compare main versions
-            if (version && version.split(".")[0] === appVersion.split(".")[0]) {
-                registerEvent("Menu", "Paste ship compare")
-                void shipCompare.initFromClipboard(urlParams)
-            }
-        }
-    }
-
-    checkShipCompareData()
+    checkShipCompareData(urlParams)
 
     void new CompareWoods()
     void new ListWoods()

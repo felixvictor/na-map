@@ -404,7 +404,7 @@ class NAMap {
 
     _initModal(): void {
         this.#modal = new Modal(`${appTitle} <span class="text-primary small">v${appVersion}</span>`, "lg")
-        const body = this.#modal.getModalBody()
+        const body = this.#modal.getBodySel()
 
         body.html(
             `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>

@@ -11,7 +11,7 @@
 import Modal from "util/modal"
 import WindInput from "util/wind-input"
 
-import { CompareShips } from "../../game-tools/compare-ships"
+import { CompareShips, initFromJourney } from "../../game-tools/compare-ships"
 
 export default class MakeJourneyModal extends Modal {
     readonly #shipId = "ship-journey"
@@ -20,15 +20,12 @@ export default class MakeJourneyModal extends Modal {
 
     constructor(title: string) {
         super(title, "sm")
-
-        this._init()
     }
 
-    _init(): void {
+    async init(): Promise<void> {
         this._injectModal()
 
-        this.#shipCompare = new CompareShips(this.#shipId)
-        void this.#shipCompare.CompareShipsInit()
+        this.#shipCompare = await initFromJourney()
     }
 
     _injectModal(): void {

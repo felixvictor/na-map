@@ -200,13 +200,14 @@ export default class MakeJourney {
         this.#journey.totalMinutes = 0
     }
 
-    _menuClicked(): void {
+    async _menuClicked(): Promise<void> {
         registerEvent("Menu", this.#baseName)
 
         if (this.#modal) {
             this.#modal.show()
         } else {
             this.#modal = new MakeJourneyModal(this.#baseName)
+            await this.#modal.init()
             this.#modal.getModalNode().addEventListener("hidden.bs.modal", () => {
                 this._useUserInput()
             })
@@ -218,7 +219,7 @@ export default class MakeJourney {
      */
     _setupListener(): void {
         ;(document.querySelector(`#${this.#menuId}`) as HTMLElement).addEventListener("click", () => {
-            this._menuClicked()
+            void this._menuClicked()
         })
         ;(document.querySelector(`#${this.#deleteLastLegButtonId}`) as HTMLElement).addEventListener("click", () => {
             this._deleteLastLeg()

@@ -14,7 +14,7 @@ import Select from "util/select"
 import { HtmlString } from "common/interface"
 import { Module, ModuleEntity, ModulePropertiesEntity } from "common/gen-json"
 import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
-import { moduleAndWoodChanges } from "./module-data"
+import { moduleAndWoodChanges } from "./module-modifier"
 import { ModuleType, ModuleTypeList, ShipColumnTypeList } from "compare-ships"
 import { ShipColumnType } from "./index"
 import { group as d3Group } from "d3-array"
@@ -268,6 +268,8 @@ export default class SelectModule extends Select {
                     })
             }
         }
+
+        console.log("XXXXXXXXXXXXXXX -> tooltips fehlt <-XXXXXXXXXXXXXXX")
     }
 
     getModule(id: number): ModuleEntity | undefined {
