@@ -23,8 +23,7 @@
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
                 "plugin:unicorn/recommended",
-                "xo/browser",
-                "xo/esnext",
+                "xo",
                 "xo-typescript",
                 "plugin:prettier/recommended"
             ],
@@ -90,8 +89,7 @@
             "extends": [
                 "eslint:recommended",
                 "plugin:unicorn/recommended",
-                "xo/esnext",
-                "xo/browser",
+                "xo",
                 "plugin:prettier/recommended"
             ],
             "rules": {
