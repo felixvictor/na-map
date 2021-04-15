@@ -11,19 +11,19 @@
 import { ModulePropertiesEntity, ShipData } from "common/gen-json"
 import { ShipColumnType } from "./index"
 import { HtmlString, ModifierName } from "common/interface"
-import { AbsoluteAndPercentageAmount, Amount, ColumnArray, ModuleType, ModuleTypeList } from "compare-ships"
+import { AbsoluteAndPercentageAmount, Amount, ModuleType } from "compare-ships"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
+import SelectModule from "./select-module"
+import SelectWood from "./select-wood"
+import { woodType } from "../compare-woods"
 
 export default class ModulesAndWoodData {
     #baseData = {} as ShipData
     #baseId: HtmlString
-    #compareId = {} as ShipColumnType
     #data = {} as ShipData
     #maxSpeed: number
     #minSpeed: number
     #modifierAmount = {} as Map<ModifierName, AbsoluteAndPercentageAmount>
-    #selectedUpgradeIdsList = {} as ColumnArray<number[]>
-    #selectedUpgradeIdsPerType = {} as ColumnArray<ModuleTypeList<number[]>>
     readonly #moduleAndWoodChanges = moduleAndWoodChanges
     readonly #moduleAndWoodCaps = moduleAndWoodCaps
     readonly #doNotRound = new Set(["Turn acceleration"]) // Integer values that should not be rounded when modifiers are applied
@@ -46,8 +46,8 @@ export default class ModulesAndWoodData {
         return currentValue ? currentValue + additionalValue : additionalValue
     }
 
-    _getCappingId(compareId: ShipColumnType): HtmlString {
-        return `${this.#baseId}-${compareId}-capping`
+    _getCappingId(columnId: ShipColumnType): HtmlString {
+        return `${this.#baseId}-${columnId}-capping`
     }
 
     _setModifier(property: ModulePropertiesEntity): void {
@@ -117,46 +117,26 @@ export default class ModulesAndWoodData {
         }
     }
 
-    _setModifierAmounts(): void {
-        /*
-
-
-
-
-        XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
-        for (const id of this.#selectedUpgradeIdsList[compareId]) {
-            const module = this.#selectModule.getModule(id)
-
-            for (const property of module?.properties ?? []) {
+    _setModifierAmountWoods(columnId: ShipColumnType, selectWood: SelectWood): void {
+        // Add modifier amount for both frame and trim
+        for (const type of woodType) {
+            const woodId = selectWood.getSelectedId(columnId, type)
+            const woodData = selectWood.woodCompare.woodData.getWoodTypeData(woodId)
+            for (const property of woodData.properties) {
                 if (this.#moduleAndWoodChanges.has(property.modifier)) {
                     this._setModifier(property)
                 }
             }
         }
-         */
+    }
 
-        /*
-        if (this.woodCompare.instances[compareId]) {
-            let dataLink = "_woodData"
-            if (compareId !== "base") {
-                dataLink = "_compareData"
-            }
+    _setModifierAmountModules(columnId: ShipColumnType, selectModule: SelectModule): void {
+        for (const type of selectModule.moduleTypes) {
+            const ids = selectModule.getSelectedUpgradeIds(columnId, type)
+            for (const id of ids) {
+                const module = selectModule.getModuleProperties(id)
 
-            // Add modifier amount for both frame and trim
-            for (const type of woodType) {
-                const t1 = this.woodCompare
-                console.log("_addModulesAndWoodData", t1)
-                const t2 = this.woodCompare.instances
-                console.log("_addModulesAndWoodData", t2)
-                const t3 = this.woodCompare.instances[compareId]
-                console.log("_addModulesAndWoodData", t3)
-                const t4 = this.woodCompare.instances[compareId][dataLink]
-                console.log("_addModulesAndWoodData", t4)
-                const t5 = this.woodCompare.instances[compareId][dataLink][type]
-                console.log("_addModulesAndWoodData", t5)
-                const t6 = this.woodCompare.instances[compareId][dataLink][type].properties
-                console.log("_addModulesAndWoodData", t6)
-                for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
+                for (const property of module?.properties ?? []) {
                     if (this.#moduleAndWoodChanges.has(property.modifier)) {
                         this._setModifier(property)
                     }
@@ -164,9 +144,7 @@ export default class ModulesAndWoodData {
             }
         }
 
-         */
-
-        console.log("XXXXXXXXXXXXXXX -> _setModifierAmounts fehlt <-XXXXXXXXXXXXXXX")
+        console.log("_setModifierAmounts", this._setModifier)
     }
 
     _adjustDataByModifiers(): void {
@@ -198,7 +176,7 @@ export default class ModulesAndWoodData {
         }
     }
 
-    _adjustDataByCaps(): void {
+    _adjustDataByCaps(columnId: ShipColumnType): void {
         const valueCapped = { isCapped: false, modifiers: new Set<ModifierName>() }
 
         const adjustValue = (
@@ -247,9 +225,9 @@ export default class ModulesAndWoodData {
         }
 
         if (valueCapped.isCapped) {
-            this._showCappingAdvice(this.#compareId, valueCapped.modifiers)
+            this._showCappingAdvice(columnId, valueCapped.modifiers)
         } else {
-            this._removeCappingAdvice(this.#compareId)
+            this._removeCappingAdvice(columnId)
         }
     }
 
@@ -266,18 +244,26 @@ export default class ModulesAndWoodData {
      * Add upgrade changes to ship this.#data
      * @param shipDataBase - Base ship this.#data
      * @param shipDataUpdated - Updated ship this.#data
-     * @param compareId - Column id
+     * @param columnId - Column id
+     * @param selectWood
+     * @param selectModule
      * @returns Updated ship this.#data
      */
-    addModulesAndWoodData(shipDataBase: ShipData, shipDataUpdated: ShipData, compareId: ShipColumnType): ShipData {
+    addModulesAndWoodData(
+        shipDataBase: ShipData,
+        shipDataUpdated: ShipData,
+        columnId: ShipColumnType,
+        selectWood: SelectWood,
+        selectModule: SelectModule
+    ): ShipData {
         this.#baseData = shipDataBase
         this.#data = JSON.parse(JSON.stringify(shipDataUpdated)) as ShipData
         this.#modifierAmount = new Map()
-        this.#compareId = compareId
 
-        this._setModifierAmounts()
+        this._setModifierAmountWoods(columnId, selectWood)
+        this._setModifierAmountModules(columnId, selectModule)
         this._adjustDataByModifiers()
-        this._adjustDataByCaps()
+        this._adjustDataByCaps(columnId)
         if (this.#modifierAmount.has("Max speed")) {
             this._setSpeedDegrees()
         }
@@ -285,7 +271,7 @@ export default class ModulesAndWoodData {
         return this.#data
     }
 
-    modulesSelected(compareId: ShipColumnType): void {
+    modulesSelected(columnId: ShipColumnType): void {
         /*
         this.#selectedUpgradeIdsList[compareId] = []
         this.#selectedUpgradeIdsPerType[compareId] = {} as Array<ModuleTypeList<number[]>>

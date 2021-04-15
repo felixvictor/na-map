@@ -1,7 +1,7 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods WoodComparison class.
+ * @file      Compare woods ColumnCompare class.
  * @module    game-tools/compare-woods/wood-comparison
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
@@ -14,12 +14,12 @@ import { HtmlString } from "common/interface"
 import { Amount, SelectedWood, WoodCompareAmount } from "compare-woods"
 import { WoodColumnType } from "./index"
 
-import { Wood } from "./wood"
+import { Column } from "./column"
 import { WoodData } from "./data"
 
 type PropertyMap = Map<string, WoodCompareAmount>
 
-export class WoodComparison extends Wood {
+export class ColumnCompare extends Column {
     readonly #selectedBaseWoodData: SelectedWood
     readonly #selectedCompareWoodData: SelectedWood
 
@@ -76,7 +76,7 @@ export class WoodComparison extends Wood {
         let text = '<table class="table table-striped small wood mt-4"><thead>'
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
         for (const [key, value] of properties) {
-            text += `<tr><td>${key}</td><td>${WoodComparison._getDiff(value.compare, value.base, value.isPercentage)}`
+            text += `<tr><td>${key}</td><td>${ColumnCompare._getDiff(value.compare, value.base, value.isPercentage)}`
             text += '<span class="rate">'
             if (value.compare >= 0) {
                 if (value.base >= 0) {

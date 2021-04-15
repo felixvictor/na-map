@@ -32,10 +32,6 @@ export default class SelectWood extends Select {
         this.#woodData = woodData
     }
 
-    get woodIdsSelected(): WoodColumnTypeList<WoodTypeList<number>> {
-        return this.#woodIdsSelected
-    }
-
     setOtherSelect(columnId: WoodColumnType, type: WoodType): void {
         const otherType: WoodType = type === "frame" ? "trim" : "frame"
 
@@ -50,16 +46,19 @@ export default class SelectWood extends Select {
         }
     }
 
-    setWoodsSelected(compareId: WoodColumnType, type: WoodType, woodId: number): void {
-        if (!this.#woodIdsSelected[compareId]) {
-            this.#woodIdsSelected[compareId] = {}
+    setWoodsSelected(columnId: WoodColumnType, type: WoodType, setDefault = false): void {
+        const select$ = this.#select$[columnId][type]
+        const woodId = setDefault ? this.#woodData.defaultWoodId[type] : Number(select$.val())
+console.log("setWoodsSelected", columnId, type, setDefault, select$, woodId, this.#woodIdsSelected[columnId]?.type)
+        if (!this.#woodIdsSelected[columnId]) {
+            this.#woodIdsSelected[columnId] = {}
         }
 
-        this.#woodIdsSelected[compareId][type] = woodId
+        this.#woodIdsSelected[columnId][type] = woodId
     }
 
     _setupSelects(columnId: WoodColumnType, type: WoodType, select$: JQuery<HTMLSelectElement>): void {
-        this.setWoodsSelected(columnId, type, this.#woodData.defaultWoodId[type])
+        this.setWoodsSelected(columnId, type, true)
         select$.append(this.#woodData.options[type])
         if (super.baseId !== "compare-woods" || (columnId !== "base" && super.baseId === "compare-woods")) {
             Select.disable(select$)
@@ -91,9 +90,7 @@ export default class SelectWood extends Select {
     }
 
     getSelectedId(columnId: WoodColumnType, type: WoodType): number {
-        const select$ = this.#select$[columnId][type]
-
-        return Number(select$.val())
+        return this.#woodIdsSelected[columnId][type]
     }
 
     getSelect$(columnId: WoodColumnType, type: WoodType): JQuery<HTMLSelectElement> {

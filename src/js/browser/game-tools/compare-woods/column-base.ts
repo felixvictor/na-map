@@ -1,7 +1,7 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods WoodBase class.
+ * @file      Compare woods ColumnBase class.
  * @module    game-tools/compare-woods/wood-base
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
@@ -14,12 +14,12 @@ import { HtmlString } from "common/interface"
 import { Amount, SelectedWood, WoodBaseAmount } from "compare-woods"
 import { WoodColumnType } from "./index"
 
-import { Wood } from "./wood"
+import { Column } from "./column"
 import { WoodData } from "./data"
 
 type PropertyMap = Map<string, WoodBaseAmount>
 
-export class WoodBase extends Wood {
+export class ColumnBase extends Column {
     readonly #selectedWoodData: SelectedWood
 
     constructor(id: HtmlString, compareId: WoodColumnType, woodData: WoodData, baseWoodData: SelectedWood) {

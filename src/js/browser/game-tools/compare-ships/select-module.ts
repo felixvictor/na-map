@@ -197,7 +197,7 @@ export default class SelectModule extends Select {
         return this.#select$[columnId][type]
     }
 
-    getSelectValue(columnId: ShipColumnType, type: ModuleType): string | number | string[] | undefined {
+    _getSelectValue(columnId: ShipColumnType, type: ModuleType): string | number | string[] | undefined {
         return this.#select$[columnId][type].val()
     }
 
@@ -272,7 +272,22 @@ export default class SelectModule extends Select {
         console.log("XXXXXXXXXXXXXXX -> tooltips fehlt <-XXXXXXXXXXXXXXX")
     }
 
-    getModule(id: number): ModuleEntity | undefined {
+    getModuleProperties(id: number): ModuleEntity | undefined {
         return this.#moduleProperties.get(id)
+    }
+
+    getSelectedUpgradeIds(columnId: ShipColumnType, type: ModuleType): number[] {
+        let ids: number[]
+        const value = this._getSelectValue(columnId, type)
+
+        if (Array.isArray(value)) {
+            // Multiple selects
+            ids = value.map((element) => Number(element))
+        } else {
+            // Single select
+            ids = value ? [Number(value)] : []
+        }
+
+        return ids
     }
 }

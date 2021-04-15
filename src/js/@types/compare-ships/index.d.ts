@@ -81,9 +81,15 @@ declare module "compare-ships" {
     }
 
     interface SelectedData {
-        moduleData: Map<string, string>
         ship: string
         wood: string[]
+        moduleData: Map<string, string>
+    }
+
+    interface SelectedId {
+        ship: number
+        wood: number[]
+        modules: Map<string, number[]>
     }
 
     interface ShipSelectMap {
@@ -130,7 +136,7 @@ declare module "compare-ships" {
     }
     type ShipColumnTypeList<T> = {
         [K in ShipColumnType]: T
-    }
+    } & { [Symbol.iterator](): IterableIterator<T> }
     type ModuleTypeList<T> = {
         [K in ModuleType]: T
     }

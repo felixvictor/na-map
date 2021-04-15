@@ -35,6 +35,7 @@ import { default as shipIcon } from "icons/icon-ship.svg"
 
 import { ShipData } from "common/gen-json"
 import { DragData, ShipDisplayData } from "compare-ships"
+import { HtmlString } from "common/interface"
 
 /**
  * Base ship for comparison (displayed on the left side)
@@ -46,16 +47,11 @@ export class ColumnBase extends Column {
     private _speedText!: Selection<SVGTextElement, DragData, HTMLElement, unknown>
     private _drag!: DragBehavior<SVGCircleElement | SVGPathElement, DragData, DragData | SubjectPosition>
 
-    /**
-     * @param id - Ship id
-     * @param shipData - Ship data
-     * @param shipCompare - Class instance of the ship to be compared to
-     */
-    constructor(id: string, shipData: ShipData, shipCompare: CompareShips) {
-        super(id, shipCompare)
+    constructor(outputDivId: HtmlString, shipData: ShipData, shipCompare: CompareShips) {
+        super(outputDivId, shipCompare)
 
         this.shipData = shipData
-
+        console.log("ColumnBase constructor", outputDivId, shipData, shipCompare)
         this._setBackground()
         this._setupDrag()
         this._drawWindProfile()
@@ -75,7 +71,7 @@ export class ColumnBase extends Column {
             .endAngle(Math.PI / 2)
 
         // Add the paths for the text
-        this._mainG
+        super.mainG
             .append("g")
             .attr("data-ui-component", "speed-textpath")
             .selectAll("path")
@@ -88,7 +84,7 @@ export class ColumnBase extends Column {
             )
 
         // And add the text
-        this._mainG
+        super.mainG
             .append("g")
             .attr("class", "speed-text")
             .selectAll("text")
@@ -122,8 +118,8 @@ export class ColumnBase extends Column {
 
     _updateCompareWindProfiles(): void {
         for (const otherCompareId of this._shipCompare.columnsCompare) {
-            if (this._shipCompare.selectedShips[otherCompareId]) {
-                ;(this._shipCompare.selectedShips[otherCompareId] as ColumnCompare).updateWindProfileRotation()
+            if (this._shipCompare.activeColumns[otherCompareId]) {
+                ;(this._shipCompare.activeColumns[otherCompareId] as ColumnCompare).updateWindProfileRotation()
             }
         }
     }
@@ -170,7 +166,7 @@ export class ColumnBase extends Column {
             .on("drag", (event: Event, d: DragData): void => {
                 dragged(event, d)
             })
-            .container(() => this._mainG.node() as DragContainerElement)
+            .container(() => super.mainG.node() as DragContainerElement)
     }
 
     _setupShipOutline(): void {
@@ -194,7 +190,7 @@ export class ColumnBase extends Column {
             type: "ship",
         } as DragData
 
-        const gShip = this._mainG.append("g").datum(datum).attr("class", "ship-outline")
+        const gShip = super.mainG.append("g").datum(datum).attr("class", "ship-outline")
 
         gShip
             .append("line")
@@ -271,7 +267,7 @@ export class ColumnBase extends Column {
             type: "windProfile",
         } as DragData
 
-        const gWindProfile = this._mainG.append("g").datum(datum).attr("class", "wind-profile")
+        const gWindProfile = super.mainG.append("g").datum(datum).attr("class", "wind-profile")
 
         // Add big wind arrow
         gWindProfile
@@ -463,6 +459,6 @@ export class ColumnBase extends Column {
             ship.gunsBack = "\u2013"
         }
 
-        $(`${this.select}`).find("div").append(Column.getText(ship))
+        super.outputDivSel.select("div").html(Column.getText(ship))
     }
 }

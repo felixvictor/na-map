@@ -17,8 +17,8 @@ import {
     PieArcDatum,
     lineRadial as d3LineRadial,
 } from "d3-shape"
-import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "common/common-format"
 
+import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "common/common-format"
 import { degreesToCompass, getOrdinal, roundToThousands } from "common/common-math"
 import { rotationAngleInDegrees } from "../../util"
 import { default as shipIcon } from "icons/icon-ship.svg"
@@ -51,8 +51,8 @@ export class ColumnCompare extends Column {
     private _gWindProfile!: Selection<SVGGElement, unknown, HTMLElement, unknown>
     private _arcsComp!: Array<PieArcDatum<number>>
 
-    constructor(compareId: string, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
-        super(compareId, shipCompare)
+    constructor(outputDivId: HtmlString, shipBaseData: ShipData, shipCompareData: ShipData, shipCompare: CompareShips) {
+        super(outputDivId, shipCompare)
 
         this._shipBaseData = shipBaseData
         this.shipCompareData = shipCompareData
@@ -128,7 +128,7 @@ export class ColumnCompare extends Column {
             .on("drag", (event: Event, d: DragData): void => {
                 dragged(event, d)
             })
-            .container(() => this._mainG.node() as DragContainerElement)
+            .container(() => super.mainG.node() as DragContainerElement)
     }
 
     _setupShipOutline(): void {
@@ -151,7 +151,7 @@ export class ColumnCompare extends Column {
             type: "ship",
         } as DragData
 
-        const gShip = this._mainG.append("g").datum(datum).attr("class", "ship-outline")
+        const gShip = super.mainG.append("g").datum(datum).attr("class", "ship-outline")
 
         gShip
             .append("line")
@@ -234,7 +234,7 @@ export class ColumnCompare extends Column {
             type: "windProfile",
         } as DragData
 
-        this._gWindProfile = this._mainG
+        this._gWindProfile = super.mainG
             .append("g")
             .attr("class", "wind-profile")
             .attr("transform", `rotate(${this._windProfile.initRotate})`)
@@ -643,6 +643,6 @@ export class ColumnCompare extends Column {
             ship.gunsBack = "\u2013"
         }
 
-        $(`${this.select}`).find("div").append(Column.getText(ship))
+        super.outputDivSel.select("div").html(Column.getText(ship))
     }
 }

@@ -20,17 +20,17 @@ import { HtmlString } from "common/interface"
 import { ShipDisplayData } from "compare-ships"
 
 export class Column {
+    readonly #outputDivSel: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #mainG = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+
     readonly ticksSpeed: number[]
     readonly ticksSpeedLabels: string[]
     // Class instance of the ship to be compared to
     readonly _shipCompare: CompareShips
-    readonly select!: HtmlString
-    _mainG!: Selection<SVGGElement, unknown, HTMLElement, unknown>
-    // Column id
-    private readonly _id: string
-    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
-    constructor(id: string, shipCompare: CompareShips) {
-        this._id = id
+
+    constructor(outputDivId: HtmlString, shipCompare: CompareShips) {
+        this.#outputDivSel = d3Select(`#${outputDivId}`)
         this._shipCompare = shipCompare
 
         // Speed ticks
@@ -38,10 +38,16 @@ export class Column {
         this.ticksSpeed = [12, 8, 4, 0]
         this.ticksSpeedLabels = this.ticksSpeed.map((speed: number) => `${speed} knots`)
 
-        this.select = `#ship-compare-${this._id}`
-
         this._setupSvg()
         this._setCompass()
+    }
+
+    get mainG(): Selection<SVGGElement, unknown, HTMLElement, unknown> {
+        return this.#mainG
+    }
+
+    get outputDivSel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+        return this.#outputDivSel
     }
 
     /**
@@ -256,22 +262,20 @@ export class Column {
      * Setup svg
      */
     _setupSvg(): void {
-        const element = d3Select(this.select)
+        this.#outputDivSel.select("svg").remove()
 
-        d3Select(`${this.select} svg`).remove()
-
-        this._svg = element
+        this.#svg = this.#outputDivSel
             .append("svg")
             .attr("width", this._shipCompare.svgWidth)
             .attr("height", this._shipCompare.svgHeight)
             .attr("data-ui-component", "sailing-profile")
             .attr("fill", "none")
-        this._mainG = this._svg
+        this.#mainG = this.#svg
             .append("g")
             .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`)
-        d3Select(`${this.select} div`).remove()
+        this.#outputDivSel.select("div").remove()
 
-        element.append("div")
+        this.#outputDivSel.append("div")
     }
 
     /**
@@ -288,7 +292,7 @@ export class Column {
             .innerRadius(this._shipCompare.innerRadius)
 
         // Add compass arcs
-        this._mainG
+        this.#mainG
             .append("g")
             .attr("class", "compass-arc")
             .selectAll("path")
@@ -297,7 +301,7 @@ export class Column {
             .join((enter) => enter.append("path").attr("d", arc))
 
         // Add the circles for each speed tick
-        this._mainG
+        this.#mainG
             .append("g")
             .attr("class", "speed-circle")
             .selectAll("circle")

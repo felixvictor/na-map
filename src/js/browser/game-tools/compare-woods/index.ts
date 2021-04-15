@@ -17,7 +17,4 @@ export type WoodType = typeof woodType[number]
 export const woodColumnType = ["base", "c1", "c2", "c3"]!
 export type WoodColumnType = typeof woodColumnType[number]
 
-export { Wood } from "./wood"
-export { WoodBase } from "./wood-base"
-export { WoodComparison } from "./wood-comparison"
 export { CompareWoods } from "./compare-woods"

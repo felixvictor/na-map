@@ -18,7 +18,7 @@ import { Amount, SelectedWood } from "compare-woods"
 
 import { WoodData } from "./data"
 
-export class Wood {
+export class Column {
     #div = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     readonly #baseId: HtmlString
     readonly #columnId: WoodColumnType

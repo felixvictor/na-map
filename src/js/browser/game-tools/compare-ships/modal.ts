@@ -27,7 +27,7 @@ export default class CompareShipsModal extends Modal {
     readonly #lastColumnId: string
 
     constructor(title: string, columnIds: ShipColumnType[], lastColumnId: string) {
-        super(title, "lg")
+        super(title, "xl")
 
         this.#columnIds = columnIds
         this.#lastColumnId = lastColumnId

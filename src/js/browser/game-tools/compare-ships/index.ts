@@ -13,7 +13,7 @@ import { appVersion } from "common/common-browser"
 import { initDefault } from "./init-default"
 import { initFromClipboard } from "./init-from-clipboard"
 
-const shipColumnType = ["base", "c1", "c2"]
+export const shipColumnType = ["base", "c1", "c2"]
 export type ShipColumnType = typeof shipColumnType[number]
 
 export { CompareShips } from "./compare-ships"

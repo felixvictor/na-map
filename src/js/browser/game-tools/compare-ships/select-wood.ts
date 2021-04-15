@@ -23,6 +23,10 @@ export default class SelectWood extends Select {
         this.#woodCompare = woodCompare
     }
 
+    get woodCompare(): CompareWoods {
+        return this.#woodCompare
+    }
+
     cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
         this.#woodCompare.select.enableSelects(newColumnId)
 
@@ -44,12 +48,16 @@ export default class SelectWood extends Select {
         return woods
     }
 
-    getSelect$(columnId: ShipColumnType, type: WoodType): JQuery<HTMLSelectElement> {
-        return this.#woodCompare.select.getSelect$(columnId, type)
-    }
-
     getSelectedId(columnId: ShipColumnType, type: WoodType): number {
         return this.#woodCompare.select.getSelectedId(columnId, type)
+    }
+
+    getSelectedIds(columnId: ShipColumnType): number[] {
+        return woodType.map((type) => this.#woodCompare.select.getSelectedId(columnId, type))
+    }
+
+    getSelect$(columnId: ShipColumnType, type: WoodType): JQuery<HTMLSelectElement> {
+        return this.#woodCompare.select.getSelect$(columnId, type)
     }
 
     setup(columnId: ShipColumnType): void {
@@ -60,6 +68,6 @@ export default class SelectWood extends Select {
         const select$ = this.getSelect$(columnId, type)
 
         Select.setSelect(select$, woodId)
-        this.#woodCompare.woodSelected(columnId, type, select$)
+        this.#woodCompare.woodSelected(columnId, type)
     }
 }

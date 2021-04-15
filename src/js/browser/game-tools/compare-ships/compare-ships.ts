@@ -13,11 +13,11 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
 import { registerEvent } from "../../analytics"
-import { appVersion, colourGreenDark, colourRedDark, colourWhite, getElementWidth } from "common/common-browser"
-import { hashids, hullRepairsPercent, repairTime, rigRepairsPercent } from "common/common-game-tools"
-import { copyToClipboard } from "../../util"
-import { moduleAndWoodCaps } from "./module-modifier"
+import { colourGreenDark, colourRedDark, colourWhite, getBaseIdOutput, getElementWidth } from "common/common-browser"
+import { hullRepairsPercent, repairTime, rigRepairsPercent } from "common/common-game-tools"
+import { copyDataClicked } from "./copy-to-clipboard"
 
+import { moduleAndWoodCaps } from "./module-modifier"
 import CompareShipsModal from "./modal"
 import SaveImage from "./save-image"
 import Select from "util/select"
@@ -27,11 +27,11 @@ import SelectWood from "./select-wood"
 import { CompareWoods, woodType } from "../compare-woods"
 import { ColumnBase } from "./column-base"
 import { ColumnCompare } from "./column-compare"
-import ModulesAndWoodData from "./module-wood-data"
 
+import ModulesAndWoodData from "./module-wood-data"
 import { Module, ShipData, ShipRepairTime } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import { ShipColumnTypeList, ModuleType, SelectedData } from "compare-ships"
+import { ShipColumnTypeList, ModuleType, SelectedData, SelectedId } from "compare-ships"
 import { ShipColumnType } from "./index"
 
 type CompareShipsBaseId = "compare-ships" | "ship-journey"
@@ -57,7 +57,7 @@ export class CompareShips {
     innerRadius!: number
     outerRadius!: number
     radiusSpeedScale!: ScaleLinear<number, number>
-    selectedShips = {} as ShipColumnTypeList<ColumnBase | ColumnCompare | undefined>
+    activeColumns = {} as ShipColumnTypeList<ColumnBase | ColumnCompare | undefined>
     shipMassScale!: ScaleLinear<number, number>
     singleShipData!: ShipData
     svgHeight!: number
@@ -82,7 +82,7 @@ export class CompareShips {
         this.#columnIds.unshift("base")
 
         for (const columnId of this.#columnIds) {
-            this.selectedShips[columnId] = undefined
+            this.activeColumns[columnId] = undefined
         }
     }
 
@@ -131,16 +131,16 @@ export class CompareShips {
         return shipId !== undefined
     }
 
-    _getModuleIds(columnId: ShipColumnType, type: ModuleType): number[] {
-        return this._selectedUpgradeIdsPerType[columnId][type]
+    _getSelectedModuleIdsPerType(columnId: ShipColumnType, type: ModuleType): number[] {
+        return this.#selectModule.getSelectedUpgradeIds(columnId, type)
     }
 
     _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
         this.#selectModule.setup(newColumnId)
         this.#selectModule.resetSelects(newColumnId, this.getShipClass(newColumnId))
-        if (this._selectedUpgradeIdsPerType[currentColumnId]) {
-            for (const type of [...this.#selectModule.moduleTypes]) {
-                const moduleIds = this._getModuleIds(currentColumnId, type)
+        for (const type of [...this.#selectModule.moduleTypes]) {
+            const moduleIds = this._getSelectedModuleIdsPerType(currentColumnId, type)
+            if (moduleIds) {
                 this.#modulesAndWoodData.setModules(newColumnId, type, moduleIds)
             }
         }
@@ -258,7 +258,7 @@ export class CompareShips {
         Select.construct(shipSel$, { title: "Ship" })
         Select.reset(shipSel$)
         shipSel$.on("changed.bs.select", () => {
-            console.log("changed.bs.select", shipSel$, shipSel$.val())
+            console.log("ship changed.bs.select", shipSel$, shipSel$.val())
             this.#shipIds.set(columnId, Number(shipSel$.val()))
             if (this.#baseId !== "ship-journey") {
                 this.#selectModule.setup(columnId)
@@ -281,7 +281,8 @@ export class CompareShips {
                 const woodSel$ = this.#selectWood.getSelect$(columnId, type)
                 Select.construct(woodSel$, { title: `Wood ${type}`, width: "150px" })
                 woodSel$.on("changed.bs.select", () => {
-                    this.woodCompare.woodSelected(columnId, type, this.#selectWood.getSelect$(columnId, type))
+                    console.log("wood changed.bs.select", woodSel$, woodSel$.val())
+                    this.woodCompare.woodSelected(columnId, type)
                     this.refreshShips(columnId)
                 })
             }
@@ -294,19 +295,18 @@ export class CompareShips {
         }
     }
 
-    _getSelectedModules(columnId: ShipColumnType): Map<string, string> {
+    _getSelectedModuleTexts(columnId: ShipColumnType): Map<string, string> {
         const modules = new Map<string, string>()
 
-        if (this._selectedUpgradeIdsPerType[columnId]) {
-            for (const type of [...this.#selectModule.moduleTypes]) {
-                const text = [] as string[]
-                for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
-                    const property = this.#selectModule.getModule(id)
-                    text.push(property?.name.replace(" Bonus", "") ?? "")
-                }
-
-                modules.set(type, text.join(", "))
+        for (const type of [...this.#selectModule.moduleTypes]) {
+            const ids = this._getSelectedModuleIdsPerType(columnId, type)
+            const text = [] as string[]
+            for (const id of ids) {
+                const property = this.#selectModule.getModuleProperties(id)
+                text.push(property?.name.replace(" Bonus", "") ?? "")
             }
+
+            modules.set(type, text.join(", "))
         }
 
         return modules
@@ -323,13 +323,45 @@ export class CompareShips {
             if (this.#shipIds.get(columnId)) {
                 selectedData[columnId] = {
                     ship: this._getShipName(this.#shipIds.get(columnId)),
-                    moduleData: this._getSelectedModules(columnId),
+                    moduleData: this._getSelectedModuleTexts(columnId),
                     wood: this.#selectWood.getSelectedText(columnId),
                 }
             }
         }
 
         return selectedData
+    }
+
+    _getSelectedModuleIds(columnId: ShipColumnType): Map<string, number[]> {
+        const moduleIds = new Map<string, number[]>()
+
+        for (const type of [...this.#selectModule.moduleTypes]) {
+            const ids = this._getSelectedModuleIdsPerType(columnId, type)
+            moduleIds.set(type, ids)
+        }
+
+        return moduleIds
+    }
+
+    _getSelectedWoodIds(columnId: ShipColumnType): number[] {
+        return this.#selectWood.getSelectedIds(columnId)
+    }
+
+    _getSelectedIds(): ShipColumnTypeList<SelectedId> {
+        const selectedIds = {} as ShipColumnTypeList<SelectedId>
+
+        for (const columnId of this.#columnIds) {
+            const shipId = this.#shipIds.get(columnId)
+            if (shipId) {
+                selectedIds[columnId] = {
+                    ship: shipId,
+                    wood: this._getSelectedWoodIds(columnId),
+                    modules: this._getSelectedModuleIds(columnId),
+                }
+            }
+        }
+
+        return selectedIds
     }
 
     initSelects(): void {
@@ -345,56 +377,8 @@ export class CompareShips {
         }
     }
 
-    _getShipAndWoodIds(): number[] {
-        const data: number[] = []
-
-        for (const columnId of this.#columnIds) {
-            const shipId = this._getShipId(columnId)
-            if (shipId) {
-                data.push(shipId)
-                for (const type of woodType) {
-                    const woodId = this.#selectWood.getSelectedId(columnId, type)
-                    data.push(woodId)
-                }
-            }
-        }
-
-        return data
-    }
-
-    _copyDataClicked(event: Event): void {
-        registerEvent("Menu", "Copy ship compare")
-        event.preventDefault()
-
-        const ShipAndWoodIds = this._getShipAndWoodIds()
-
-        if (ShipAndWoodIds.length > 0) {
-            const ShipCompareUrl = new URL(window.location.href)
-
-            // Add app version
-            ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion))
-            // Add selected ships and woods, triple (shipId, frameId, trimId) per column, flat array
-            ShipCompareUrl.searchParams.set("cmp", hashids.encode(ShipAndWoodIds))
-
-            // Add selected modules, new searchParam per module
-            for (const columnId of this.#columnIds) {
-                const columnIndex = this.#columnIds.indexOf(columnId)
-                if (this._selectedUpgradeIdsPerType[columnId]) {
-                    for (const type of [...this.#selectModule.moduleTypes]) {
-                        const moduleIds = this._getModuleIds(columnId, type)
-                        const typeIndex = [...this.#selectModule.moduleTypes].indexOf(type)
-
-                        if (moduleIds?.length) {
-                            const param = `${columnIndex}${typeIndex}`
-
-                            ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds))
-                        }
-                    }
-                }
-            }
-
-            copyToClipboard(ShipCompareUrl.href, this.#modal!.getModalNode())
-        }
+    _getShipDefaultData(columnId: ShipColumnType): ShipData {
+        return this.#shipData.find((ship) => ship.id === this.#shipIds.get(columnId)) ?? ({} as ShipData)
     }
 
     /**
@@ -403,7 +387,7 @@ export class CompareShips {
      * @returns Ship data
      */
     _getShipData(columnId: ShipColumnType): ShipData {
-        const shipDataDefault = this.#shipData.find((ship) => ship.id === this.#shipIds.get(columnId))!
+        const shipDataDefault = this._getShipDefaultData(columnId)
         shipDataDefault.boarding = {
             attack: 0,
             cannonsAccuracy: 0,
@@ -436,14 +420,20 @@ export class CompareShips {
             traverseUpDown: 0,
             traverseSide: 0,
         }
-        shipDataUpdated = this.#modulesAndWoodData.addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId)
+        shipDataUpdated = this.#modulesAndWoodData.addModulesAndWoodData(
+            shipDataDefault,
+            shipDataUpdated,
+            columnId,
+            this.#selectWood,
+            this.#selectModule
+        )
 
         return shipDataUpdated
     }
 
     _updateDifferenceProfileNeeded(id: ShipColumnType): void {
-        if (id !== "base" && this.selectedShips[id]) {
-            ;(this.selectedShips[id] as ColumnCompare).updateDifferenceProfile()
+        if (id !== "base" && this.activeColumns[id]) {
+            ;(this.activeColumns[id] as ColumnCompare).updateDifferenceProfile()
         }
     }
 
@@ -473,8 +463,8 @@ export class CompareShips {
         return this.#shipData.find((ship) => ship.id === this.#shipIds.get(columnId))?.class ?? 0
     }
 
-    _setSelectedShip(columnId: ShipColumnType, ship: ColumnBase | ColumnCompare): void {
-        this.selectedShips[columnId] = ship
+    _setSelectedShip(columnId: ShipColumnType, columnData: ColumnBase | ColumnCompare): void {
+        this.activeColumns[columnId] = columnData
     }
 
     async menuClicked(): Promise<void> {
@@ -493,16 +483,17 @@ export class CompareShips {
             this._initSelectListeners()
             this._initCloneListeners()
 
-            console.log(this.#modal.copyButtonId, this.#modal.imageButtonId)
             // Copy data to clipboard (ctrl-c key event)
             this.#modal.getModalNode().addEventListener("keydown", (event: Event): void => {
                 if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
-                    this._copyDataClicked(event)
+                    event.preventDefault()
+                    copyDataClicked(this._getSelectedIds(), this.#selectModule.moduleTypes, this.#modal!.getModalNode())
                 }
             })
             // Copy data to clipboard (click event)
             document.querySelector(`#${this.#modal.copyButtonId}`)?.addEventListener("click", (event) => {
-                this._copyDataClicked(event)
+                event.preventDefault()
+                copyDataClicked(this._getSelectedIds(), this.#selectModule.moduleTypes, this.#modal!.getModalNode())
             })
             // Make image
             document.querySelector(`#${this.#modal.imageButtonId}`)?.addEventListener("click", async (event) => {
@@ -516,23 +507,27 @@ export class CompareShips {
         this._setGraphicsParameters()
     }
 
-    refreshShips(compareId: ShipColumnType): void {
+    refreshShips(columnId: ShipColumnType): void {
+        console.log("refreshShips", columnId)
         if (this.#baseId === "ship-journey") {
-            this.singleShipData = this.#shipData.find((ship) => ship.id === this.#shipIds.get(compareId))!
+            this.singleShipData = this._getShipDefaultData(columnId)
         } else {
-            this.#modulesAndWoodData.modulesSelected(compareId)
-            const singleShipData = this._getShipData(compareId)
-            if (compareId === "base") {
-                this._setSelectedShip(compareId, new ColumnBase(compareId, singleShipData, this))
+            const singleShipData = this._getShipData(columnId)
+            this.#modulesAndWoodData.modulesSelected(columnId)
+            if (columnId === "base") {
+                this._setSelectedShip(
+                    columnId,
+                    new ColumnBase(`${getBaseIdOutput(this.#baseId)}-${columnId}`, singleShipData, this)
+                )
                 for (const otherCompareId of this.columnsCompare) {
                     this.#selectShip.enableSelect(otherCompareId)
-                    if (this.selectedShips[otherCompareId]) {
+                    if (this.activeColumns[otherCompareId]) {
                         this._setSelectedShip(
                             otherCompareId,
                             new ColumnCompare(
-                                otherCompareId,
+                                `${getBaseIdOutput(this.#baseId)}-${otherCompareId}`,
                                 singleShipData,
-                                (this.selectedShips[otherCompareId] as ColumnCompare).shipCompareData,
+                                (this.activeColumns[otherCompareId] as ColumnCompare).shipCompareData,
                                 this
                             )
                         )
@@ -540,12 +535,17 @@ export class CompareShips {
                 }
             } else {
                 this._setSelectedShip(
-                    compareId,
-                    new ColumnCompare(compareId, (this.selectedShips.Base as ColumnBase).shipData, singleShipData, this)
+                    columnId,
+                    new ColumnCompare(
+                        `${getBaseIdOutput(this.#baseId)}-${columnId}`,
+                        (this.activeColumns.base as ColumnBase).shipData,
+                        singleShipData,
+                        this
+                    )
                 )
             }
 
-            this._updateSailingProfile(compareId)
+            this._updateSailingProfile(columnId)
         }
     }
 }
