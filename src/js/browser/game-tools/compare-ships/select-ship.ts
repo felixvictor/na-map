@@ -73,13 +73,13 @@ export default class SelectShip extends Select {
                     `<optgroup label="${getOrdinal(Number(key.key), false)} rate">${key.values
                         .map(
                             (ship) =>
-                                `<option data-subtext="${ship.battleRating} ${
-                                    isImported(ship.name) ? "Imported" : ""
-                                }" value="${ship.id}">${stripShipName(ship.name)} (${ship.guns})`
+                                `<option data-subtext="${ship.battleRating}${
+                                    isImported(ship.name) ? " Imported" : ""
+                                }" value="${ship.id}">${stripShipName(ship.name)} (${ship.guns})</option>`
                         )
-                        .join("</option>")}`
+                        .join("")}</optgroup>`
             )
-            .join("</optgroup>")
+            .join("")
     }
 
     getSelectId(columnId: ShipColumnType): HtmlString {
@@ -101,7 +101,7 @@ export default class SelectShip extends Select {
 
     setup(columnId: ShipColumnType): void {
         const id = this.getSelectId(columnId)
-        console.log("ship setup", columnId, id)
+
         this._injectSelects(id, columnId)
         this.#select$[columnId] = $(`#${id}`)
         const options = this._getShipOptions()

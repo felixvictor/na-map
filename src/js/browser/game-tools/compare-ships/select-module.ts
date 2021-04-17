@@ -115,7 +115,6 @@ export default class SelectModule extends Select {
         // const tooltip = new BSTooltip(element, { boundary: "viewport", html: true })
         const tooltip = new BSTooltip(element, { html: true })
         element.addEventListener("show.bs.tooltip", () => {
-            console.log("show.bs.tooltip", element, module)
             // Remember shown tooltip
             this.#tooltips.set(module.id, tooltip)
         })
@@ -128,7 +127,6 @@ export default class SelectModule extends Select {
         for (const element of select$.data("selectpicker").selectpicker.current.elements as HTMLLIElement[]) {
             if (!(element.classList.contains("dropdown-divider") || element.classList.contains("dropdown-header"))) {
                 const module = this._getModuleFromName(element.textContent)
-                console.log("initTooltip", select$, element, module)
                 if (module) {
                     this._addTooltip(element, module)
                 }
@@ -174,9 +172,9 @@ export default class SelectModule extends Select {
         let options: string
         const moduleTypeWithSingleOption = new Set(["Permanent", "Column trim"])
 
+        // eslint-disable-next-line unicorn/prefer-ternary
         if (modulesGrouped.length > 1) {
             // Get options with sub types as optgroups
-            console.log(modulesGrouped)
             options = modulesGrouped
                 .map(
                     (group) =>
@@ -197,7 +195,7 @@ export default class SelectModule extends Select {
     _fillSelect(columnId: ShipColumnType, type: string, shipClass: number): void {
         const options = this._getUpgradesOptions(type, shipClass)
 
-        this.#select$[columnId][type].find("option").remove()
+        this.#select$[columnId][type].empty()
         this.#select$[columnId][type].append(options)
     }
 

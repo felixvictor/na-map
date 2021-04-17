@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
 import "bootstrap/js/dist/modal"
 
 import "bootstrap-select"
@@ -100,11 +99,14 @@ export default class ListRecipes {
                         .sort(sortBy(["name"]))
                         .map(
                             (recipe: RecipeEntity) =>
-                                `<option value="${recipe.id}">${recipe.name.replace(/(\d)-(\d)(st|rd|th)/, replacer)}`
+                                `<option value="${recipe.id}">${recipe.name.replace(
+                                    /(\d)-(\d)(st|rd|th)/,
+                                    replacer
+                                )}</option>`
                         )
-                        .join("</option>")}`
+                        .join("")}</optgroup>`
             )
-            .join("</optgroup>")
+            .join("")
     }
 
     _setupSelect(): void {
