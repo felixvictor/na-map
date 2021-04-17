@@ -279,6 +279,7 @@ export default class ModulesAndWoodData {
         for (const type of this.#selectModule.moduleTypes) {
             const value = this.#selectModule.getSelectValue(compareId, type)
 
+Select.getSelectValueAsNumberArray(value)
             if (Array.isArray(value)) {
                 // Multiple selects
                 this.#selectedUpgradeIdsPerType[compareId][type] = this.#selectedUpgradeIdsPerType[compareId][

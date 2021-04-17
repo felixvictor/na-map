@@ -23,14 +23,36 @@ export default class Select {
         return this.#baseId
     }
 
-    static setSelect(select$: JQuery<HTMLSelectElement>, ids: number | number[]): void {
-        let value: string | string[]
-        // eslint-disable-next-line unicorn/prefer-ternary
-        if (Array.isArray(ids)) {
-            value = ids.map<string>((id: number | string) => String(id))
+    static getSelectValueAsNumberArray(value: string | number | string[] | undefined): number[] {
+        let values: number[]
+
+        if (Array.isArray(value)) {
+            // Multiple selects
+            values = value.map((element) => Number(element))
         } else {
-            value = String(ids)
+            // Single select
+            values = value ? [Number(value)] : []
         }
+
+        return values
+    }
+
+    static getSelectValueAsStringArray(value: number | number[]): string[] {
+        let values: string[]
+
+        if (Array.isArray(value)) {
+            // Multiple selects
+            values = value.map((element) => String(element))
+        } else {
+            // Single select
+            values = value ? [String(value)] : []
+        }
+
+        return values
+    }
+
+    static setSelect(select$: JQuery<HTMLSelectElement>, ids: number | number[]): void {
+        const value = Select.getSelectValueAsStringArray(ids)
 
         if (value) {
             select$.val(value)

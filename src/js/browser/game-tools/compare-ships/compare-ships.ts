@@ -136,8 +136,11 @@ export class CompareShips {
     }
 
     _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this.#selectModule.setup(newColumnId)
-        this.#selectModule.resetSelects(newColumnId, this.getShipClass(newColumnId))
+        const shipClass = this.getShipClass(newColumnId)
+
+        this.#selectModule.setup(newColumnId, shipClass)
+        this.#selectModule.resetSelects(newColumnId, shipClass)
+
         for (const type of [...this.#selectModule.moduleTypes]) {
             const moduleIds = this._getSelectedModuleIdsPerType(currentColumnId, type)
             if (moduleIds) {
@@ -258,12 +261,14 @@ export class CompareShips {
         Select.construct(shipSel$, { title: "Ship" })
         Select.reset(shipSel$)
         shipSel$.on("changed.bs.select", () => {
-            console.log("ship changed.bs.select", shipSel$, shipSel$.val())
-            this.#shipIds.set(columnId, Number(shipSel$.val()))
+            const shipId = Number(this.#selectShip.getSelectValue(columnId))
+            console.log("ship changed.bs.select", shipSel$, shipId)
+            this.#shipIds.set(columnId, shipId)
             if (this.#baseId !== "ship-journey") {
-                this.#selectModule.setup(columnId)
+                const shipClass = this.getShipClass(columnId)
+                this.#selectModule.setup(columnId, shipClass)
                 this._setupModuleSelectListener(columnId)
-                this.#selectModule.resetSelects(columnId, this.getShipClass(columnId))
+                this.#selectModule.resetSelects(columnId, shipClass)
             }
 
             this.refreshShips(columnId)

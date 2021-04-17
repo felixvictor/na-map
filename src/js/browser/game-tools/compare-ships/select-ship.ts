@@ -17,7 +17,7 @@ import { getOrdinal } from "common/common-math"
 import Select from "util/select"
 
 import { ShipColumnType } from "./index"
-import { ShipColumnTypeList, ShipSelectData, ShipSelectMap } from "compare-ships"
+import { ModuleType, ShipColumnTypeList, ShipSelectData, ShipSelectMap } from "compare-ships"
 import { HtmlString } from "common/interface"
 import { ShipData } from "common/gen-json"
 import { sortBy } from "common/common"
@@ -59,6 +59,13 @@ export default class SelectShip extends Select {
             .sort(sortBy(["key"]))
     }
 
+    _injectSelects(id: HtmlString, columnId: string): void {
+        const select = d3Select(`#${super.baseId}-${columnId} .input-group label select`)
+        console.log("ship _injectSelects", `#${super.baseId}-${columnId} .input-group label select`, select.node())
+
+        select.attr("name", id).attr("id", this.getSelectId(columnId))
+    }
+
     _getShipOptions(): HtmlString {
         return this.#selectData
             .map(
@@ -88,11 +95,8 @@ export default class SelectShip extends Select {
         Select.enable(this.#select$[columnId])
     }
 
-    _injectSelects(id: HtmlString, columnId: string): void {
-        const select = d3Select(`#${super.baseId}-${columnId} .input-group label select`)
-        console.log("ship _injectSelects", `#${super.baseId}-${columnId} .input-group label select`, select.node())
-
-        select.attr("name", id).attr("id", this.getSelectId(columnId))
+    getSelectValue(columnId: ShipColumnType): string | number | string[] | undefined {
+        return this.#select$[columnId].val()
     }
 
     setup(columnId: ShipColumnType): void {
