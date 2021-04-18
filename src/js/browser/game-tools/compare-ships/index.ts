@@ -8,10 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { appVersion } from "common/common-browser"
-
 import { initDefault } from "./init-default"
 import { initFromClipboard } from "./init-from-clipboard"
+import { ShipCompareSearchParamsRead } from "./search-params-read"
 
 export const shipColumnType = ["base", "c1", "c2"]
 export type ShipColumnType = typeof shipColumnType[number]
@@ -19,22 +18,10 @@ export type ShipColumnType = typeof shipColumnType[number]
 export { CompareShips } from "./compare-ships"
 export { initFromJourney } from "./init-from-journey"
 
-const hasShipCompareParams = (urlParams: URLSearchParams): boolean => {
-    if (urlParams.has("cmp") && urlParams.has("v")) {
-        const version = urlParams.get("v")
-        // Compare main versions
-        if (version && version.split(".")[0] === appVersion.split(".")[0]) {
-            return true
-        }
-    }
-
-    return false
-}
-
-export const checkShipCompareData = (urlParams: URLSearchParams): void => {
-    if (hasShipCompareParams(urlParams)) {
-        void initFromClipboard(urlParams)
-    } else {
+export const checkShipCompareData = (readParams?: ShipCompareSearchParamsRead): void => {
+    if (readParams === undefined) {
         void initDefault()
+    } else {
+        void initFromClipboard(readParams)
     }
 }

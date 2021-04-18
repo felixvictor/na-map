@@ -24,14 +24,13 @@ import ListWoods from "./list-woods"
 import ShowIncomeMap from "./show-income-map"
 import ShowPortOwnerships from "./show-port-ownerships"
 import { CompareWoods } from "./compare-woods"
+import { ShipCompareSearchParamsRead } from "./compare-ships/search-params-read"
 
 /**
  * Init
- * @param serverId - Server id
- * @param urlParams - Search Parameters
  */
-const init = (serverId: string, urlParams: URLSearchParams): void => {
-    checkShipCompareData(urlParams)
+const init = (serverId: string, readParams?: ShipCompareSearchParamsRead): void => {
+    checkShipCompareData(readParams)
 
     void new CompareWoods()
     void new ListWoods()

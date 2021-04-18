@@ -1,8 +1,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Convert modules.
- * @module    src/node/convert-modules
+ * @file      Convert setModules.
+ * @module    src/node/convert-setModules
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -531,7 +531,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         }
     }
 
-    // Get the not empty modules and sort
+    // Get the not empty setModules and sort
     const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]))
     // Group by type
     const modulesGrouped = d3Group(result, (module: ModuleEntity): string => module.type)

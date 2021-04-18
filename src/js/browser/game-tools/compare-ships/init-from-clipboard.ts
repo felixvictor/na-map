@@ -1,29 +1,27 @@
 import { registerEvent } from "../../analytics"
 import { CompareShips } from "./compare-ships"
 import { hashids } from "common/common-game-tools"
-import { woodType } from "../compare-woods"
+import { ShipCompareSearchParamsRead } from "./search-params-read"
 
 let shipCompare: CompareShips
 
-export const initFromClipboard = async (urlParams: URLSearchParams): Promise<void> => {
+export const initFromClipboard = async (searchParams: ShipCompareSearchParamsRead): Promise<void> => {
     registerEvent("Menu", "Paste ship compare")
 
+    console.log("initFromClipboard", searchParams._getVersion())
     shipCompare = new CompareShips()
     await shipCompare.loadAndSetupData()
 
-    if (shipAndWoodsIds.length > 0) {
+    const selectedIds = searchParams.getSelectedIds()
+    if (selectedIds[0].ship) {
         await shipCompare.menuClicked()
-        setShipAndWoodsSelects(shipAndWoodsIds)
-        setModuleSelects(urlParams)
+        setShipAndWoodsSelects(selectedIds)
+        setModuleSelects(selectedIds)
     }
 }
 
-const setShipAndWoodsSelects = (ids: number[]): void => {
-
-}
-
 /**
- * Get selected modules, new searchParam per module
+ * Get selected setModules, new searchParam per module
  */
 const setModuleSelects = (urlParams: URLSearchParams): void => {
     for (const [columnIndex, columnId] of shipCompare.columnIds.entries()) {

@@ -189,7 +189,7 @@ export class CompareShips {
 
     async loadAndSetupData(): Promise<void> {
         this.#moduleDataDefault = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../../../lib/gen-generic/modules.json")
+            await import(/* webpackChunkName: "data-setModules" */ "../../../../../lib/gen-generic/modules.json")
         ).default as Module[]
         this.#shipData = (
             await import(/* webpackChunkName: "data-ships" */ "../../../../../lib/gen-generic/ships.json")

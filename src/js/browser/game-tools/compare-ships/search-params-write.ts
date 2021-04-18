@@ -1,5 +1,3 @@
-import { appVersion } from "common/common-browser"
-import { hashids } from "common/common-game-tools"
 import { shipColumnType } from "./index"
 import { ModuleType, SelectedId, ShipColumnTypeList } from "compare-ships"
 import { ShipCompareSearchParams } from "./search-params"
@@ -7,7 +5,6 @@ import { ShipCompareSearchParams } from "./search-params"
 export class ShipCompareSearchParamsWrite extends ShipCompareSearchParams {
     #moduleTypes: Set<ModuleType>
     #selectedIds: ShipColumnTypeList<SelectedId>
-    #shipCompareUrl = new URL(window.location.href)
 
     constructor(selectedIds: ShipColumnTypeList<SelectedId>, moduleTypes: Set<ModuleType>) {
         super()
@@ -20,21 +17,11 @@ export class ShipCompareSearchParamsWrite extends ShipCompareSearchParams {
     }
 
     getSearchParam(): string {
-        return this.#shipCompareUrl.href
-    }
-
-    _setVersion(version: string): void {
-        this.#shipCompareUrl.searchParams.set("v", version)
+        return super.getUrl()
     }
 
     _addVersion(): void {
-        const version = encodeURIComponent(appVersion)
-
-        this._setVersion(version)
-    }
-
-    _setShipsAndWoodIds(ids: number[]): void {
-        this.#shipCompareUrl.searchParams.set("cmp", hashids.encode(ids))
+        super.setVersion()
     }
 
     // Add selected ships and woods, triple (shipId, frameId, trimId) per column, flat array
@@ -47,25 +34,17 @@ export class ShipCompareSearchParamsWrite extends ShipCompareSearchParams {
             }
         }
 
-        console.log("addShipsAndWoods", ids)
-        this._setShipsAndWoodIds(ids)
+        super.setShipsAndWoodIds(ids)
     }
 
-    _setModules(param: string, value: number[]): void {
-        this.#shipCompareUrl.searchParams.set(param, hashids.encode(value))
-    }
-
-    // Add selected modules, new searchParam per module
+    // Add selected setModules, new searchParam per module
     _addModules(): void {
         for (const [columnIndex, columnId] of shipColumnType.entries()) {
             if (this.#selectedIds[columnId]) {
-                console.log(columnId, columnIndex, this.#selectedIds[columnId].modules)
                 for (const [moduleTypeIndex, moduleType] of [...this.#moduleTypes].entries()) {
                     const value = this.#selectedIds[columnId].modules.get(moduleType) ?? []
                     if (value.length > 0) {
-                        const param = `${columnIndex}${moduleTypeIndex}`
-                        console.log(moduleType, value, param, hashids.encode(value))
-                        this._setModules(param, value)
+                        super.setModuleIds(columnIndex, moduleTypeIndex, value)
                     }
                 }
             }

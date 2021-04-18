@@ -12,6 +12,7 @@ import { serverIds } from "common/servers"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
+import { ShipCompareSearchParamsRead } from "./game-tools/compare-ships/search-params-read"
 
 import "scss/main.scss"
 
@@ -112,12 +113,10 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
 
 /**
  * Load game tools
- * @param serverId - Server id
- * @param searchParams - Query arguments
  */
-const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
+const loadGameTools = async (serverId: string, readParams?: ShipCompareSearchParamsRead): Promise<void> => {
     const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
-    gameTools.init(serverId, searchParams)
+    gameTools.init(serverId, readParams)
 }
 
 /**
@@ -131,6 +130,8 @@ const loadMapTools = async (): Promise<void> => {
 const load = async (): Promise<void> => {
     const serverId = getServerName()
     const searchParams = getSearchParams()
+    const readParams = new ShipCompareSearchParamsRead(searchParams)
+    console.log("readParams.isCurrentVersion()", readParams.isCurrentVersion())
 
     // Remove search string from URL
     // {@link https://stackoverflow.com/a/5298684}
@@ -138,12 +139,12 @@ const load = async (): Promise<void> => {
 
     await loadMap(serverId, searchParams)
 
-    if (searchParams.get("v")) {
-        void loadGameTools(serverId, searchParams)
+    if (readParams.isCurrentVersion()) {
+        void loadGameTools(serverId, readParams)
     } else {
         ;(document.querySelector("#game-tools-dropdown") as HTMLElement).addEventListener(
             "show.bs.dropdown",
-            async () => loadGameTools(serverId, searchParams),
+            async () => loadGameTools(serverId, undefined),
             { once: true }
         )
     }

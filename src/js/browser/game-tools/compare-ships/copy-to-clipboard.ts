@@ -12,6 +12,8 @@ export const copyDataClicked = (
 
     console.log("copyDataClicked", selectedIds)
 
-    const searchParams = new ShipCompareSearchParamsWrite(selectedIds, moduleTypes)
-    copyToClipboard(searchParams.getSearchParam(), modalNode)
+    const url = new ShipCompareSearchParamsWrite(selectedIds, moduleTypes)
+    const searchParams = url.getSearchParam()
+
+    copyToClipboard(searchParams, modalNode)
 }

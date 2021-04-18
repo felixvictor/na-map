@@ -1,29 +1,45 @@
+import { shipColumnType } from "./index"
 import { SelectedId, ShipColumnTypeList } from "compare-ships"
-import { hashids } from "common/common-game-tools"
-import { woodType } from "../compare-woods"
 import { ShipCompareSearchParams } from "./search-params"
 
+
+/*
+
+http://localhost:8080/?v=12.6.3&cmp=ovBudA4fv71fv9iLmF7mD&00=Lo2&11=0D0
+
+ */
 export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
     #selectedIds = {} as ShipColumnTypeList<SelectedId>
-    #urlParams: URLSearchParams
 
     constructor(urlParams: URLSearchParams) {
-        super()
-        this.#urlParams = urlParams
+        super(urlParams)
 
-        this._getVersion()
-        this._getShipsAndWoods()
-        this._getModules()
+        this.getShipsAndWoods()
+        this.getModules()
+        console.log("selectedIds", this.#selectedIds)
     }
 
-    _getVersion(): void {}
+    getSelectedIds(): ShipColumnTypeList<SelectedId> {
+        return this.#selectedIds
+    }
 
-    _getShipsAndWoods(): void {
-        const shipAndWoodsIds = this._getShipsAndWoodIds()
+    getShipsAndWoods(): void {
+        const ids = super.getShipsAndWoodIds()
+        console.log("getShipsAndWoods", ids)
         let i = 0
 
-        shipCompare.columnIds.some((columnId) => {
-            if (!shipCompare.hasShipId(ids[i])) {
+        shipColumnType.some((columnId) => {
+            this.#selectedIds[columnId] = {} as SelectedId
+            this.#selectedIds[columnId].ship = ids[i]
+            this.#selectedIds[columnId].wood = [ids[i + 1], ids[i + 2]]
+            i += 3
+            return i >= ids.length
+        })
+
+        /*
+        shipColumnType.some((columnId) => {
+            const shipId = ids[i]
+            if (!shipCompare.hasShipId(shipId)) {
                 return false
             }
 
@@ -46,11 +62,9 @@ export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
             shipCompare.refreshShips(columnId)
             return i >= ids.length
         })
+
+         */
     }
 
-    _getShipsAndWoodIds(): number[] {
-        return hashids.decode(this.#urlParams.get("cmp") ?? "") as number[]
-    }
-
-    _getModules(): void {}
+    getModules(): void {}
 }

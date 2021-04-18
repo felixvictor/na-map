@@ -35,7 +35,7 @@ const commonPaths = getCommonPaths()
 const craftGroups = new Map([
     ["AdmiralityShips", "Admirality permits"],
     ["AdmiraltyBooks", "Admirality books"],
-    ["AdmiraltyModules", "Admirality modules"],
+    ["AdmiraltyModules", "Admirality setModules"],
     ["AdmiraltyRecipes", "Admirality blueprints"],
     ["AdmiraltyResourcesAndMaterials", "Admirality resources"],
     ["AdmiraltyRewards", "PVP rewards"],

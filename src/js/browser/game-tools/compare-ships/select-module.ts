@@ -100,7 +100,7 @@ export default class SelectModule extends Select {
      * Setup module data
      */
     _setupData(): void {
-        // Get all modules where change modifier (moduleChanges) exists
+        // Get all setModules where change modifier (moduleChanges) exists
         this.#moduleProperties = new Map(
             this.#moduleDataDefault.flatMap((type) =>
                 type[1]
