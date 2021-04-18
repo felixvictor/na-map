@@ -3,13 +3,13 @@ import { ModuleType, SelectedId, ShipColumnTypeList } from "compare-ships"
 import { ShipCompareSearchParams } from "./search-params"
 
 export class ShipCompareSearchParamsWrite extends ShipCompareSearchParams {
-    #moduleTypes: Set<ModuleType>
     #selectedIds: ShipColumnTypeList<SelectedId>
 
     constructor(selectedIds: ShipColumnTypeList<SelectedId>, moduleTypes: Set<ModuleType>) {
         super()
+
+        super.moduleTypes = moduleTypes
         this.#selectedIds = selectedIds
-        this.#moduleTypes = moduleTypes
 
         this._addVersion()
         this._addShipsAndWoods()
@@ -41,7 +41,7 @@ export class ShipCompareSearchParamsWrite extends ShipCompareSearchParams {
     _addModules(): void {
         for (const [columnIndex, columnId] of shipColumnType.entries()) {
             if (this.#selectedIds[columnId]) {
-                for (const [moduleTypeIndex, moduleType] of [...this.#moduleTypes].entries()) {
+                for (const [moduleTypeIndex, moduleType] of [...super.moduleTypes].entries()) {
                     const value = this.#selectedIds[columnId].modules.get(moduleType) ?? []
                     if (value.length > 0) {
                         super.setModuleIds(columnIndex, moduleTypeIndex, value)

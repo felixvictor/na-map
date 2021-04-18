@@ -5,19 +5,23 @@ import { ShipCompareSearchParamsRead } from "./search-params-read"
 
 let shipCompare: CompareShips
 
+/*
+
+http://localhost:8080/?v=12.6.3&cmp=EL5h5bfQ5hkpiNofDNh4NuR2fbR&00=Lo2&11=0D0&23=BZOr
+
+ */
+
 export const initFromClipboard = async (searchParams: ShipCompareSearchParamsRead): Promise<void> => {
     registerEvent("Menu", "Paste ship compare")
 
-    console.log("initFromClipboard", searchParams._getVersion())
     shipCompare = new CompareShips()
     await shipCompare.loadAndSetupData()
-
-    const selectedIds = searchParams.getSelectedIds()
-    if (selectedIds[0].ship) {
-        await shipCompare.menuClicked()
+    await shipCompare.menuClicked()
+    console.log("initFromClipboard moduleTypes", shipCompare.selectModule.moduleTypes)
+    const selectedIds = searchParams.getSelectedIds(shipCompare.selectModule.moduleTypes)
+    console.log("initFromClipboard", selectedIds, Object.keys(selectedIds))
         setShipAndWoodsSelects(selectedIds)
         setModuleSelects(selectedIds)
-    }
 }
 
 /**

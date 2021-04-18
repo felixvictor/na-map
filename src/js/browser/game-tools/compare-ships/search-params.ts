@@ -1,9 +1,12 @@
 import { hashids } from "common/common-game-tools"
 import { appVersion } from "common/common-browser"
+import { ModuleType } from "compare-ships"
 
 export class ShipCompareSearchParams {
     #VERSION = "v"
     #SHIPANDWOODS = "cmp"
+
+    #moduleTypes = {} as Set<ModuleType>
     #shipCompareUrl = new URL(window.location.href)
 
     constructor(urlParams: URLSearchParams | undefined = undefined) {
@@ -12,7 +15,7 @@ export class ShipCompareSearchParams {
         }
     }
 
-    static _getDecodedValue(codedValue: string | null): number[] {
+    static getDecodedValue(codedValue: string | null): number[] {
         const value = codedValue ? (hashids.decode(codedValue) as number[]) : ([] as number[])
 
         return value
@@ -22,6 +25,18 @@ export class ShipCompareSearchParams {
         const codedValue = hashids.encode(value)
 
         return codedValue
+    }
+
+    get moduleTypes(): Set<ModuleType> {
+        return this.#moduleTypes
+    }
+
+    set moduleTypes(moduleTypes: Set<ModuleType>) {
+        this.#moduleTypes = moduleTypes
+    }
+
+    get searchParams(): URLSearchParams {
+        return this.#shipCompareUrl.searchParams
     }
 
     getUrl(): string {
@@ -41,17 +56,13 @@ export class ShipCompareSearchParams {
         return false
     }
 
-    _getModuleIndex(columnIndex: number, moduleTypeIndex: number): string {
-        return `${columnIndex}${moduleTypeIndex}`
-    }
-
-    getModuleIds(columnIndex: number, moduleTypeIndex: number): number[] {
+    getModuleIds(columnIndex: number, moduleTypeIndex: number): [string, number[]] {
         const param = this._getModuleIndex(columnIndex, moduleTypeIndex)
         const codedValue = this.#shipCompareUrl.searchParams.get(param)
 
-        const value = ShipCompareSearchParams._getDecodedValue(codedValue)
+        const value = ShipCompareSearchParams.getDecodedValue(codedValue)
 
-        return value
+        return [param, value]
     }
 
     setModuleIds(columnIndex: number, moduleTypeIndex: number, moduleIds: number[]): void {
@@ -62,11 +73,15 @@ export class ShipCompareSearchParams {
     }
 
     getShipsAndWoodIds(): number[] {
-        const codedValue = this.#shipCompareUrl.searchParams.get(this.#SHIPANDWOODS)
+        const codedValue = this._getParam(this.#SHIPANDWOODS)
+        if (codedValue) {
+            this._deleteParam(this.#SHIPANDWOODS)
+            const value = ShipCompareSearchParams.getDecodedValue(codedValue)
 
-        const value = ShipCompareSearchParams._getDecodedValue(codedValue)
+            return value
+        }
 
-        return value
+        return []
     }
 
     setShipsAndWoodIds(ids: number[]): void {
@@ -81,19 +96,34 @@ export class ShipCompareSearchParams {
         this.#shipCompareUrl.searchParams.set(this.#VERSION, codedVersion)
     }
 
-    _hasShipWoods(): boolean {
-        return this.#shipCompareUrl.searchParams.has(this.#VERSION)
+    _deleteParam(key: string): void {
+        this.#shipCompareUrl.searchParams.delete(key)
+    }
+
+    _getModuleIndex(columnIndex: number, moduleTypeIndex: number): string {
+        return `${columnIndex}${moduleTypeIndex}`
+    }
+
+    _getParam(key: string): string | undefined {
+        return this.#shipCompareUrl.searchParams.get(key) ?? undefined
     }
 
     _getVersion(): string | undefined {
         if (this._hasVersion()) {
-            const codedVersion = this.#shipCompareUrl.searchParams.get(this.#VERSION) as string
-            const version = decodeURIComponent(codedVersion)
+            const codedVersion = this._getParam(this.#VERSION)
+            if (codedVersion) {
+                this._deleteParam(this.#VERSION)
+                const version = decodeURIComponent(codedVersion)
 
-            return version
+                return version
+            }
         }
 
         return undefined
+    }
+
+    _hasShipWoods(): boolean {
+        return this.#shipCompareUrl.searchParams.has(this.#VERSION)
     }
 
     _hasVersion(): boolean {
@@ -101,9 +131,8 @@ export class ShipCompareSearchParams {
     }
 
     _setSearchParams(urlParams: URLSearchParams): void {
-        for (const pair of urlParams.entries()) {
-            console.log("set searchParams", pair[0], pair[1])
-            this.#shipCompareUrl.searchParams.set(pair[0], pair[1])
+        for (const [key, value] of urlParams.entries()) {
+            this.#shipCompareUrl.searchParams.set(key, value)
         }
     }
 }

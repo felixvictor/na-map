@@ -131,7 +131,6 @@ const load = async (): Promise<void> => {
     const serverId = getServerName()
     const searchParams = getSearchParams()
     const readParams = new ShipCompareSearchParamsRead(searchParams)
-    console.log("readParams.isCurrentVersion()", readParams.isCurrentVersion())
 
     // Remove search string from URL
     // {@link https://stackoverflow.com/a/5298684}
