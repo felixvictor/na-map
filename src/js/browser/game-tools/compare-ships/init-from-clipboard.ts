@@ -20,26 +20,5 @@ export const initFromClipboard = async (searchParams: ShipCompareSearchParamsRea
     console.log("initFromClipboard moduleTypes", shipCompare.selectModule.moduleTypes)
     const selectedIds = searchParams.getSelectedIds(shipCompare.selectModule.moduleTypes)
     console.log("initFromClipboard", selectedIds, Object.keys(selectedIds))
-        setShipAndWoodsSelects(selectedIds)
-        setModuleSelects(selectedIds)
-}
-
-/**
- * Get selected setModules, new searchParam per module
- */
-const setModuleSelects = (urlParams: URLSearchParams): void => {
-    for (const [columnIndex, columnId] of shipCompare.columnIds.entries()) {
-        let needRefresh = false
-        for (const [typeIndex, type] of [...shipCompare.selectModule.moduleTypes].entries()) {
-            if (urlParams.has(`${columnIndex}${typeIndex}`)) {
-                const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`)!) as number[]
-                shipCompare.modulesAndWoodData.setModules(columnId, type, moduleIds)
-                needRefresh = true
-            }
-        }
-
-        if (needRefresh) {
-            shipCompare.refreshShips(columnId)
-        }
-    }
+    shipCompare.setSelectedIds(selectedIds)
 }

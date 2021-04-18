@@ -76,7 +76,9 @@ export default class SelectModule extends Select {
     }
 
     setSelectedIds(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
+        console.log("_setSelectedModuleIds", columnId, moduleIds)
         for (const type of [...this.#moduleTypes]) {
+            console.log("-- _setSelectedModuleIds", type, moduleIds.get(type) ?? [])
             this._setSelectedModules(columnId, type, moduleIds.get(type) ?? [])
         }
     }

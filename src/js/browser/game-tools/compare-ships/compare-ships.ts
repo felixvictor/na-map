@@ -386,6 +386,8 @@ export class CompareShips {
             this._setSelectedShipId(columnId, selectedIds[columnId].ship)
             this._setSelectedWoodIds(columnId, selectedIds[columnId].wood)
             this._setSelectedModuleIds(columnId, selectedIds[columnId].modules)
+
+            this.refreshShips(columnId)
         }
     }
 
