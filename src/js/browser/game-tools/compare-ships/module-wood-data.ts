@@ -240,15 +240,8 @@ export default class ModulesAndWoodData {
         })
     }
 
-    /**
-     * Add upgrade changes to ship this.#data
-     * @param shipDataBase - Base ship this.#data
-     * @param shipDataUpdated - Updated ship this.#data
-     * @param columnId - Column id
-     * @param selectWood
-     * @param selectModule
-     * @returns Updated ship this.#data
-     */
+    // Add upgrade changes to ship this.#data
+    // eslint-disable-next-line max-params
     addModulesAndWoodData(
         shipDataBase: ShipData,
         shipDataUpdated: ShipData,
@@ -269,61 +262,5 @@ export default class ModulesAndWoodData {
         }
 
         return this.#data
-    }
-
-    modulesSelected(columnId: ShipColumnType): void {
-        /*
-        this.#selectedUpgradeIdsList[compareId] = []
-        this.#selectedUpgradeIdsPerType[compareId] = {} as Array<ModuleTypeList<number[]>>
-
-        for (const type of this.#selectModule.moduleTypes) {
-            const value = this.#selectModule.getSelectValue(compareId, type)
-
-Select.getSelectValueAsNumberArray(value)
-            if (Array.isArray(value)) {
-                // Multiple selects
-                this.#selectedUpgradeIdsPerType[compareId][type] = this.#selectedUpgradeIdsPerType[compareId][
-                    type
-                ].map((element) => Number(element))
-            } else {
-                // Single select
-                this.#selectedUpgradeIdsPerType[compareId][type] = value
-                    ? [Number(this.#selectedUpgradeIdsPerType[compareId][type])]
-                    : []
-            }
-
-            if (this.#selectedUpgradeIdsPerType[compareId][type].length > 0) {
-                this.#selectedUpgradeIdsList[compareId] = [
-                    ...this.#selectedUpgradeIdsList[compareId],
-                    ...this.#selectedUpgradeIdsPerType[compareId][type],
-                ]
-            }
-
-            console.log("_modulesSelected", compareId, type, this.#selectedUpgradeIdsPerType[compareId][type])
-        }
-
-         */
-        console.log("XXXXXXXXXXXXXXX -> modulesSelected fehlt <-XXXXXXXXXXXXXXX")
-    }
-
-    setModules(columnId: ShipColumnType, type: ModuleType, moduleIds: number[]): void {
-        /*
-        if (!this.#selectedUpgradeIdsPerType[columnId]) {
-            this.#selectedUpgradeIdsPerType[columnId] = {} as Array<ModuleTypeList<number[]>>
-        }
-
-        if (!this.#selectedUpgradeIdsList[columnId]) {
-            this.#selectedUpgradeIdsList[columnId] = []
-        }
-
-        console.log("moduleIds", { columnId }, { type }, { moduleIds })
-
-        const tttt = moduleIds.map((element) => Number(element))
-        this.#selectedUpgradeIdsPerType[columnId][type as ModuleType] = tttt
-        Select.setSelect(this.#selectModule.getSelect$(columnId, type), this.#selectedUpgradeIdsPerType[columnId][type])
-        this.#selectedUpgradeIdsList[columnId].push(...this.#selectedUpgradeIdsPerType[columnId][type])
-
-         */
-        console.log("XXXXXXXXXXXXXXX -> setModules fehlt <-XXXXXXXXXXXXXXX")
     }
 }

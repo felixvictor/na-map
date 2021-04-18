@@ -110,10 +110,6 @@ export class CompareShips {
         return this.#shipData.some((ship) => ship.id === id)
     }
 
-    _getShipId(columnId: ShipColumnType): number {
-        return this.#shipIds.get(columnId) ?? 0
-    }
-
     setShip(columnId: ShipColumnType, shipId: number): void {
         this.#shipIds.set(columnId, shipId)
         SelectShip.setSelect(this.#selectShip.getSelect$(columnId), shipId)
@@ -123,7 +119,7 @@ export class CompareShips {
     }
 
     _cloneShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
-        const shipId = this._getShipId(currentColumnId)
+        const shipId = this._getSelectedShipId(currentColumnId)
         if (shipId) {
             this.setShip(newColumnId, shipId)
         }
@@ -337,6 +333,14 @@ export class CompareShips {
         return selectedData
     }
 
+    _getSelectedShipId(columnId: ShipColumnType): number {
+        return this.#shipIds.get(columnId) ?? 0
+    }
+
+    _getSelectedWoodIds(columnId: ShipColumnType): number[] {
+        return this.#selectWood.getSelectedIds(columnId)
+    }
+
     _getSelectedModuleIds(columnId: ShipColumnType): Map<string, number[]> {
         const moduleIds = new Map<string, number[]>()
 
@@ -348,15 +352,11 @@ export class CompareShips {
         return moduleIds
     }
 
-    _getSelectedWoodIds(columnId: ShipColumnType): number[] {
-        return this.#selectWood.getSelectedIds(columnId)
-    }
-
     _getSelectedIds(): ShipColumnTypeList<SelectedId> {
         const selectedIds = {} as ShipColumnTypeList<SelectedId>
 
         for (const columnId of this.#columnIds) {
-            const shipId = this.#shipIds.get(columnId)
+            const shipId = this._getSelectedShipId(columnId)
             if (shipId) {
                 selectedIds[columnId] = {
                     ship: shipId,
@@ -367,6 +367,26 @@ export class CompareShips {
         }
 
         return selectedIds
+    }
+
+    _setSelectedShipId(columnId: ShipColumnType, shipId: number): void {
+        this.#shipIds.set(columnId, shipId)
+    }
+
+    _setSelectedWoodIds(columnId: ShipColumnType, woodIds: number[]): void {
+        this.#selectWood.setSelectedIds(columnId, woodIds)
+    }
+
+    _setSelectedModuleIds(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
+        this.#selectModule.setSelectedIds(columnId, moduleIds)
+    }
+
+    setSelectedIds(selectedIds: ShipColumnTypeList<SelectedId>): void {
+        for (const columnId of this.#columnIds) {
+            this._setSelectedShipId(columnId, selectedIds[columnId].ship)
+            this._setSelectedWoodIds(columnId, selectedIds[columnId].wood)
+            this._setSelectedModuleIds(columnId, selectedIds[columnId].modules)
+        }
     }
 
     initSelects(): void {
@@ -518,7 +538,6 @@ export class CompareShips {
             this.singleShipData = this._getShipDefaultData(columnId)
         } else {
             const singleShipData = this._getShipData(columnId)
-            this.#modulesAndWoodData.modulesSelected(columnId)
             if (columnId === "base") {
                 this._setSelectedShip(
                     columnId,

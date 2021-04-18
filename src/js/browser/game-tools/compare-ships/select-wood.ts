@@ -70,4 +70,10 @@ export default class SelectWood extends Select {
         Select.setSelect(select$, woodId)
         this.#woodCompare.woodSelected(columnId, type)
     }
+
+    setSelectedIds(columnId: ShipColumnType, ids: number[]): void {
+        for (const [index, type] of woodType.entries()) {
+            this.setWood(columnId, type, ids[index])
+        }
+    }
 }

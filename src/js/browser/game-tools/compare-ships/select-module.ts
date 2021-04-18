@@ -71,6 +71,16 @@ export default class SelectModule extends Select {
         return rate <= 3 ? "L" : rate <= 5 ? "M" : "S"
     }
 
+    _setSelectedModules(columnId: ShipColumnType, type: ModuleType, ids: number[]): void {
+        Select.setSelect(this.#select$[columnId][type], ids)
+    }
+
+    setSelectedIds(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
+        for (const type of [...this.#moduleTypes]) {
+            this._setSelectedModules(columnId, type, moduleIds.get(type) ?? [])
+        }
+    }
+
     _getModuleFromName(moduleName: string | null): ModuleEntity | undefined {
         let module = {} as ModuleEntity | undefined
 
