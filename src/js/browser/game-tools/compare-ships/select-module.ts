@@ -10,17 +10,18 @@
 
 import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
-import Select from "util/select"
-import { HtmlString } from "common/interface"
-import { Module, ModuleEntity, ModulePropertiesEntity } from "common/gen-json"
-import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
-import { moduleAndWoodChanges } from "./module-modifier"
-import { ModuleType, ModuleTypeList, ShipColumnTypeList } from "compare-ships"
-import { ShipColumnType } from "./index"
 import { group as d3Group } from "d3-array"
 import { select as d3Select } from "d3-selection"
+
 import { sortBy } from "common/common"
 import { getBaseIdSelects } from "common/common-browser"
+import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
+import { moduleAndWoodChanges } from "./module-modifier"
+import { HtmlString } from "common/interface"
+import { Module, ModuleEntity, ModulePropertiesEntity } from "common/gen-json"
+import { ModuleType, ModuleTypeList, ShipColumnTypeList } from "compare-ships"
+import { ShipColumnType } from "./index"
+import Select from "util/select"
 
 type ModuleOptionType = [number, ModuleEntity]
 
@@ -82,7 +83,7 @@ export default class SelectModule extends Select {
     }
 
     _getModuleFromName(moduleName: string | null): ModuleEntity | undefined {
-        let module = {} as ModuleEntity | undefined
+        let module: ModuleEntity | undefined
 
         this.#moduleDataDefault.some((type) => {
             module = type[1].find((module) => module.name === moduleName)

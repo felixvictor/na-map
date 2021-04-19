@@ -53,15 +53,15 @@ export class CompareShips {
     readonly #menuId: HtmlString
     readonly #moduleAndWoodCaps = moduleAndWoodCaps
 
-    colorScale!: ScaleLinear<string, string>
-    innerRadius!: number
-    outerRadius!: number
-    radiusSpeedScale!: ScaleLinear<number, number>
     activeColumns = {} as ShipColumnTypeList<ColumnBase | ColumnCompare | undefined>
-    shipMassScale!: ScaleLinear<number, number>
-    singleShipData!: ShipData
-    svgHeight!: number
-    svgWidth!: number
+    colorScale = {} as ScaleLinear<string, string>
+    innerRadius = 0
+    outerRadius = 0
+    radiusSpeedScale = {} as ScaleLinear<number, number>
+    shipMassScale = {} as ScaleLinear<number, number>
+    singleShipData = {} as ShipData
+    svgHeight = 0
+    svgWidth = 0
     windProfileRotate = 0
     woodCompare = {} as CompareWoods
     readonly colourScaleSpeedDiff: ScaleLinear<string, string>

@@ -11,11 +11,11 @@
 import { ModulePropertiesEntity, ShipData } from "common/gen-json"
 import { ShipColumnType } from "./index"
 import { HtmlString, ModifierName } from "common/interface"
-import { AbsoluteAndPercentageAmount, Amount, ModuleType } from "compare-ships"
+import { AbsoluteAndPercentageAmount, Amount } from "compare-ships"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
+import { woodType } from "../compare-woods"
 import SelectModule from "./select-module"
 import SelectWood from "./select-wood"
-import { woodType } from "../compare-woods"
 
 export default class ModulesAndWoodData {
     #baseData = {} as ShipData

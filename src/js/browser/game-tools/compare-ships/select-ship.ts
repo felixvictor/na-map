@@ -11,16 +11,16 @@
 import { group as d3Group } from "d3-array"
 import { select as d3Select } from "d3-selection"
 
+import { sortBy } from "common/common"
 import { isImported, stripShipName } from "common/common-game-tools"
 import { getOrdinal } from "common/common-math"
 
-import Select from "util/select"
-
 import { ShipColumnType } from "./index"
-import { ModuleType, ShipColumnTypeList, ShipSelectData, ShipSelectMap } from "compare-ships"
+import { ShipColumnTypeList, ShipSelectData, ShipSelectMap } from "compare-ships"
 import { HtmlString } from "common/interface"
 import { ShipData } from "common/gen-json"
-import { sortBy } from "common/common"
+
+import Select from "util/select"
 
 export default class SelectShip extends Select {
     #select$ = {} as ShipColumnTypeList<JQuery<HTMLSelectElement>>

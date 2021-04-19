@@ -12,9 +12,7 @@ import { select as d3Select, Selection } from "d3-selection"
 import { arc as d3Arc, pie as d3Pie } from "d3-shape"
 
 import { numberSegments } from "common/common-browser"
-
 import { CompareShips } from "./compare-ships"
-
 import { ShipGunDeck, ShipGuns } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { ShipDisplayData } from "compare-ships"
