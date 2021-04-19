@@ -43,7 +43,11 @@ export default class Select {
         return value ? [String(value)] : []
     }
 
-    static setSelect(select$: JQuery<HTMLSelectElement>, ids: number | number[]): void {
+    static getValues(select$: JQuery<HTMLSelectElement>): string | number | string[] | undefined {
+        return select$.val()
+    }
+
+    static setSelectValues(select$: JQuery<HTMLSelectElement>, ids: number | number[]): void {
         const value = Select.getSelectValueAsStringArray(ids)
 
         if (value.length > 0) {

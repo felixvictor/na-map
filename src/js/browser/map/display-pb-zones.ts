@@ -10,7 +10,7 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
-import { servers } from "common/servers"
+import { getServerType, ServerId, ServerType } from "common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
@@ -24,7 +24,7 @@ export default class DisplayPbZones {
     readonly #fortRangeRadius = 15
     readonly #towerRangeRadius = 12
     showPB: string
-    #serverType: string
+    #serverType: ServerType
     #lowerBound = {} as Point
     #upperBound = {} as Point
     private readonly _ports!: DisplayPorts
@@ -39,9 +39,9 @@ export default class DisplayPbZones {
     private _raidZonesFiltered!: PbZoneRaid[]
     private _g!: Selection<SVGGElement, unknown, HTMLElement, unknown>
 
-    constructor(ports: DisplayPorts, serverId: string) {
+    constructor(ports: DisplayPorts, serverId: ServerId) {
         this._ports = ports
-        this.#serverType = servers.find((server) => server.id === serverId)!.type
+        this.#serverType = getServerType(serverId)
 
         this._showId = "show-zones"
 

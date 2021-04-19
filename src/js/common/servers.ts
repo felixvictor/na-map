@@ -10,15 +10,16 @@
 
 export const serverIds = ["eu1", "eu2"]!
 export type ServerId = typeof serverIds[number]
+export type ServerType = "PVE" | "PVP"
 
 export interface Server {
     id: ServerId
     name: string
-    type: string
+    type: ServerType
 }
 
 // If changed check also webpack.config
-export const servers = [
+export const servers: Server[] = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" },
 ]
@@ -28,3 +29,5 @@ export const servers = [
    source_base_url="http://storage.googleapis.com/nacleandevshards/"
    server_names=(dev)
 */
+
+export const getServerType = (serverId: ServerId): ServerType => servers.find((server) => server.id === serverId)!.type

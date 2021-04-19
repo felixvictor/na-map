@@ -73,7 +73,7 @@ export default class SelectModule extends Select {
     }
 
     _setModuleTypeValues(columnId: ShipColumnType, type: ModuleType, ids: number[]): void {
-        Select.setSelect(this.#select$[columnId][type], ids)
+        Select.setSelectValues(this.#select$[columnId][type], ids)
     }
 
     setValues(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {

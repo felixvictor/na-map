@@ -67,7 +67,7 @@ export default class SelectWood extends Select {
     setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
         const select$ = this.getSelect$(columnId, type)
 
-        Select.setSelect(select$, woodId)
+        Select.setSelectValues(select$, woodId)
         this.#woodCompare.woodSelected(columnId, type)
     }
 

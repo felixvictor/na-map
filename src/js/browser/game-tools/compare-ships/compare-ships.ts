@@ -112,7 +112,7 @@ export class CompareShips {
 
     setShip(columnId: ShipColumnType, shipId: number): void {
         this.#shipIds.set(columnId, shipId)
-        SelectShip.setSelect(this.#selectShip.getSelect$(columnId), shipId)
+        SelectShip.setSelectValues(this.#selectShip.getSelect$(columnId), shipId)
         if (columnId === "base" && this.#baseId !== "ship-journey") {
             this._enableCompareSelects()
         }
