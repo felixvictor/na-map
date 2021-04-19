@@ -71,7 +71,7 @@ export default class SelectWood extends Select {
         this.#woodCompare.woodSelected(columnId, type)
     }
 
-    setSelectedIds(columnId: ShipColumnType, ids: number[]): void {
+    setValues(columnId: ShipColumnType, ids: number[]): void {
         for (const [index, type] of woodType.entries()) {
             this.setWood(columnId, type, ids[index])
         }

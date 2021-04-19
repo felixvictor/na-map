@@ -10,8 +10,6 @@ export const copyDataClicked = (
 ): void => {
     registerEvent("Menu", "Copy ship compare")
 
-    console.log("copyDataClicked", selectedIds)
-
     const url = new ShipCompareSearchParamsWrite(selectedIds, moduleTypes)
     const searchParams = url.getSearchParam()
 

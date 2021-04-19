@@ -143,8 +143,6 @@ export default class ModulesAndWoodData {
                 }
             }
         }
-
-        console.log("_setModifierAmounts", this._setModifier)
     }
 
     _adjustDataByModifiers(): void {

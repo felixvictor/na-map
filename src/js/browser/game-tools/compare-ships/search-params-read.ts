@@ -19,7 +19,6 @@ export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
 
     _getShipsAndWoods(): void {
         const ids = super.getShipsAndWoodIds()
-        console.log("getShipsAndWoods", ids)
         let i = 0
 
         shipColumnType.some((columnId) => {
@@ -48,7 +47,6 @@ export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
     }
 
     _getModuleType(moduleTypeIndex: number): string {
-        console.log("_getModuleType", moduleTypeIndex, super.moduleTypes)
         return [...super.moduleTypes][moduleTypeIndex]
     }
 }

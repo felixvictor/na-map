@@ -61,7 +61,6 @@ export default class SelectShip extends Select {
 
     _injectSelects(id: HtmlString, columnId: string): void {
         const select = d3Select(`#${super.baseId}-${columnId} .input-group label select`)
-        console.log("ship _injectSelects", `#${super.baseId}-${columnId} .input-group label select`, select.node())
 
         select.attr("name", id).attr("id", this.getSelectId(columnId))
     }
@@ -91,11 +90,10 @@ export default class SelectShip extends Select {
     }
 
     enableSelect(columnId: string): void {
-        console.log("enableSelect", columnId)
         Select.enable(this.#select$[columnId])
     }
 
-    getSelectValue(columnId: ShipColumnType): string | number | string[] | undefined {
+    getSelectedValue(columnId: ShipColumnType): string | number | string[] | undefined {
         return this.#select$[columnId].val()
     }
 

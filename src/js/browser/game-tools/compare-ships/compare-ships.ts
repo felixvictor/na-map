@@ -120,6 +120,7 @@ export class CompareShips {
 
     _cloneShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
         const shipId = this._getSelectedShipId(currentColumnId)
+
         if (shipId) {
             this.setShip(newColumnId, shipId)
         }
@@ -127,48 +128,40 @@ export class CompareShips {
         return shipId !== undefined
     }
 
-    _getSelectedModuleIdsPerType(columnId: ShipColumnType, type: ModuleType): number[] {
-        return this.#selectModule.getSelectedUpgradeIds(columnId, type)
+    _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
+        const moduleIds = this._getSelectedModuleIds(currentColumnId)
+
+        this._initModuleSelects(newColumnId)
+        this.#selectModule.setValues(newColumnId, moduleIds)
     }
 
-    _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        const shipClass = this.getShipClass(newColumnId)
+    _clone(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
+        const hasData = this._cloneShipData(currentColumnId, newColumnId)
 
-        this.#selectModule.setup(newColumnId, shipClass)
-        this.#selectModule.resetSelects(newColumnId, shipClass)
+        if (hasData) {
+            this.#selectWood.cloneWoodData(currentColumnId, newColumnId)
+            this._cloneModuleData(currentColumnId, newColumnId)
 
-        for (const type of [...this.#selectModule.moduleTypes]) {
-            const moduleIds = this._getSelectedModuleIdsPerType(currentColumnId, type)
-            if (moduleIds) {
-                this.#modulesAndWoodData.setModules(newColumnId, type, moduleIds)
-            }
+            this._refreshColumn(newColumnId)
         }
     }
 
-    _cloneShipToLeft(currentColumnId: ShipColumnType): void {
+    _cloneToLeft(currentColumnId: ShipColumnType): void {
         const newColumnIndex = this.#columnIds.indexOf(currentColumnId)
         const newColumnId = this.#columnIds[newColumnIndex - 1]
 
-        const hasData = this._cloneShipData(currentColumnId, newColumnId)
-        if (hasData) {
-            this.#selectWood.cloneWoodData(currentColumnId, newColumnId)
-            this._cloneModuleData(currentColumnId, newColumnId)
-
-            this.refreshShips(newColumnId)
-        }
+        this._clone(currentColumnId, newColumnId)
     }
 
-    _cloneShipToRight(currentColumnId: ShipColumnType): void {
+    _cloneToRight(currentColumnId: ShipColumnType): void {
         const newColumnIndex = this.#columnIds.indexOf(currentColumnId)
         const newColumnId = this.#columnIds[newColumnIndex + 1]
 
-        const hasData = this._cloneShipData(currentColumnId, newColumnId)
-        if (hasData) {
-            this.#selectWood.cloneWoodData(currentColumnId, newColumnId)
-            this._cloneModuleData(currentColumnId, newColumnId)
+        this._clone(currentColumnId, newColumnId)
+    }
 
-            this.refreshShips(newColumnId)
-        }
+    _getSelectedModuleIdsPerType(columnId: ShipColumnType, type: ModuleType): number[] {
+        return this.#selectModule.getSelectedUpgradeIds(columnId, type)
     }
 
     _setupData(): void {
@@ -208,7 +201,7 @@ export class CompareShips {
      */
     _setGraphicsParameters(): void {
         const column = this.#modal!.getModalNode().querySelector(".column-base") as HTMLElement
-        console.log("_setGraphicsParameters", this.#modal!.getModalNode(), column)
+
         this.svgWidth = getElementWidth(column) ?? 0
         // noinspection JSSuspiciousNameCombination
         this.svgHeight = this.svgWidth
@@ -227,7 +220,7 @@ export class CompareShips {
                 ;(document.querySelector(
                     `#${this.#modal!.cloneLeftButtonId}-${columnId}`
                 ) as HTMLButtonElement).addEventListener("click", () => {
-                    this._cloneShipToLeft(columnId)
+                    this._cloneToLeft(columnId)
                 })
             }
 
@@ -237,7 +230,7 @@ export class CompareShips {
                 ;(document.querySelector(
                     `#${this.#modal!.cloneRightButtonId}-${columnId}`
                 ) as HTMLButtonElement).addEventListener("click", () => {
-                    this._cloneShipToRight(columnId)
+                    this._cloneToRight(columnId)
                 })
             }
         }
@@ -246,7 +239,7 @@ export class CompareShips {
     _setupModuleSelectListener(columnId: ShipColumnType): void {
         for (const type of this.#selectModule.moduleTypes) {
             this.#selectModule.getSelect$(columnId, type).on("changed.bs.select", () => {
-                this.refreshShips(columnId)
+                this._refreshColumn(columnId)
             })
         }
     }
@@ -257,17 +250,14 @@ export class CompareShips {
         Select.construct(shipSel$, { title: "Ship" })
         Select.reset(shipSel$)
         shipSel$.on("changed.bs.select", () => {
-            const shipId = Number(this.#selectShip.getSelectValue(columnId))
-            console.log("ship changed.bs.select", shipSel$, shipId)
+            const shipId = Number(this.#selectShip.getSelectedValue(columnId))
+
             this.#shipIds.set(columnId, shipId)
             if (this.#baseId !== "ship-journey") {
-                const shipClass = this.getShipClass(columnId)
-                this.#selectModule.setup(columnId, shipClass)
-                this._setupModuleSelectListener(columnId)
-                this.#selectModule.resetSelects(columnId, shipClass)
+                this._initModuleSelects(columnId)
             }
 
-            this.refreshShips(columnId)
+            this._refreshColumn(columnId)
             if (columnId === "base" && this.#baseId !== "ship-journey") {
                 this._enableCompareSelects()
             }
@@ -282,12 +272,19 @@ export class CompareShips {
                 const woodSel$ = this.#selectWood.getSelect$(columnId, type)
                 Select.construct(woodSel$, { title: `Wood ${type}`, width: "150px" })
                 woodSel$.on("changed.bs.select", () => {
-                    console.log("wood changed.bs.select", woodSel$, woodSel$.val())
                     this.woodCompare.woodSelected(columnId, type)
-                    this.refreshShips(columnId)
+                    this._refreshColumn(columnId)
                 })
             }
         }
+    }
+
+    _initModuleSelects(columnId: string): void {
+        const shipClass = this.getShipClass(columnId)
+
+        this.#selectModule.setup(columnId, shipClass)
+        this.#selectModule.updateSelects(columnId, shipClass)
+        this._setupModuleSelectListener(columnId)
     }
 
     _initSelectListeners(): void {
@@ -369,25 +366,26 @@ export class CompareShips {
         return selectedIds
     }
 
-    _setSelectedShipId(columnId: ShipColumnType, shipId: number): void {
+    _setShip(columnId: ShipColumnType, shipId: number): void {
         this.#shipIds.set(columnId, shipId)
     }
 
-    _setSelectedWoodIds(columnId: ShipColumnType, woodIds: number[]): void {
-        this.#selectWood.setSelectedIds(columnId, woodIds)
+    _setWoods(columnId: ShipColumnType, woodIds: number[]): void {
+        this.#selectWood.setValues(columnId, woodIds)
     }
 
-    _setSelectedModuleIds(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
-        this.#selectModule.setSelectedIds(columnId, moduleIds)
+    _setModules(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
+        this.#selectModule.setValues(columnId, moduleIds)
     }
 
     setSelectedIds(selectedIds: ShipColumnTypeList<SelectedId>): void {
         for (const columnId of this.#columnIds) {
-            this._setSelectedShipId(columnId, selectedIds[columnId].ship)
-            this._setSelectedWoodIds(columnId, selectedIds[columnId].wood)
-            this._setSelectedModuleIds(columnId, selectedIds[columnId].modules)
+            this._setShip(columnId, selectedIds[columnId].ship)
+            this._setWoods(columnId, selectedIds[columnId].wood)
+            this._initModuleSelects(columnId)
+            this._setModules(columnId, selectedIds[columnId].modules)
 
-            this.refreshShips(columnId)
+            this._refreshColumn(columnId)
         }
     }
 
@@ -534,8 +532,7 @@ export class CompareShips {
         this._setGraphicsParameters()
     }
 
-    refreshShips(columnId: ShipColumnType): void {
-        console.log("refreshShips", columnId)
+    _refreshColumn(columnId: ShipColumnType): void {
         if (this.#baseId === "ship-journey") {
             this.singleShipData = this._getShipDefaultData(columnId)
         } else {

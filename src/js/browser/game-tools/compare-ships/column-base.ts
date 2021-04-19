@@ -51,7 +51,7 @@ export class ColumnBase extends Column {
         super(outputDivId, shipCompare)
 
         this.shipData = shipData
-        console.log("ColumnBase constructor", outputDivId, shipData, shipCompare)
+
         this._setBackground()
         this._setupDrag()
         this._drawWindProfile()

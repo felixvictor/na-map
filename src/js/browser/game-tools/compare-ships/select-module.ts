@@ -71,15 +71,13 @@ export default class SelectModule extends Select {
         return rate <= 3 ? "L" : rate <= 5 ? "M" : "S"
     }
 
-    _setSelectedModules(columnId: ShipColumnType, type: ModuleType, ids: number[]): void {
+    _setModuleTypeValues(columnId: ShipColumnType, type: ModuleType, ids: number[]): void {
         Select.setSelect(this.#select$[columnId][type], ids)
     }
 
-    setSelectedIds(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
-        console.log("_setSelectedModuleIds", columnId, moduleIds)
+    setValues(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
         for (const type of [...this.#moduleTypes]) {
-            console.log("-- _setSelectedModuleIds", type, moduleIds.get(type) ?? [])
-            this._setSelectedModules(columnId, type, moduleIds.get(type) ?? [])
+            this._setModuleTypeValues(columnId, type, moduleIds.get(type) ?? [])
         }
     }
 
@@ -124,7 +122,6 @@ export default class SelectModule extends Select {
     _addTooltip(element: HTMLLIElement, module: ModuleEntity): void {
         // Add tooltip with module properties
         element.dataset.bsOriginalTitle = SelectModule._getModifierFromModule(module.properties)
-        // const tooltip = new BSTooltip(element, { boundary: "viewport", html: true })
         const tooltip = new BSTooltip(element, { html: true })
         element.addEventListener("show.bs.tooltip", () => {
             // Remember shown tooltip
@@ -174,9 +171,6 @@ export default class SelectModule extends Select {
 
     /**
      * Get select options
-     * @param moduleType - Module type
-     * @param shipClass - Ship class
-     * @returns HTML formatted option
      */
     _getUpgradesOptions(moduleType: string, shipClass: number): string {
         // Group module data by sub type (e.g. "Gunnery")
@@ -223,7 +217,7 @@ export default class SelectModule extends Select {
         return this.#select$[columnId][type].val()
     }
 
-    resetSelects(columnId: ShipColumnType, shipClass: number): void {
+    updateSelects(columnId: ShipColumnType, shipClass: number): void {
         for (const type of this.#moduleTypes) {
             this._fillSelect(columnId, type, shipClass)
             this._refreshSelect(columnId, type)
@@ -289,7 +283,7 @@ export default class SelectModule extends Select {
             }
         }
 
-        this.resetSelects(columnId, shipClass)
+        this.updateSelects(columnId, shipClass)
     }
 
     getModuleProperties(id: number): ModuleEntity | undefined {
@@ -298,6 +292,7 @@ export default class SelectModule extends Select {
 
     getSelectedUpgradeIds(columnId: ShipColumnType, type: ModuleType): number[] {
         const value = this._getSelectValue(columnId, type)
+
         return Select.getSelectValueAsNumberArray(value)
     }
 }

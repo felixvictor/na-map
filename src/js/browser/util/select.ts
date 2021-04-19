@@ -24,41 +24,33 @@ export default class Select {
     }
 
     static getSelectValueAsNumberArray(value: string | number | string[] | undefined): number[] {
-        let values: number[]
-
         if (Array.isArray(value)) {
             // Multiple selects
-            values = value.map((element) => Number(element))
-        } else {
-            // Single select
-            values = value ? [Number(value)] : []
+            return value.map((element) => Number(element))
         }
 
-        return values
+        // Single select
+        return value ? [Number(value)] : []
     }
 
     static getSelectValueAsStringArray(value: number | number[]): string[] {
-        let values: string[]
-
         if (Array.isArray(value)) {
             // Multiple selects
-            values = value.map((element) => String(element))
-        } else {
-            // Single select
-            values = value ? [String(value)] : []
+            return value.map((element) => String(element))
         }
 
-        return values
+        // Single select
+        return value ? [String(value)] : []
     }
 
     static setSelect(select$: JQuery<HTMLSelectElement>, ids: number | number[]): void {
         const value = Select.getSelectValueAsStringArray(ids)
 
-        if (value) {
+        if (value.length > 0) {
             select$.val(value)
         }
 
-        Select.render(select$)
+        Select.refresh(select$)
     }
 
     static construct(select$: JQuery<HTMLSelectElement>, options: BootstrapSelectOptions): void {
