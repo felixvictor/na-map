@@ -8,19 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/modal"
-
 import { sum as d3Sum } from "d3-array"
-import { select as d3Select, Selection } from "d3-selection"
-
-import { registerEvent } from "../analytics"
+import { registerEvent } from "../../analytics"
 import { capitalizeFirstLetter, findNationByNationShortName } from "common/common"
-import { insertBaseModal, loadJsonFile } from "common/common-browser"
+import { getIdFromBaseName, loadJsonFile } from "common/common-browser"
 
+import { Selection } from "d3-selection"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { PortBonus, portBonusType, PortBonusValue } from "common/types"
+
+import Modal from "util/modal"
 
 interface PortData {
     id: number
@@ -35,15 +33,16 @@ interface PortData {
  *
  */
 export default class ListPortBonus {
-    #baseId: HtmlString
-    #baseName: string
-    #buttonId: HtmlString
-    #modalId: HtmlString
-    #serverId: string
-    #portPerServer = {} as PortPerServer[]
-    #portBasicData = {} as PortBasic[]
-    #pbPerServer = {} as PortBattlePerServer[]
-    #portData = {} as PortData[]
+    readonly #baseId: HtmlString
+    readonly #baseName = "List port bonuses"
+    readonly #menuId: HtmlString
+    #modal: Modal | undefined = undefined
+
+    readonly #serverId: string
+    #portPerServer = [] as PortPerServer[]
+    #portBasicData = [] as PortBasic[]
+    #pbPerServer = [] as PortBattlePerServer[]
+    #portData = [] as PortData[]
     #rows = {} as Selection<HTMLTableRowElement, PortData, HTMLTableSectionElement, unknown>
     #sortAscending = true
     #sortIndex = 0
@@ -51,10 +50,9 @@ export default class ListPortBonus {
 
     constructor(serverId: string) {
         this.#serverId = serverId
-        this.#baseName = "List port bonuses"
-        this.#baseId = "port-bonus-list"
-        this.#buttonId = `menu-${this.#baseId}`
-        this.#modalId = `modal-${this.#baseId}`
+
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
 
         this._setupListener()
     }
@@ -62,8 +60,9 @@ export default class ListPortBonus {
     async _loadData(): Promise<void> {
         this.#portPerServer = await loadJsonFile<PortPerServer[]>(`${this.#serverId}-ports.json`)
         this.#pbPerServer = await loadJsonFile<PortBattlePerServer[]>(`${this.#serverId}-pb.json`)
-        this.#portBasicData = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
-            .default as PortBasic[]
+        this.#portBasicData = (
+            await import(/* webpackChunkName: "data-ports" */ "../../../../../lib/gen-generic/ports.json")
+        ).default as PortBasic[]
     }
 
     _setupData(): void {
@@ -96,18 +95,21 @@ export default class ListPortBonus {
         this._setupData()
     }
 
-    _setupListener(): void {
-        let firstClick = true
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
 
-        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this.#baseName)
-
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "lg")
             this._listSelected()
+        }
+    }
+
+    _setupListener(): void {
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
@@ -158,21 +160,6 @@ export default class ListPortBonus {
         this.#table.append("tbody")
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-lg" })
-
-        const body = d3Select(`#${this.#modalId} .modal-body`)
-
-        this.#table = body.append("table").attr("class", "table table-sm small na-table")
-        this._initTable()
-        this._updateTable()
-        this._sortRows(0, false)
-    }
-
-    _initModal(): void {
-        this._injectModal()
-    }
-
     _updateTable(): void {
         // Data join rows
         this.#rows = this.#table
@@ -202,12 +189,10 @@ export default class ListPortBonus {
     }
 
     _listSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this.#modalId}`)) {
-            this._initModal()
-        }
+        this.#table = this.#modal!.outputSel.append("table").attr("class", "table table-sm small na-table")
 
-        // Show modal
-        $(`#${this.#modalId}`).modal("show")
+        this._initTable()
+        this._updateTable()
+        this._sortRows(0, false)
     }
 }
