@@ -273,7 +273,7 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
 /**
  * Get ship mass
  * @param id - Ship id
- * @returns Column mass
+ * @returns Ship mass
  */
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
@@ -317,7 +317,7 @@ const convertGenericShipData = (): ShipData[] => {
     )
 
     return ((apiItems.filter(
-        (item) => item.ItemType === "Column" && !item.NotUsed && !shipsNotUsed.has(item.Id)
+        (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
     ) as unknown) as APIShip[]).map(
         (apiShip: APIShip): ShipData => {
             const guns = {
@@ -661,12 +661,14 @@ const convertShips = async (): Promise<void> => {
     ships = convertGenericShipData()
     ships = convertAddShipData(ships)
     ships.sort(sortBy(["id"]))
+
     await saveJsonAsync(commonPaths.fileShip, ships)
 }
 
 export const convertShipData = async (): Promise<void> => {
     apiItems = readJson(path.resolve(baseAPIFilename, `${serverIds[0]}-ItemTemplates-${serverDate}.json`))
     cannons = readJson(commonPaths.fileCannon)
+
     await convertShips()
     await convertShipBlueprints()
 }

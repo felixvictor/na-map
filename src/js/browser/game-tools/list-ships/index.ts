@@ -8,18 +8,16 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/modal"
-import { select as d3Select, Selection } from "d3-selection"
-
-import { registerEvent } from "../analytics"
-import { insertBaseModal } from "common/common-browser"
+import { registerEvent } from "../../analytics"
+import { sortBy } from "common/common"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatFloatFixed, formatInt } from "common/common-format"
 import { beautifyShipName } from "common/common-game-tools"
 
+import { Selection } from "d3-selection"
 import { ShipData } from "common/gen-json"
 import { HeaderMap, HtmlString } from "common/interface"
-import { sortBy } from "common/common"
+import Modal from "util/modal"
 
 type ShipListData = Array<[number | string, string]>
 
@@ -27,30 +25,27 @@ type ShipListData = Array<[number | string, string]>
  *
  */
 export default class ShipList {
-    readonly #baseName: string
-    readonly #baseId: HtmlString
-    readonly #buttonId: HtmlString
-    readonly #modalId: HtmlString
-    #shipListData = {} as ShipListData[]
+    #modal: Modal | undefined = undefined
     #rows = {} as Selection<HTMLTableRowElement, ShipListData, HTMLTableSectionElement, unknown>
+    #shipListData = [] as ShipListData[]
     #sortAscending = true
     #sortIndex = 0
     #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
+    readonly #baseId: HtmlString
+    readonly #baseName = "List ships"
+    readonly #menuId: HtmlString
 
     constructor() {
-        this.#baseName = "List ships"
-        this.#baseId = "ship-list"
-        this.#buttonId = `menu-${this.#baseId}`
-        this.#modalId = `modal-${this.#baseId}`
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
 
         this._setupListener()
     }
 
     async _loadAndSetupData(): Promise<void> {
         const shipData = (
-            await import(/* webpackChunkName: "data-ships" */ "../../../../lib/gen-generic/ships.json")
-        ).default // @ts-expect-error
-            .sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
+            await import(/* webpackChunkName: "data-ships" */ "../../../../../lib/gen-generic/ships.json")
+        ).default.sort(sortBy(["class", "-battleRating", "name"])) as ShipData[]
 
         this.#shipListData = shipData.map(
             (ship: ShipData): ShipListData => [
@@ -73,20 +68,25 @@ export default class ShipList {
                 [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
             ]
         )
+
+        console.log(shipData, this.#shipListData)
+    }
+
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "lg")
+            this._shipListSelected()
+        }
     }
 
     _setupListener(): void {
-        let firstClick = true
-
-        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this.#baseName)
-
-            this._shipListSelected()
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
@@ -156,21 +156,6 @@ export default class ShipList {
         this.#table.append("tbody")
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-lg" })
-
-        const body = d3Select(`#${this.#modalId} .modal-body`)
-
-        this.#table = body.append("table").attr("class", "table table-sm small na-table")
-        this._initTable()
-        this._updateTable()
-        this._sortRows(0, false)
-    }
-
-    _initModal(): void {
-        this._injectModal()
-    }
-
     _updateTable(): void {
         // Data join rows
         this.#rows = this.#table
@@ -192,12 +177,10 @@ export default class ShipList {
     }
 
     _shipListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this.#modalId}`)) {
-            this._initModal()
-        }
+        this.#table = this.#modal!.outputSel.append("table").attr("class", "table table-sm small na-table")
 
-        // Show modal
-        $(`#${this.#modalId}`).modal("show")
+        this._initTable()
+        this._updateTable()
+        this._sortRows(0, false)
     }
 }
