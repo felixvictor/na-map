@@ -8,22 +8,20 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/modal"
-
-import { select as d3Select, Selection } from "d3-selection"
+import { Selection } from "d3-selection"
 import dayjs from "dayjs"
 import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
 
-import { registerEvent } from "../analytics"
+import { registerEvent } from "../../analytics"
 import { capitalizeFirstLetter, findNationByNationShortName } from "common/common"
-import { insertBaseModal, loadJsonFile } from "common/common-browser"
-import { displayClan } from "../util"
+import { getIdFromBaseName, insertBaseModal, loadJsonFile } from "common/common-browser"
+import { displayClan } from "../../util"
 import { PortBattlePerServer } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import Modal from "util/modal"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(relativeTime)
@@ -40,25 +38,24 @@ interface RowSortData {
  *
  */
 export default class ListPortBattles {
-    #tableId!: HtmlString
-    #data!: RowSortData[]
-    #serverId!: string
-    readonly #baseName: string
-    readonly #baseId: HtmlString
-    readonly #buttonId: HtmlString
-    readonly #modalId: HtmlString
+    #data = [] as RowSortData[]
+    #modal: Modal | undefined = undefined
     #rows = {} as Selection<HTMLTableRowElement, RowSortData, HTMLTableSectionElement, unknown>
     #sortAscending = true
     #sortIndex = 0
     #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
+    #tableId!: HtmlString
+    readonly #baseId: HtmlString
+    readonly #baseName = "List of port battles"
+    readonly #menuId: HtmlString
+    readonly #serverId!: string
 
     constructor(serverId: string) {
         this.#serverId = serverId
-        this.#baseName = "List of port battles"
-        this.#baseId = "pb-list"
-        this.#buttonId = `menu-${this.#baseId}`
-        this.#tableId = `table-${this.#baseId}`
-        this.#modalId = `modal-${this.#baseId}`
+
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
+        this.#tableId = `${this.#baseId}-table`
 
         this._setupListener()
     }
@@ -90,18 +87,21 @@ export default class ListPortBattles {
             })
     }
 
-    _setupListener(): void {
-        let firstClick = true
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
 
-        document.querySelector(`#${this.#buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this.#baseName)
-
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "lg")
             this._pbListSelected()
+        }
+    }
+
+    _setupListener(): void {
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
@@ -137,21 +137,6 @@ export default class ListPortBattles {
         this.#table.append("tbody")
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this.#modalId, title: this.#baseName, size: "modal-lg" })
-
-        const body = d3Select(`#${this.#modalId} .modal-body`)
-
-        this.#table = body.append("table").attr("class", "table table-sm small na-table text-table")
-        this._initTable()
-        this._updateTable()
-        this._sortRows(0, false)
-    }
-
-    _initModal(): void {
-        this._injectModal()
-    }
-
     _updateTable(): void {
         // Data join rows
         this.#rows = this.#table
@@ -168,12 +153,9 @@ export default class ListPortBattles {
     }
 
     _pbListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this.#modalId}`)) {
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this.#modalId}`).modal("show")
+        this.#table = this.#modal!.outputSel.append("table").attr("class", "table table-sm small na-table text-table")
+        this._initTable()
+        this._updateTable()
+        this._sortRows(0, false)
     }
 }

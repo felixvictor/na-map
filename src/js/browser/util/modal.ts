@@ -69,10 +69,7 @@ export default class Modal {
 
         this.#bodySel = content.append("div").attr("class", "modal-body")
         this.#selectsSel = this.#bodySel.append("div").attr("id", this.getBaseIdSelects())
-        this.#outputSel = this.#bodySel
-            .append("div")
-            .attr("id", this.getBaseIdOutput())
-            .attr("class", "container-fluid")
+        this.#outputSel = this.#bodySel.append("div").attr("id", this.getBaseIdOutput())
 
         this.#footerSel = content.append<HTMLElement>("footer").attr("class", "modal-footer")
         this.#footerSel
