@@ -8,13 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { default as BSTab } from "bootstrap/js/dist/tab"
 
-import "bootstrap/js/dist/tab"
-import "bootstrap/js/dist/modal"
-
-import { select as d3Select, Selection } from "d3-selection"
-
-import { registerEvent } from "../analytics"
+import { registerEvent } from "../../analytics"
 import {
     CannonFamily,
     cannonFamilyList,
@@ -23,11 +19,13 @@ import {
     CannonTypeList,
     capitalizeFirstLetter,
 } from "common/common"
-import { insertBaseModal } from "common/common-browser"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatFloatFixed } from "common/common-format"
 
+import { Selection } from "d3-selection"
 import { Cannon, CannonDamage, CannonEntity, CannonGeneric, CannonPenetration } from "common/gen-json"
 import { HeaderMap, HtmlResult, HtmlString } from "common/interface"
+import Modal from "util/modal"
 
 interface FamilyRowData {
     family: CannonFamily
@@ -42,38 +40,32 @@ interface RowData {
  *
  */
 export default class ListCannons {
-    private readonly _rows = {} as CannonTypeList<
-        Selection<HTMLTableRowElement, RowData[], HTMLTableSectionElement, unknown>
-    >
-
-    private _sortAscending = {} as CannonTypeList<boolean>
-    private _sortIndex = {} as CannonTypeList<number>
-    private readonly _switchesSel = {} as CannonTypeList<HTMLInputElement[]>
-    private readonly _tables = {} as CannonTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>>
-    private readonly _groupOrder = ["name", "damage", "penetration", "generic", "family"]
-    private _cannonData = {} as CannonTypeList<RowData[][]>
-    private _cannonDataDefault = {} as CannonTypeList<FamilyRowData[]>
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _checkboxId: HtmlString
-    private readonly _modalId: HtmlString
-    private readonly _header: HeaderMap
+    readonly #baseId: HtmlString
+    readonly #baseName = "List cannons"
+    readonly #checkboxId: HtmlString
+    readonly #groupOrder = ["name", "damage", "penetration", "generic", "family"]
+    readonly #header = { group: new Map(), element: new Set() } as HeaderMap
+    readonly #menuId: HtmlString
+    readonly #rows = {} as CannonTypeList<Selection<HTMLTableRowElement, RowData[], HTMLTableSectionElement, unknown>>
+    readonly #switchesSel = {} as CannonTypeList<HTMLInputElement[]>
+    readonly #tables = {} as CannonTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>>
+    #cannonData = {} as CannonTypeList<RowData[][]>
+    #cannonDataDefault = {} as CannonTypeList<FamilyRowData[]>
+    #modal: Modal | undefined = undefined
+    #sortAscending = {} as CannonTypeList<boolean>
+    #sortIndex = {} as CannonTypeList<number>
 
     constructor() {
-        this._baseName = "List cannons"
-        this._baseId = "cannon-list"
-        this._buttonId = `menu-${this._baseId}`
-        this._checkboxId = `checkbox-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
+        this.#checkboxId = `checkbox-${this.#baseId}`
 
-        this._header = { group: new Map(), element: new Set() }
         this._setupListener()
     }
 
     async _loadAndSetupData(): Promise<void> {
         const cannonData = (
-            await import(/* webpackChunkName: "data-cannons" */ "../../../../lib/gen-generic/cannons.json")
+            await import(/* webpackChunkName: "data-cannons" */ "../../../../../lib/gen-generic/cannons.json")
         ).default as Cannon
         this._setupData(cannonData)
     }
@@ -94,27 +86,27 @@ export default class ListCannons {
     _setupData(cannonData: Cannon): void {
         // Get group and element header from first long cannon, sort by groupOrder
         const cannon = Object.entries(cannonData.long[0]).sort(
-            (a, b) => this._groupOrder.indexOf(a[0]) - this._groupOrder.indexOf(b[0])
+            (a, b) => this.#groupOrder.indexOf(a[0]) - this.#groupOrder.indexOf(b[0])
         )
         for (const [groupKey, groupValue] of cannon) {
             if (groupKey === "name") {
-                this._header.group.set("", 1)
-                this._header.element.add("Lb")
+                this.#header.group.set("", 1)
+                this.#header.element.add("Lb")
             } else if (groupKey !== "family") {
-                this._header.group.set(capitalizeFirstLetter(groupKey), Object.entries(groupValue).length)
+                this.#header.group.set(capitalizeFirstLetter(groupKey), Object.entries(groupValue).length)
                 for (const elementKey of Object.keys(groupValue)) {
-                    this._header.element.add(capitalizeFirstLetter(elementKey))
+                    this.#header.element.add(capitalizeFirstLetter(elementKey))
                 }
             }
         }
 
         // Get data, sort by groupOrder
         for (const type of cannonType) {
-            this._cannonDataDefault[type] = cannonData[type].map(
+            this.#cannonDataDefault[type] = cannonData[type].map(
                 (cannon: CannonEntity): FamilyRowData => {
                     const elements = [] as RowData[]
                     const cannonSorted = Object.entries(cannon).sort(
-                        (a, b) => this._groupOrder.indexOf(a[0]) - this._groupOrder.indexOf(b[0])
+                        (a, b) => this.#groupOrder.indexOf(a[0]) - this.#groupOrder.indexOf(b[0])
                     )
                     for (const [groupKey, groupValue] of cannonSorted) {
                         if (groupKey === "name") {
@@ -142,28 +134,32 @@ export default class ListCannons {
         }
     }
 
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "xl")
+            this._injectTab()
+        }
+    }
+
     _setupListener(): void {
-        let firstClick = true
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this._baseName)
-
-            this._cannonListSelected()
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
     _sortRows(type: CannonType, index: number, changeOrder = true): void {
-        if (changeOrder && this._sortIndex[type] === index) {
-            this._sortAscending[type] = !this._sortAscending[type]
+        if (changeOrder && this.#sortIndex[type] === index) {
+            this.#sortAscending[type] = !this.#sortAscending[type]
         }
 
-        this._sortIndex[type] = index
-        const sign = this._sortAscending[type] ? 1 : -1
-        this._rows[type].sort((a, b): number => {
+        this.#sortIndex[type] = index
+        const sign = this.#sortAscending[type] ? 1 : -1
+        this.#rows[type].sort((a, b): number => {
             if (index === 0) {
                 return (a[index].value as string).localeCompare(b[index].value as string) * sign
             }
@@ -172,48 +168,63 @@ export default class ListCannons {
         })
     }
 
+    _getTabId(): HtmlString {
+        return `${this.#baseId}-tab`
+    }
+
+    _getTabItemId(type: CannonType): HtmlString {
+        return `${this._getTabId()}-${type}-item`
+    }
+
+    _getTabContentId(type: CannonType): HtmlString {
+        return `${this._getTabId()}-${type}-content`
+    }
+
+    _getListId(type: CannonType): HtmlString {
+        return `${this._getTabId()}-${type}-list`
+    }
+
     _addNavPills(body: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
-        const nav = body.append("ul").attr("class", "nav nav-pills").attr("role", "tablist")
+        const nav = body.append("ul").attr("id", this._getTabId()).attr("class", "nav nav-tabs").attr("role", "tablist")
         for (const [index, type] of cannonType.entries()) {
-            nav.append("li")
-                .attr("class", "nav-item")
-                .attr("role", "presentation")
-                .append("a")
-                .attr("class", `nav-link${index === 0 ? " active" : ""}`)
-                .attr("id", `tab-${this._baseId}-${type}`)
-                .attr("href", `#tab-content-${this._baseId}-${type}`)
+            const item = nav.append("li").attr("class", "nav-item").attr("role", "presentation")
+            const button = item
+                .append("button")
+                .attr("class", "nav-link")
+                .attr("id", this._getTabItemId(type))
+                .attr("data-bs-target", `#${this._getTabContentId(type)}`)
                 .attr("data-bs-toggle", "tab")
                 .attr("role", "tab")
-                .attr("aria-controls", `${this._baseId}-${type}`)
-                .attr("aria-selected", `${index === 0 ? "true" : "false"}`)
                 .text(capitalizeFirstLetter(type))
+
+            if (index === 0) {
+                button.attr("class", "nav-link active").attr("aria-current", "page")
+            }
         }
     }
 
     _injectSwitches(tabContent: Selection<HTMLDivElement, unknown, HTMLElement, unknown>, type: CannonType): void {
         const divSwitches = tabContent.append("div").attr("class", "mb-3")
         for (const family of cannonFamilyList[type]) {
-            const divSwitch = divSwitches
-                .append("div")
-                .attr("class", "custom-control custom-switch custom-control-inline")
+            const divSwitch = divSwitches.append("div").attr("class", "form-check form-check-inline form-switch")
             divSwitch
                 .append("input")
-                .attr("id", `${this._checkboxId}-${type}-${family}`)
-                .attr("name", `${this._checkboxId}-${type}`)
-                .attr("class", "custom-control-input")
+                .attr("id", `${this.#checkboxId}-${type}-${family}`)
+                .attr("name", `${this.#checkboxId}-${type}`)
+                .attr("class", "form-check-input")
                 .attr("type", "checkbox")
                 .property("checked", true)
             divSwitch
                 .append("label")
-                .attr("for", `${this._checkboxId}-${type}-${family}`)
-                .attr("class", "custom-control-label")
+                .attr("for", `${this.#checkboxId}-${type}-${family}`)
+                .attr("class", "form-check-label")
                 .text(capitalizeFirstLetter(family))
         }
 
-        this._switchesSel[type] = [
-            ...document.querySelectorAll<HTMLInputElement>(`input[name=${this._checkboxId}-${type}]`),
+        this.#switchesSel[type] = [
+            ...document.querySelectorAll<HTMLInputElement>(`input[name=${this.#checkboxId}-${type}]`),
         ]
-        for (const input of this._switchesSel[type]) {
+        for (const input of this.#switchesSel[type]) {
             input.addEventListener("change", (event: Event) => {
                 event.preventDefault()
                 this._cannonFamilySelected(type)
@@ -225,13 +236,13 @@ export default class ListCannons {
         tabContent: Selection<HTMLDivElement, unknown, HTMLElement, unknown>,
         type: CannonType
     ): void {
-        this._sortAscending[type] = true
-        this._tables[type] = tabContent.append("table").attr("class", "table table-sm small na-table")
-        const head = this._tables[type].append("thead")
+        this.#sortAscending[type] = true
+        this.#tables[type] = tabContent.append("table").attr("class", "table table-sm small na-table")
+        const head = this.#tables[type].append("thead")
         head.append("tr")
             .attr("class", "thead-group")
             .selectAll("th")
-            .data([...this._header.group])
+            .data([...this.#header.group])
             .join("th")
             .classed("border-bottom-0", (d, i) => i === 0)
             .classed("text-center", (d, i) => i !== 0)
@@ -240,7 +251,7 @@ export default class ListCannons {
             .text((d) => d[0])
         head.append("tr")
             .selectAll("th")
-            .data([...this._header.element])
+            .data([...this.#header.element])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
             .classed("border-top-0", (d, i) => i === 0)
@@ -249,7 +260,7 @@ export default class ListCannons {
             .on("click", (_event, d) => {
                 this._sortRows(type, d.index)
             })
-        this._tables[type].append("tbody")
+        this.#tables[type].append("tbody")
     }
 
     _insertTabContent(
@@ -257,50 +268,47 @@ export default class ListCannons {
         type: CannonType,
         index: number
     ): void {
-        this._sortAscending[type] = true
+        this.#sortAscending[type] = true
 
         const tabContent = tab
             .append("div")
             .attr("class", `tab-pane fade${index === 0 ? " show active" : ""}`)
-            .attr("id", `tab-content-${this._baseId}-${type}`)
-            .attr("href", `#tab-content-${this._baseId}-${type}`)
+            .attr("id", this._getTabContentId(type))
             .attr("role", "tabpanel")
-            .attr("aria-labelledby", `${this._baseId}-${type}-tab`)
+            .attr("aria-labelledby", this._getTabItemId(type))
             .append("div")
-            .attr("id", `${type}-list`)
+            .attr("id", this._getListId(type))
 
         this._injectSwitches(tabContent, type)
         this._injectTableStructure(tabContent, type)
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-xl" })
+    _injectTab(): void {
+        const div = this.#modal!.outputSel
+        this._addNavPills(div)
 
-        const body = d3Select<HTMLDivElement, unknown>(`#${this._modalId} .modal-body`)
-        this._addNavPills(body)
-
-        const tab = body.append("div").attr("class", "tab-content pt-2")
+        const tab = div.append("div").attr("class", "tab-content pt-2")
         for (const [index, type] of cannonType.entries()) {
-            this._sortIndex[type] = 0
+            this.#sortIndex[type] = 0
             this._insertTabContent(tab, type, index)
             this._cannonFamilySelected(type)
         }
-    }
 
-    _initModal(): void {
-        this._injectModal()
+        const firstTabEl = document.querySelector(`#${this._getTabId()}li:last-child button`) as HTMLButtonElement
+        const bsTab = new BSTab(firstTabEl)
+        bsTab.show()
     }
 
     _updateTable(type: CannonType): void {
         // Data join rows
-        this._rows[type] = this._tables[type]
+        this.#rows[type] = this.#tables[type]
             .select<HTMLTableSectionElement>("tbody")
             .selectAll<HTMLTableRowElement, RowData[]>("tr")
-            .data(this._cannonData[type], (d: RowData[]): string => d[0].formattedValue)
+            .data(this.#cannonData[type], (d: RowData[]): string => d[0].formattedValue)
             .join((enter) => enter.append("tr"))
 
         // Data join cells
-        this._rows[type]
+        this.#rows[type]
             .selectAll<HTMLTableCellElement, string>("td")
             .data((row): RowData[] => row)
             .join((enter) =>
@@ -316,27 +324,17 @@ export default class ListCannons {
     _cannonFamilySelected(type: CannonType): void {
         const activeFamilies = new Set<CannonFamily>()
 
-        for (const input of this._switchesSel[type]) {
+        for (const input of this.#switchesSel[type]) {
             if (input.checked) {
-                const family = input.id.replace(`${this._checkboxId}-${type}-`, "")
+                const family = input.id.replace(`${this.#checkboxId}-${type}-`, "")
                 activeFamilies.add(family)
             }
         }
 
-        this._cannonData[type] = this._cannonDataDefault[type]
+        this.#cannonData[type] = this.#cannonDataDefault[type]
             .filter((cannon) => activeFamilies.has(cannon.family))
             .map((cannon) => cannon.data)
         this._updateTable(type)
-        this._sortRows(type, this._sortIndex[type], false)
-    }
-
-    _cannonListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this._modalId}`).modal("show")
+        this._sortRows(type, this.#sortIndex[type], false)
     }
 }
