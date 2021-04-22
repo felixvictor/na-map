@@ -9,18 +9,26 @@
  */
 
 import "bootstrap-select"
-import { HtmlString } from "common/interface"
+
 import { getIdFromBaseName } from "common/common-browser"
+import { Selection } from "d3-selection"
+import { HtmlString } from "common/interface"
 
 export default class Select {
     readonly #baseId: HtmlString
+    readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
-    constructor(id: HtmlString) {
+    constructor(id: HtmlString, selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>) {
         this.#baseId = getIdFromBaseName(id)
+        this.#selectsDiv = selectsDiv
     }
 
     get baseId(): HtmlString {
         return this.#baseId
+    }
+
+    get selectsDiv(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+        return this.#selectsDiv
     }
 
     static getSelectValueAsNumberArray(value: string | number | string[] | undefined): number[] {

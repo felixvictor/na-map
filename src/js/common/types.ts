@@ -17,3 +17,9 @@ export interface PortBonusJson {
     name: string
     portBonus: PortBonus
 }
+
+export const woodFamily = ["regular", "seasoned", "exceptional"]!
+export type WoodFamily = typeof woodFamily[number]
+
+export const woodType = ["frame", "trim"]!
+export type WoodType = typeof woodType[number]

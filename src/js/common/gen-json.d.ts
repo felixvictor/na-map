@@ -24,8 +24,7 @@ import {
     PeneDistance,
 } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
-import { FrontlinesType, LootType, PortBonus } from "./types"
-import { WoodFamily, WoodType } from "../browser/game-tools/compare-woods"
+import { FrontlinesType, LootType, PortBonus, WoodFamily, WoodType } from "./types"
 
 /****************************
  * buildings.json

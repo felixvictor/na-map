@@ -25,6 +25,8 @@ export default class Modal {
     #bodySel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #footerSel = {} as Selection<HTMLElement, unknown, HTMLElement, unknown>
     #modalSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #outputSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #selectsSel = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
     constructor(title: string, size: string, buttonText = "Close") {
         this.#baseName = title
@@ -66,6 +68,11 @@ export default class Modal {
             .attr("aria-label", "Close")
 
         this.#bodySel = content.append("div").attr("class", "modal-body")
+        this.#selectsSel = this.#bodySel.append("div").attr("id", this.getBaseIdSelects())
+        this.#outputSel = this.#bodySel
+            .append("div")
+            .attr("id", this.getBaseIdOutput())
+            .attr("class", "container-fluid")
 
         this.#footerSel = content.append<HTMLElement>("footer").attr("class", "modal-footer")
         this.#footerSel
@@ -88,12 +95,28 @@ export default class Modal {
         return this.#modalSel.node() as HTMLDivElement
     }
 
-    getBodySel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+    getBaseIdSelects(): HtmlString {
+        return `${this.#baseId}-selects`
+    }
+
+    getBaseIdOutput(): HtmlString {
+        return `${this.#baseId}-output`
+    }
+
+    get bodySel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
         return this.#bodySel
     }
 
-    getFooter(): Selection<HTMLElement, unknown, HTMLElement, unknown> {
+    get footer(): Selection<HTMLElement, unknown, HTMLElement, unknown> {
         return this.#footerSel
+    }
+
+    get outputSel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+        return this.#outputSel
+    }
+
+    get selectsSel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+        return this.#selectsSel
     }
 
     removeFooter(): void {

@@ -8,107 +8,73 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/modal"
-
-import "bootstrap-select"
-import { select as d3Select } from "d3-selection"
-
-import { registerEvent } from "../analytics"
-import { insertBaseModal } from "common/common-browser"
+import { registerEvent } from "../../analytics"
 import { formatPP, formatSignInt, formatSignPercent } from "common/common-format"
 import { getOrdinal } from "common/common-math"
-import { chunkify } from "../util"
+import { chunkify } from "../../util"
 
-import JQuery from "jquery"
 import { Module, ModuleEntity } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { sortBy } from "common/common"
+import Modal from "util/modal"
+import ListModulesSelect from "./select"
+import { getIdFromBaseName } from "common/common-browser"
 
 export default class ListModules {
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
-    private _moduleData: Module[] = {} as Module[]
+    readonly #baseId: HtmlString
+    readonly #baseName = "List modules"
+    readonly #menuId: HtmlString
+    #modal: Modal | undefined = undefined
+    #select = {} as ListModulesSelect
+    #moduleData = {} as Module[]
+
     constructor() {
-        this._baseName = "List modules"
-        this._baseId = "module-list"
-        this._buttonId = `menu-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
 
         this._setupListener()
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleData = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../../lib/gen-generic/modules.json")
+        this.#moduleData = (
+            await import(/* webpackChunkName: "data-modules" */ "../../../../../lib/gen-generic/modules.json")
         ).default as Module[]
     }
 
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "xl")
+            this._setupSelect()
+            this._setupSelectListener()
+        }
+    }
+
     _setupListener(): void {
-        let firstClick = true
-
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this._baseName)
-
-            this._moduleListSelected()
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
-    // noinspection DuplicatedCode
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName })
-
-        const id = `${this._baseId}-select`
-        const body = d3Select(`#${this._modalId} .modal-body`)
-        body.append("label").attr("for", id)
-        body.append("select").attr("name", id).attr("id", id)
-        body.append("div").attr("id", `${this._baseId}`)
-    }
-
-    _getOptions(): HtmlString {
-        return `${this._moduleData.map((type) => `<option value="${type[0]}"">${type[0]}</option>;`).join("")}`
-    }
-
     _setupSelect(): void {
-        const select$ = $(`#${this._baseId}-select`)
-        const options = this._getOptions()
-        select$.append(options)
+        const selectpickerOptions: BootstrapSelectOptions = { noneSelectedText: "Select module category" }
+
+        this.#select = new ListModulesSelect(
+            this.#baseId,
+            this.#modal!.selectsSel,
+            selectpickerOptions,
+            this.#moduleData
+        )
     }
 
     _setupSelectListener(): void {
-        const select$ = $(`#${this._baseId}-select`)
-
-        select$
-            .addClass("selectpicker")
-            .on("change", (event) => {
-                this._moduleSelected(event)
-            })
-            .selectpicker({ noneSelectedText: "Select module category" })
-            .val("default")
-            .selectpicker("refresh")
-    }
-
-    _initModal(): void {
-        this._injectModal()
-        this._setupSelect()
-        this._setupSelectListener()
-    }
-
-    _moduleListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this._modalId}`).modal("show")
+        this.#select.getSelect$().on("change", () => {
+            this._moduleSelected()
+        })
     }
 
     /**
@@ -145,7 +111,7 @@ export default class ListModules {
 
         let rate = ""
         const rows = [] as HtmlString[]
-        for (const type of this._moduleData) {
+        for (const type of this.#moduleData) {
             if (type[0] === moduleType) {
                 for (const [i, module] of type[1].sort(sortBy(["name"])).entries()) {
                     rate = getRate(module.moduleLevel)
@@ -210,16 +176,15 @@ export default class ListModules {
 
     /**
      * Show modules for selected module type
-     * @param event - Event
      */
-    _moduleSelected(event: JQuery.ChangeEvent): void {
-        const moduleType = $(event.currentTarget).find(":selected").val() as string
+    _moduleSelected(): void {
+        const moduleType = String(this.#select.getSelectedValues())
+        const div = this.#modal!.outputSel
 
         // Remove old recipe list
-        d3Select(`#${this._baseId} div`).remove()
+        div.select("div").remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("row mt-4", true)
-        d3Select(`#${this._baseId} div`).html(this._getText(moduleType))
+        div.append("div").classed("row mt-4", true).html(this._getText(moduleType))
     }
 }

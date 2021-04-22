@@ -14,8 +14,8 @@ import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
 import { BaseModalPure, DataSource, HtmlString } from "./interface"
-import { NationListAlternative } from "common/gen-json"
-import { findNationByNationShortName } from "common/common"
+import { NationListAlternative } from "./gen-json"
+import { findNationByNationShortName } from "./common"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -300,5 +300,3 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
 
 export const getIdFromBaseName = (baseName: string): HtmlString => baseName.toLocaleLowerCase().replaceAll(" ", "-")
 
-export const getBaseIdSelects = (id: HtmlString): HtmlString => `${id}-selects`
-export const getBaseIdOutput = (id: HtmlString): HtmlString => `${id}-output`

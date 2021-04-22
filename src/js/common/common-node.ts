@@ -26,9 +26,6 @@ export const cleanName = (name: string): string =>
 
 /**
  * Simple sort of numbers a and b
- * @param   a - Number a
- * @param   b - Number b
- * @returns Sort result
  */
 export const simpleNumberSort = (a: number | undefined, b: number | undefined): number => (a && b ? a - b : 0)
 
