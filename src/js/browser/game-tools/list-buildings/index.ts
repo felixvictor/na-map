@@ -8,111 +8,75 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/modal"
-
-import { select as d3Select } from "d3-selection"
-import "bootstrap-select"
-
-import { registerEvent } from "../analytics"
-import { insertBaseModal } from "common/common-browser"
+import { registerEvent } from "../../analytics"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatInt } from "common/common-format"
 import { getCurrencyAmount } from "common/common-game-tools"
 
 import { Building, BuildingResult } from "common/gen-json"
-import { sortBy } from "common/common"
+import { HtmlString } from "common/interface"
+import ListBuildingsSelect from "./select"
+import Modal from "util/modal"
 
 export default class ListBuildings {
-    private readonly _baseName: string
-    private readonly _baseId: string
-    private readonly _buttonId: string
-    private readonly _modalId: string
-
-    private _buildingData: Building[]
+    readonly #baseId: HtmlString
+    readonly #baseName = "List buildings"
+    readonly #menuId: HtmlString
+    #modal: Modal | undefined = undefined
+    #select = {} as ListBuildingsSelect
+    #buildingData = {} as Building[]
 
     constructor() {
-        this._baseName = "List buildings"
-        this._baseId = "building-list"
-        this._buttonId = `menu-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
-
-        this._buildingData = []
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
 
         this._setupListener()
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._buildingData = (
-            await import(/* webpackChunkName: "data-buildings" */ "../../../../lib/gen-generic/buildings.json")
+        this.#buildingData = (
+            await import(/* webpackChunkName: "data-buildings" */ "../../../../../lib/gen-generic/buildings.json")
         ).default as Building[]
     }
 
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "lg")
+            this._setupSelect()
+            this._setupSelectListener()
+        }
+    }
+
     _setupListener(): void {
-        let firstClick = true
-        document.querySelector(`#${this._buttonId}`)!.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this._baseName)
-
-            this._buildingListSelected()
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName })
-        const id = `${this._baseId}-select`
-        const body = d3Select(`#${this._modalId} .modal-body`)
-        body.append("label").attr("for", id)
-        body.append("select").attr("name", id).attr("id", id)
-        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")
-    }
-
-    _getOptions(): string {
-        return `${this._buildingData
-            .sort(sortBy(["name"]))
-            .map((building: Building): string => `<option value="${building.name}">${building.name}</option>;`)
-            .join("")}`
-    }
-
     _setupSelect(): void {
-        const select$ = $(`#${this._baseId}-select`)
-        const options = this._getOptions()
-        select$.append(options)
+        const selectpickerOptions: BootstrapSelectOptions = { noneSelectedText: "Select building" }
+
+        this.#select = new ListBuildingsSelect(
+            this.#baseId,
+            this.#modal!.selectsSel,
+            selectpickerOptions,
+            this.#buildingData
+        )
     }
 
     _setupSelectListener(): void {
-        const select$ = $(`#${this._baseId}-select`)
-
-        select$
-            .addClass("selectpicker")
-            .on("change", (event: Event) => {
-                this._buildingSelected(event)
-            })
-            .selectpicker({ noneSelectedText: "Select building" })
-        select$.val("default").selectpicker("refresh")
-    }
-
-    _initModal(): void {
-        this._injectModal()
-        this._setupSelect()
-        this._setupSelectListener()
-    }
-
-    _buildingListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this._modalId}`).modal("show")
+        this.#select.getSelect$().on("change", () => {
+            this._buildingSelected()
+        })
     }
 
     _getBuildingData(selectedBuildingName: string): Building {
-        return this._buildingData.find((building) => building.name === selectedBuildingName)!
+        return this.#buildingData.find((building) => building.name === selectedBuildingName)!
     }
 
     _getProductText(currentBuilding: Building): string {
@@ -202,14 +166,14 @@ export default class ListBuildings {
     /**
      * Show buildings for selected building type
      */
-    _buildingSelected(event: Event): void {
-        const building = String($(event.currentTarget!).find(":selected").val())
+    _buildingSelected(): void {
+        const building = String(this.#select.getSelectedValues())
+        const div = this.#modal!.outputSel
 
         // Remove old recipe list
-        d3Select(`#${this._baseId} div`).remove()
+        div.select("div").remove()
 
         // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("buildings mt-4", true)
-        d3Select(`#${this._baseId} div`).html(this._getText(building))
+        div.append("div").classed("mt-4", true).html(this._getText(building))
     }
 }
