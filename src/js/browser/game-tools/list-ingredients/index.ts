@@ -10,88 +10,64 @@
 
 import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
-import "bootstrap/js/dist/modal"
-
-
-import { select as d3Select } from "d3-selection"
-
-import { registerEvent } from "../analytics"
-import { insertBaseModal } from "common/common-browser"
+import { registerEvent } from "../../analytics"
+import { sortBy } from "common/common"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatSignInt, formatSignPercent } from "common/common-format"
-import { chunkify } from "../util"
+import { chunkify } from "../../util"
 
 import { Module, RecipeIngredientEntity } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import { sortBy } from "common/common"
+
+import Modal from "util/modal"
 
 export default class ListIngredients {
-    private readonly _baseName: string
-    private readonly _baseId: HtmlString
-    private readonly _buttonId: HtmlString
-    private readonly _modalId: HtmlString
-    private _moduleData: Module[] = {} as Module[]
-    private _ingredientData: RecipeIngredientEntity[] = {} as RecipeIngredientEntity[]
+    #ingredientData = [] as RecipeIngredientEntity[]
+    #modal: Modal | undefined = undefined
+    #moduleData = [] as Module[]
+    readonly #baseId: HtmlString
+    readonly #baseName = "List recipe ingredients"
+    readonly #menuId: HtmlString
+
     constructor() {
-        this._baseName = "List recipe ingredients"
-        this._baseId = "ingredient-list"
-        this._buttonId = `menu-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
 
         this._setupListener()
     }
 
     async _loadAndSetupData(): Promise<void> {
-        this._moduleData = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../../lib/gen-generic/modules.json")
+        this.#moduleData = (
+            await import(/* webpackChunkName: "data-modules" */ "../../../../../lib/gen-generic/modules.json")
         ).default as Module[]
-        this._ingredientData = (
-            await import(/* webpackChunkName: "data-recipes" */ "../../../../lib/gen-generic/recipes.json")
+        this.#ingredientData = (
+            await import(/* webpackChunkName: "data-recipes" */ "../../../../../lib/gen-generic/recipes.json")
         ).default.ingredient as RecipeIngredientEntity[]
     }
 
-    _setupListener(): void {
-        let firstClick = true
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
 
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this._baseName)
-
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "xl")
             this._ingredientListSelected()
-        })
-    }
-
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName })
-
-        const body = d3Select(`#${this._modalId} .modal-body`)
-
-        body.append("div").attr("id", `${this._baseId}`).attr("class", "container-fluid")
-    }
-
-    _initModal(): void {
-        this._injectModal()
-        this._injectList()
-    }
-
-    _ingredientListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
-            this._initModal()
         }
+    }
 
-        // Show modal
-        $(`#${this._modalId}`).modal("show")
+    _setupListener(): void {
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
+        })
     }
 
     _getProperties(recipeName: string): HtmlString {
         let text: string
         let moduleType = ""
         let properties = ""
-        for (const type of this._moduleData) {
+        for (const type of this.#moduleData) {
             const modules = type[1].sort(sortBy(["name"])).filter((module) => module.name === recipeName)
             for (const module of modules) {
                 moduleType = type[0]
@@ -114,7 +90,7 @@ export default class ListIngredients {
     }
 
     _getRows(): HtmlString[] {
-        return this._ingredientData.map(
+        return this.#ingredientData.map(
             (ingredient) =>
                 `<tr><td>${ingredient.name}</td><td>${ingredient.recipeNames
                     .map((recipeName) => {
@@ -148,20 +124,19 @@ export default class ListIngredients {
         return text
     }
 
-    /**
-     * Show ingredients
-     */
-    _injectList(): void {
-        // Remove old recipe list
-        d3Select(`#${this._baseId} div`).remove()
+    _ingredientListSelected(): void {
+        const div = this.#modal!.outputSel
 
-        // Add new recipe list
-        d3Select(`#${this._baseId}`).append("div").classed("row", true)
-        d3Select(`#${this._baseId} div`).html(this._getText())
-        $('[data-bs-toggle="tooltip"]').tooltip({
-            html: true,
-            placement: "auto",
-            sanitize: false,
+        div.select("div").remove()
+        div.append("div").attr("class", "row").html(this._getText())
+
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new BSTooltip(tooltipTriggerEl, {
+                html: true,
+                placement: "auto",
+                sanitize: false,
+            })
         })
     }
 }
