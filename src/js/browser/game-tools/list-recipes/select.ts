@@ -1,12 +1,13 @@
-import { select as d3Select } from "d3-selection"
-import JQuery from "jquery"
-import { getBaseIdSelects } from "common/common-browser"
-import { HtmlString } from "common/interface"
-import Select from "util/select"
-import { RecipeEntity, RecipeGroup } from "common/gen-json"
 import { sortBy } from "common/common"
 import { getOrdinal } from "common/common-math"
+
+import { Selection } from "d3-selection"
+import JQuery from "jquery"
+import { HtmlString } from "common/interface"
+import { RecipeEntity, RecipeGroup } from "common/gen-json"
 import { ServerType } from "common/servers"
+
+import Select from "util/select"
 
 const replacer = (match: string, p1: number, p2: number): string =>
     `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`
@@ -16,8 +17,15 @@ export default class ListRecipesSelect extends Select {
     #select$ = {} as JQuery<HTMLSelectElement>
     #serverType: ServerType
 
-    constructor(id: HtmlString, options: BootstrapSelectOptions, recipeData: RecipeGroup[], serverType: ServerType) {
-        super(id)
+    // eslint-disable-next-line max-params
+    constructor(
+        id: HtmlString,
+        selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>,
+        options: BootstrapSelectOptions,
+        recipeData: RecipeGroup[],
+        serverType: ServerType
+    ) {
+        super(id, selectsDiv)
         this.#recipeData = recipeData
         this.#serverType = serverType
 
@@ -49,10 +57,9 @@ export default class ListRecipesSelect extends Select {
     }
 
     _injectSelects(): void {
-        const selectsDiv = d3Select(`#${getBaseIdSelects(super.baseId)}`)
         const id = this.getSelectId()
 
-        const div = selectsDiv.append("div")
+        const div = super.selectsDiv.append("div")
         div.append("select").attr("name", id).attr("id", id).attr("class", "selectpicker")
         div.append("label")
             .attr("for", id)

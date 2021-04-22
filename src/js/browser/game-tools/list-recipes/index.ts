@@ -8,29 +8,24 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/modal"
-
-import "bootstrap-select"
-import { select as d3Select } from "d3-selection"
-
 import { registerEvent } from "../../analytics"
-import { getBaseIdOutput, getIdFromBaseName } from "common/common-browser"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatInt, formatSignPercent } from "common/common-format"
 import { getCurrencyAmount } from "common/common-game-tools"
 import { getServerType, ServerId, ServerType } from "common/servers"
 
 import { Module, RecipeEntity, RecipeGroup } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import ListRecipesModal from "./modal"
 import ListRecipesSelect from "./select"
+import Modal from "util/modal"
 
 export default class ListRecipes {
     readonly #baseId: HtmlString
     readonly #baseName = "List admiralty items and recipes"
+    readonly #menuId: HtmlString
     readonly #serverType: ServerType
-    #modal: ListRecipesModal | undefined = undefined
+    #modal: Modal | undefined = undefined
     #select = {} as ListRecipesSelect
-    #menuId: HtmlString
     #moduleData = [] as Module[]
     #recipeData = [] as RecipeGroup[]
     #recipes!: Map<number, RecipeEntity>
@@ -40,7 +35,6 @@ export default class ListRecipes {
         this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
 
-        console.log("constructor CHANGE ejs", this.#menuId)
         this._setupListener()
     }
 
@@ -63,7 +57,7 @@ export default class ListRecipes {
             this.#modal.show()
         } else {
             await this._loadAndSetupData()
-            this.#modal = new ListRecipesModal(this.#baseName)
+            this.#modal = new Modal(this.#baseName, "xl")
             this._setupSelect()
             this._setupSelectListener()
         }
@@ -85,7 +79,13 @@ export default class ListRecipes {
             virtualScroll: true,
         }
 
-        this.#select = new ListRecipesSelect(this.#baseId, selectpickerOptions, this.#recipeData, this.#serverType)
+        this.#select = new ListRecipesSelect(
+            this.#baseId,
+            this.#modal!.selectsSel,
+            selectpickerOptions,
+            this.#recipeData,
+            this.#serverType
+        )
     }
 
     _setupSelectListener(): void {
@@ -181,7 +181,7 @@ export default class ListRecipes {
      */
     _recipeSelected(): void {
         const recipeId = Number(this.#select.getSelectedValues())
-        const div = d3Select(`#${getBaseIdOutput(this.#baseId)}`)
+        const div = this.#modal!.outputSel
 
         // Remove old recipe list
         div.select("div").remove()
