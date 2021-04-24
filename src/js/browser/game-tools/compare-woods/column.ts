@@ -10,27 +10,20 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
-import { getBaseIdOutput } from "common/common-browser"
-
 import { HtmlString } from "common/interface"
-import { WoodColumnType, WoodType } from "./index"
-import { Amount, SelectedWood } from "compare-woods"
+import { Amount } from "compare-woods"
 
 import { WoodData } from "./data"
+import { WoodProperty, WoodTrimOrFrame } from "common/gen-json"
 
 export class Column {
-    #div = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    readonly #baseId: HtmlString
-    readonly #columnId: WoodColumnType
-    readonly #divId: HtmlString
+    #div: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     readonly #woodData: WoodData
 
-    constructor(id: HtmlString, columnId: WoodColumnType, woodData: WoodData) {
-        this.#baseId = id
-        this.#columnId = columnId
+    constructor(divOutputId: HtmlString, woodData: WoodData) {
+        this.#div = d3Select(`#${divOutputId}`)
         this.#woodData = woodData
 
-        this.#divId = `#${getBaseIdOutput(this.#baseId)}-${columnId}`
         this._setupMainDiv()
     }
 
@@ -43,12 +36,12 @@ export class Column {
     }
 
     _setupMainDiv(): void {
-        d3Select(`${this.#divId} div`).remove()
-        this.#div = d3Select(this.#divId).append("div")
+        this.#div.select("div").remove()
+        this.#div.append("div")
     }
 
-    getProperty(data: SelectedWood, type: WoodType, modifierName: string): Amount {
-        const property = data[type]?.properties.find((prop) => prop.modifier === modifierName)
+    getProperty(data: WoodTrimOrFrame, modifierName: string): Amount {
+        const property = data?.properties.find((prop) => prop.modifier === modifierName) ?? ({} as WoodProperty)
 
         const amount = property?.amount ?? 0
         const isPercentage = property?.isPercentage ?? false

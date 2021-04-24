@@ -8,9 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { getBaseIdOutput, getBaseIdSelects } from "common/common-browser"
 import { WoodColumnType } from "../compare-woods"
 import Modal from "util/modal"
+import { HtmlString } from "common/interface"
 
 export default class CompareWoodsModal extends Modal {
     readonly #columnIds: WoodColumnType[]
@@ -23,12 +23,20 @@ export default class CompareWoodsModal extends Modal {
         this._init()
     }
 
+    getBaseIdSelects(columnId: WoodColumnType): HtmlString {
+        return `${super.baseIdSelects}-${columnId}`
+    }
+
+    getBaseIdOutput(columnId: WoodColumnType): HtmlString {
+        return `${super.baseIdOutput}-${columnId}`
+    }
+
     _init(): void {
         this._injectModal()
     }
 
     _injectModal(): void {
-        const body = super.getBodySel()
+        const body = super.bodySel
 
         const row = body.append("div").attr("class", "container-fluid").append("div").attr("class", "row wood")
         for (const columnId of this.#columnIds) {
@@ -36,8 +44,8 @@ export default class CompareWoodsModal extends Modal {
                 .append("div")
                 .attr("class", `col-md-3 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
 
-            columnDiv.append("div").attr("id", `${getBaseIdSelects(super.baseId)}-${columnId}`)
-            columnDiv.append("div").attr("id", `${getBaseIdOutput(super.baseId)}-${columnId}`)
+            columnDiv.append("div").attr("id", `${this.getBaseIdSelects(columnId)}`)
+            columnDiv.append("div").attr("id", `${this.getBaseIdOutput(columnId)}`)
         }
     }
 }

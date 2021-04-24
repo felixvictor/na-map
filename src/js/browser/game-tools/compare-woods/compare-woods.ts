@@ -11,30 +11,32 @@
 import { registerEvent } from "../../analytics"
 
 import { HtmlString } from "common/interface"
-import { SelectedWood, WoodTypeList } from "compare-woods"
-import { WoodColumnType, woodType, WoodType } from "./index"
+import { SelectedWood, WoodColumnTypeList, WoodTypeList } from "compare-woods"
+import { WoodColumnType } from "./index"
 
 import CompareWoodsModal from "./modal"
-import SelectWood from "./select"
 import { ColumnBase } from "./column-base"
 import { ColumnCompare } from "./column-compare"
 import { WoodData } from "./data"
+import { woodType, WoodType } from "common/types"
+import Select from "util/select"
 
 type CompareWoodsBaseId = "compare-woods" | "compare-ships" | "ship-journey"
 
 export class CompareWoods {
-    #isColumnActive = {} as WoodTypeList<boolean>
     #columnIds = {} as WoodColumnType[]
     #columnIdsCompare = {} as WoodColumnType[]
+    #isColumnActive = {} as WoodColumnTypeList<boolean>
     #modal: CompareWoodsModal | undefined = undefined
+    #select = {} as WoodColumnTypeList<WoodTypeList<Select>>
     #woodData = {} as WoodData
-    #select = {} as SelectWood
     readonly #baseName: string
     readonly #baseId: CompareWoodsBaseId
     readonly #menuId: HtmlString
 
     constructor(id = "compare-woods" as CompareWoodsBaseId) {
         this.#baseId = id
+
         this.#baseName = this.#baseId === "compare-woods" ? "Compare woods" : this.#baseId
         this.#menuId = `menu-${this.#baseId}`
 
@@ -45,20 +47,36 @@ export class CompareWoods {
         this._setupData()
     }
 
-    get select(): SelectWood {
-        return this.#select
+    _enableSelects(columnId: WoodColumnType): void {
+        for (const type of woodType) {
+            this.#select[columnId][type].enable()
+        }
     }
 
-    get woodData(): WoodData {
-        return this.#woodData
+    _disableSelects(columnId: WoodColumnType): void {
+        for (const type of woodType) {
+            this.#select[columnId][type].disable()
+        }
     }
 
     async init(): Promise<void> {
         this.#woodData = new WoodData(this.#baseId)
         await this.#woodData.init()
-        this.#select = new SelectWood(this.#baseId, this.#woodData)
         for (const columnId of this.#columnIds) {
-            this.#select.setup(columnId)
+            this.#select[columnId] = {}
+            for (const type of woodType) {
+                this.#select[columnId][type] = new Select(
+                    `${this.#baseId}-${columnId}-${type}`,
+                    this.#modal!.getBaseIdSelects(columnId),
+                    { title: `Select ${type}` },
+                    this.#woodData.getOptions(type)
+                )
+            }
+
+            if (this.#baseId !== "compare-woods" || (columnId !== "base" && this.#baseId === "compare-woods")) {
+                this._disableSelects(columnId)
+            }
+
             this.#isColumnActive[columnId] = false
             if (this.#baseId === "compare-woods") {
                 this._setupSelectListener(columnId)
@@ -99,20 +117,19 @@ export class CompareWoods {
     _setColumns(compareId: WoodColumnType): void {
         if (compareId === "base") {
             this.#isColumnActive[compareId] = true
-            void new ColumnBase(this.#baseId, "base", this.#woodData, this._getWoodData("base"))
+            void new ColumnBase(this.#modal!.getBaseIdOutput(compareId), this.#woodData, this._getWoodData("base"))
 
             for (const columnId of this.#columnIdsCompare) {
                 // For wood-compare: add instances with enabling selects
                 // For ship-compare: add instances without enabling selects
                 if (this.#baseId === "compare-woods") {
-                    this.#select.enableSelects(columnId)
+                    this._enableSelects(columnId)
                 }
 
                 if (this.#isColumnActive[columnId]) {
                     this.#isColumnActive[columnId] = true
                     void new ColumnCompare(
-                        this.#baseId,
-                        columnId,
+                        this.#modal!.getBaseIdOutput(columnId),
                         this.#woodData,
                         this._getWoodData("base"),
                         this._getWoodData(columnId)
@@ -122,8 +139,7 @@ export class CompareWoods {
         } else {
             this.#isColumnActive[compareId] = true
             void new ColumnCompare(
-                this.#baseId,
-                compareId,
+                this.#modal!.getBaseIdOutput(compareId),
                 this.#woodData,
                 this._getWoodData("base"),
                 this._getWoodData(compareId)
@@ -131,28 +147,39 @@ export class CompareWoods {
         }
     }
 
-    woodSelected(compareId: WoodColumnType, type: WoodType): void {
-        this.#select.setWoodsSelected(compareId, type)
-        this.#select.setOtherSelect(compareId, type)
+    _setOtherSelect(columnId: WoodColumnType, type: WoodType): void {
+        const otherType: WoodType = type === "frame" ? "trim" : "frame"
+        const otherTypeValue = Number(this.#select[columnId][otherType].getValues())
+
+        if (otherTypeValue === 0) {
+            this.#select[columnId][otherType].reset(this.#woodData.defaultWoodId[otherType])
+        }
+    }
+
+    woodSelected(columnId: WoodColumnType, type: WoodType): void {
+        this._setOtherSelect(columnId, type)
 
         if (this.#baseId === "compare-woods") {
-            this._setColumns(compareId)
+            this._setColumns(columnId)
         }
     }
 
     _setupSelectListener(columnId: WoodColumnType): void {
         for (const type of woodType) {
-            const select$ = $<HTMLSelectElement>(`#${this.#select.getSelectId(columnId, type)}`)
+            const { select$ } = this.#select[columnId][type]
             select$.on("change", () => {
                 this.woodSelected(columnId, type)
             })
         }
     }
 
-    _getWoodData(id: WoodColumnType): SelectedWood {
+    _getWoodData(columnId: WoodColumnType): SelectedWood {
+        const frameWoodId = Number(this.#select[columnId].frame.getValues())
+        const trimWoodId = Number(this.#select[columnId].trim.getValues())
+
         return {
-            frame: this.#woodData.getWoodTypeData(this.#select.getSelectedId(id, "frame")),
-            trim: this.#woodData.getWoodTypeData(this.#select.getSelectedId(id, "trim")),
+            frame: this.#woodData.getWoodTypeData(frameWoodId),
+            trim: this.#woodData.getWoodTypeData(trimWoodId),
         }
     }
 }

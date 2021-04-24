@@ -12,7 +12,6 @@ import { formatFloat, formatPercent } from "common/common-format"
 
 import { HtmlString } from "common/interface"
 import { Amount, SelectedWood, WoodBaseAmount } from "compare-woods"
-import { WoodColumnType } from "./index"
 
 import { Column } from "./column"
 import { WoodData } from "./data"
@@ -22,8 +21,8 @@ type PropertyMap = Map<string, WoodBaseAmount>
 export class ColumnBase extends Column {
     readonly #selectedWoodData: SelectedWood
 
-    constructor(id: HtmlString, compareId: WoodColumnType, woodData: WoodData, baseWoodData: SelectedWood) {
-        super(id, compareId, woodData)
+    constructor(divOutputId: HtmlString, woodData: WoodData, baseWoodData: SelectedWood) {
+        super(divOutputId, woodData)
 
         this.#selectedWoodData = baseWoodData
 
@@ -31,8 +30,8 @@ export class ColumnBase extends Column {
     }
 
     _getPropertySum(modifierName: string): Amount {
-        const propertyFrame = super.getProperty(this.#selectedWoodData, "frame", modifierName)
-        const propertyTrim = super.getProperty(this.#selectedWoodData, "trim", modifierName)
+        const propertyFrame = super.getProperty(this.#selectedWoodData.frame, modifierName)
+        const propertyTrim = super.getProperty(this.#selectedWoodData.trim, modifierName)
 
         return {
             amount: propertyFrame.amount + propertyTrim.amount,

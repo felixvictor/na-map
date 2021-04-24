@@ -15,6 +15,8 @@ import { getIdFromBaseName } from "common/common-browser"
 
 export default class Modal {
     readonly #baseId: HtmlString
+    readonly #baseIdOutput: HtmlString
+    readonly #baseIdSelects: HtmlString
     readonly #baseName: string
     readonly #buttonId: HtmlString
     readonly #buttonText: string
@@ -31,6 +33,8 @@ export default class Modal {
     constructor(title: string, size: string, buttonText = "Close") {
         this.#baseName = title
         this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#baseIdSelects = `${this.#baseId}-selects`
+        this.#baseIdOutput = `${this.#baseId}-output`
         this.#buttonId = `menu-${this.baseId}`
         this.#buttonText = buttonText
         this.#modalId = `modal-${this.baseId}`
@@ -68,8 +72,8 @@ export default class Modal {
             .attr("aria-label", "Close")
 
         this.#bodySel = content.append("div").attr("class", "modal-body")
-        this.#selectsSel = this.#bodySel.append("div").attr("id", this.getBaseIdSelects())
-        this.#outputSel = this.#bodySel.append("div").attr("id", this.getBaseIdOutput())
+        this.#selectsSel = this.#bodySel.append("div").attr("id", this.#baseIdSelects)
+        this.#outputSel = this.#bodySel.append("div").attr("id", this.#baseIdOutput)
 
         this.#footerSel = content.append<HTMLElement>("footer").attr("class", "modal-footer")
         this.#footerSel
@@ -92,12 +96,12 @@ export default class Modal {
         return this.#modalSel.node() as HTMLDivElement
     }
 
-    getBaseIdSelects(): HtmlString {
-        return `${this.#baseId}-selects`
+    get baseIdSelects(): HtmlString {
+        return this.#baseIdSelects
     }
 
-    getBaseIdOutput(): HtmlString {
-        return `${this.#baseId}-output`
+    get baseIdOutput(): HtmlString {
+        return this.#baseIdOutput
     }
 
     get bodySel(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {

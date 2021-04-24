@@ -10,25 +10,28 @@
 
 import "bootstrap-select"
 
-import { getIdFromBaseName } from "common/common-browser"
-import { Selection } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
 
 export default class Select {
-    readonly #baseId: HtmlString
+    #select$ = {} as JQuery<HTMLSelectElement>
+    readonly #bsSelectOptions: BootstrapSelectOptions
+    readonly #id: HtmlString
+    readonly #options: HtmlString
     readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
-    constructor(id: HtmlString, selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>) {
-        this.#baseId = getIdFromBaseName(id)
-        this.#selectsDiv = selectsDiv
-    }
+    constructor(
+        id: HtmlString,
+        selectsDivId: HtmlString,
+        bsSelectOptions: BootstrapSelectOptions,
+        options: HtmlString
+    ) {
+        this.#id = `${id}-select`
+        this.#selectsDiv = d3Select(`#${selectsDivId}`)
+        this.#bsSelectOptions = bsSelectOptions
+        this.#options = options
 
-    get baseId(): HtmlString {
-        return this.#baseId
-    }
-
-    get selectsDiv(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
-        return this.#selectsDiv
+        this._init()
     }
 
     static getSelectValueAsNumberArray(value: string | number | string[] | undefined): number[] {
@@ -51,41 +54,64 @@ export default class Select {
         return value ? [String(value)] : []
     }
 
-    static getValues(select$: JQuery<HTMLSelectElement>): string | number | string[] | undefined {
-        return select$.val()
+    get select$(): JQuery<HTMLSelectElement> {
+        return this.#select$
     }
 
-    static setSelectValues(select$: JQuery<HTMLSelectElement>, ids: number | number[]): void {
+    getValues(): string | number | string[] | undefined {
+        return this.#select$.val()
+    }
+
+    setSelectValues(ids: number | number[]): void {
         const value = Select.getSelectValueAsStringArray(ids)
 
         if (value.length > 0) {
-            select$.val(value)
+            this.#select$.val(value)
         }
 
-        Select.refresh(select$)
+        this.refresh()
     }
 
-    static construct(select$: JQuery<HTMLSelectElement>, options: BootstrapSelectOptions): void {
-        select$.selectpicker(options)
+    disable(): void {
+        this.#select$.prop("disabled", true)
+        this.refresh()
     }
 
-    static disable(select$: JQuery<HTMLSelectElement>): void {
-        select$.prop("disabled", true)
+    enable(): void {
+        this.#select$.removeAttr("disabled").selectpicker("refresh")
+        this.refresh()
     }
 
-    static enable(select$: JQuery<HTMLSelectElement>): void {
-        select$.removeAttr("disabled").selectpicker("refresh")
+    render(): void {
+        this.#select$.selectpicker("render")
     }
 
-    static render(select$: JQuery<HTMLSelectElement>): void {
-        select$.selectpicker("render")
+    refresh(): void {
+        this.#select$.selectpicker("refresh")
     }
 
-    static refresh(select$: JQuery<HTMLSelectElement>): void {
-        select$.selectpicker("refresh")
+    reset(value: string | number | string[] = "default"): void {
+        this.#select$.val(value).selectpicker("refresh")
     }
 
-    static reset(select$: JQuery<HTMLSelectElement>, value: string | number | string[] = "default"): void {
-        select$.val(value).selectpicker("refresh")
+    _construct(): void {
+        this.#select$.selectpicker(this.#bsSelectOptions)
+    }
+
+    _injectSelects(): void {
+        const div = this.#selectsDiv.append("div")
+        div.append("label")
+            .append("select")
+            .attr("name", this.#id)
+            .attr("id", this.#id)
+            .attr("class", "selectpicker")
+    }
+
+    _init(): void {
+        this._injectSelects()
+        this.#select$ = $(`#${this.#id}`)
+        this.#select$.append(this.#options)
+        this._construct()
+        this.reset()
     }
 }

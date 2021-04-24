@@ -12,7 +12,6 @@ import { formatFloat, formatPercent, formatSignFloat } from "common/common-forma
 
 import { HtmlString } from "common/interface"
 import { Amount, SelectedWood, WoodCompareAmount } from "compare-woods"
-import { WoodColumnType } from "./index"
 
 import { Column } from "./column"
 import { WoodData } from "./data"
@@ -23,15 +22,8 @@ export class ColumnCompare extends Column {
     readonly #selectedBaseWoodData: SelectedWood
     readonly #selectedCompareWoodData: SelectedWood
 
-    // eslint-disable-next-line max-params
-    constructor(
-        id: HtmlString,
-        compareId: WoodColumnType,
-        woodData: WoodData,
-        baseData: SelectedWood,
-        compareData: SelectedWood
-    ) {
-        super(id, compareId, woodData)
+    constructor(divOutputId: HtmlString, woodData: WoodData, baseData: SelectedWood, compareData: SelectedWood) {
+        super(divOutputId, woodData)
 
         this.#selectedBaseWoodData = baseData
         this.#selectedCompareWoodData = compareData
@@ -47,8 +39,8 @@ export class ColumnCompare extends Column {
     }
 
     _getBasePropertySum(modifierName: string): Amount {
-        const basePropertyFrame = super.getProperty(this.#selectedBaseWoodData, "frame", modifierName)
-        const basePropertyTrim = super.getProperty(this.#selectedBaseWoodData, "trim", modifierName)
+        const basePropertyFrame = super.getProperty(this.#selectedBaseWoodData.frame, modifierName)
+        const basePropertyTrim = super.getProperty(this.#selectedBaseWoodData.trim, modifierName)
 
         return {
             amount: basePropertyFrame.amount + basePropertyTrim.amount,
@@ -57,8 +49,8 @@ export class ColumnCompare extends Column {
     }
 
     _getComparePropertySum(modifierName: string): Amount {
-        const comparePropertyFrame = super.getProperty(this.#selectedCompareWoodData, "frame", modifierName)
-        const comparePropertyTrim = super.getProperty(this.#selectedCompareWoodData, "trim", modifierName)
+        const comparePropertyFrame = super.getProperty(this.#selectedCompareWoodData.frame, modifierName)
+        const comparePropertyTrim = super.getProperty(this.#selectedCompareWoodData.trim, modifierName)
 
         return {
             amount: comparePropertyFrame.amount + comparePropertyTrim.amount,

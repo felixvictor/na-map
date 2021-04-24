@@ -8,12 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-export const woodFamily = ["regular", "seasoned", "exceptional"]!
-export type WoodFamily = typeof woodFamily[number]
-
-export const woodType = ["frame", "trim"]!
-export type WoodType = typeof woodType[number]
-
 export const woodColumnType = ["base", "c1", "c2", "c3"]!
 export type WoodColumnType = typeof woodColumnType[number]
 

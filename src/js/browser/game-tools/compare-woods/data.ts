@@ -15,7 +15,7 @@ import { simpleStringSort, sortBy } from "common/common"
 import { WoodJsonData, WoodTrimOrFrame } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { MinMax, WoodDataMap, WoodTypeList } from "compare-woods"
-import { WoodType } from "./index"
+import { WoodType } from "common/types"
 
 export class WoodData {
     #baseId: HtmlString
@@ -37,10 +37,6 @@ export class WoodData {
         return this.#modifierNames
     }
 
-    get options(): WoodTypeList<HtmlString> {
-        return this.#options
-    }
-
     findWoodId(type: WoodType, woodName: string): number {
         return [...this.#woods.entries()].find(([, value]) => value.type === type && value.name === woodName)?.[0] ?? 0
     }
@@ -51,6 +47,10 @@ export class WoodData {
 
     getMinProperty(key: string): number {
         return this.#minMaxProperty.get(key)?.min ?? 1
+    }
+
+    getOptions(type: WoodType): HtmlString {
+        return this.#options[type]
     }
 
     getWoodName(woodId: number): string {
@@ -97,11 +97,11 @@ export class WoodData {
             frame: woodJsonData.frame
                 .sort(sortBy(["name"]))
                 .map((wood) => `<option value="${wood.id}">${wood.name}</option>`)
-                .toString(),
+                .join(""),
             trim: woodJsonData.trim
                 .sort(sortBy(["name"]))
                 .map((wood) => `<option value="${wood.id}">${wood.name}</option>`)
-                .toString(),
+                .join(""),
         }
     }
 
