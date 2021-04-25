@@ -9,7 +9,7 @@
  */
 
 import { group as d3Group } from "d3-array"
-import { select as d3Select } from "d3-selection"
+import { select as d3Select, Selection } from "d3-selection"
 
 import { sortBy } from "common/common"
 import { isImported, stripShipName } from "common/common-game-tools"
@@ -28,8 +28,12 @@ export default class SelectShip extends Select {
 
     readonly #shipData: ShipData[]
 
-    constructor(id: HtmlString, shipData: ShipData[]) {
-        super(id)
+    constructor(
+        id: HtmlString,
+        selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>,
+        shipData: ShipData[]
+    ) {
+        super(id, selectsDiv)
 
         this.#shipData = shipData
 
@@ -65,21 +69,6 @@ export default class SelectShip extends Select {
         select.attr("name", id).attr("id", this.getSelectId(columnId))
     }
 
-    _getShipOptions(): HtmlString {
-        return this.#selectData
-            .map(
-                (key) =>
-                    `<optgroup label="${getOrdinal(Number(key.key), false)} rate">${key.values
-                        .map(
-                            (ship) =>
-                                `<option data-subtext="${ship.battleRating}${
-                                    isImported(ship.name) ? " Imported" : ""
-                                }" value="${ship.id}">${stripShipName(ship.name)} (${ship.guns})</option>`
-                        )
-                        .join("")}</optgroup>`
-            )
-            .join("")
-    }
 
     getSelectId(columnId: ShipColumnType): HtmlString {
         return `${super.baseId}-${columnId}-select`
@@ -104,8 +93,6 @@ export default class SelectShip extends Select {
         this.#select$[columnId] = $(`#${id}`)
         const options = this._getShipOptions()
         this.#select$[columnId].append(options)
-        if (columnId !== "base") {
-            Select.disable(this.#select$[columnId])
-        }
+
     }
 }

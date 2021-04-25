@@ -88,7 +88,7 @@ declare module "compare-ships" {
 
     interface SelectedId {
         ship: number
-        wood: number[]
+        wood: Map<string, number>
         modules: Map<string, number[]>
     }
 

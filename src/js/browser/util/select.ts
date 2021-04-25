@@ -17,19 +17,23 @@ export default class Select {
     #select$ = {} as JQuery<HTMLSelectElement>
     readonly #bsSelectOptions: BootstrapSelectOptions
     readonly #id: HtmlString
+    readonly #isMultiple: boolean
     readonly #options: HtmlString
     readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
 
+    // eslint-disable-next-line max-params
     constructor(
         id: HtmlString,
         selectsDivId: HtmlString,
         bsSelectOptions: BootstrapSelectOptions,
-        options: HtmlString
+        options: HtmlString,
+        isMultiple = false
     ) {
         this.#id = `${id}-select`
         this.#selectsDiv = d3Select(`#${selectsDivId}`)
         this.#bsSelectOptions = bsSelectOptions
         this.#options = options
+        this.#isMultiple = isMultiple
 
         this._init()
     }
@@ -104,6 +108,7 @@ export default class Select {
             .append("select")
             .attr("name", this.#id)
             .attr("id", this.#id)
+            .property("multiple", this.#isMultiple)
             .attr("class", "selectpicker")
     }
 

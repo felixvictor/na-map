@@ -11,19 +11,19 @@
 import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import { group as d3Group } from "d3-array"
-import { select as d3Select } from "d3-selection"
-
 import { sortBy } from "common/common"
-import { getBaseIdSelects } from "common/common-browser"
 import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
 import { moduleAndWoodChanges } from "./module-modifier"
+
+import { Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
 import { Module, ModuleEntity, ModulePropertiesEntity } from "common/gen-json"
 import { ModuleType, ModuleTypeList, ShipColumnTypeList } from "compare-ships"
 import { ShipColumnType } from "./index"
+
 import Select from "util/select"
 
-type ModuleOptionType = [number, ModuleEntity]
+
 
 export default class SelectModule extends Select {
     #select$ = {} as ShipColumnTypeList<ModuleTypeList<JQuery<HTMLSelectElement>>>
@@ -34,8 +34,12 @@ export default class SelectModule extends Select {
     readonly #moduleDataDefault: Module[]
     readonly #moduleAndWoodChanges = moduleAndWoodChanges
 
-    constructor(id: HtmlString, moduleDataDefault: Module[]) {
-        super(id)
+    constructor(
+        id: HtmlString,
+        selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>,
+        moduleDataDefault: Module[]
+    ) {
+        super(id, selectsDiv)
 
         this.#moduleDataDefault = moduleDataDefault
 
@@ -82,16 +86,7 @@ export default class SelectModule extends Select {
         }
     }
 
-    _getModuleFromName(moduleName: string | null): ModuleEntity | undefined {
-        let module: ModuleEntity | undefined
 
-        this.#moduleDataDefault.some((type) => {
-            module = type[1].find((module) => module.name === moduleName)
-            return Boolean(module)
-        })
-
-        return module
-    }
 
     _getSelectId(columnId: ShipColumnType, type: ModuleType): HtmlString {
         return `${super.baseId}-${columnId}-${type.replace(/\s/, "")}-select`
@@ -101,103 +96,14 @@ export default class SelectModule extends Select {
      * Setup module data
      */
     _setupData(): void {
-        // Get all setModules where change modifier (moduleChanges) exists
-        this.#moduleProperties = new Map(
-            this.#moduleDataDefault.flatMap((type) =>
-                type[1]
-                    .filter((module) =>
-                        module.properties.some((property) => {
-                            return this.#moduleAndWoodChanges.has(property.modifier)
-                        })
-                    )
-                    .map((module) => [module.id, module])
-            )
-        )
 
-        // Get types from moduleProperties list
-        this.#moduleTypes = new Set<ModuleType>(
-            [...this.#moduleProperties].map((module) => module[1].type.replace(/\s\u2013\s[\s/A-Za-z\u25CB]+/, ""))
-        )
     }
 
-    _addTooltip(element: HTMLLIElement, module: ModuleEntity): void {
-        // Add tooltip with module properties
-        element.dataset.bsOriginalTitle = SelectModule._getModifierFromModule(module.properties)
-        const tooltip = new BSTooltip(element, { html: true })
-        element.addEventListener("show.bs.tooltip", () => {
-            // Remember shown tooltip
-            this.#tooltips.set(module.id, tooltip)
-        })
-        element.addEventListener("hide.bs.tooltip", () => {
-            this.#tooltips.set(module.id, undefined)
-        })
-    }
 
-    _initTooltip(select$: JQuery<HTMLSelectElement>): void {
-        for (const element of select$.data("selectpicker").selectpicker.current.elements as HTMLLIElement[]) {
-            if (!(element.classList.contains("dropdown-divider") || element.classList.contains("dropdown-header"))) {
-                const module = this._getModuleFromName(element.textContent)
-                if (module) {
-                    this._addTooltip(element, module)
-                }
-            }
-        }
-    }
-
-    _getModuleDataForShipClass(moduleType: string, shipClass: number): ModuleOptionType[] {
-        return [...this.#moduleProperties].filter(
-            (module) =>
-                module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
-                (module[1].moduleLevel === "U" || module[1].moduleLevel === SelectModule._getModuleLevel(shipClass))
-        )
-    }
-
-    _getModulesGrouped(moduleType: string, shipClass: number): Array<{ key: string; values: ModuleOptionType[] }> {
-        const moduleData = this._getModuleDataForShipClass(moduleType, shipClass)
-        return [...d3Group(moduleData, (module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))]
-            .map(([key, value]) => ({
-                key,
-                values: value.sort((a, b) => a[1].name.localeCompare(b[1].name)),
-            }))
-            .sort(sortBy(["key"]))
-    }
-
-    _getMaxOptions(moduleTypeWithSingleOption: Set<string>, moduleType: string): number {
-        return moduleTypeWithSingleOption.has(moduleType.replace(/[\sA-Za-z]+\s–\s/, "")) ? 1 : 5
-    }
-
-    _getOption(values: ModuleOptionType[]): HtmlString {
-        return values.map((module) => `<option value="${module[0]}">${module[1].name}</option>`).join("")
-    }
 
     /**
      * Get select options
      */
-    _getUpgradesOptions(moduleType: string, shipClass: number): string {
-        // Group module data by sub type (e.g. "Gunnery")
-        const modulesGrouped = this._getModulesGrouped(moduleType, shipClass)
-        let options: string
-        const moduleTypeWithSingleOption = new Set(["Permanent", "Column trim"])
-
-        // eslint-disable-next-line unicorn/prefer-ternary
-        if (modulesGrouped.length > 1) {
-            // Get options with sub types as optgroups
-            options = modulesGrouped
-                .map(
-                    (group) =>
-                        `<optgroup label="${group.key}" data-max-options="${this._getMaxOptions(
-                            moduleTypeWithSingleOption,
-                            moduleType
-                        )}">${this._getOption(group.values)}</optgroup>`
-                )
-                .join("")
-        } else {
-            // Get options without optgroups
-            options = modulesGrouped.map((group) => `${this._getOption(group.values)}`).join("")
-        }
-
-        return options
-    }
 
     _fillSelect(columnId: ShipColumnType, type: string, shipClass: number): void {
         const options = this._getUpgradesOptions(type, shipClass)
@@ -226,9 +132,7 @@ export default class SelectModule extends Select {
     }
 
     _injectSelects(columnId: ShipColumnType): void {
-        const mainDiv = d3Select(`#${getBaseIdSelects(super.baseId)}-${columnId}`)
-
-        const div = mainDiv.append("div").attr("class", "input-group justify-content-between")
+        const div = super.selectsDiv.append("div").attr("class", "input-group justify-content-between")
         for (const type of this.#moduleTypes) {
             const id = this._getSelectId(columnId, type)
             div.append("label")

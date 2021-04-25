@@ -20,6 +20,7 @@ import { ColumnCompare } from "./column-compare"
 import { WoodData } from "./data"
 import { woodType, WoodType } from "common/types"
 import Select from "util/select"
+import CompareShipsModal from "js/browser/game-tools/compare-ships/modal"
 
 type CompareWoodsBaseId = "compare-woods" | "compare-ships" | "ship-journey"
 
@@ -59,27 +60,29 @@ export class CompareWoods {
         }
     }
 
+    initSelects(columnId: WoodColumnType, divOutputId: HtmlString): void {
+        this.#select[columnId] = {} as WoodColumnTypeList<Select>
+        for (const type of woodType) {
+            this.#select[columnId][type] = new Select(
+                `${this.#baseId}-${columnId}-${type}`,
+                divOutputId,
+                { title: `Select ${type}` },
+                this.#woodData.getOptions(type)
+            )
+        }
+    }
+
     async init(): Promise<void> {
         this.#woodData = new WoodData(this.#baseId)
         await this.#woodData.init()
         for (const columnId of this.#columnIds) {
-            this.#select[columnId] = {}
-            for (const type of woodType) {
-                this.#select[columnId][type] = new Select(
-                    `${this.#baseId}-${columnId}-${type}`,
-                    this.#modal!.getBaseIdSelects(columnId),
-                    { title: `Select ${type}` },
-                    this.#woodData.getOptions(type)
-                )
-            }
-
-            if (this.#baseId !== "compare-woods" || (columnId !== "base" && this.#baseId === "compare-woods")) {
-                this._disableSelects(columnId)
-            }
-
             this.#isColumnActive[columnId] = false
             if (this.#baseId === "compare-woods") {
+                this.initSelects(columnId, this.#modal!.getBaseIdSelects(columnId))
                 this._setupSelectListener(columnId)
+                if (columnId !== "base") {
+                    this._disableSelects(columnId)
+                }
             }
         }
     }

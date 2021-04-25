@@ -57,6 +57,16 @@ export class WoodData {
         return this.#woods.get(woodId)?.name ?? ""
     }
 
+    getSelectedWoodData(selectedWoodIds: Map<string, number>): WoodTypeList<WoodTrimOrFrame> {
+        const woodData = {} as WoodTypeList<WoodTrimOrFrame>
+
+        for (const [woodType, woodId] of selectedWoodIds) {
+            woodData[woodType] = this.getWoodTypeData(woodId)
+        }
+
+        return woodData
+    }
+
     getWoodTypeData(woodId: number): WoodTrimOrFrame {
         return this.#woods.get(woodId) ?? ({} as WoodTrimOrFrame)
     }

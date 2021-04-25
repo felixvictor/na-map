@@ -8,17 +8,22 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
+import { woodType, WoodType } from "common/types"
 import { ShipColumnType } from "./index"
-
 import Select from "util/select"
-import { CompareWoods, woodType, WoodType } from "../compare-woods"
+import { CompareWoods } from "../compare-woods"
 
 export default class SelectWood extends Select {
     readonly #woodCompare: CompareWoods
 
-    constructor(id: HtmlString, woodCompare: CompareWoods) {
-        super(id)
+    constructor(
+        id: HtmlString,
+        selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>,
+        woodCompare: CompareWoods
+    ) {
+        super(id, selectsDiv)
 
         this.#woodCompare = woodCompare
     }
@@ -27,26 +32,9 @@ export default class SelectWood extends Select {
         return this.#woodCompare
     }
 
-    cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this.#woodCompare.select.enableSelects(newColumnId)
 
-        if (this.getSelectedId(currentColumnId, "frame")) {
-            for (const type of woodType) {
-                const woodId = this.getSelectedId(currentColumnId, type)
-                this.setWood(newColumnId, type, woodId)
-            }
-        }
-    }
 
-    getSelectedText(columnId: ShipColumnType): string[] {
-        const woods = [] as string[]
-        for (const type of woodType) {
-            const woodId = this.getSelectedId(columnId, type)
-            woods.push(this.#woodCompare.woodData.getWoodName(woodId))
-        }
 
-        return woods
-    }
 
     getSelectedId(columnId: ShipColumnType, type: WoodType): number {
         return this.#woodCompare.select.getSelectedId(columnId, type)

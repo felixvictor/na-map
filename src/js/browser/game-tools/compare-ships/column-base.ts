@@ -28,7 +28,7 @@ import { Selection } from "d3-selection"
 
 import { Column } from "./column"
 import { CompareShips } from "./compare-ships"
-import { ColumnCompare } from "js/browser/game-tools/compare-ships/column-compare"
+import { ColumnCompare } from "./column-compare"
 
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor } from "common/common-game-tools"
 import { default as shipIcon } from "icons/icon-ship.svg"

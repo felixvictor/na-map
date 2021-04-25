@@ -8,14 +8,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { ModulePropertiesEntity, ShipData } from "common/gen-json"
+import { ModuleEntity, ModulePropertiesEntity, ShipData, WoodTrimOrFrame } from "common/gen-json"
 import { ShipColumnType } from "./index"
 import { HtmlString, ModifierName } from "common/interface"
 import { AbsoluteAndPercentageAmount, Amount } from "compare-ships"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
-import { woodType } from "../compare-woods"
-import SelectModule from "./select-module"
-import SelectWood from "./select-wood"
+import { WoodTypeList } from "compare-woods"
 
 export default class ModulesAndWoodData {
     #baseData = {} as ShipData
@@ -117,12 +115,11 @@ export default class ModulesAndWoodData {
         }
     }
 
-    _setModifierAmountWoods(columnId: ShipColumnType, selectWood: SelectWood): void {
+    _setModifierAmountWoods(woodData: WoodTypeList<WoodTrimOrFrame>): void {
         // Add modifier amount for both frame and trim
-        for (const type of woodType) {
-            const woodId = selectWood.getSelectedId(columnId, type)
-            const woodData = selectWood.woodCompare.woodData.getWoodTypeData(woodId)
-            for (const property of woodData.properties) {
+        for (const [, woodProperties] of Object.entries(woodData)) {
+            for (const property of woodProperties?.properties ?? []) {
+                console.log("_setModifierAmountWoods", property)
                 if (this.#moduleAndWoodChanges.has(property.modifier)) {
                     this._setModifier(property)
                 }
@@ -130,16 +127,12 @@ export default class ModulesAndWoodData {
         }
     }
 
-    _setModifierAmountModules(columnId: ShipColumnType, selectModule: SelectModule): void {
-        for (const type of selectModule.moduleTypes) {
-            const ids = selectModule.getSelectedUpgradeIds(columnId, type)
-            for (const id of ids) {
-                const module = selectModule.getModuleProperties(id)
-
-                for (const property of module?.properties ?? []) {
-                    if (this.#moduleAndWoodChanges.has(property.modifier)) {
-                        this._setModifier(property)
-                    }
+    _setModifierAmountModules(moduleData: ModuleEntity[]): void {
+        for (const module of moduleData) {
+            for (const property of module?.properties ?? []) {
+                console.log("_setModifierAmountModules", property)
+                if (this.#moduleAndWoodChanges.has(property.modifier)) {
+                    this._setModifier(property)
                 }
             }
         }
@@ -244,15 +237,15 @@ export default class ModulesAndWoodData {
         shipDataBase: ShipData,
         shipDataUpdated: ShipData,
         columnId: ShipColumnType,
-        selectWood: SelectWood,
-        selectModule: SelectModule
+        woodData: WoodTypeList<WoodTrimOrFrame>,
+        moduleData: ModuleEntity[]
     ): ShipData {
         this.#baseData = shipDataBase
         this.#data = JSON.parse(JSON.stringify(shipDataUpdated)) as ShipData
         this.#modifierAmount = new Map()
 
-        this._setModifierAmountWoods(columnId, selectWood)
-        this._setModifierAmountModules(columnId, selectModule)
+        this._setModifierAmountWoods(woodData)
+        this._setModifierAmountModules(moduleData)
         this._adjustDataByModifiers()
         this._adjustDataByCaps(columnId)
         if (this.#modifierAmount.has("Max speed")) {
