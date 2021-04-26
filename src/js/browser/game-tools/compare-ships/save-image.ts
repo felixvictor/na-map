@@ -10,14 +10,15 @@
 
 import html2canvas from "html2canvas"
 
+import { select as d3Select } from "d3-selection"
+
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 dayjs.extend(utc)
 
+import { showCursorDefault, showCursorWait } from "common/common-browser"
 import { ShipColumnType } from "./index"
 import { ShipColumnTypeList, SelectedData } from "compare-ships"
-import { select as d3Select } from "d3-selection"
-import { showCursorDefault, showCursorWait } from "common/common-browser"
 import { HtmlString } from "common/interface"
 
 export default class SaveImage {

@@ -1,3 +1,4 @@
+import { woodType } from "common/types"
 import { shipColumnType } from "./index"
 import { ModuleType, SelectedId, ShipColumnTypeList } from "compare-ships"
 import { ShipCompareSearchParams } from "./search-params"
@@ -7,14 +8,11 @@ export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
 
     getSelectedIds(moduleTypes: Set<ModuleType>): ShipColumnTypeList<SelectedId> {
         super.moduleTypes = moduleTypes
-        this._init()
 
-        return this.#selectedIds
-    }
-
-    _init(): void {
         this._getShipsAndWoods()
         this._getModules()
+
+        return this.#selectedIds
     }
 
     _getShipsAndWoods(): void {
@@ -24,7 +22,10 @@ export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
         shipColumnType.some((columnId) => {
             this.#selectedIds[columnId] = {} as SelectedId
             this.#selectedIds[columnId].ship = ids[i]
-            this.#selectedIds[columnId].wood = [ids[i + 1], ids[i + 2]]
+            this.#selectedIds[columnId].wood = new Map([
+                [woodType[0], ids[i + 1]],
+                [woodType[1], ids[i + 2]],
+            ])
             this.#selectedIds[columnId].modules = new Map<string, number[]>()
             i += 3
             return i >= ids.length

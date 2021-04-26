@@ -8,33 +8,35 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
+
 import { group as d3Group, max as d3Max, min as d3Min } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 
 import { registerEvent } from "../../analytics"
+import { sortBy } from "common/common"
 import { colourGreenDark, colourRedDark, colourWhite, getElementWidth } from "common/common-browser"
+import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
 import { hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShipName } from "common/common-game-tools"
-import { copyDataClicked } from "./copy-to-clipboard"
-
+import { getOrdinal } from "common/common-math"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
-import CompareShipsModal from "./modal"
-import SaveImage from "./save-image"
-import SelectModule from "./select-module"
-import { WoodColumnType } from "../compare-woods"
-import { ColumnBase } from "./column-base"
-import { ColumnCompare } from "./column-compare"
-import { WoodType, woodType } from "common/types"
-import { Module, ModuleEntity, ShipData, ShipRepairTime } from "common/gen-json"
+
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { WoodType, woodType } from "common/types"
 import { ShipColumnTypeList, ModuleType, SelectedData, SelectedId, ShipSelectData } from "compare-ships"
 import { ShipColumnType } from "./index"
-import ModulesAndWoodData from "./module-wood-data"
-import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
-import { getOrdinal } from "common/common-math"
-import { sortBy } from "common/common"
+import { WoodColumnType } from "../compare-woods"
+
+import CompareShipsModal from "./modal"
+import SaveImage from "./save-image"
+import { copyDataClicked } from "./copy-to-clipboard"
 import { WoodData } from "../compare-woods/data"
 import { CompareShipsSelect } from "./select"
+import { ColumnBase } from "./column-base"
+import { ColumnCompare } from "./column-compare"
+import ModulesAndWoodData from "./module-wood-data"
 
 type CompareShipsBaseId = "compare-ships" | "ship-journey"
 type ModuleOptionType = [number, ModuleEntity]
@@ -92,6 +94,28 @@ export class CompareShips {
         }
     }
 
+    static _getModuleLevel(rate: number): string {
+        return rate <= 3 ? "L" : rate <= 5 ? "M" : "S"
+    }
+
+    static _getModifierFromModule(properties: ModulePropertiesEntity[]): HtmlString {
+        return `<p class="mb-0">${properties
+            .map((property) => {
+                let amount
+                if (property.isPercentage) {
+                    amount = formatSignPercent(property.amount / 100)
+                } else {
+                    amount =
+                        property.amount < 1 && property.amount > 0
+                            ? formatPP(property.amount, 1)
+                            : formatSignFloat(property.amount, 2)
+                }
+
+                return `${property.modifier} ${amount}`
+            })
+            .join("<br>")}</p>`
+    }
+
     get columnIds(): ShipColumnType[] {
         return this.#columnIds
     }
@@ -102,6 +126,14 @@ export class CompareShips {
 
     get modulesAndWoodData(): ModulesAndWoodData {
         return this.#modulesAndWoodData
+    }
+
+    get moduleTypes(): Set<ModuleType> {
+        return this.#moduleTypes
+    }
+
+    get selects(): CompareShipsSelect {
+        return this.#selects
     }
 
     hasShipId(id: number): boolean {
@@ -121,7 +153,7 @@ export class CompareShips {
 
     _addTooltip(element: HTMLLIElement, module: ModuleEntity): void {
         // Add tooltip with module properties
-        element.dataset.bsOriginalTitle = SelectModule._getModifierFromModule(module.properties)
+        element.dataset.bsOriginalTitle = CompareShips._getModifierFromModule(module.properties)
         const tooltip = new BSTooltip(element, { html: true })
         element.addEventListener("show.bs.tooltip", () => {
             // Remember shown tooltip
@@ -159,8 +191,7 @@ export class CompareShips {
         for (const moduleType of this.#moduleTypes) {
             this.#selects.initModuleSelects(columnId, moduleType, this._getModuleOption(moduleType, shipClass))
 
-            console.log(moduleType, this.#selects
-                .getModule$(columnId, moduleType))
+            console.log(moduleType, this.#selects.getModule$(columnId, moduleType))
             this.#selects
                 .getModule$(columnId, moduleType)
                 .on("show.bs.select", (event: Event) => {
@@ -242,7 +273,7 @@ export class CompareShips {
         return [...this.#moduleProperties].filter(
             (module) =>
                 module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
-                (module[1].moduleLevel === "U" || module[1].moduleLevel === SelectModule._getModuleLevel(shipClass))
+                (module[1].moduleLevel === "U" || module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
         )
     }
 
@@ -587,6 +618,7 @@ export class CompareShips {
 
         for (const columnId of this.#columnIds) {
             const shipId = this.#selects.getSelectedShipId(columnId)
+
             if (shipId) {
                 selectedData[columnId] = {
                     ship: this._getShipName(shipId),

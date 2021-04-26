@@ -82,7 +82,7 @@ export default class CompareShipsModal extends Modal {
     _injectModal(): void {
         const body = super.bodySel
 
-        const row = body.append("div").attr("class", "container-fluid").append("div").attr("class", "row")
+        const row = body.append("div").attr("class", "row")
 
         for (const columnId of this.#columnIds) {
             const columnDiv = row
@@ -90,8 +90,7 @@ export default class CompareShipsModal extends Modal {
                 .attr("id", this.getBaseId(columnId))
                 .attr("class", `col-md-4 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
 
-            const selectsDiv = columnDiv.append("div").attr("id", this.getBaseIdSelects(columnId))
-            const shipSelectDiv = selectsDiv
+            const shipSelectDiv = columnDiv
                 .append("div")
                 .attr("class", "input-group justify-content-between flex-nowrap mb-1")
 
@@ -120,6 +119,11 @@ export default class CompareShipsModal extends Modal {
                     .append("i")
                     .attr("class", "icon icon-clone-right")
             }
+
+            columnDiv
+                .append("div")
+                .attr("id", this.getBaseIdSelects(columnId))
+                .attr("class", "input-group justify-content-between")
 
             columnDiv
                 .append("div")

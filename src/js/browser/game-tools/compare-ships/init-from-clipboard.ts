@@ -12,16 +12,16 @@ export const initFromClipboard = async (searchParams: ShipCompareSearchParamsRea
     await shipCompare.loadAndSetupData()
     await shipCompare.menuClicked()
 
-    const selectedIds = searchParams.getSelectedIds(shipCompare.selectModule.moduleTypes)
+    const selectedIds = searchParams.getSelectedIds(shipCompare.moduleTypes)
     setSelectedIds(selectedIds)
 }
 
 const setSelectedIds = (selectedIds: ShipColumnTypeList<SelectedId>): void => {
-    for (const columnId of columnIds) {
-        shipCompare.setShip(columnId, selectedIds[columnId].ship)
-        shipCompare.setWood(columnId, selectedIds[columnId].wood)
+    for (const columnId of Object.keys(selectedIds)) {
+        shipCompare.selects.setShip(columnId, selectedIds[columnId].ship)
+        shipCompare.selects.setWoods(columnId, selectedIds[columnId].wood)
         shipCompare._initModuleSelects(columnId)
-        shipCompare._setModules(columnId, selectedIds[columnId].modules)
+        shipCompare.selects.setModules(columnId, selectedIds[columnId].modules)
 
         shipCompare._refreshColumn(columnId)
     }
