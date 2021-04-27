@@ -19,6 +19,7 @@ const { SubresourceIntegrityPlugin } = require("webpack-subresource-integrity")
 const TerserPlugin = require("terser-webpack-plugin")
 const svgToMiniDataURI = require("mini-svg-data-uri")
 const { extendDefaultPlugins, optimize } = require("svgo")
+const { TsconfigPathsPlugin } = require("tsconfig-paths-webpack-plugin")
 
 const { getCommonPaths } = require("./dist/js/common/common-dir.cjs")
 const commonPaths = getCommonPaths(__dirname)
@@ -101,15 +102,6 @@ const colourRedLight = colours.get("red-light")
 const colourRedDark = colours.get("red-dark")
 const colourWhite = colours.get("white")
 const colourLight = colours.get("light")
-
-const aliasPaths = {}
-for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
-    aliasPaths[key.replace("/*", "")] = path.resolve(
-        __dirname,
-        TSCONFIG.compilerOptions.baseUrl,
-        value.map((path) => path.replace("/*", ""))[0]
-    )
-}
 
 const babelOpt = {
     cacheDirectory: true,
@@ -330,7 +322,11 @@ const config = {
 
     resolve: {
         extensions: [".ts", ".js", ".json"],
-        alias: aliasPaths,
+        plugins: [
+            new TsconfigPathsPlugin({
+                /* options: see below */
+            }),
+        ],
     },
 
     target: isProduction ? "browserslist" : "web",
