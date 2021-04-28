@@ -1,57 +1,68 @@
+// noinspection ES6PreferShortImport
+/* eslint-disable unicorn/prefer-module */
 /**
  * webpack.config
  */
 
-import path from "node:path"
-
+// eslint-disable-next-line unicorn/prefer-node-protocol
+import path from "path"
 import webpack from "webpack"
 
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 import CopyPlugin from "copy-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
-
+import { FaviconWebpackPlugionOptions } from "favicons-webpack-plugin/src/options"
 import HtmlPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin"
-import parseCss from "css"
-import PreloadWebpackPlugin from "preload-webpack-plugin"
+import parseCss, { Declaration, Rule } from "css"
 import sass from "sass"
 import { SubresourceIntegrityPlugin } from "webpack-subresource-integrity"
 import SitemapPlugin from "sitemap-webpack-plugin"
-
 import TerserPlugin from "terser-webpack-plugin"
-import svgToMiniDataURI from "mini-svg-data-uri";
-
+import svgToMiniDataURI from "mini-svg-data-uri"
+import { argv } from "yargs"
 import { extendDefaultPlugins, optimize } from "svgo"
-import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
+import { readJson } from "./src/js/common/common-file"
+import { getCommonPaths } from "./src/js/common/common-dir"
+import { servers } from "./src/js/common/servers"
+import TSCONFIG from "./tsconfig.json"
+import PACKAGE from "./package.json"
 
-import { getCommonPaths } from "./dist/js/common/common-dir.cjs"
+type AliasPaths = Record<string, string>
+const aliasPaths: AliasPaths = {}
+const { baseUrl, paths } = TSCONFIG.compilerOptions
+for (const [key, value] of Object.entries(paths)) {
+    const basePath = key.replace("/*", "")
+    aliasPaths[basePath] = path.resolve(__dirname, baseUrl, value.map((path) => path.replace("/*", ""))[0])
+}
+
 const commonPaths = getCommonPaths(__dirname)
 const { dirLib, dirOutput, dirSrc } = commonPaths
-
 const dirEjs = path.resolve(dirSrc, "ejs")
 const dirFlags = path.resolve(dirSrc, "images", "flags")
 const dirFonts = path.resolve(dirSrc, "fonts")
 const dirIcons = path.resolve(dirSrc, "icons")
 const dirJs = path.resolve(dirSrc, "js")
 const dirMap = path.resolve(dirSrc, "images", "map")
-const dirPrefixIcons = path.join("images", "icons")
 
+const dirPrefixIcons = path.join("images", "icons")
 const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
 const filePostcssProdConfig = path.resolve(dirSrc, "postcss.prod.config.js")
 const filePostcssDevConfig = path.resolve(dirSrc, "postcss.dev.config.js")
+
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 // Variables
-import PACKAGE from "./package.json"
-import TSCONFIG from "./tsconfig.json";
+interface Repair {
+    percent: number
+    time: number
+    volume: number
+}
+type RepairList = Record<string, Repair>
+const repairs: RepairList = readJson(`${dirLib}/gen-generic/repairs.json`)
 
-import repairs from `${dirLib}/gen-generic/repairs.json`
-import { isProduction } from "webpack-mode"
-const servers = [
-    { id: "eu1", name: "War", type: "PVP" },
-    { id: "eu2", name: "Peace", type: "PVE" },
-]
+const isProduction = argv.mode === "production"
 const { TARGET, QUIET } = process.env
 const isQuiet = Boolean(QUIET)
 
@@ -64,9 +75,9 @@ const descriptionLong =
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
 const regExpFont = /\.(woff2?|ttf)$/
-const regExpCss = /^map\.\w+\.css$/
 
-const setColours = () => {
+type ColourMap = Map<string, string>
+const setColours = (): ColourMap => {
     const compiledCss = sass
         .renderSync({
             file: fileScssPreCompile,
@@ -74,39 +85,36 @@ const setColours = () => {
         .css.toString()
     const parsedCss = parseCss.parse(compiledCss)
     return new Map(
-        parsedCss.stylesheet.rules
-            .filter((rule) => rule.selectors && rule.selectors[0].startsWith(".colour-palette "))
-            .filter(
-                (rule) =>
-                    rule &&
-                    rule.declarations &&
-                    rule.declarations.find((declaration) => declaration.property === "background-color")
+        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+            rule.selectors?.[0].startsWith(".colour-palette ")
+        ) as Rule[])
+            .filter((rule: Rule) =>
+                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
             )
-            .map((rule) => {
-                const d =
-                    rule &&
-                    rule.declarations &&
-                    rule.declarations.find((declaration) => declaration.property === "background-color")
-                return [rule.selectors[0].replace(".colour-palette .", "") || "", d.value || ""]
+            .map((rule: Rule) => {
+                const d = rule?.declarations?.find(
+                    (declaration: Declaration) => declaration.property === "background-color"
+                ) as Declaration
+                return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
             })
     )
 }
 
 const colours = setColours()
-const backgroundColour = colours.get("primary-500")
-const themeColour = colours.get("secondary-500")
-const colourYellowDark = colours.get("yellow-dark")
-const primary700 = colours.get("primary-700")
-const primary200 = colours.get("primary-200")
-const primary300 = colours.get("primary-300")
-const colourGreen = colours.get("green")
-const colourGreenLight = colours.get("green-light")
-const colourGreenDark = colours.get("green-dark")
-const colourRed = colours.get("red")
-const colourRedLight = colours.get("red-light")
-const colourRedDark = colours.get("red-dark")
-const colourWhite = colours.get("white")
-const colourLight = colours.get("light")
+const backgroundColour = colours.get("primary-500") ?? "#e11"
+const themeColour = colours.get("secondary-500") ?? "#e11"
+const colourYellowDark = colours.get("yellow-dark") ?? "#e11"
+const primary700 = colours.get("primary-700") ?? "#e11"
+const primary200 = colours.get("primary-200") ?? "#e11"
+const primary300 = colours.get("primary-300") ?? "#e11"
+const colourGreen = colours.get("green") ?? "#e11"
+const colourGreenLight = colours.get("green-light") ?? "#e11"
+const colourGreenDark = colours.get("green-dark") ?? "#e11"
+const colourRed = colours.get("red") ?? "#e11"
+const colourRedLight = colours.get("red-light") ?? "#e11"
+const colourRedDark = colours.get("red-dark") ?? "#e11"
+const colourWhite = colours.get("white") ?? "#e11"
+const colourLight = colours.get("light") ?? "#e11"
 
 const babelOpt = {
     cacheDirectory: true,
@@ -179,7 +187,7 @@ const svgoOpt = {
 }
 
 // noinspection JSIncompatibleTypesComparison
-const htmlOpt = {
+const htmlOpt: HtmlPlugin.Options = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
     iconLarge: `${dirPrefixIcons}/firefox_app_512x512.png`,
     canonicalUrl: TARGET === "na-map" ? targetUrl : "",
@@ -192,11 +200,11 @@ const htmlOpt = {
     minify: htmlMinifyOpt,
     scriptLoading: "defer",
     servers,
-    template: path.resolve(__dirname, dirEjs, "index.ejs"),
+    template: path.resolve(dirEjs, "index.ejs"),
     title: PACKAGE.description,
 }
 
-const faviconsOpt = {
+const faviconsOpt: FaviconWebpackPlugionOptions = {
     logo: fileLogo,
     cache: true,
     devMode: "webapp",
@@ -207,7 +215,6 @@ const faviconsOpt = {
         appName: PACKAGE.name,
         appShortName: PACKAGE.name,
         background: backgroundColour,
-        fingerprints: false,
         icons: {
             android: true,
             appleIcon: false,
@@ -219,9 +226,7 @@ const faviconsOpt = {
             yandex: false,
         },
         lang: "en-GB",
-        // eslint-disable-next-line camelcase
         start_url: "/",
-        // eslint-disable-next-line camelcase
         theme_color: themeColour,
         version: PACKAGE.version,
     },
@@ -231,13 +236,7 @@ const MiniCssExtractPluginOpt = {
     esModule: true,
 }
 
-const config = {
-    devServer: {
-        host: "localhost",
-        hot: true,
-        open: true,
-    },
-
+const config: webpack.Configuration = {
     devtool: false,
 
     entry: [path.resolve(dirJs, "browser/main.ts")],
@@ -305,33 +304,13 @@ const config = {
         }),
         new HtmlPlugin(htmlOpt),
         new FaviconsPlugin(faviconsOpt),
-        new PreloadWebpackPlugin({
-            rel: "preload",
-            include: "allAssets",
-            fileWhitelist: [regExpFont, regExpCss],
-            as(entry) {
-                if (regExpCss.test(entry)) {
-                    return "style"
-                }
-
-                if (regExpFont.test(entry)) {
-                    return "font"
-                }
-
-                return "script"
-            },
-        }),
-        new SitemapPlugin({ base: targetUrl, paths: sitemapPaths, options: { skipGzip: false } }),
+        new SitemapPlugin({ base: targetUrl, paths: sitemapPaths, options: { skipgzip: false } }),
         new SubresourceIntegrityPlugin(),
     ],
 
     resolve: {
+        alias: aliasPaths,
         extensions: [".ts", ".js", ".json"],
-        plugins: [
-            new TsconfigPathsPlugin({
-                /* options: see below */
-            }),
-        ],
     },
 
     target: isProduction ? "browserslist" : "web",
@@ -410,8 +389,9 @@ const config = {
                 include: dirFlags,
                 type: "asset/inline",
                 generator: {
-                    dataUrl: (content) => {
-                        let svg = content.toString()
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+                    dataUrl: (content: any): string => {
+                        let svg: string = content.toString()
 
                         // Replace with custom colours
                         svg = svg.replace('fill="#fff" fill-opacity="0"/>', `fill="${primary700}" fill-opacity="0.3"/>`)
@@ -430,8 +410,9 @@ const config = {
                 include: dirIcons,
                 type: "asset/inline",
                 generator: {
-                    dataUrl: (content) => {
-                        let svg = content.toString()
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+                    dataUrl: (content: any): string => {
+                        let svg: string = content.toString()
 
                         // Replace with custom colours
                         svg = svg.replace('fill="$themeColour"', `fill="${themeColour}"`)
@@ -469,11 +450,23 @@ if (isProduction && !isQuiet) {
 */
 
 if (isProduction) {
+    if (!config.optimization) {
+        config.optimization = {}
+    }
+
     config.optimization.minimize = true
     config.optimization.minimizer = [
         new CssMinimizerPlugin({
-            minimizerOptions: [{ comments: false, sourceMap: false }],
-            minify: [CssMinimizerPlugin.cssoMinify],
+            minimizerOptions: {
+                preset: [
+                    "default",
+                    {
+                        discardComments: { removeAll: true },
+                    },
+                ],
+            },
+            // @ts-expect-error
+            minify: CssMinimizerPlugin.cssoMinify,
         }),
         new TerserPlugin({
             parallel: true,
@@ -494,4 +487,4 @@ if (isProduction) {
     config.devtool = "eval-source-map"
 }
 
-module.exports = () => config
+export default config
