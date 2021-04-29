@@ -233,7 +233,7 @@
                 </div>
             </div>
 
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown pe-2">
                     <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
                        role="button" title="Map tools" aria-label="Map tools"
@@ -251,7 +251,7 @@
                                     class="small text-end badge badge-pill bg-primary">shift+<span
                                         class="caps">F11</span></span></a>
                         <a class="dropdown-item" id="menu-get-position" href="#">Get position</a>
-                        <a class="dropdown-item" id="menu-make-journey" href="#"> Make journey</a>
+                        <a class="dropdown-item" id="menu-make-journey" href="#">Make journey</a>
                     </div>
                 </li>
 
@@ -280,7 +280,7 @@
                         <a class="dropdown-item" id="menu-list-port-bonuses">Port bonuses</a>
                         <a class="dropdown-item" id="menu-list-recipe-ingredients">Recipe ingredients</a>
                         <a class="dropdown-item" id="menu-list-ships">Ships</a>
-                        <a class="dropdown-item" id="menu-ship-blueprint-list">Ship blueprints</a>
+                        <a class="dropdown-item" id="menu-list-ship-blueprint">Ship blueprints</a>
                         <a class="dropdown-item" id="menu-wood-list">Woods</a>
 
                         <div class="dropdown-divider"></div>
@@ -372,23 +372,25 @@
                         <% makeRadioGroup(dataRadio) %>
                     </div>
                 </li>
-            </ul>
 
-            <div class="btn-group" role="group">
-                <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
-                    <i class="icon icon-clear icon-navbar" aria-hidden="true"></i><span
-                            class="visually-hidden">Clear</span>
-                </button>
-                <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
-                   href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
-                    <i class="icon icon-gift icon-navbar" aria-hidden="true"></i><span
-                            class="visually-hidden">Donate</span>
-                </a>
-                <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
-                    <i class="icon icon-info icon-navbar" aria-hidden="true"></i><span
-                            class="visually-hidden">About</span>
-                </button>
-            </div>
+                <form>
+                    <div class="btn-group" role="group">
+                        <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
+                            <i class="icon icon-clear icon-navbar" aria-hidden="true"></i><span
+                                    class="visually-hidden">Clear</span>
+                        </button>
+                        <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
+                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
+                            <i class="icon icon-gift icon-navbar" aria-hidden="true"></i><span
+                                    class="visually-hidden">Donate</span>
+                        </a>
+                        <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
+                            <i class="icon icon-info icon-navbar" aria-hidden="true"></i><span
+                                    class="visually-hidden">About</span>
+                        </button>
+                    </div>
+                </form>
+            </ul>
         </div>
     </div>
 </nav>
