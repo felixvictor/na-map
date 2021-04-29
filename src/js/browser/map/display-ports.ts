@@ -69,7 +69,9 @@ import {
 import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
 
+// eslint-disable-next-line unicorn/prefer-node-protocol
 import Cookie from "util/cookie"
+// eslint-disable-next-line unicorn/prefer-node-protocol
 import RadioButton from "util/radio-button"
 import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"
@@ -191,6 +193,7 @@ export default class DisplayPorts {
     #regionPolygon!: Area[]
     #regionPolygonFiltered!: Area[]
     #scale = 0
+    #tooltip: BSTooltip | undefined = undefined
     #upperBound = {} as Point
     readonly #baseId = "show-radius"
     readonly #circleSize = defaultCircleSize
@@ -231,10 +234,6 @@ export default class DisplayPorts {
          * Get showRadius setting from cookie or use default value
          */
         this.showRadius = this._getShowRadiusSetting()
-    }
-
-    static _hideDetails(this: JQuery.PlainObject): void {
-        $(this).tooltip("dispose")
     }
 
     async init(): Promise<void> {
@@ -978,15 +977,25 @@ export default class DisplayPorts {
         return h
     }
 
+    _hideDetails(): void {
+        if (this.#tooltip !== undefined) {
+            this.#tooltip.dispose()
+            this.#tooltip = undefined
+        }
+    }
+
     _showDetails(event: Event, d: PortWithTrades): void {
         const element = event.currentTarget as Element
-        new BSTooltip(element, {
+
+        this._hideDetails()
+        this.#tooltip = new BSTooltip(element, {
             html: true,
             placement: "auto",
             trigger: "manual",
             title: render(this._tooltipData(this._getText(d))),
             sanitize: false,
-        }).show()
+        })
+        this.#tooltip.show()
 
         if (this.map.showTrades.show) {
             if (this.map.showTrades.listType !== "inventory") {
@@ -995,13 +1004,6 @@ export default class DisplayPorts {
 
             this.map.showTrades.update(this._getInventory(d))
         }
-
-        /*
-        const body = document.querySelector("body")
-        const div = document.createElement("div")
-        body?.appendChild(div)
-        render(this._tooltipData(this._getText(d)), div)
-        */
     }
 
     _updateIcons(): void {
@@ -1026,7 +1028,9 @@ export default class DisplayPorts {
                     .on("click", (event: Event, d: PortWithTrades) => {
                         this._showDetails(event, d)
                     })
-                    .on("mouseleave", DisplayPorts._hideDetails)
+                    .on("mouseleave", () => {
+                        this._hideDetails()
+                    })
             )
             .attr("r", circleSize)
     }
@@ -1085,55 +1089,105 @@ export default class DisplayPorts {
         let fill: PortCircleStringF = () => ""
 
         // noinspection IfStatementWithTooManyBranchesJS
-        if (this.showRadius === "tax") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
-            this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
-            cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
-            r = (d): number => this.#portRadius(d.taxIncome) ?? 0
-        } else if (this.showRadius === "net") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
-            this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
-            cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
-            r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
-        } else if (this.showRadius === "points") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints > portPointThreshold)
-            this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
-            cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
-            r = (d): number => this.#portRadius(d.portPoints) ?? 0
-        } else if (this.showRadius === "position") {
-            cssClass = (): string => "bubble here"
-            r = (d): number => d.distance ?? 0
-        } else if (this.showRadius === "attack") {
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
-            this.#attackRadius.range([rMin, rMax / 1.5])
-            cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
-            fill = (d): string =>
-                d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
-            r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
-        } else if (this.circleType === "currentGood") {
-            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
-            r = (): number => rMax / 2
-        } else if (this.showRadius === "county") {
-            cssClass = (d): string =>
-                d.capturable ? (d.countyCapital ? "bubble capital" : "bubble non-capital") : "bubble not-capturable"
-            fill = (d): string => (d.capturable ? this.#colourScaleCounty(d.county) : "")
-            r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
-        } else if (this.showRadius === "tradePorts") {
-            cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
-            r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
-        } else if (this.showRadius === "frontline") {
-            cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
-            r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
-            data = data.filter((d) => d.enemyPort ?? d.ownPort)
-        } else if (this.showRadius === "currentGood") {
-            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
-            r = (): number => rMax / 2
-        } else if (this.showRadius === "off") {
-            data = []
+        switch (this.showRadius) {
+            case "tax": {
+                data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
+                this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
+                cssClass = (): string => "bubble"
+                fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
+                r = (d): number => this.#portRadius(d.taxIncome) ?? 0
+
+                break
+            }
+
+            case "net": {
+                data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
+                this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
+                cssClass = (): string => "bubble"
+                fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
+                r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
+
+                break
+            }
+
+            case "points": {
+                data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints > portPointThreshold)
+                this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
+                cssClass = (): string => "bubble"
+                fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
+                r = (d): number => this.#portRadius(d.portPoints) ?? 0
+
+                break
+            }
+
+            case "position": {
+                cssClass = (): string => "bubble here"
+                r = (d): number => d.distance ?? 0
+
+                break
+            }
+
+            case "attack": {
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
+                this.#attackRadius.range([rMin, rMax / 1.5])
+                cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
+                fill = (d): string =>
+                    d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
+                r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
+
+                break
+            }
+
+            default: {
+                if (this.circleType === "currentGood") {
+                    cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
+                    r = (): number => rMax / 2
+                } else
+                    switch (this.showRadius) {
+                        case "county": {
+                            cssClass = (d): string =>
+                                d.capturable
+                                    ? d.countyCapital
+                                        ? "bubble capital"
+                                        : "bubble non-capital"
+                                    : "bubble not-capturable"
+                            fill = (d): string => (d.capturable ? this.#colourScaleCounty(d.county) : "")
+                            r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
+
+                            break
+                        }
+
+                        case "tradePorts": {
+                            cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
+                            r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
+
+                            break
+                        }
+
+                        case "frontline": {
+                            cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
+                            r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
+                            data = data.filter((d) => d.enemyPort ?? d.ownPort)
+
+                            break
+                        }
+
+                        case "currentGood": {
+                            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
+                            r = (): number => rMax / 2
+
+                            break
+                        }
+
+                        case "off": {
+                            data = []
+
+                            break
+                        }
+                        // No default
+                    }
+            }
         }
 
         this.#gPortCircle
