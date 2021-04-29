@@ -1,5 +1,5 @@
 // noinspection ES6PreferShortImport
-/* eslint-disable unicorn/prefer-module */
+
 /**
  * webpack.config
  */
@@ -15,52 +15,48 @@ import { FaviconWebpackPlugionOptions } from "favicons-webpack-plugin/src/option
 import HtmlPlugin from "html-webpack-plugin"
 import MiniCssExtractPlugin from "mini-css-extract-plugin"
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin"
-import parseCss, { Declaration, Rule } from "css"
-import sass from "sass"
 import { SubresourceIntegrityPlugin } from "webpack-subresource-integrity"
 import SitemapPlugin from "sitemap-webpack-plugin"
 import TerserPlugin from "terser-webpack-plugin"
 import svgToMiniDataURI from "mini-svg-data-uri"
-import { argv } from "yargs"
 import { extendDefaultPlugins, optimize } from "svgo"
-import { readJson } from "./src/js/common/common-file"
-import { getCommonPaths } from "./src/js/common/common-dir"
-import { servers } from "./src/js/common/servers"
-import TSCONFIG from "./tsconfig.json"
+
 import PACKAGE from "./package.json"
-
-type AliasPaths = Record<string, string>
-const aliasPaths: AliasPaths = {}
-const { baseUrl, paths } = TSCONFIG.compilerOptions
-for (const [key, value] of Object.entries(paths)) {
-    const basePath = key.replace("/*", "")
-    aliasPaths[basePath] = path.resolve(__dirname, baseUrl, value.map((path) => path.replace("/*", ""))[0])
-}
-
-const commonPaths = getCommonPaths(__dirname)
-const { dirLib, dirOutput, dirSrc } = commonPaths
-const dirEjs = path.resolve(dirSrc, "ejs")
-const dirFlags = path.resolve(dirSrc, "images", "flags")
-const dirFonts = path.resolve(dirSrc, "fonts")
-const dirIcons = path.resolve(dirSrc, "icons")
-const dirJs = path.resolve(dirSrc, "js")
-const dirMap = path.resolve(dirSrc, "images", "map")
-
-const dirPrefixIcons = path.join("images", "icons")
-const fileLogo = path.resolve(dirSrc, dirPrefixIcons, "logo.png")
-const filePostcssProdConfig = path.resolve(dirSrc, "postcss.prod.config.js")
-const filePostcssDevConfig = path.resolve(dirSrc, "postcss.dev.config.js")
-
-const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
-
-// Variables
-interface Repair {
-    percent: number
-    time: number
-    volume: number
-}
-type RepairList = Record<string, Repair>
-const repairs: RepairList = readJson(`${dirLib}/gen-generic/repairs.json`)
+import { argv } from "yargs"
+import { servers } from "./src/js/common/servers"
+import {
+    backgroundColour,
+    colourGreen,
+    colourGreenDark,
+    colourGreenLight,
+    colourLight,
+    colourRed,
+    colourRedDark,
+    colourRedLight,
+    colourWhite,
+    colourYellowDark,
+    primary200,
+    primary300,
+    primary700,
+    themeColour,
+} from "./src/js/webpack/colours"
+import { repairs } from "./src/js/webpack/repairs"
+import {
+    aliasPaths,
+    dirEjs,
+    dirFlags,
+    dirFonts,
+    dirIcons,
+    dirJs,
+    dirLib,
+    dirMap,
+    dirOutput,
+    dirPrefixIcons,
+    dirSrc,
+    fileLogo,
+    filePostcssDevConfig,
+    filePostcssProdConfig,
+} from "./src/js/webpack/dir"
 
 const isProduction = argv.mode === "production"
 const { TARGET, QUIET } = process.env
@@ -75,46 +71,6 @@ const descriptionLong =
 const sitemapPaths = ["/fonts/", "/icons", "/images"]
 
 const regExpFont = /\.(woff2?|ttf)$/
-
-type ColourMap = Map<string, string>
-const setColours = (): ColourMap => {
-    const compiledCss = sass
-        .renderSync({
-            file: fileScssPreCompile,
-        })
-        .css.toString()
-    const parsedCss = parseCss.parse(compiledCss)
-    return new Map(
-        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
-            rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[])
-            .filter((rule: Rule) =>
-                rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
-            )
-            .map((rule: Rule) => {
-                const d = rule?.declarations?.find(
-                    (declaration: Declaration) => declaration.property === "background-color"
-                ) as Declaration
-                return [rule.selectors?.[0].replace(".colour-palette .", "") ?? "", d.value ?? ""]
-            })
-    )
-}
-
-const colours = setColours()
-const backgroundColour = colours.get("primary-500") ?? "#e11"
-const themeColour = colours.get("secondary-500") ?? "#e11"
-const colourYellowDark = colours.get("yellow-dark") ?? "#e11"
-const primary700 = colours.get("primary-700") ?? "#e11"
-const primary200 = colours.get("primary-200") ?? "#e11"
-const primary300 = colours.get("primary-300") ?? "#e11"
-const colourGreen = colours.get("green") ?? "#e11"
-const colourGreenLight = colours.get("green-light") ?? "#e11"
-const colourGreenDark = colours.get("green-dark") ?? "#e11"
-const colourRed = colours.get("red") ?? "#e11"
-const colourRedLight = colours.get("red-light") ?? "#e11"
-const colourRedDark = colours.get("red-dark") ?? "#e11"
-const colourWhite = colours.get("white") ?? "#e11"
-const colourLight = colours.get("light") ?? "#e11"
 
 const babelOpt = {
     cacheDirectory: true,
