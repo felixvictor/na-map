@@ -47,7 +47,13 @@ export default class Toast {
             .attr("aria-atomic", "true")
 
         const header = this.#toast.append("div").attr("class", "toast-header")
-        header.append("img").attr("class", "rounded me-2").attr("src", iconSmallSrc).attr("alt", "logo")
+        header
+            .append("img")
+            .attr("class", "rounded me-2")
+            .attr("height", "48px")
+            .attr("width", "48px")
+            .attr("src", iconSmallSrc)
+            .attr("alt", "logo")
         header
             .append("em")
             .attr("class", "me-auto")
