@@ -294,7 +294,7 @@ export default class ListCannons {
             this._cannonFamilySelected(type)
         }
 
-        const firstTabEl = document.querySelector(`#${this._getTabId()}li:last-child button`) as HTMLButtonElement
+        const firstTabEl = document.querySelector(`#${this._getTabId()} li:last-child button`) as HTMLButtonElement
         const bsTab = new BSTab(firstTabEl)
         bsTab.show()
     }
