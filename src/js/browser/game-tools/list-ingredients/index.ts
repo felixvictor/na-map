@@ -72,14 +72,14 @@ export default class ListIngredients {
             for (const module of modules) {
                 moduleType = type[0]
 
-                properties = `<tr><td>${module.properties
+                properties = `${module.properties
                     .map((property) => {
                         const amount = property.isPercentage
                             ? formatSignPercent(property.amount / 100)
                             : formatSignInt(property.amount)
                         return `${property.modifier} ${amount}`
                     })
-                    .join("</td></tr><tr><td>")}</td></tr>`
+                    .join("<br>")}`
             }
         }
 
