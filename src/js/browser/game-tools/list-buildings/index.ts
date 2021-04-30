@@ -9,22 +9,22 @@
  */
 
 import { registerEvent } from "../../analytics"
+import { sortBy } from "common/common"
 import { getIdFromBaseName } from "common/common-browser"
 import { formatInt } from "common/common-format"
 import { getCurrencyAmount } from "common/common-game-tools"
-
 import { Building, BuildingResult } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import ListBuildingsSelect from "./select"
 import Modal from "util/modal"
+import Select from "util/select"
 
 export default class ListBuildings {
     readonly #baseId: HtmlString
     readonly #baseName = "List buildings"
     readonly #menuId: HtmlString
-    #modal: Modal | undefined = undefined
-    #select = {} as ListBuildingsSelect
     #buildingData = {} as Building[]
+    #modal: Modal | undefined = undefined
+    #select = {} as Select
 
     constructor() {
         this.#baseId = getIdFromBaseName(this.#baseName)
@@ -58,19 +58,21 @@ export default class ListBuildings {
         })
     }
 
-    _setupSelect(): void {
-        const selectpickerOptions: BootstrapSelectOptions = { noneSelectedText: "Select building" }
+    _getOptions(): HtmlString {
+        return `${this.#buildingData
+            .sort(sortBy(["name"]))
+            .map((building: Building): string => `<option value="${building.name}">${building.name}</option>;`)
+            .join("")}`
+    }
 
-        this.#select = new ListBuildingsSelect(
-            this.#baseId,
-            this.#modal!.selectsSel,
-            selectpickerOptions,
-            this.#buildingData
-        )
+    _setupSelect(): void {
+        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select building" }
+
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions(), false)
     }
 
     _setupSelectListener(): void {
-        this.#select.getSelect$().on("change", () => {
+        this.#select.select$.on("change", () => {
             this._buildingSelected()
         })
     }
@@ -167,7 +169,7 @@ export default class ListBuildings {
      * Show buildings for selected building type
      */
     _buildingSelected(): void {
-        const building = String(this.#select.getSelectedValues())
+        const building = String(this.#select.getValues())
         const div = this.#modal!.outputSel
 
         // Remove old recipe list

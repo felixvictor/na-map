@@ -39,7 +39,6 @@ export default class Modal {
         this.#buttonText = buttonText
         this.#modalId = `modal-${this.baseId}`
         this.#size = `modal-${size}`
-
         this._inject()
         this.#modal = new BSModal(this.#modalSel.node() as Element)
         this.show()
