@@ -12,8 +12,9 @@ import { h, render } from "preact"
 import htm from "htm"
 
 import { registerEvent } from "../../analytics"
+import { sortBy } from "common/common"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatInt } from "common/common-format"
-
 import {
     Loot,
     LootAmount,
@@ -25,11 +26,9 @@ import {
 } from "common/gen-json"
 import { lootType, LootType } from "common/types"
 import { HtmlResult, HtmlString } from "common/interface"
-import { sortBy } from "common/common"
-import ListLootSelect from "./select"
-import { getIdFromBaseName } from "common/common-browser"
-import Select from "util/select"
 import { LootItemMap, SourceDetail } from "list-loot"
+
+import Select from "util/select"
 import Modal from "util/modal"
 
 const html = htm.bind(h)
@@ -39,7 +38,7 @@ export default class ListLoot {
     #items: LootItemMap = new Map()
     #modal: Modal | undefined = undefined
     #optionItems: LootItemMap = new Map()
-    #select = {} as LootTypeList<ListLootSelect>
+    #select = {} as LootTypeList<Select>
     #selectedItemId = 0
     #selectedType: LootType = "" as LootType
     readonly #baseId: HtmlString
@@ -169,11 +168,10 @@ export default class ListLoot {
                 virtualScroll: true,
             }
 
-            this.#select[type] = new ListLootSelect(
-                this.#baseId,
-                this.#modal!.selectsSel,
+            this.#select[type] = new Select(
+                `${this.#baseId}-${type}`,
+                this.#modal!.baseIdSelects,
                 selectpickerOptions,
-                type,
                 this._getOptions(type)
             )
         }
@@ -181,7 +179,7 @@ export default class ListLoot {
 
     _setupSelectListener(): void {
         for (const type of this.#types) {
-            this.#select[type].getSelect$().on("change", () => {
+            this.#select[type].select$.on("change", () => {
                 this.#selectedType = type
                 this._itemSelected()
             })
@@ -289,7 +287,7 @@ export default class ListLoot {
     _resetOtherSelects(): void {
         const types = this.#types.filter((type) => type !== this.#selectedType)
         for (const type of types) {
-            Select.reset(this.#select[type].getSelect$())
+            this.#select[type].reset()
         }
     }
 
@@ -297,7 +295,7 @@ export default class ListLoot {
      * Show items for selected loot or chest
      */
     _itemSelected(): void {
-        this.#selectedItemId = Number(this.#select[this.#selectedType].getSelectedValues())
+        this.#selectedItemId = Number(this.#select[this.#selectedType].getValues())
         const div = this.#modal!.outputSel
 
         this._resetOtherSelects()
