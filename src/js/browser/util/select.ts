@@ -104,12 +104,12 @@ export default class Select {
 
     _injectSelects(): void {
         this.#selectsDiv
-            .append("label")
             .append("select")
             .attr("name", this.#id)
             .attr("id", this.#id)
             .property("multiple", this.#isMultiple)
             .attr("class", "selectpicker")
+        this.#selectsDiv.append("label").attr("for", this.#id)
     }
 
     _init(): void {
