@@ -17,15 +17,15 @@ import { Module, ModuleEntity } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { sortBy } from "common/common"
 import Modal from "util/modal"
-import ListModulesSelect from "./select"
 import { getIdFromBaseName } from "common/common-browser"
+import Select from "util/select"
 
 export default class ListModules {
     readonly #baseId: HtmlString
     readonly #baseName = "List modules"
     readonly #menuId: HtmlString
     #modal: Modal | undefined = undefined
-    #select = {} as ListModulesSelect
+    #select = {} as Select
     #moduleData = {} as Module[]
 
     constructor() {
@@ -60,19 +60,18 @@ export default class ListModules {
         })
     }
 
-    _setupSelect(): void {
-        const selectpickerOptions: BootstrapSelectOptions = { noneSelectedText: "Select module category" }
+    _getOptions(): HtmlString {
+        return `${this.#moduleData.map((type) => `<option value="${type[0]}">${type[0]}</option>`).join("")}`
+    }
 
-        this.#select = new ListModulesSelect(
-            this.#baseId,
-            this.#modal!.selectsSel,
-            selectpickerOptions,
-            this.#moduleData
-        )
+    _setupSelect(): void {
+        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select module category" }
+
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
     }
 
     _setupSelectListener(): void {
-        this.#select.getSelect$().on("change", () => {
+        this.#select.select$.on("change", () => {
             this._moduleSelected()
         })
     }
@@ -178,7 +177,7 @@ export default class ListModules {
      * Show modules for selected module type
      */
     _moduleSelected(): void {
-        const moduleType = String(this.#select.getSelectedValues())
+        const moduleType = String(this.#select.getValues())
         const div = this.#modal!.outputSel
 
         // Remove old recipe list
