@@ -8,6 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { select as d3Select } from "d3-selection"
 import { registerEvent } from "../../analytics"
 import { getIdFromBaseName } from "common/common-browser"
 import { formatInt, formatSignPercent } from "common/common-format"
@@ -16,8 +17,14 @@ import { getServerType, ServerId, ServerType } from "common/servers"
 
 import { Module, RecipeEntity, RecipeGroup } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import ListRecipesSelect from "./select"
+
 import Modal from "util/modal"
+import Select from "util/select"
+import { sortBy } from "common/common"
+import { getOrdinal } from "common/common-math"
+
+const replacer = (match: string, p1: number, p2: number): string =>
+    `${getOrdinal(p1)}\u202F\u2013\u202F${getOrdinal(p2)}`
 
 export default class ListRecipes {
     readonly #baseId: HtmlString
@@ -25,7 +32,7 @@ export default class ListRecipes {
     readonly #menuId: HtmlString
     readonly #serverType: ServerType
     #modal: Modal | undefined = undefined
-    #select = {} as ListRecipesSelect
+    #select = {} as Select
     #moduleData = [] as Module[]
     #recipeData = [] as RecipeGroup[]
     #recipes!: Map<number, RecipeEntity>
@@ -69,8 +76,27 @@ export default class ListRecipes {
         })
     }
 
+    _getOptions(): HtmlString {
+        return this.#recipeData
+            .map(
+                (group) =>
+                    `<optgroup label="${group.group}">${group.recipes
+                        .filter((recipe) => recipe.serverType === "Any" || recipe.serverType === this.#serverType)
+                        .sort(sortBy(["name"]))
+                        .map(
+                            (recipe: RecipeEntity) =>
+                                `<option value="${recipe.id}">${recipe.name.replace(
+                                    /(\d)-(\d)(st|rd|th)/,
+                                    replacer
+                                )}</option>`
+                        )
+                        .join("")}</optgroup>`
+            )
+            .join("")
+    }
+
     _setupSelect(): void {
-        const selectpickerOptions: BootstrapSelectOptions = {
+        const bsSelectOptions: BootstrapSelectOptions = {
             dropupAuto: false,
             liveSearch: true,
             liveSearchNormalize: true,
@@ -79,17 +105,15 @@ export default class ListRecipes {
             virtualScroll: true,
         }
 
-        this.#select = new ListRecipesSelect(
-            this.#baseId,
-            this.#modal!.selectsSel,
-            selectpickerOptions,
-            this.#recipeData,
-            this.#serverType
-        )
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
+
+        d3Select(`#${this.#modal!.baseIdSelects} label`)
+            .attr("class", "text-muted ps-2")
+            .text("Items listed here may not be available in the game (yet).")
     }
 
     _setupSelectListener(): void {
-        this.#select.getSelect$().on("change", () => {
+        this.#select.select$.on("change", () => {
             this._recipeSelected()
         })
     }
@@ -180,7 +204,7 @@ export default class ListRecipes {
      * Show recipes for selected recipe type
      */
     _recipeSelected(): void {
-        const recipeId = Number(this.#select.getSelectedValues())
+        const recipeId = Number(this.#select.getValues())
         const div = this.#modal!.outputSel
 
         // Remove old recipe list
