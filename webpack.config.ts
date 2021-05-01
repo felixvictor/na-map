@@ -4,7 +4,6 @@
  * webpack.config
  */
 
-// eslint-disable-next-line unicorn/prefer-node-protocol
 import path from "path"
 import webpack from "webpack"
 
