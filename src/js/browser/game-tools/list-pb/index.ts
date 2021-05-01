@@ -17,7 +17,7 @@ import utc from "dayjs/plugin/utc.js"
 
 import { registerEvent } from "../../analytics"
 import { capitalizeFirstLetter, findNationByNationShortName } from "common/common"
-import { getIdFromBaseName, insertBaseModal, loadJsonFile } from "common/common-browser"
+import { getIdFromBaseName, loadJsonFile } from "common/common-browser"
 import { displayClan } from "../../util"
 import { PortBattlePerServer } from "common/gen-json"
 import { HtmlString } from "common/interface"
@@ -94,7 +94,7 @@ export default class ListPortBattles {
             this.#modal.show()
         } else {
             await this._loadAndSetupData()
-            this.#modal = new Modal(this.#baseName, "lg")
+            this.#modal = new Modal(this.#baseName, "xl")
             this._pbListSelected()
         }
     }
