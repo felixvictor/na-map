@@ -71,7 +71,10 @@ export default class Modal {
             .attr("aria-label", "Close")
 
         this.#bodySel = content.append("div").attr("class", "modal-body")
-        this.#selectsSel = this.#bodySel.append("div").attr("id", this.#baseIdSelects)
+        this.#selectsSel = this.#bodySel
+            .append("div")
+            .attr("class", "mb-3")
+            .attr("id", this.#baseIdSelects)
         this.#outputSel = this.#bodySel.append("div").attr("id", this.#baseIdOutput)
 
         this.#footerSel = content.append<HTMLElement>("footer").attr("class", "modal-footer")

@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import { ServerId } from "common/servers"
+
 import { checkShipCompareData } from "./compare-ships"
 import ListBuildings from "./list-buildings"
 import ListCannons from "./list-cannons"
@@ -29,7 +31,7 @@ import { ShipCompareSearchParamsRead } from "./compare-ships/search-params-read"
 /**
  * Init
  */
-const init = (serverId: string, readParams?: ShipCompareSearchParamsRead): void => {
+const init = (serverId: ServerId, readParams?: ShipCompareSearchParamsRead): void => {
     checkShipCompareData(readParams)
 
     void new CompareWoods()

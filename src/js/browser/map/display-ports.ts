@@ -69,9 +69,7 @@ import {
 import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
 
-// eslint-disable-next-line unicorn/prefer-node-protocol
 import Cookie from "util/cookie"
-// eslint-disable-next-line unicorn/prefer-node-protocol
 import RadioButton from "util/radio-button"
 import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"

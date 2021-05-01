@@ -8,7 +8,7 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { serverIds } from "common/servers"
+import { ServerId, serverIds } from "common/servers"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
@@ -54,7 +54,7 @@ const radios = new RadioButton(baseId, radioButtonValues)
  * Get server name from cookie or use default value
  * @returns Server name
  */
-const getServerName = (): string => {
+const getServerName = (): ServerId => {
     const r = cookie.get()
 
     radios.set(r)
@@ -105,7 +105,7 @@ const setupListener = (): void => {
  * @param serverId - Server id
  * @param searchParams - Query arguments
  */
-const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
+const loadMap = async (serverId: ServerId, searchParams: URLSearchParams): Promise<void> => {
     const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
     const map = new Map.NAMap(serverId, searchParams)
     await map.MapInit()
@@ -114,7 +114,7 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
 /**
  * Load game tools
  */
-const loadGameTools = async (serverId: string, readParams?: ShipCompareSearchParamsRead): Promise<void> => {
+const loadGameTools = async (serverId: ServerId, readParams?: ShipCompareSearchParamsRead): Promise<void> => {
     const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
     gameTools.init(serverId, readParams)
 }

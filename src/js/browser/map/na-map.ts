@@ -19,6 +19,7 @@ import { mapSize } from "common/common-var"
 import { displayClan } from "../util"
 
 import { MinMaxCoord, ZoomLevel } from "common/interface"
+import { ServerId } from "common/servers"
 
 import Cookie from "util/cookie"
 import Modal from "util/modal"
@@ -75,7 +76,7 @@ class NAMap {
     #modal: Modal | undefined = undefined
 
     readonly rem = defaultFontSize // Font size in px
-    serverName: string
+    serverName: ServerId
     showGrid: string
     showTrades!: ShowTrades
     width = 0
@@ -104,7 +105,7 @@ class NAMap {
      * @param serverName - Naval action server name
      * @param searchParams - Query arguments
      */
-    constructor(serverName: string, searchParams: URLSearchParams) {
+    constructor(serverName: ServerId, searchParams: URLSearchParams) {
         /**
          * Naval action server name
          */
@@ -339,9 +340,9 @@ class NAMap {
         const x = transform.x - scale / 2
         const y = transform.y - scale / 2
         const xMin = Math.max(0, Math.floor((this.#x0 - x) / k))
-        const xMax = Math.min(1 << z0, Math.ceil((this.#x1 - x) / k))
+        const xMax = Math.min(Number(1 << z0), Math.ceil((this.#x1 - x) / k))
         const yMin = Math.max(0, Math.floor((this.#y0 - y) / k))
-        const yMax = Math.min(1 << z0, Math.ceil((this.#y1 - y) / k))
+        const yMax = Math.min(Number(1 << z0), Math.ceil((this.#y1 - y) / k))
         for (let y = yMin; y < yMax; ++y) {
             for (let x = xMin; x < xMax; ++x) {
                 tiles.tiles.push([x, y, z0])
@@ -404,7 +405,7 @@ class NAMap {
 
     _initModal(): void {
         this.#modal = new Modal(`${appTitle} <span class="text-primary small">v${appVersion}</span>`, "lg")
-        const body = this.#modal.getBodySel()
+        const body = this.#modal.bodySel
 
         body.html(
             `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>

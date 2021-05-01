@@ -16,6 +16,7 @@ import { getIdFromBaseName, loadJsonFile } from "common/common-browser"
 import { Selection } from "d3-selection"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { ServerId } from "common/servers"
 import { PortBonus, portBonusType, PortBonusValue } from "common/types"
 
 import Modal from "util/modal"
@@ -38,7 +39,7 @@ export default class ListPortBonus {
     readonly #menuId: HtmlString
     #modal: Modal | undefined = undefined
 
-    readonly #serverId: string
+    readonly #serverId: ServerId
     #portPerServer = [] as PortPerServer[]
     #portBasicData = [] as PortBasic[]
     #pbPerServer = [] as PortBattlePerServer[]
@@ -48,7 +49,7 @@ export default class ListPortBonus {
     #sortIndex = 0
     #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
 
-    constructor(serverId: string) {
+    constructor(serverId: ServerId) {
         this.#serverId = serverId
 
         this.#baseId = getIdFromBaseName(this.#baseName)

@@ -8,11 +8,11 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { select as d3Select, Selection } from "d3-selection"
+import { Selection } from "d3-selection"
 
 import { registerEvent } from "../../analytics"
 import { capitalizeFirstLetter, simpleStringSort } from "common/common"
-import { getIdFromBaseName, insertBaseModal } from "common/common-browser"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatFloatFixed, formatPP } from "common/common-format"
 
 import { WoodJsonData, WoodProperty, WoodTrimOrFrame } from "common/gen-json"

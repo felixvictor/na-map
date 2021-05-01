@@ -21,6 +21,7 @@ import { getIdFromBaseName, loadJsonFile } from "common/common-browser"
 import { displayClan } from "../../util"
 import { PortBattlePerServer } from "common/gen-json"
 import { HtmlString } from "common/interface"
+import { ServerId } from "common/servers"
 import Modal from "util/modal"
 
 dayjs.extend(customParseFormat)
@@ -48,9 +49,9 @@ export default class ListPortBattles {
     readonly #baseId: HtmlString
     readonly #baseName = "List of port battles"
     readonly #menuId: HtmlString
-    readonly #serverId!: string
+    readonly #serverId!: ServerId
 
-    constructor(serverId: string) {
+    constructor(serverId: ServerId) {
         this.#serverId = serverId
 
         this.#baseId = getIdFromBaseName(this.#baseName)

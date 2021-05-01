@@ -348,3 +348,33 @@ svg {
         fill: $primary-100;
     }
 }
+
+.voronoi {
+    .cell {
+        stroke: $white;
+        stroke-width: 1px;
+    }
+
+    .label text {
+        text-anchor: middle !important;
+        fill: $white;
+    }
+
+    .label > .name {
+        dominant-baseline: text-after-edge;
+    }
+
+    .label > .value {
+        dominant-baseline: text-before-edge;
+    }
+
+    .hoverer {
+        fill: transparent;
+        stroke: $white;
+        stroke-width: 0;
+    }
+
+    .hoverer:hover {
+        stroke-width: 3px;
+    }
+}

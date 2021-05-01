@@ -27,19 +27,21 @@ import {
     colourWhite,
     getElementHeight,
     getElementWidth,
+    getIdFromBaseName,
 } from "common/common-browser"
 import dayjs from "dayjs"
 
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { BaseModal } from "./base-modal"
 import { PortBasic } from "common/gen-json"
-import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
+import { DataSource, HtmlString, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
 import { ϕ } from "common/common-math"
 import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
 
 import { NAMap } from "js/browser/map/na-map"
+import Modal from "util/modal"
+import { ServerId } from "common/servers"
 
 dayjs.extend(customParseFormat)
 
@@ -61,7 +63,12 @@ interface DivDimension {
 /**
  *
  */
-export default class PowerMap extends BaseModal {
+export default class PowerMap {
+    #serverId: ServerId
+    readonly #baseId: HtmlString
+    readonly #baseName = "Ownership map"
+    readonly #menuId: HtmlString
+
     #columnsPerRow = 0
     #ctx = {} as CanvasRenderingContext2D
     #dateElem = {} as Selection<HTMLLabelElement, unknown, HTMLElement, unknown>
@@ -89,7 +96,6 @@ export default class PowerMap extends BaseModal {
     #stopCommand = false
     #voronoi = {} as Voronoi<Delaunay.Point>
     readonly #NAMap: NAMap
-    readonly #baseId = "power-map"
     readonly #colourScale: ScaleOrdinal<number, string>
     readonly #coord
     readonly #delayDefault = 200
@@ -97,9 +103,12 @@ export default class PowerMap extends BaseModal {
 
     readonly #speedFactor = 2
 
-    constructor(readonly map: NAMap, readonly serverId: string, readonly coord: MinMaxCoord) {
-        super(serverId, "Ownership map")
+    constructor(readonly map: NAMap, readonly serverId: ServerId, readonly coord: MinMaxCoord) {
+        this.#serverId = serverId
         this.#NAMap = map
+
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
 
         this.#coord = coord
         this.#colourScale = d3ScaleOrdinal<number, string>()
@@ -137,23 +146,21 @@ export default class PowerMap extends BaseModal {
         this._setupData(readData)
     }
 
-    /**
-     * Setup listener
-     */
-    async _setupListener(): Promise<void> {
-        let firstClick = true
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
 
-        ;(document.querySelector(`#${this.buttonId}`) as HTMLButtonElement).addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            } else {
-                this.#index = 0
-            }
+        await this._loadAndSetupData()
+        showCursorWait()
+        this._mapElementsOff()
+        this._initialMapZoom()
+        this._initVoronoi()
+        void this._initCanvas()
+        this._drawPowerMap()
+    }
 
-            registerEvent("Tools", this.baseName)
-
-            this._menuItemSelected()
+    _setupListener(): void {
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
@@ -459,14 +466,14 @@ export default class PowerMap extends BaseModal {
     _initRange(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
 
-        const formGroup = formRow.append("div").attr("class", "form-group col-md-7 form-row mb-0")
+        const formGroup = formRow.append("div").attr("class", "row col-md-7 mb-0")
         this.#rangeInput = formGroup
             .append("div")
             .attr("class", "col-md-5")
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
-            .attr("class", "form-control-range custom-range px-md-2")
+            .attr("class", "form-range px-md-2")
             .attr("style", "height:100%")
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
@@ -659,7 +666,7 @@ export default class PowerMap extends BaseModal {
             .attr("class", "p-2")
         this.#legendControllerElement = legendController.node() as HTMLDivElement
 
-        const formRow = legendController.append("form").append("div").attr("class", "form-row align-items-center")
+        const formRow = legendController.append("form").append("div").attr("class", "row input-group align-items-center")
 
         const ro = new ResizeObserver(() => {
             this._adjustControllerHeight()
@@ -725,17 +732,5 @@ export default class PowerMap extends BaseModal {
         }
         this._initLegend(dim)
         await this._setPattern()
-    }
-
-    /**
-     * Action when menu item is clicked
-     */
-    _menuItemSelected(): void {
-        showCursorWait()
-        this._mapElementsOff()
-        this._initialMapZoom()
-        this._initVoronoi()
-        void this._initCanvas()
-        this._drawPowerMap()
     }
 }
