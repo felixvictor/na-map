@@ -20,7 +20,6 @@ import { ColumnCompare } from "./column-compare"
 import { WoodData } from "./data"
 import { woodType, WoodType } from "common/types"
 import Select from "util/select"
-import CompareShipsModal from "js/browser/game-tools/compare-ships/modal"
 
 type CompareWoodsBaseId = "compare-woods" | "compare-ships" | "ship-journey"
 

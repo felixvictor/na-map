@@ -13,7 +13,12 @@ import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
+import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
+
 import loadImage from "image-promise"
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+dayjs.extend(customParseFormat)
 
 import { registerEvent } from "../analytics"
 import { findNationById, nations, range, sleep } from "common/common"
@@ -29,21 +34,15 @@ import {
     getElementWidth,
     getIdFromBaseName,
 } from "common/common-browser"
-import dayjs from "dayjs"
-
-import customParseFormat from "dayjs/plugin/customParseFormat"
-import { PortBasic } from "common/gen-json"
-import { DataSource, HtmlString, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
 import { ϕ } from "common/common-math"
-import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
 
-import { NAMap } from "js/browser/map/na-map"
-import Modal from "util/modal"
+import { PortBasic } from "common/gen-json"
+import { DataSource, HtmlString, MinMaxCoord, PowerMapList } from "common/interface"
+
 import { ServerId } from "common/servers"
-
-dayjs.extend(customParseFormat)
+import { NAMap } from "js/browser/map/na-map"
 
 interface JsonData {
     power: PowerMapList
@@ -115,7 +114,7 @@ export default class PowerMap {
             .domain(range(0, nations.length - 1))
             .range(nationColourList)
 
-        void this._setupListener()
+        this._setupListener()
     }
 
     _setupData(data: JsonData): void {
@@ -666,7 +665,10 @@ export default class PowerMap {
             .attr("class", "p-2")
         this.#legendControllerElement = legendController.node() as HTMLDivElement
 
-        const formRow = legendController.append("form").append("div").attr("class", "row input-group align-items-center")
+        const formRow = legendController
+            .append("form")
+            .append("div")
+            .attr("class", "row input-group align-items-center")
 
         const ro = new ResizeObserver(() => {
             this._adjustControllerHeight()

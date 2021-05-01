@@ -11,11 +11,6 @@
 import { select as d3Select, Selection } from "d3-selection"
 import { line as d3Line } from "d3-shape"
 
-import { registerEvent } from "../../analytics"
-import { degreesPerSecond, getIdFromBaseName } from "common/common-browser"
-import { compassToDegrees, degreesToCompass, degreesToRadians } from "common/common-math"
-import { displayCompassAndDegrees, printCompassRose } from "../../util"
-
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import utc from "dayjs/plugin/utc"
@@ -23,9 +18,14 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
-import PredictWindModal from "./modal"
+import { registerEvent } from "../../analytics"
+import { degreesPerSecond, getIdFromBaseName } from "common/common-browser"
+import { compassToDegrees, degreesToCompass, degreesToRadians } from "common/common-math"
+import { displayCompassAndDegrees, printCompassRose } from "../../util"
 
 import { HtmlString } from "common/interface"
+
+import PredictWindModal from "./modal"
 
 export default class PredictWind {
     #modal: PredictWindModal | undefined = undefined

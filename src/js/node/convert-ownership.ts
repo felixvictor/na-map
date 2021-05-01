@@ -237,11 +237,11 @@ const processFiles = async (serverId: ServerId, fileNames: string[]): Promise<un
                 .then((decompressedContent) => {
                     if (decompressedContent) {
                         const currentDate = (fileBaseNameRegex[serverId].exec(path.basename(fileName)) ?? [])[1]
-                        parseData(serverId, JSON.parse(decompressedContent.toString()), currentDate)
+                        parseData(serverId, JSON.parse(decompressedContent.toString()) as APIPort[], currentDate)
                     }
                 })
-                .catch((error) => {
-                    throw new Error(error)
+                .catch((error: unknown) => {
+                    throw new Error(error as string)
                 }),
         Promise.resolve()
     )

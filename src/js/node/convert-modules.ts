@@ -31,6 +31,15 @@ import {
 import { ModifierName } from "../common/interface"
 
 type APIModifierName = string
+type CleanedModule = {
+    id: number
+    name: string
+    usageType: string
+    moduleLevel: string
+    properties: ModulePropertiesEntity[]
+    type: string
+    hasSamePropertiesAsPrevious?: boolean | undefined
+}
 
 let apiItems: APIItemGeneric[]
 
@@ -72,7 +81,7 @@ const exceptionalWoodIds = new Set([
  */
 // eslint-disable-next-line complexity
 export const convertModulesAndWoodData = async (): Promise<void> => {
-    const modules = new Map()
+    const modules = new Map<string, CleanedModule>()
 
     const woods = {} as WoodJsonData
     woods.trim = []
@@ -392,11 +401,11 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleType = (module: ModuleConvertEntity): string => {
         let type: string
-        let { moduleLevel, moduleType, permanentType, sortingGroup, usageType } = module
+        let { moduleLevel, moduleType, name, permanentType, sortingGroup, usageType } = module
 
         if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim"
-        } else if (moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
+        } else if (moduleType === "Permanent" && !name.endsWith(" Bonus")) {
             type = "Permanent"
         } else if (usageType === "All" && !sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Perk"
@@ -407,12 +416,12 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         }
 
         // Correct sorting group
-        if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
+        if (name.endsWith("French Rig Refit") || name === "Bridgetown Frame Refit") {
             sortingGroup = "survival"
         }
 
         if (type === "Ship trim") {
-            const result = bonusRegex.exec(module.name)
+            const result = bonusRegex.exec(name)
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
         } else {
             sortingGroup = sortingGroup
@@ -526,13 +535,15 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 }
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
-            modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule)
+            modules.set(
+                cleanedModule.name + cleanedModule.moduleLevel,
+                dontSave ? ({} as CleanedModule) : cleanedModule
+            )
         }
     }
 
-    // Get the not empty setModules and sort
+    // Get the non-empty setModules and sort
     const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]))
     // Group by type
     const modulesGrouped = d3Group(result, (module: ModuleEntity): string => module.type)

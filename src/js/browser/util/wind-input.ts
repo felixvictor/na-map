@@ -36,7 +36,7 @@ export default class WindInput {
 
     _setup(): void {
         // @ts-expect-error
-        window.tooltip = (arguments_) => `${displayCompass(arguments_.value)}<br>${String(arguments_.value)}°`
+        window.tooltip = (arguments_) => `${displayCompass(String(arguments_.value))}<br>${String(arguments_.value)}°`
 
         this.#slider$.roundSlider({
             sliderType: "default",

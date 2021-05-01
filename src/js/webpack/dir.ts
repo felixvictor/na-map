@@ -1,6 +1,5 @@
 // noinspection ES6PreferShortImport
 
-// eslint-disable-next-line unicorn/prefer-node-protocol
 import path from "path"
 import TSCONFIG from "../../../tsconfig.json"
 import { getCommonPaths } from "../common/common-dir"

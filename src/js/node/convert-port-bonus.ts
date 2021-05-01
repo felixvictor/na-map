@@ -40,7 +40,7 @@ const readCSV = () => {
 
     fs.createReadStream(commonPaths.filePortBonusCSV)
         .pipe(csvParser({ separator: ";" }))
-        .on("data", (data) => csvData.push(data))
+        .on("data", (data) => csvData.push(data as CSVData))
         .on("error", (error) => {
             throw error
         })

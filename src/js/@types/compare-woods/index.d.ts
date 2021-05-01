@@ -1,5 +1,5 @@
 declare module "compare-woods" {
-    import { WoodColumnType} from "js/browser/game-tools/compare-woods"
+    import { WoodColumnType } from "js/browser/game-tools/compare-woods"
     import { WoodTrimOrFrame } from "common/gen-json"
     import { ArrayIndex } from "common/interface"
     import { WoodType } from "common/types"

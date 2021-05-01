@@ -110,7 +110,7 @@ export default class DisplayPbZones {
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._showId}`)?.addEventListener("change", (event) => {
+        document.querySelector(`#${this._showId}`)?.addEventListener("change", () => {
             this._showPBZonesSelected()
         })
     }

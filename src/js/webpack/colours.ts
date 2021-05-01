@@ -2,7 +2,6 @@
 
 import sass from "sass"
 import parseCss, { Declaration, Rule } from "css"
-// eslint-disable-next-line unicorn/prefer-node-protocol
 import path from "path"
 import { dirSrc } from "./dir"
 

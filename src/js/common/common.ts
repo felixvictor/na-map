@@ -262,7 +262,7 @@ export class TupleKeyMap<K, V> extends Map {
 
     forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
         for (const [key, value] of this.map.entries()) {
-            callbackfn.call(thisArg, value, JSON.parse(key), this)
+            callbackfn.call(thisArg, value, JSON.parse(key) as K, this)
         }
     }
 }

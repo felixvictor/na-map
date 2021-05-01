@@ -177,9 +177,7 @@ export default class DisplayGrid {
         /**
          * List of ticks (negative values [-max .. 0])
          */
-        const tNeg = tPos
-            // copy values from tPos
-            .slice(0)
+        const tNeg = [...tPos]
             // reverse items
             .reverse()
             // convert to negatives

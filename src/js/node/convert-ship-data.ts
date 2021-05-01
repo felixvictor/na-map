@@ -513,6 +513,7 @@ const addAdditionalData = (addData: ShipData, id: number): void => {
             }
 
             // Get all elements per group
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             for (const [element, value] of Object.entries(values)) {
                 // add value
                 ship[group][element] = value

@@ -20,7 +20,6 @@ import {
     radiansToDegrees,
 } from "common/common-math"
 
-import JQuery from "jquery"
 import { Selection } from "d3-selection"
 
 /**
@@ -69,7 +68,7 @@ export const displayCompassAndDegrees = (wind: number | string, svg = false): st
  * @returns Wind in correctionValueDegrees
  */
 export const getUserWind = (sliderId: string): number => {
-    const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"))
+    const currentUserWind = degreesToCompass(Number($(`#${sliderId}`).roundSlider("getValue")))
     let windDegrees: number
 
     // eslint-disable-next-line unicorn/prefer-ternary

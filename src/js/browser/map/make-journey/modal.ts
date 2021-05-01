@@ -29,7 +29,7 @@ export default class MakeJourneyModal extends Modal {
     }
 
     _injectModal(): void {
-        const body = super.getBodySel()
+        const body = super.bodySel
 
         // Add wind input slider
         this.#windInput = new WindInput(body, this.baseId)

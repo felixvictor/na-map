@@ -608,6 +608,7 @@ export default class DisplayPorts {
     _setupFlags(): void {
         this.#nationIcons = getIcons()
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getPattern = (id: string): SVGPatternElement => {
             const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern")
             pattern.id = id
@@ -618,6 +619,7 @@ export default class DisplayPorts {
             return pattern
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getImage = (nation: NationShortName): SVGImageElement => {
             const image = document.createElementNS("http://www.w3.org/2000/svg", "image")
             image.setAttribute("width", String(this.#iconSize))
@@ -627,6 +629,7 @@ export default class DisplayPorts {
             return image
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getCircleCapital = (): SVGCircleElement => {
             const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
             circleCapital.setAttribute("cx", String(this.#iconSize / 2))
@@ -637,6 +640,7 @@ export default class DisplayPorts {
             return circleCapital
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getRectAvail = (): SVGRectElement => {
             const rectAvail = document.createElementNS("http://www.w3.org/2000/svg", "rect")
             rectAvail.setAttribute("height", "480")

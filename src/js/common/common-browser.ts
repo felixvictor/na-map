@@ -283,6 +283,7 @@ const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<
 }
 
 export const getIcons = (): NationListAlternative<string> => {
+    // eslint-disable-next-line unicorn/prefer-module
     return importAll((require as __WebpackModuleApi.RequireFunction).context("../../images/flags", false, /\.svg$/))
 }
 
@@ -299,4 +300,3 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
 }
 
 export const getIdFromBaseName = (baseName: string): HtmlString => baseName.toLocaleLowerCase().replaceAll(" ", "-")
-
