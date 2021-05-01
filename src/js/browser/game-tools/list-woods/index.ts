@@ -8,28 +8,29 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-
-import "bootstrap/js/dist/modal"
-
 import { select as d3Select, Selection } from "d3-selection"
 
-import { registerEvent } from "../analytics"
-import {
-    capitalizeFirstLetter,
-    simpleStringSort,
-} from "common/common"
-import { insertBaseModal } from "common/common-browser"
+import { registerEvent } from "../../analytics"
+import { capitalizeFirstLetter, simpleStringSort } from "common/common"
+import { getIdFromBaseName, insertBaseModal } from "common/common-browser"
 import { formatFloatFixed, formatPP } from "common/common-format"
 
 import { WoodJsonData, WoodProperty, WoodTrimOrFrame } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import { woodFamily, WoodFamily, WoodType, woodType } from "./compare-woods"
 import { WoodTypeList } from "compare-woods"
+import { woodFamily, WoodFamily, woodType, WoodType } from "common/types"
+import Modal from "util/modal"
 
 /**
  *
  */
 export default class ListWoods {
+    #modal: Modal | undefined = undefined
+    readonly #baseId: HtmlString
+    readonly #baseName = "List woods"
+    readonly #checkboxId: HtmlString
+    readonly #menuId: HtmlString
+
     private _modifiers: WoodTypeList<Set<string>> = {} as WoodTypeList<Set<string>>
     private _rows: WoodTypeList<
         Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>
@@ -44,21 +45,33 @@ export default class ListWoods {
 
     private _woodData: WoodJsonData = {} as WoodJsonData
     private _woodDataDefault: WoodJsonData = {} as WoodJsonData
-    private readonly _baseId: HtmlString
-    private readonly _baseName: string
-    private readonly _buttonId: HtmlString
-    private readonly _checkboxId: HtmlString
-    private readonly _modalId: HtmlString
     private readonly _modifiersNotUsed = new Set(["Column material", "Boarding morale"])
 
     constructor() {
-        this._baseName = "List woods"
-        this._baseId = "wood-list"
-        this._buttonId = `menu-${this._baseId}`
-        this._checkboxId = `checkbox-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
+        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#menuId = `menu-${this.#baseId}`
+        this.#checkboxId = `checkbox-${this.#baseId}`
 
         this._setupListener()
+    }
+
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "xl")
+            this._injectBody()
+            this._woodFamilySelected()
+        }
+    }
+
+    _setupListener(): void {
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
+        })
     }
 
     _getModifiers(type: WoodType): string[] {
@@ -77,7 +90,7 @@ export default class ListWoods {
 
     async _loadData(): Promise<void> {
         this._woodDataDefault = (
-            await import(/* webpackChunkName: "data-woods" */ "../../../../lib/gen-generic/woods.json")
+            await import(/* webpackChunkName: "data-woods" */ "../../../../../lib/gen-generic/woods.json")
         ).default as WoodJsonData
     }
 
@@ -108,21 +121,6 @@ export default class ListWoods {
     async _loadAndSetupData(): Promise<void> {
         await this._loadData()
         this._setupData()
-    }
-
-    _setupListener(): void {
-        let firstClick = true
-
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this._baseName)
-
-            this._woodListSelected()
-        })
     }
 
     _sortRows(type: WoodType, index: number, changeOrder = true): void {
@@ -159,31 +157,27 @@ export default class ListWoods {
         this._tables[type].append("tbody")
     }
 
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName, size: "modal-xl" })
+    _injectBody(): void {
+        const div = this.#modal!.outputSel
 
-        const body = d3Select(`#${this._modalId} .modal-body`)
-
-        const divSwitches = body.append("div").attr("class", "mb-3")
+        const divSwitches = div.append("div").attr("class", "mb-3")
         for (const family of woodFamily) {
-            const divSwitch = divSwitches
-                .append("div")
-                .attr("class", "custom-control custom-switch custom-control-inline")
+            const divSwitch = divSwitches.append("div").attr("class", "form-check form-check-inline form-switch")
             divSwitch
                 .append("input")
-                .attr("id", `${this._checkboxId}-${family}`)
-                .attr("name", `${this._checkboxId}`)
-                .attr("class", "custom-control-input")
+                .attr("id", `${this.#checkboxId}-${family}`)
+                .attr("name", `${this.#checkboxId}`)
+                .attr("class", "form-check-input")
                 .attr("type", "checkbox")
                 .property("checked", true)
             divSwitch
                 .append("label")
-                .attr("for", `${this._checkboxId}-${family}`)
-                .attr("class", "custom-control-label")
+                .attr("for", `${this.#checkboxId}-${family}`)
+                .attr("class", "form-check-label")
                 .text(capitalizeFirstLetter(family))
         }
 
-        this._switchesSel = [...document.querySelectorAll<HTMLInputElement>(`input[name=${this._checkboxId}]`)]
+        this._switchesSel = [...document.querySelectorAll<HTMLInputElement>(`input[name=${this.#checkboxId}]`)]
         for (const input of this._switchesSel) {
             input.addEventListener("change", (event: Event) => {
                 event.preventDefault()
@@ -192,16 +186,12 @@ export default class ListWoods {
         }
 
         for (const type of woodType) {
-            body.append("h5").text(capitalizeFirstLetter(`${type}s`))
-            this._tables[type] = body.append("table").attr("class", "table table-sm small na-table")
+            div.append("h5").text(capitalizeFirstLetter(`${type}s`))
+            this._tables[type] = div.append("table").attr("class", "table table-sm small na-table")
             this._initTable(type)
             this._updateTable(type)
             this._sortRows(type, 0, false)
         }
-    }
-
-    _initModal(): void {
-        this._injectModal()
     }
 
     _getFormattedAmount(property: WoodProperty): HtmlString {
@@ -248,7 +238,7 @@ export default class ListWoods {
         const activeFamilies = new Set<WoodFamily>()
         for (const input of this._switchesSel) {
             if (input.checked) {
-                const family = input.id.replace(`${this._checkboxId}-`, "")!
+                const family = input.id.replace(`${this.#checkboxId}-`, "")!
                 activeFamilies.add(family)
             }
         }
@@ -258,15 +248,5 @@ export default class ListWoods {
             this._updateTable(type)
             this._sortRows(type, this._sortIndex[type], false)
         }
-    }
-
-    _woodListSelected(): void {
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this._modalId}`)) {
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this._modalId}`).modal("show")
     }
 }
