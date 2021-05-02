@@ -162,7 +162,7 @@ text,
 // tooltip
 
 .tooltip {
-    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
+    box-shadow: 0 14px 28px rgba($paper-900, 0.25), 0 10px 10px rgba($paper-900, 0.22);
 
     table {
         margin-bottom: 0;
@@ -188,17 +188,11 @@ text,
 /////////////////////////////////////7
 // table
 
-tr:nth-of-type(even) {
-    background-color: $primary-050;
-}
-
-.sort-table {
+.table-sort {
     thead th {
         cursor: s-resize;
-        border-bottom-color: $white;
     }
 }
-
 
 /////////////////////////////////////7
 // bar
