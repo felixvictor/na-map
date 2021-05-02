@@ -152,7 +152,7 @@ export default class ListPortBonus {
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
             .classed("text-end", (d, i) => i > 1)
-            .attr("role", "columnheader")
+            .attr("scope", "col")
             .style("width", (d, i) => (i > 2 ? "3rem" : ""))
             .text((d) => capitalizeFirstLetter(d.data))
             .on("click", (_event, d) => {
@@ -190,7 +190,10 @@ export default class ListPortBonus {
     }
 
     _listSelected(): void {
-        this.#table = this.#modal!.outputSel.append("table").attr("class", "table table-sm small na-table")
+        this.#table = this.#modal!.outputSel.append("table").attr(
+            "class",
+            "table table-sm table-striped table-hover table-sort"
+        )
 
         this._initTable()
         this._updateTable()

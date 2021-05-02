@@ -130,7 +130,7 @@ export default class ListPortBattles {
             .data(["Time", "Port", "Attacker", "Defender"])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
-            .attr("role", "columnheader")
+            .attr("scope", "col")
             .text((d) => d.data)
             .on("click", (_event, d) => {
                 this._sortRows(d.index)
@@ -154,7 +154,10 @@ export default class ListPortBattles {
     }
 
     _pbListSelected(): void {
-        this.#table = this.#modal!.outputSel.append("table").attr("class", "table table-sm small na-table text-table")
+        this.#table = this.#modal!.outputSel.append("table").attr(
+            "class",
+            "table table-sm table-striped table-hover text-table table-sort"
+        )
         this._initTable()
         this._updateTable()
         this._sortRows(0, false)

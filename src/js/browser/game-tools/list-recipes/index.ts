@@ -64,7 +64,7 @@ export default class ListRecipes {
             this.#modal.show()
         } else {
             await this._loadAndSetupData()
-            this.#modal = new Modal(this.#baseName, "xl")
+            this.#modal = new Modal(this.#baseName, "lg")
             this._setupSelect()
             this._setupSelectListener()
         }
@@ -127,7 +127,7 @@ export default class ListRecipes {
     }
 
     _getRequirementText(currentRecipe: RecipeEntity): HtmlString {
-        let text = '<table class="table table-sm card-table"><tbody>'
+        let text = '<table class="table table-sm table-striped table-hover text-table"><tbody>'
         if (currentRecipe.labourPrice) {
             text += `<tr><td>${currentRecipe.labourPrice} labour hours</td></tr>`
         }
@@ -137,9 +137,9 @@ export default class ListRecipes {
         }
 
         if (currentRecipe.itemRequirements.length > 0) {
-            text += `<tr><td>${currentRecipe.itemRequirements
-                .map((requirement) => `${requirement.amount} ${requirement.name}`)
-                .join("</td></tr><tr><td>")}</td></tr>`
+            text += `${currentRecipe.itemRequirements
+                .map((requirement) => `<tr><td>${requirement.amount} ${requirement.name}</td></tr>`)
+                .join("")}`
         }
 
         text += "</tbody></table>"
@@ -169,7 +169,7 @@ export default class ListRecipes {
 
         if (properties) {
             text += `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`
-            text += `<table class="table table-sm card-table na-table"><tbody>${properties}</tbody></table>`
+            text += `<table class="table table-sm table-striped table-hover text-table"><tbody>${properties}</tbody></table>`
         } else {
             text += `<p>${formatInt(currentRecipe.result.amount)} ${currentRecipe.result.name}</p>`
         }
@@ -184,15 +184,15 @@ export default class ListRecipes {
     _getText(selectedRecipeId: number): HtmlString {
         const currentRecipe = this._getRecipeData(selectedRecipeId)
 
-        let text = '<div class="row no-gutters card-deck">'
+        let text = '<div class="card-group">'
 
-        text += '<div class="card col-6"><div class="card-header">Item</div>'
-        text += '<div class="card-body">'
+        text += '<div class="card"><div class="card-body">'
+        text += '<h5 class="card-title">Item</h5>'
         text += this._getRequirementText(currentRecipe)
         text += "</div></div>"
 
-        text += '<div class="card col-6"><div class="card-header">Result</div>'
-        text += '<div class="card-body">'
+        text += '<div class="card"><div class="card-body">'
+        text += '<h5 class="card-title">Result</h5>'
         text += this._getPropertiesText(currentRecipe)
         text += "</div></div>"
 

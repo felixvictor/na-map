@@ -25,6 +25,11 @@ $overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
 $overlay-text-colour-contrast: $primary-700;
 $overlay-text-colour: color-contrast($overlay-background);
 
+.modal-header,
+.modal-footer {
+    background-color: $paper-200;
+}
+
 .bg-map {
     background-color: $background-map;
 }

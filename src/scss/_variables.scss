@@ -28,6 +28,8 @@ $min-contrast-ratio: 3;
 $body-bg: $paper-200;
 $body-color: $primary-800;
 $body-text-align: left;
+$border-color: $primary-300;
+$text-muted: $paper-700;
 
 // Spacing
 $spacer: 1rem;
@@ -69,10 +71,13 @@ $navbar-light-active-color: rgba($primary-800, 1);
 $navbar-light-disabled-color: rgba($primary-800, 0.4);
 $navbar-light-toggler-border-color: rgba($primary-800, 0.2);
 
+$card-border-width: 0;
+$modal-header-border-width: 0;
+$modal-footer-border-width: 0;
+
 /*
 // Body
-$border-color: $primary-300;
-$text-muted: $primary-700;
+
 
 
 // Links

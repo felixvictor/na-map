@@ -417,9 +417,9 @@ export default class ListShipBlueprints {
 
         const addCard = (title: TableType): void => {
             const card = cardDeck.append("div").attr("class", "card")
-            card.append("div").attr("class", "card-header").text(title)
             const cardBody = card.append("div").attr("class", "card-body")
-            this.#tables[title] = cardBody.append("table").attr("class", "table table-sm card-table")
+            cardBody.append("h5").attr("class", "card-title").text(title)
+            this.#tables[title] = cardBody.append("table").attr("class", "table table-sm table-striped table-hover")
             this.#tables[title].append("thead")
             this.#tables[title].append("tbody")
         }
