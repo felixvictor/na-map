@@ -60,8 +60,14 @@ $tooltip-arrow-height: 0;
 // Toast
 $toast-font-size: $font-size-base;
 
-$dropdown-header-color: $gray-800;
+$dropdown-header-color: $primary-800;
 $table-bg-scale: -85%; // -80% !default;
+
+$navbar-light-color: rgba($primary-800, 0.75);
+$navbar-light-hover-color: rgba($primary-800, 0.8);
+$navbar-light-active-color: rgba($primary-800, 1);
+$navbar-light-disabled-color: rgba($primary-800, 0.4);
+$navbar-light-toggler-border-color: rgba($primary-800, 0.2);
 
 /*
 // Body
