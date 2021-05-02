@@ -10,6 +10,7 @@
 
 /// <reference types="webpack-env" />
 
+import { default as BSDropdown } from "bootstrap/js/dist/dropdown"
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
@@ -118,8 +119,7 @@ export const initMultiDropdownNavbar = (id: string): void => {
     const CLASS_NAME = "has-child-dropdown-show"
     const mainElement = document.querySelector(`#${id}`) as HTMLElement
 
-    // @ts-expect-error
-    bootstrap.Dropdown.prototype.toggle = (function (_original) {
+    BSDropdown.prototype.toggle = (function (_original) {
         return function () {
             for (const e of document.querySelectorAll(`.${CLASS_NAME}`)) {
                 e.classList.remove(CLASS_NAME)
@@ -132,10 +132,9 @@ export const initMultiDropdownNavbar = (id: string): void => {
             }
 
             // @ts-expect-error
-            return _original.call(this)
+            _original.call(this)
         }
-        // @ts-expect-error
-    })(bootstrap.Dropdown.prototype.toggle)
+    })(BSDropdown.prototype.toggle)
 
     for (const dd of mainElement.querySelectorAll(".dropdown")) {
         dd.addEventListener("hide.bs.dropdown", function (this: HTMLElement, e: Event) {
@@ -299,4 +298,5 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
     return Math.floor(width)
 }
 
-export const getIdFromBaseName = (baseName: string): HtmlString => baseName.toLocaleLowerCase().replaceAll(" ", "-")
+export const getIdFromBaseName = (baseName: string): HtmlString =>
+    baseName.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", "")

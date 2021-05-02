@@ -18,24 +18,22 @@ export default class Select {
     readonly #bsSelectOptions: BootstrapSelectOptions
     readonly #id: HtmlString
     readonly #isMultiple: boolean
-    readonly #options: HtmlString
-    readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown> | undefined
 
     // eslint-disable-next-line max-params
     constructor(
         id: HtmlString,
-        selectsDivId: HtmlString,
+        selectsDivId: HtmlString | undefined,
         bsSelectOptions: BootstrapSelectOptions,
         options: HtmlString,
         isMultiple = false
     ) {
         this.#id = `${id}-select`
-        this.#selectsDiv = d3Select(`#${selectsDivId}`)
+        this.#selectsDiv = selectsDivId ? d3Select(`#${selectsDivId}`) : undefined
         this.#bsSelectOptions = bsSelectOptions
-        this.#options = options
         this.#isMultiple = isMultiple
 
-        this._init()
+        this._init(options)
     }
 
     static getSelectValueAsNumberArray(value: string | number | string[] | undefined): number[] {
@@ -98,12 +96,13 @@ export default class Select {
         this.#select$.val(value).selectpicker("refresh")
     }
 
-    _construct(): void {
-        this.#select$.selectpicker(this.#bsSelectOptions)
+    setOptions(options: HtmlString): void {
+        this.select$.empty()
+        this.select$.append(options)
     }
 
     _injectSelects(): void {
-        const div = this.#selectsDiv.append("div")
+        const div = this.#selectsDiv!.append("div")
 
         div.append("select")
             .attr("name", this.#id)
@@ -113,10 +112,17 @@ export default class Select {
         div.append("label").attr("for", this.#id)
     }
 
-    _init(): void {
-        this._injectSelects()
+    _construct(): void {
+        this.#select$.selectpicker(this.#bsSelectOptions)
+    }
+
+    _init(options: HtmlString): void {
+        if (this.#selectsDiv) {
+            this._injectSelects()
+        }
+
         this.#select$ = $(`#${this.#id}`)
-        this.#select$.append(this.#options)
+        this.setOptions(options)
         this._construct()
         this.reset()
     }

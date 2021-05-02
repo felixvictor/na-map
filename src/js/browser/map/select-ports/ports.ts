@@ -8,15 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import SelectPortsSelect from "./select"
-
 import { registerEvent } from "../../analytics"
+import { NationShortName, sortBy, TupleKeyMap } from "common/common"
 import { Coordinate, Distance, getDistance, Point } from "common/common-math"
-import DisplayPorts from "../display-ports"
-
 import { Port, PortIntersection, PortWithTrades, TradeGoodProfit, TradeProfit } from "common/gen-json"
 import { HtmlString } from "common/interface"
-import { NationShortName, sortBy, TupleKeyMap } from "common/common"
+import Select from "util/select"
+import DisplayPorts from "../display-ports"
+import { getIdFromBaseName } from "common/common-browser"
 
 interface SelectPort {
     [index: string]: PortIntersection
@@ -26,38 +25,27 @@ interface SelectPort {
     nation: NationShortName
 }
 
-export default class SelectPortsSelectPorts extends SelectPortsSelect {
-    #dataLoaded = false
+export default class SelectPortsSelectPorts {
+    #baseName = "Show trade relations"
+    #baseId: HtmlString
     #distances = new Map<number, number>()
+    #select = {} as Select
+    #tradePort = {} as PortWithTrades
     readonly #numberPorts: number
     readonly #ports: DisplayPorts
     readonly #sellProfit = new TupleKeyMap<[number, number], TradeProfit>()
-    #tradePort = {} as PortWithTrades
 
     constructor(ports: DisplayPorts) {
-        super("Show trade relations")
-
         this.#ports = ports
         this.#numberPorts = this.#ports.portData.length
 
+        this.#baseId = `port-select-${getIdFromBaseName(this.#baseName)}`
+
+        this._setupSelect()
         this._setupListener()
-        this.select$.selectpicker()
     }
 
-    _setupListener(): void {
-        this.select$.one("show.bs.select", () => {
-            this._injectSelect()
-        })
-        this.selectSel.addEventListener("change", async () => {
-            registerEvent("Menu", this.baseName)
-
-            await this._loadData()
-            this._resetOtherSelects()
-            this._selectSelected()
-        })
-    }
-
-    _injectSelect(): void {
+    _getOptions(): HtmlString {
         const selectPorts: SelectPort[] = this.#ports.portDataDefault
             .map(
                 (d: Port) =>
@@ -69,33 +57,43 @@ export default class SelectPortsSelectPorts extends SelectPortsSelect {
                     } as SelectPort)
             )
             .sort(sortBy(["name"]))
-        const options = `${selectPorts
+
+        return `${selectPorts
             .map(
                 (port: SelectPort): HtmlString =>
-                    `<option data-subtext="${port.nation}" value="${port.coord.toString()}" data-id="${port.id}">${
+                    `<option data-subtext="${port.nation}" value="${port.coord.toString()}/${port.id}">${
                         port.name
                     }</option>`
             )
             .join("")}`
+    }
 
-        this.selectSel.insertAdjacentHTML("beforeend", options)
-        this.select$.selectpicker("refresh")
+    _setupSelect(): void {
+        this.#select = new Select(this.#baseId, undefined, {}, "")
+    }
+
+    _setupListener(): void {
+        this.#select.select$.one("show.bs.select", () => {
+            this.#select.setOptions(this._getOptions())
+            this.#select.reset()
+        })
+        this.#select.select$.one("change", async () => {
+            await this._loadData()
+        })
+        this.#select.select$.on("change", () => {
+            registerEvent("Menu", this.#baseName)
+
+            this._selectSelected()
+        })
     }
 
     async _loadData(): Promise<void> {
-        if (!this.#dataLoaded) {
-            const distances = (
-                await import(/* webpackChunkName: "data-distances" */ "../../../../../lib/gen-generic/distances.json")
-            ).default as Distance[]
-            this.#distances = new Map(
-                distances.map(([fromPortId, toPortId, distance]) => [
-                    fromPortId * this.#numberPorts + toPortId,
-                    distance,
-                ])
-            )
-
-            this.#dataLoaded = true
-        }
+        const distances = (
+            await import(/* webpackChunkName: "data-distances" */ "../../../../../lib/gen-generic/distances.json")
+        ).default as Distance[]
+        this.#distances = new Map(
+            distances.map(([fromPortId, toPortId, distance]) => [fromPortId * this.#numberPorts + toPortId, distance])
+        )
     }
 
     _setTradePortPartners(): void {
@@ -212,15 +210,16 @@ export default class SelectPortsSelectPorts extends SelectPortsSelect {
     }
 
     _selectSelected(): void {
-        const port = this.selectSel.options[this.selectSel.selectedIndex]
-        const c = port?.value.split(",")
-        const id = Number(port?.getAttribute("data-id"))
+        const portData = String(this.#select.getValues())
+
+        const [c, id] = portData.split("/")
+        const [x, y] = c.split(",")
 
         this.#ports.currentPort = {
-            id,
-            coord: { x: Number(c?.[0]), y: Number(c?.[1]) },
+            id: Number(id),
+            coord: { x: Number(x), y: Number(y) },
         }
-        this.#ports.tradePortId = id
+        this.#ports.tradePortId = Number(id)
 
         this._setTradePortPartners()
 

@@ -23,7 +23,7 @@
     <% data.forEach(function(select) { %>
         <% const id = getBaseId(select.title) %>
         <li class="nav-item pe-2">
-            <label><select name="port-select-<%= id %>" id="port-select-<%= id %>" class="selectpicker"
+            <label><select name="port-select-<%= id %>-select" id="port-select-<%= id %>-select" class="selectpicker"
                            data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
                            data-live-search-placeholder="Search ..." data-virtual-scroll="true"
                            title="<%= select.title %>"></select></label>
@@ -152,12 +152,12 @@
                         <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
                             <h6 class="dropdown-header">Port owner</h6>
                                 <label class="dropend">
-                                    <select title="Select nation" name="port-select-select-nation"
-                                            id="port-select-select-nation"></select>
+                                    <select title="Select nation" name="port-select-nation-select"
+                                            id="port-select-nation-select"></select>
                                 </label>
                                 <label class="dropend">
-                                    <select title="Select clan" name="port-select-select-clan"
-                                            id="port-select-select-clan"></select>
+                                    <select title="Select clan" name="port-select-clan-select"
+                                            id="port-select-clan-select"></select>
                                 </label>
 
                             <div class="dropdown-divider"></div>
@@ -184,7 +184,7 @@
                 <% makeSelects(dataSelects) %>
 
                 <div class="nav-item pe-2">
-                    <label><select name="port-select-show-good-availability" id="port-select-show-good-availability" class="d-none"></select></label>
+                    <label><select name="port-select-show-good-availability-select" id="port-select-show-good-availability-select" class="d-none"></select></label>
                 </div>
             </div>
 

@@ -8,36 +8,29 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import SelectPortsSelect from "./select"
 import { registerEvent } from "../../analytics"
 import { GoodList, PortPerServer, PortWithTrades } from "common/gen-json"
-import DisplayPorts from "js/browser/map/display-ports"
+import DisplayPorts from "../display-ports"
+import { HtmlString } from "common/interface"
+import Select from "util/select"
+import { getIdFromBaseName } from "common/common-browser"
 
-export default class SelectPortsSelectGoods extends SelectPortsSelect {
+export default class SelectPortsSelectGoods {
+    #baseName = "Show goods’ relations"
+    #baseId: HtmlString
     #ports: DisplayPorts
+    #select = {} as Select
 
     constructor(ports: DisplayPorts) {
-        super("Show goods’ relations")
-
         this.#ports = ports
 
+        this.#baseId = `port-select-${getIdFromBaseName(this.#baseName)}`
+
+        this._setupSelect()
         this._setupListener()
-        this.select$.selectpicker()
     }
 
-    _setupListener(): void {
-        this.select$.one("show.bs.select", () => {
-            this._injectSelect()
-        })
-        this.selectSel.addEventListener("change", async () => {
-            registerEvent("Menu", this.baseName)
-
-            this._resetOtherSelects()
-            this._selectSelected()
-        })
-    }
-
-    _injectSelect(): void {
+    _getOptions(): HtmlString {
         const selectGoods = new Map<number, string>()
         const types = ["consumesTrading", "dropsTrading", "dropsNonTrading", "producesNonTrading"] as Array<
             keyof PortPerServer
@@ -55,13 +48,28 @@ export default class SelectPortsSelectGoods extends SelectPortsSelect {
         }
 
         const sortedGoods = [...selectGoods].sort((a, b) => a[1].localeCompare(b[1]))
-        const options = `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
-        this.selectSel.insertAdjacentHTML("beforeend", options)
-        this.select$.selectpicker("refresh")
+
+        return `${sortedGoods.map((good) => `<option value="${good[0]}">${good[1]}</option>`).join("")}`
+    }
+
+    _setupSelect(): void {
+        this.#select = new Select(this.#baseId, undefined, {}, "")
+    }
+
+    _setupListener(): void {
+        this.#select.select$.one("show.bs.select", () => {
+            this.#select.setOptions(this._getOptions())
+            this.#select.reset()
+        })
+        this.#select.select$.on("change", () => {
+            registerEvent("Menu", this.#baseName)
+
+            this._selectSelected()
+        })
     }
 
     _selectSelected(): void {
-        const goodSelectedId = Number(this.selectSel.options[this.selectSel.selectedIndex].value)
+        const goodSelectedId = Number(this.#select.getValues())
 
         const sourcePorts = (JSON.parse(
             JSON.stringify(

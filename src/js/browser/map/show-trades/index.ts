@@ -355,7 +355,7 @@ export default class ShowTrades {
         this._showCookie.set(show)
 
         await this.showOrHide()
-        this.#inventorySelect.injectSelect(this.show)
+        this.#inventorySelect.show(this.show)
         this._filterTradesBySelectedNations()
         this._sortLinkData()
         this.update()

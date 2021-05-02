@@ -9,36 +9,85 @@
  */
 
 import { registerEvent } from "../../analytics"
-import { HtmlString } from "common/interface"
+import { getIdFromBaseName } from "common/common-browser"
 import { formatInt, formatSiCurrency } from "common/common-format"
 import { NationShortName, sortBy } from "common/common"
+
+import { HtmlString } from "common/interface"
 import { InventoryEntity } from "common/gen-json"
 
-import SelectPortsSelect from "./select"
+import Select from "util/select"
 import DisplayPorts from "../display-ports"
 import { NAMap } from "../na-map"
 
 type goodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>
 
-export default class SelectPortsSelectInventory extends SelectPortsSelect {
+export default class SelectPortsSelectInventory {
+    #baseName = "Show good availability"
+    #baseId: HtmlString
+    #select = {} as Select
     #isInventorySelected = false
     #map: NAMap
     #ports: DisplayPorts
 
     constructor(ports: DisplayPorts, map: NAMap) {
-        super("Show good availability")
-
         this.#ports = ports
         this.#map = map
 
+        this.#baseId = `port-select-${getIdFromBaseName(this.#baseName)}`
+
+        this._setupSelect()
         this._setupListener()
     }
 
-    _setupListener(): void {
-        this.selectSel.addEventListener("change", async () => {
-            registerEvent("Menu", this.baseName)
+    show(show: boolean): void {
+        const selectSel = this.#select.select$.get(0)
 
-            this._resetOtherSelects()
+        if (show) {
+            selectSel.classList.remove("d-none")
+            ;(selectSel.parentNode as HTMLSelectElement).classList.remove("d-none")
+            this.#select.setOptions(this._getOptions())
+            this.#select.reset()
+        } else {
+            selectSel.classList.add("d-none")
+            ;(selectSel.parentNode as HTMLSelectElement).classList.add("d-none")
+        }
+    }
+
+    _getOptions(): HtmlString {
+        const selectGoods = new Map<number, string>()
+
+        for (const port of this.#ports.portDataDefault) {
+            if (port.inventory) {
+                for (const good of port.inventory) {
+                    selectGoods.set(good.id, this.#ports.tradeItem.get(good.id)?.name ?? "")
+                }
+            }
+        }
+
+        return `${[...selectGoods]
+            .sort((a, b) => a[1].localeCompare(b[1]))
+            .map((good) => `<option value="${good[0]}">${good[1]}</option>`)
+            .join("")}`
+    }
+
+    _setupSelect(): void {
+        const bsSelectOptions = {
+            dropupAuto: false,
+            liveSearch: true,
+            liveSearchNormalize: true,
+            liveSearchPlaceholder: "Search ...",
+            title: this.#baseName,
+            virtualScroll: true,
+        }
+
+        this.#select = new Select(this.#baseId, undefined, bsSelectOptions, "")
+    }
+
+    _setupListener(): void {
+        this.#select.select$.on("change", () => {
+            registerEvent("Menu", this.#baseName)
+
             this._selectSelected()
         })
     }
@@ -75,7 +124,7 @@ export default class SelectPortsSelectInventory extends SelectPortsSelect {
     }
 
     _selectSelected(): void {
-        const goodIdSelected = Number(this.selectSel.options[this.selectSel.selectedIndex].value)
+        const goodIdSelected = Number(this.#select.getValues())
         const buyGoods = new Map() as goodMap
         const sellGoods = new Map() as goodMap
 
@@ -110,44 +159,6 @@ export default class SelectPortsSelectInventory extends SelectPortsSelect {
 
         this.#map.showTrades.update(this._getPortList(goodIdSelected, buyGoods, sellGoods))
         this.#ports.update()
-    }
-
-    injectSelect(show: boolean): void {
-        if (!this.selectSel.classList.contains("selectpicker")) {
-            const selectGoods = new Map<number, string>()
-
-            for (const port of this.#ports.portDataDefault) {
-                if (port.inventory) {
-                    for (const good of port.inventory) {
-                        selectGoods.set(good.id, this.#ports.tradeItem.get(good.id)?.name ?? "")
-                    }
-                }
-            }
-
-            const options = `${[...selectGoods]
-                .sort((a, b) => a[1].localeCompare(b[1]))
-                .map((good) => `<option value="${good[0]}">${good[1]}</option>`)
-                .join("")}`
-
-            this.selectSel.insertAdjacentHTML("beforeend", options)
-            this.selectSel.classList.add("selectpicker")
-            this.select$.selectpicker({
-                dropupAuto: false,
-                liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
-                title: "Show good availability",
-                virtualScroll: true,
-            })
-        }
-
-        if (show) {
-            this.selectSel.classList.remove("d-none")
-            ;(this.selectSel.parentNode as HTMLSelectElement).classList.remove("d-none")
-        } else {
-            this.selectSel.classList.add("d-none")
-            ;(this.selectSel.parentNode as HTMLSelectElement).classList.add("d-none")
-        }
     }
 
     get isInventorySelected(): boolean {
