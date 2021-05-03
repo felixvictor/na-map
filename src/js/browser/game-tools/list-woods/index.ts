@@ -31,17 +31,15 @@ export default class ListWoods {
     readonly #checkboxId: HtmlString
     readonly #menuId: HtmlString
 
-    private _modifiers: WoodTypeList<Set<string>> = {} as WoodTypeList<Set<string>>
-    private _rows: WoodTypeList<
+    private _modifiers = {} as WoodTypeList<Set<string>>
+    private _rows = {} as WoodTypeList<
         Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>
-    > = {} as WoodTypeList<Selection<HTMLTableRowElement, WoodTrimOrFrame, HTMLTableSectionElement, unknown>>
-
-    private _sortAscending: WoodTypeList<boolean> = {} as WoodTypeList<boolean>
-    private _sortIndex: WoodTypeList<number> = {} as WoodTypeList<number>
-    private _switchesSel!: HTMLInputElement[]
-    private _tables: WoodTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>> = {} as WoodTypeList<
-        Selection<HTMLTableElement, unknown, HTMLElement, unknown>
     >
+
+    private _sortAscending = {} as WoodTypeList<boolean>
+    private _sortIndex = {} as WoodTypeList<number>
+    private _switchesSel!: HTMLInputElement[]
+    private _tables = {} as WoodTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>>
 
     private _woodData: WoodJsonData = {} as WoodJsonData
     private _woodDataDefault: WoodJsonData = {} as WoodJsonData
@@ -148,9 +146,9 @@ export default class ListWoods {
             .data(["Wood", ...this._modifiers[type]])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
-            .classed("text-end", (d, i) => i !== 0)
+            .classed("text-start", (d, i) => i === 0)
             .attr("role", "columnheader")
-            .text((d) => d.data)
+            .html((d) => d.data.replace(" ", "<br>"))
             .on("click", (_event, d) => {
                 this._sortRows(type, d.index)
             })
@@ -187,7 +185,9 @@ export default class ListWoods {
 
         for (const type of woodType) {
             div.append("h5").text(capitalizeFirstLetter(`${type}s`))
-            this._tables[type] = div.append("table").attr("class", "table table-sm small na-table")
+            this._tables[type] = div
+                .append("table")
+                .attr("class", "table table-sm table-striped table-hover table-sort")
             this._initTable(type)
             this._updateTable(type)
             this._sortRows(type, 0, false)
@@ -227,7 +227,7 @@ export default class ListWoods {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-end", (d, i) => i !== 0)
+                    .classed("text-start", (d, i) => i === 0)
                     .html((d) => {
                         return d
                     })

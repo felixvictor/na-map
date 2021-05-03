@@ -164,7 +164,7 @@ export default class ListModules {
         let text = ""
         for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm small na-table"><thead>'
+            text += '<table class="table table-sm small table-striped table-hover text-table text-start"><thead>'
             text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"

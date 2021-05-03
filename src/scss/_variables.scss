@@ -9,7 +9,7 @@
 ////
 
 //$enable-caret: true !default;
-$enable-rounded: false;
+//$enable-rounded: true !default;
 $enable-shadows: true;
 //$enable-gradients: false !default;
 //$enable-transitions: true !default;
@@ -62,7 +62,7 @@ $tooltip-arrow-height: 0;
 // Toast
 $toast-font-size: $font-size-base;
 
-$dropdown-header-color: $primary-800;
+$dropdown-header-color: $text-muted;
 $table-bg-scale: -85%; // -80% !default;
 
 $navbar-light-color: rgba($primary-800, 0.75);
@@ -74,6 +74,9 @@ $navbar-light-toggler-border-color: rgba($primary-800, 0.2);
 $card-border-width: 0;
 $modal-header-border-width: 0;
 $modal-footer-border-width: 0;
+$table-border-width: 0;
+$table-cell-padding-x: 0;
+$table-cell-padding-x-sm: 0;
 
 /*
 // Body

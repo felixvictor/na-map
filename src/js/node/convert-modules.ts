@@ -124,7 +124,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
-        ["NONE SHIP_MATERIAL", "Ship material"],
+        // ["NONE SHIP_MATERIAL", "Ship material"],
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acceleration"],
@@ -272,38 +272,45 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         const wood = {} as WoodTrimOrFrame
         wood.id = module.id
 
-        wood.properties = module.APImodifiers.map((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
-            // Add modifier if in modifier map
-            const modifierName = modifiers.get(apiModifierName) ?? ""
-            let amount = modifier.Percentage
-            let isPercentage = true
+        wood.properties = module.APImodifiers
+            // filter unused modifiers
+            .filter((modifier) => {
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
 
-            if (modifier.Absolute) {
-                amount = modifier.Absolute
-                isPercentage = false
-            }
+                return modifiers.get(apiModifierName)
+            })
+            .map((modifier) => {
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+                // Add modifier if in modifier map
+                const modifierName = modifiers.get(apiModifierName)!
+                let amount = modifier.Percentage
+                let isPercentage = true
 
-            // Some modifiers are wrongly indicated as a percentage
-            if (notPercentage.has(modifierName)) {
-                isPercentage = false
-            }
+                if (modifier.Absolute) {
+                    amount = modifier.Absolute
+                    isPercentage = false
+                }
 
-            if (flipAmountForModule.has(modifierName)) {
-                amount *= -1
-            }
+                // Some modifiers are wrongly indicated as a percentage
+                if (notPercentage.has(modifierName)) {
+                    isPercentage = false
+                }
 
-            if (modifierName === "Splinter resistance") {
-                amount = Math.round(amount * 100)
-                isPercentage = true
-            }
+                if (flipAmountForModule.has(modifierName)) {
+                    amount *= -1
+                }
 
-            return {
-                modifier: modifierName ?? "",
-                amount,
-                isPercentage,
-            }
-        })
+                if (modifierName === "Splinter resistance") {
+                    amount = Math.round(amount * 100)
+                    isPercentage = true
+                }
+
+                return {
+                    modifier: modifierName,
+                    amount,
+                    isPercentage,
+                }
+            })
 
         if (module.name.includes("(S)")) {
             wood.family = "seasoned"

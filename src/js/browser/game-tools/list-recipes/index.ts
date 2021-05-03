@@ -127,7 +127,7 @@ export default class ListRecipes {
     }
 
     _getRequirementText(currentRecipe: RecipeEntity): HtmlString {
-        let text = '<table class="table table-sm table-striped table-hover text-table"><tbody>'
+        let text = '<table class="table table-sm table-hover text-table"><tbody>'
         if (currentRecipe.labourPrice) {
             text += `<tr><td>${currentRecipe.labourPrice} labour hours</td></tr>`
         }
@@ -169,7 +169,7 @@ export default class ListRecipes {
 
         if (properties) {
             text += `<h6 class="card-subtitle mb-2 text-muted">${moduleType}</h6>`
-            text += `<table class="table table-sm table-striped table-hover text-table"><tbody>${properties}</tbody></table>`
+            text += `<table class="table table-sm table-hover text-table"><tbody>${properties}</tbody></table>`
         } else {
             text += `<p>${formatInt(currentRecipe.result.amount)} ${currentRecipe.result.name}</p>`
         }

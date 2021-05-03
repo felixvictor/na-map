@@ -10,28 +10,26 @@
 
 @import "mixins";
 
-$background-map: $primary;
-$dark-overlay-background-colour: $primary-800;
-$dark-overlay-background-colour-contrast: $primary-700;
+$dark-overlay-background-colour: $paper-800;
+$dark-overlay-background-colour-contrast: $paper-700;
 $dark-overlay-background: rgba($dark-overlay-background-colour, 0.8);
 $dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, 0.8);
-$dark-overlay-text-colour-contrast: $primary-200;
+$dark-overlay-text-colour-contrast: $paper-200;
 $dark-overlay-text-colour: color-contrast($dark-overlay-background);
 
-$overlay-background-colour: $primary-200;
-$overlay-background-colour-contrast: $primary-050;
+$overlay-background-colour: $paper-200;
+$overlay-background-colour-contrast: $paper-050;
 $overlay-background: rgba($overlay-background-colour, 0.8);
 $overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
-$overlay-text-colour-contrast: $primary-700;
+$overlay-text-colour-contrast: $paper-700;
 $overlay-text-colour: color-contrast($overlay-background);
 
-.modal-header,
 .modal-footer {
     background-color: $paper-200;
 }
 
 .bg-map {
-    background-color: $background-map;
+    background-color: $primary;
 }
 
 text,
@@ -197,6 +195,49 @@ text,
     thead th {
         cursor: s-resize;
     }
+}
+
+th {
+    font-style: italic;
+    font-weight: 400;
+}
+
+table thead {
+    border-bottom: 0.3rem solid $paper-600;
+}
+
+.table-sm thead {
+    border-bottom: 0.2rem solid $paper-600;
+}
+
+.table > thead {
+    vertical-align: top;
+}
+
+table {
+    text-align: end;
+}
+
+.text-table {
+    text-align: start;
+}
+
+
+/////////////////////////////////////7
+// dropdown
+
+.bootstrap-select {
+    .dropdown-menu li a.opt {
+        padding-left: 1rem;
+    }
+}
+
+.dropdown-divider {
+    border: unset;
+}
+
+.dropdown-header {
+    font-size: medium;
 }
 
 /////////////////////////////////////7

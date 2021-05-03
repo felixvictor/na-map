@@ -162,10 +162,10 @@ export const getSailingDistanceInK = (pixelDistance: number): number => pixelDis
  * @returns Formatted Ordinal
  */
 export function getOrdinal(n: number, sup = true): HtmlString {
-    const s = ["th", "st", "nd", "rd"]
+    const s = sup ? ["th", "st", "nd", "rd"] : ["ᵗʰ", "ˢᵗ", "ⁿᵈ", "ʳᵈ"]
     const v = n % 100
     const text = s[(v - 20) % 10] || s[v] || s[0]
-    return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`)
+    return String(n) + text
 }
 
 /**

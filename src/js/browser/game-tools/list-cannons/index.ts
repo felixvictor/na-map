@@ -237,7 +237,7 @@ export default class ListCannons {
         type: CannonType
     ): void {
         this.#sortAscending[type] = true
-        this.#tables[type] = tabContent.append("table").attr("class", "table table-sm small na-table")
+        this.#tables[type] = tabContent.append("table").attr("class", "table table-sm small table-striped table-hover")
         const head = this.#tables[type].append("thead")
         head.append("tr")
             .attr("class", "thead-group")
@@ -294,7 +294,7 @@ export default class ListCannons {
             this._cannonFamilySelected(type)
         }
 
-        const firstTabEl = document.querySelector(`#${this._getTabId()} li:last-child button`) as HTMLButtonElement
+        const firstTabEl = document.querySelector(`#${this._getTabId()} li:first-child button`) as HTMLButtonElement
         const bsTab = new BSTab(firstTabEl)
         bsTab.show()
     }
@@ -312,12 +312,9 @@ export default class ListCannons {
             .selectAll<HTMLTableCellElement, string>("td")
             .data((row): RowData[] => row)
             .join((enter) =>
-                enter
-                    .append("td")
-                    .classed("text-end", (d, i) => i !== 0)
-                    .html((d) => {
-                        return d.formattedValue
-                    })
+                enter.append("td").html((d) => {
+                    return d.formattedValue
+                })
             )
     }
 

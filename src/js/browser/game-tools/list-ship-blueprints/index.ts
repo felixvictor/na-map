@@ -205,6 +205,7 @@ export default class ListShipBlueprints {
             rows.selectAll("td")
                 .data((d) => d)
                 .join((enter) => enter.append("td"))
+                .classed("text-start", (d, i) => i === 0)
                 .html((d) => d)
         }
 

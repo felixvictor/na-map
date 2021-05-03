@@ -151,9 +151,9 @@ export default class ListPortBonus {
             .data(["Port", "Nation", ...portBonusType, "Port points", "Points invested"])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
-            .classed("text-end", (d, i) => i > 1)
+            .classed("text-start", (d, i) => i <= 1)
             .attr("scope", "col")
-            .style("width", (d, i) => (i > 2 ? "3rem" : ""))
+            .style("width", (d, i) => (i >= 2 ? "4rem" : ""))
             .text((d) => capitalizeFirstLetter(d.data))
             .on("click", (_event, d) => {
                 this._sortRows(d.index)
@@ -184,7 +184,7 @@ export default class ListPortBonus {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-end", (d, i) => i > 1)
+                    .classed("text-start", (d, i) => i <= 1)
                     .text((d) => (d === 0 ? "" : String(d)))
             )
     }
@@ -192,7 +192,7 @@ export default class ListPortBonus {
     _listSelected(): void {
         this.#table = this.#modal!.outputSel.append("table").attr(
             "class",
-            "table table-sm table-striped table-hover table-sort"
+            "table table-sm small table-striped table-hover table-sort"
         )
 
         this._initTable()

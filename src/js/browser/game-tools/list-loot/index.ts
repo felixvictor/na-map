@@ -157,6 +157,8 @@ export default class ListLoot {
     }
 
     _setupSelect(): void {
+        this.#modal!.selectsSel.attr("class", "d-flex flex-wrap mb-3")
+
         for (const type of this.#types) {
             const title = type === "loot" ? "ship loot" : type === "fish" ? "fishing region" : type
             const selectpickerOptions: BootstrapSelectOptions = {
@@ -192,12 +194,12 @@ export default class ListLoot {
         chance = true
     ): HtmlResult {
         return html`
-            <table class="table table-sm small na-table no-sort">
+            <table class="table table-sm small table-striped table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">${title}</th>
-                        ${chance ? html`<th scope="col" class="text-end">Chance (0 − 100)</th>` : ""}
-                        <th scope="col" class="text-end">Amount</th>
+                        <th scope="col" class="text-start">${title}</th>
+                        ${chance ? html`<th scope="col">Chance (0 − 100)</th>` : ""}
+                        <th scope="col">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -205,13 +207,11 @@ export default class ListLoot {
                         (item) =>
                             html`
                                 <tr>
-                                    <td>${item.name}</td>
+                                    <td class="text-start">${item.name}</td>
                                     ${chance
-                                        ? html` <td class="text-end">
-                                              ${ListLoot._printChance((item as LootLootItemsEntity).chance)}
-                                          </td>`
+                                        ? html` <td>${ListLoot._printChance((item as LootLootItemsEntity).chance)}</td>`
                                         : ""}
-                                    <td class="text-end">${ListLoot._printAmount(item.amount)}</td>
+                                    <td>${ListLoot._printAmount(item.amount)}</td>
                                 </tr>
                             `
                     )}
@@ -281,7 +281,7 @@ export default class ListLoot {
      * Construct item table
      */
     _getTable(): HtmlResult {
-        return html` <div class="mt-4">${this._getText()}</div> `
+        return html`<div class="mt-4">${this._getText()}</div>`
     }
 
     _resetOtherSelects(): void {

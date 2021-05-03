@@ -73,7 +73,6 @@ export default class Modal {
         this.#bodySel = content.append("div").attr("class", "modal-body")
         this.#selectsSel = this.#bodySel
             .append("div")
-            .attr("class", "mb-3")
             .attr("id", this.#baseIdSelects)
         this.#outputSel = this.#bodySel.append("div").attr("id", this.#baseIdOutput)
 
@@ -81,7 +80,7 @@ export default class Modal {
         this.#footerSel
             .append("button")
             .attr("type", "button")
-            .attr("class", "btn btn-secondary")
+            .attr("class", "btn")
             .attr("data-bs-dismiss", "modal")
             .text(this.#buttonText)
     }

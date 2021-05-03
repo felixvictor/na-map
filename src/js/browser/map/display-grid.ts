@@ -192,18 +192,16 @@ export default class DisplayGrid {
      * Setup x axis
      */
     _setupXAxis(): void {
-        this.#gXAxis.selectAll(".tick text").attr("dx", "-0.3em").attr("dy", "2em")
-        // eslint-disable-next-line unicorn/no-null
-        this.#gXAxis.attr("text-anchor", "end").attr("fill", null).attr("font-family", null)
+        this.#gXAxis.selectAll(".tick text").attr("dx", "-0.3rem").attr("dy", "2rem")
+        this.#gXAxis.attr("font-family", "inherit")
     }
 
     /**
      * Setup y axis
      */
     _setupYAxis(): void {
-        // eslint-disable-next-line unicorn/no-null
-        this.#gYAxis.attr("text-anchor", "end").attr("fill", null).attr("font-family", null)
-        this.#gYAxis.selectAll(".tick text").attr("dx", "3.5em").attr("dy", "-.3em")
+        this.#gYAxis.attr("font-family", "inherit")
+        this.#gYAxis.selectAll(".tick text").attr("dx", "3.5rem").attr("dy", "-.5rem")
     }
 
     /**

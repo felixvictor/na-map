@@ -83,7 +83,7 @@ export default class ListIngredients {
             }
         }
 
-        text = `<h6 class='text-muted text-start'>${moduleType}</h6>`
+        text = `<h6 class='text-muted'>${moduleType}</h6>`
         text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`
 
         return properties ? text : ""
@@ -115,7 +115,7 @@ export default class ListIngredients {
 
         for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm small na-table"><thead>'
+            text += '<table class="table table-sm small table-striped table-hover text-table text-start"><thead>'
             text += "<tr><th>Ingredient</th><th>Recipes</th></tr></thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"

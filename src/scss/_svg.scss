@@ -340,12 +340,13 @@ svg {
     }
 
     line {
-        stroke: $primary-500;
+        stroke: $primary-400;
     }
 
     text {
         font-style: italic;
         fill: $primary-100;
+        text-anchor: end;
     }
 }
 

@@ -150,7 +150,7 @@ export default class ShipList {
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
             .classed("border-top-0", true)
-            .classed("text-end", (d, i) => i !== 1)
+            .classed("text-start", (d, i) => i <= 1)
             .text((d) => d.data)
             .on("click", (_event, d) => {
                 this._sortRows(d.index)
@@ -174,13 +174,16 @@ export default class ShipList {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-end", (d, i) => i !== 1)
+                    .classed("text-start", (d, i) => i <= 1)
                     .html((d) => d[1])
             )
     }
 
     _shipListSelected(): void {
-        this.#table = this.#modal!.outputSel.append("table").attr("class", "table table-sm small na-table")
+        this.#table = this.#modal!.outputSel.append("table").attr(
+            "class",
+            "table table-sm small table-striped table-hove"
+        )
 
         this._initTable()
         this._updateTable()
