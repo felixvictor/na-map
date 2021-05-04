@@ -890,14 +890,16 @@ export default class DisplayPorts {
                               ${port.brLimit}<br />
                               <span class="des">Rating</span>
                           </div>
-                          <div class="me-3">
-                              ${port.capturer}<br />
-                              <span class="des">Capturer</span>
-                          </div>
-                          <div class="me-5">
-                              ${port.captureTime}<br />
-                              <span class="des">Capture</span>
-                          </div>
+                          ${port.capturer
+                              ? html` <div class="me-3">
+                                        ${port.capturer}<br />
+                                        <span class="des">Capturer</span>
+                                    </div>
+                                    <div class="me-5">
+                                        ${port.captureTime}<br />
+                                        <span class="des">Capture</span>
+                                    </div>`
+                              : html``}
 
                           <div class="ms-auto me-3">
                               ${port.taxIncome} (${port.portTax})<br />

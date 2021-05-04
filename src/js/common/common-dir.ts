@@ -34,21 +34,21 @@ interface DirList {
     dirLib: string
     dirGenServer: string
     dirGenGeneric: string
-    fileTwitterRefreshId: string
-    filePbSheet: string
-    filePortBonusCSV: string
-    filePortBonus: string
     fileBuilding: string
     fileCannon: string
     fileLoot: string
     fileModules: string
+    filePbSheet: string
     filePbZone: string
     filePort: string
+    filePortBonus: string
+    filePortBonusCSV: string
     filePrices: string
     fileRecipe: string
     fileRepair: string
     fileShip: string
     fileShipBlueprint: string
+    fileTwitterRefreshId: string
     fileWood: string
 }
 
@@ -77,7 +77,6 @@ export function getCommonPaths(appRoot = process.env.PWD ?? ""): DirList {
 
         fileTwitterRefreshId: buildPath(dirAPI, "response-id.txt"),
 
-        filePbSheet: buildPath(dirGenGeneric, "port-battle.xlsx"),
         filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
         filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),
 
@@ -85,6 +84,7 @@ export function getCommonPaths(appRoot = process.env.PWD ?? ""): DirList {
         fileCannon: buildPath(dirGenGeneric, "cannons.json"),
         fileLoot: buildPath(dirGenGeneric, "loot.json"),
         fileModules: buildPath(dirGenGeneric, "modules.json"),
+        filePbSheet: buildPath(dirGenGeneric, "port-battle.xlsx"),
         filePbZone: buildPath(dirGenGeneric, "pb-zones.json"),
         filePort: buildPath(dirGenGeneric, "ports.json"),
         filePrices: buildPath(dirGenGeneric, "prices.json"),

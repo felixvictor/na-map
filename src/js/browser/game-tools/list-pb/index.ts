@@ -70,9 +70,10 @@ export default class ListPortBattles {
                 const portBattleST = dayjs.utc(port.portBattle)
                 const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
                 const defenderNation = findNationByNationShortName(port.nation)?.name
-                const defender = port.capturer
-                    ? `${defenderNation ?? ""} (${displayClan(port.capturer)})`
-                    : defenderNation ?? ""
+                const defender =
+                    !port.capturer || port.capturer === "RAIDER"
+                        ? defenderNation ?? ""
+                        : `${defenderNation ?? ""} (${displayClan(port.capturer)})`
 
                 return {
                     sort: port.portBattle ?? "",
