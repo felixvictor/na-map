@@ -410,8 +410,6 @@ const flagAcquired = (result: RegExpExecArray): void => {
     const flagsSet = flagsMap.get(nation) ?? new Set<FlagEntity>()
     flagsSet.add(flag)
     flagsMap.set(nation, flagsSet)
-
-    console.log("flagAcquired", flagsSet, flagsMap)
 }
 
 const cleanExpiredAndDoubleEntries = (flagSet: Set<FlagEntity>): Map<string, number> => {
