@@ -55,7 +55,17 @@ export default class ListPortBonus {
         this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
 
-        this._setupListener()
+        if (serverId === "eu1") {
+            this._setupListener()
+        } else {
+            this._removeMenu()
+        }
+    }
+
+    _removeMenu(): void {
+        const menuSel = document.querySelector(`#${this.#menuId}`) as HTMLDivElement
+
+        menuSel.remove()
     }
 
     async _loadData(): Promise<void> {
