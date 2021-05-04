@@ -1,3 +1,5 @@
+import { NationFullName, NationShortName } from "../common/common";
+
 const frontlinesType = ["attacking", "defending"]!
 export type FrontlinesType = typeof frontlinesType[number]
 
@@ -16,6 +18,17 @@ export interface PortBonusJson {
     id: number
     name: string
     portBonus: PortBonus
+}
+
+export interface FlagEntity {
+    [index: string]: number | string
+    expire: string
+    number: number
+}
+export interface FlagsPerNation {
+    [index: string]: NationFullName | FlagEntity[]
+    nation: NationFullName
+    flags: FlagEntity[]
 }
 
 export const woodFamily = ["regular", "seasoned", "exceptional"]!

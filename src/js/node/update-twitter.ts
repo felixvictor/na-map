@@ -23,6 +23,7 @@ import {
     findNationByName,
     findNationByNationShortName,
     simpleStringSort,
+    sortBy,
 } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
@@ -31,6 +32,8 @@ import { flagValidity, portBattleCooldown } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
+import { FlagEntity, FlagsPerNation } from "../common/types"
+const flagsMap = new Map<string, Set<FlagEntity>>()
 
 const commonPaths = getCommonPaths()
 
@@ -42,6 +45,10 @@ const runType = process.argv[6] ?? "full"
 
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`)
 let ports: PortBattlePerServer[] = []
+
+const flagsFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-flags.json`)
+let flagsPerNations: FlagsPerNation[] = []
+
 let Twitter: Twit
 let tweets: string[] = []
 const refreshDefault = "0"
@@ -219,8 +226,7 @@ const getCooldownTime = (tweetTime: string | undefined): string => {
     return portBattleEndTimeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat)
 }
 
-const getActiveTime = (time: string): string =>
-    dayjs.utc(time, dateTimeFormat).add(flagValidity, "hour").format(dateTimeFormat)
+const getActiveTime = (time: dayjs.Dayjs): dayjs.Dayjs => time.add(flagValidity, "days")
 
 const updatePort = (portName: string, updatedPort: PortBattlePerServer): void => {
     const portIndex = getPortIndex(portName)
@@ -395,9 +401,72 @@ const cooledOff = (result: RegExpExecArray): void => {
 const flagAcquired = (result: RegExpExecArray): void => {
     const nation = result[2]
     const numberOfFlags = Number(result[3])
-    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat)
-    const active = getActiveTime(tweetTime)
+    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter)
+    const active = getActiveTime(tweetTime).format(dateTimeFormat)
+
     console.log("      --- conquest flag", numberOfFlags, nation, active)
+
+    const flag = { expire: active, number: numberOfFlags }
+    const flagsSet = flagsMap.get(nation) ?? new Set<FlagEntity>()
+    flagsSet.add(flag)
+    flagsMap.set(nation, flagsSet)
+
+    console.log("flagAcquired", flagsSet, flagsMap)
+}
+
+const cleanExpiredAndDoubleEntries = (flagSet: Set<FlagEntity>): Map<string, number> => {
+    const now = dayjs.utc()
+    const cleanedFlags = new Map<string, number>()
+
+    for (const flag of flagSet) {
+        const expire = dayjs.utc(flag.expire, dateTimeFormat)
+
+        if (expire.isAfter(now)) {
+            cleanedFlags.set(flag.expire, flag.number)
+        }
+    }
+
+    return cleanedFlags
+}
+
+const cleanFlags = (): FlagsPerNation[] => {
+    const cleanedFlagsPerNation = [] as FlagsPerNation[]
+
+    for (const [nation, flagSet] of flagsMap) {
+        const cleanedFlags = cleanExpiredAndDoubleEntries(flagSet)
+
+        if (cleanedFlags.size) {
+            // Map to FlagEntity[]
+            const flags = ([...cleanedFlags].map(([expire, number]) => ({
+                expire,
+                number,
+            })) as FlagEntity[]).sort(sortBy(["expire"]))
+
+            cleanedFlagsPerNation.push({
+                nation,
+                flags,
+            })
+        }
+    }
+
+    return cleanedFlagsPerNation
+}
+
+const initFlags = (): void => {
+    for (const flagsPerNation of flagsPerNations) {
+        const flagsSet = new Set<FlagEntity>()
+        for (const flag of flagsPerNation.flags) {
+            flagsSet.add(flag)
+        }
+
+        flagsMap.set(flagsPerNation.nation, flagsSet)
+    }
+}
+
+const updateFlags = async (): Promise<void> => {
+    const cleanedFlagsPerNation = cleanFlags()
+
+    await saveJsonAsync(flagsFilename, cleanedFlagsPerNation)
 }
 
 const portR = "[A-zÀ-ÿ’ -]+"
@@ -505,8 +574,12 @@ const updatePorts = async (): Promise<void> => {
 
 const updateTwitter = async (): Promise<void> => {
     ports = readJson(portFilename)
+    flagsPerNations = readJson(flagsFilename)
+
+    initFlags()
     await getTweets()
     await updatePorts()
+    await updateFlags()
     if (runType.startsWith("partial")) {
         process.exitCode = Number(!isPortDataChanged)
     }
