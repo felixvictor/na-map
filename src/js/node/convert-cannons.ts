@@ -204,7 +204,11 @@ const addData = (fileData: XmlGeneric): void => {
 
     cannon.name = getName()
     cannon.family = getFamily(cannon.name)
-    if (cannon.family !== "unicorn") {
+    if (
+        cannon.family !== "unicorn" &&
+        !(cannon.family === "defense" && cannon.name === "24 (Fort)") &&
+        !(cannon.family === "defense" && cannon.name === "24 (Tower)")
+    ) {
         cannons[getType()].push(cannon)
     }
 }
