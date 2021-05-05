@@ -82,13 +82,14 @@ export default class CompareShipsModal extends Modal {
     _injectModal(): void {
         const body = super.bodySel
 
+        body.selectAll("div").remove()
         const row = body.append("div").attr("class", "row")
 
         for (const columnId of this.#columnIds) {
             const columnDiv = row
                 .append("div")
                 .attr("id", this.getBaseId(columnId))
-                .attr("class", `col-md-4 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
+                .attr("class", `col-md-4 ${columnId === "base" ? "column-base" : "column-comp bg-paper"}`)
 
             const shipSelectDiv = columnDiv
                 .append("div")

@@ -370,7 +370,7 @@ export class ColumnBase extends Column {
 
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
-            backArmor: `${formatInt(this.shipData.stern.armour)}</br><span class="badge badge-white">${formatInt(
+            backArmor: `${formatInt(this.shipData.stern.armour)}</br><span class="badge bg-white text-muted">${formatInt(
                 this.shipData.stern.thickness
             )}</span>`,
             battleRating: String(this.shipData.battleRating),
@@ -381,7 +381,7 @@ export class ColumnBase extends Column {
             deceleration: formatFloat(this.shipData.ship.deceleration),
             decks: pluralise(this.shipData.guns.decks, "deck"),
             firezoneHorizontalWidth: String(this.shipData.ship.firezoneHorizontalWidth),
-            frontArmor: `${formatInt(this.shipData.bow.armour)}</br><span class="badge badge-white">${formatInt(
+            frontArmor: `${formatInt(this.shipData.bow.armour)}</br><span class="badge bg-white text-muted">${formatInt(
                 this.shipData.bow.thickness
             )}</span>`,
             guns: String(this.shipData.guns.total),
@@ -392,7 +392,7 @@ export class ColumnBase extends Column {
             hullRepairAmount: `${formatInt(
                 (this.shipData.repairAmount!.armour + this.shipData.repairAmount!.armourPerk) * 100
             )}`,
-            hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
+            hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge bg-white text-muted">${formatInt(
                 hullRepairsNeeded * repairsSetSize
             )}</span>`,
             leakResistance: formatSignInt(this.shipData.resistance!.leaks * 100),
@@ -400,13 +400,13 @@ export class ColumnBase extends Column {
             limitFront: this.shipData.guns.gunsPerDeck[4],
             mastBottomArmor: `${formatInt(
                 this.shipData.mast.bottomArmour
-            )}</br><span class="badge badge-white">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
+            )}</br><span class="badge bg-white text-muted">${formatInt(this.shipData.mast.bottomThickness)}</span>`,
             mastMiddleArmor: `${formatInt(
                 this.shipData.mast.middleArmour
-            )}</br><span class="badge badge-white">${formatInt(this.shipData.mast.middleThickness)}</span>`,
-            mastTopArmor: `${formatInt(this.shipData.mast.topArmour)}</br><span class="badge badge-white">${formatInt(
-                this.shipData.mast.topThickness
-            )}</span>`,
+            )}</br><span class="badge bg-white text-muted">${formatInt(this.shipData.mast.middleThickness)}</span>`,
+            mastTopArmor: `${formatInt(
+                this.shipData.mast.topArmour
+            )}</br><span class="badge bg-white text-muted">${formatInt(this.shipData.mast.topThickness)}</span>`,
             maxCrew: formatInt(this.shipData.crew.max),
             maxSpeed: formatFloat(this.shipData.speed.max, 3),
             maxWeight: formatInt(this.shipData.maxWeight),
@@ -418,20 +418,20 @@ export class ColumnBase extends Column {
             rigRepairAmount: `${formatInt(
                 (this.shipData.repairAmount!.sails + this.shipData.repairAmount!.sailsPerk) * 100
             )}`,
-            rigRepairsNeeded: `${formatInt(rigRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
+            rigRepairsNeeded: `${formatInt(rigRepairsNeeded)}\u00A0<span class="badge bg-white text-muted">${formatInt(
                 rigRepairsNeeded * repairsSetSize
             )}</span>`,
             rollAngle: formatInt(this.shipData.ship.rollAngle),
-            rudder: `${formatInt(this.shipData.rudder.armour)}\u00A0<span class="badge badge-white">${formatInt(
+            rudder: `${formatInt(this.shipData.rudder.armour)}\u00A0<span class="badge bg-white text-muted">${formatInt(
                 this.shipData.rudder.thickness
             )}</span>`,
-            rumRepairsNeeded: `${formatInt(rumRepairsNeeded)}\u00A0<span class="badge badge-white">${formatInt(
+            rumRepairsNeeded: `${formatInt(rumRepairsNeeded)}\u00A0<span class="badge bg-white text-muted">${formatInt(
                 rumRepairsNeeded * repairsSetSize
             )}</span>`,
             sailingCrew: formatInt(this.shipData.crew.sailing ?? 0),
             sails: formatInt(this.shipData.sails.armour),
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
-            sideArmor: `${formatInt(this.shipData.sides.armour)}</br><span class="badge badge-white">${formatInt(
+            sideArmor: `${formatInt(this.shipData.sides.armour)}</br><span class="badge bg-white text-muted">${formatInt(
                 this.shipData.sides.thickness
             )}</span>`,
             splinterResistance: formatSignInt(this.shipData.resistance!.splinter * 100),

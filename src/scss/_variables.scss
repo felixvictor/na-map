@@ -78,6 +78,12 @@ $table-border-width: 0;
 $table-cell-padding-x: 0;
 $table-cell-padding-x-sm: 0;
 
+// Badges
+$badge-font-size: 0.9rem;
+$badge-font-weight: 400;
+$badge-padding-y: map-get($spacers, 1) / 1.618;
+$badge-padding-x: map-get($spacers, 1);
+
 /*
 // Body
 

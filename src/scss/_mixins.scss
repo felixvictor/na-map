@@ -17,8 +17,10 @@
 @mixin des {
     position: relative;
     top: -0.4rem;
+    display: inline-flex;
     font-size: small;
     font-stretch: condensed;
+    line-height: 1.1;
 }
 
 /// Defines background colour and a contrasting text colour

@@ -53,7 +53,7 @@ export class Column {
      * @param gunsPerDeck - ShipGunDeck
      */
     static pd(gunsPerDeck: ShipGunDeck): HtmlString {
-        let s = `<span class="badge badge-white">${gunsPerDeck.maxCannonLb}\u202F/\u202F`
+        let s = `<span class="badge bg-white text-muted">${gunsPerDeck.maxCannonLb}\u202F/\u202F`
         // eslint-disable-next-line unicorn/prefer-ternary
         if (gunsPerDeck.maxCarroLb) {
             s += `${gunsPerDeck.maxCarroLb}`
@@ -171,7 +171,7 @@ export class Column {
         text += displayColumn("turnAcceleration", "Turn acceleration")
         text += "</div></div></div>"
 
-        text += displayFirstColumn('Hit points <span class="badge badge-white">Thickness</span>')
+        text += displayFirstColumn('Hit points <span class="badge bg-white text-muted">Thickness</span>')
         text += Column.displaySecondBlock()
         text += displayColumn("sideArmor", "Sides")
         text += displayColumn("structure", "Hull")
@@ -179,7 +179,7 @@ export class Column {
         text += displayColumn("backArmor", "Stern")
         text += "</div></div></div>"
 
-        text += displayFirstColumn('Masts <span class="badge badge-white">Thickness</span>')
+        text += displayFirstColumn('Masts <span class="badge bg-white text-muted">Thickness</span>')
         text += Column.displaySecondBlock()
         text += displayColumn("sails", "Sails")
         text += displayColumn("mastBottomArmor", "Bottom")
@@ -225,7 +225,7 @@ export class Column {
         text += displayColumn("splinterResistance", "Splinter %")
         text += "</div></div></div>"
 
-        text += displayFirstColumn('Repairs needed <span class="badge badge-white">Set of 5</span>')
+        text += displayFirstColumn('Repairs needed <span class="badge bg-white text-muted">Set of 5</span>')
         text += Column.displaySecondBlock()
         text += displayColumn("hullRepairsNeeded", "Hull", 4)
         text += displayColumn("rigRepairsNeeded", "Rig", 4)

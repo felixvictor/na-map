@@ -306,7 +306,7 @@ export class ColumnCompare extends Column {
 
             let diff: number
             let formattedDiff: string
-            let badge = "badge-danger"
+            let badge = "bg-danger"
 
             if (isPercentage) {
                 diff = Number.parseFloat((b - a).toFixed(decimals)) * 100
@@ -316,11 +316,11 @@ export class ColumnCompare extends Column {
                 formattedDiff = formatFloat(Math.abs(diff))
             } else {
                 diff = 1 - a / b
-                formattedDiff = formatPercent(Math.abs(diff), 0)
+                formattedDiff = formatPercent(Math.abs(diff), 0).replace("%", '<span class="x-small">%</span>')
             }
 
             if (diff < 0) {
-                badge = "badge-success"
+                badge = "bg-success"
             }
 
             return `<span class="badge ${badge}">${formattedDiff}</span>`
@@ -436,10 +436,9 @@ export class ColumnCompare extends Column {
             backArmor: `${formatInt(this.shipCompareData.stern.armour)}\u00A0${getDiff(
                 this.shipCompareData.stern.armour,
                 this._shipBaseData.stern.armour
-            )}</br><span class="badge badge-white">${formatInt(this.shipCompareData.stern.thickness)}</span>${getDiff(
-                this.shipCompareData.stern.thickness,
-                this._shipBaseData.stern.thickness
-            )}`,
+            )}</br><span class="badge bg-white text-muted">${formatInt(
+                this.shipCompareData.stern.thickness
+            )}</span>${getDiff(this.shipCompareData.stern.thickness, this._shipBaseData.stern.thickness)}`,
             battleRating: `${this.shipCompareData.battleRating}\u00A0${getDiff(
                 this.shipCompareData.battleRating,
                 this._shipBaseData.battleRating
@@ -480,10 +479,9 @@ export class ColumnCompare extends Column {
             frontArmor: `${formatInt(this.shipCompareData.bow.armour)}\u00A0${getDiff(
                 this.shipCompareData.bow.armour,
                 this._shipBaseData.bow.armour
-            )}</br><span class="badge badge-white">${formatInt(this.shipCompareData.bow.thickness)}</span>${getDiff(
-                this.shipCompareData.bow.thickness,
-                this._shipBaseData.bow.thickness
-            )}`,
+            )}</br><span class="badge bg-white text-muted">${formatInt(
+                this.shipCompareData.bow.thickness
+            )}</span>${getDiff(this.shipCompareData.bow.thickness, this._shipBaseData.bow.thickness)}`,
             guns: `${this.shipCompareData.guns.total}\u00A0${getDiff(
                 this.shipCompareData.guns.total,
                 this._shipBaseData.guns.total
@@ -507,9 +505,9 @@ export class ColumnCompare extends Column {
                 3,
                 true
             )}`,
-            hullRepairsNeeded: `${formatInt(hullRepairsNeededCompare)} <span class="badge badge-white">${formatInt(
-                hullRepairsNeededCompare * repairsSetSize
-            )}</span>`,
+            hullRepairsNeeded: `${formatInt(
+                hullRepairsNeededCompare
+            )} <span class="badge bg-white text-muted">${formatInt(hullRepairsNeededCompare * repairsSetSize)}</span>`,
             leakResistance: `${formatSignInt(this.shipCompareData.resistance!.leaks * 100)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.leaks,
                 this._shipBaseData.resistance!.leaks,
@@ -521,22 +519,21 @@ export class ColumnCompare extends Column {
             mastBottomArmor: `${formatInt(this.shipCompareData.mast.bottomArmour)} ${getDiff(
                 this.shipCompareData.mast.bottomArmour,
                 this._shipBaseData.mast.bottomArmour
-            )}</br><span class="badge badge-white">${formatInt(
+            )}</br><span class="badge bg-white text-muted">${formatInt(
                 this.shipCompareData.mast.bottomThickness
             )}</span>${getDiff(this.shipCompareData.mast.bottomThickness, this._shipBaseData.mast.bottomThickness)}`,
             mastMiddleArmor: `${formatInt(this.shipCompareData.mast.middleArmour)} ${getDiff(
                 this.shipCompareData.mast.middleArmour,
                 this._shipBaseData.mast.middleArmour
-            )}</br><span class="badge badge-white">${formatInt(
+            )}</br><span class="badge bg-white text-muted">${formatInt(
                 this.shipCompareData.mast.middleThickness
             )}</span>${getDiff(this.shipCompareData.mast.middleThickness, this._shipBaseData.mast.middleThickness)}`,
             mastTopArmor: `${formatInt(this.shipCompareData.mast.topArmour)} ${getDiff(
                 this.shipCompareData.mast.topArmour,
                 this._shipBaseData.mast.topArmour
-            )}</br><span class="badge badge-white">${formatInt(this.shipCompareData.mast.topThickness)}</span>${getDiff(
-                this.shipCompareData.mast.topThickness,
-                this._shipBaseData.mast.topThickness
-            )}`,
+            )}</br><span class="badge bg-white text-muted">${formatInt(
+                this.shipCompareData.mast.topThickness
+            )}</span>${getDiff(this.shipCompareData.mast.topThickness, this._shipBaseData.mast.topThickness)}`,
             maxCrew: `${formatInt(this.shipCompareData.crew.max)}\u00A0${getDiff(
                 this.shipCompareData.crew.max,
                 this._shipBaseData.crew.max
@@ -576,10 +573,10 @@ export class ColumnCompare extends Column {
                 3,
                 true
             )}`,
-            rigRepairsNeeded: `${formatInt(rigRepairsNeededCompare)} <span class="badge badge-white">${formatInt(
+            rigRepairsNeeded: `${formatInt(rigRepairsNeededCompare)} <span class="badge bg-white text-muted">${formatInt(
                 rigRepairsNeededCompare * repairsSetSize
             )}</span>`,
-            rumRepairsNeeded: `${formatInt(rumRepairsNeededCompare)} <span class="badge badge-white">${formatInt(
+            rumRepairsNeeded: `${formatInt(rumRepairsNeededCompare)} <span class="badge bg-white text-muted">${formatInt(
                 rumRepairsNeededCompare * repairsSetSize
             )}</span>`,
             sailingCrew: `${formatInt(this.shipCompareData.crew.sailing)}`,
@@ -591,10 +588,9 @@ export class ColumnCompare extends Column {
             sideArmor: `${formatInt(this.shipCompareData.sides.armour)}\u00A0${getDiff(
                 this.shipCompareData.sides.armour,
                 this._shipBaseData.sides.armour
-            )}</br><span class="badge badge-white">${formatInt(this.shipCompareData.sides.thickness)}</span>${getDiff(
-                this.shipCompareData.sides.thickness,
-                this._shipBaseData.sides.thickness
-            )}`,
+            )}</br><span class="badge bg-white text-muted">${formatInt(
+                this.shipCompareData.sides.thickness
+            )}</span>${getDiff(this.shipCompareData.sides.thickness, this._shipBaseData.sides.thickness)}`,
             splinterResistance: `${formatSignInt(this.shipCompareData.resistance!.splinter * 100)}\u00A0${getDiff(
                 this.shipCompareData.resistance!.splinter,
                 this._shipBaseData.resistance!.splinter,
