@@ -573,12 +573,12 @@ export class ColumnCompare extends Column {
                 3,
                 true
             )}`,
-            rigRepairsNeeded: `${formatInt(rigRepairsNeededCompare)} <span class="badge bg-white text-muted">${formatInt(
-                rigRepairsNeededCompare * repairsSetSize
-            )}</span>`,
-            rumRepairsNeeded: `${formatInt(rumRepairsNeededCompare)} <span class="badge bg-white text-muted">${formatInt(
-                rumRepairsNeededCompare * repairsSetSize
-            )}</span>`,
+            rigRepairsNeeded: `${formatInt(
+                rigRepairsNeededCompare
+            )} <span class="badge bg-white text-muted">${formatInt(rigRepairsNeededCompare * repairsSetSize)}</span>`,
+            rumRepairsNeeded: `${formatInt(
+                rumRepairsNeededCompare
+            )} <span class="badge bg-white text-muted">${formatInt(rumRepairsNeededCompare * repairsSetSize)}</span>`,
             sailingCrew: `${formatInt(this.shipCompareData.crew.sailing)}`,
             sails: `${formatInt(this.shipCompareData.sails.armour)}\u00A0${getDiff(
                 this.shipCompareData.sails.armour,

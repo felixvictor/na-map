@@ -102,7 +102,7 @@ export default class Select {
     }
 
     _injectSelects(): void {
-        const div = this.#selectsDiv!.append("div")
+        const div = this.#selectsDiv!.append("div").attr("class", "mb-1")
 
         div.append("select")
             .attr("name", this.#id)

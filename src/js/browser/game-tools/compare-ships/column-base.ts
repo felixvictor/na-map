@@ -370,9 +370,9 @@ export class ColumnBase extends Column {
 
             acceleration: formatFloat(this.shipData.ship.acceleration),
             additionalRow: `${this.shipData.guns.decks < 4 ? "<br>\u00A0" : ""}`,
-            backArmor: `${formatInt(this.shipData.stern.armour)}</br><span class="badge bg-white text-muted">${formatInt(
-                this.shipData.stern.thickness
-            )}</span>`,
+            backArmor: `${formatInt(
+                this.shipData.stern.armour
+            )}</br><span class="badge bg-white text-muted">${formatInt(this.shipData.stern.thickness)}</span>`,
             battleRating: String(this.shipData.battleRating),
             bowRepair: `${formatInt(this.shipData.repairTime.bow)}`,
             cannonBroadside: formatInt(this.shipData.guns.broadside.cannons),
@@ -392,9 +392,9 @@ export class ColumnBase extends Column {
             hullRepairAmount: `${formatInt(
                 (this.shipData.repairAmount!.armour + this.shipData.repairAmount!.armourPerk) * 100
             )}`,
-            hullRepairsNeeded: `${formatInt(hullRepairsNeeded)}\u00A0<span class="badge bg-white text-muted">${formatInt(
-                hullRepairsNeeded * repairsSetSize
-            )}</span>`,
+            hullRepairsNeeded: `${formatInt(
+                hullRepairsNeeded
+            )}\u00A0<span class="badge bg-white text-muted">${formatInt(hullRepairsNeeded * repairsSetSize)}</span>`,
             leakResistance: formatSignInt(this.shipData.resistance!.leaks * 100),
             limitBack: this.shipData.guns.gunsPerDeck[5],
             limitFront: this.shipData.guns.gunsPerDeck[4],
@@ -431,9 +431,9 @@ export class ColumnBase extends Column {
             sailingCrew: formatInt(this.shipData.crew.sailing ?? 0),
             sails: formatInt(this.shipData.sails.armour),
             shipRating: `${getOrdinal(this.shipData.class)} rate`,
-            sideArmor: `${formatInt(this.shipData.sides.armour)}</br><span class="badge bg-white text-muted">${formatInt(
-                this.shipData.sides.thickness
-            )}</span>`,
+            sideArmor: `${formatInt(
+                this.shipData.sides.armour
+            )}</br><span class="badge bg-white text-muted">${formatInt(this.shipData.sides.thickness)}</span>`,
             splinterResistance: formatSignInt(this.shipData.resistance!.splinter * 100),
             sternRepair: `${formatInt(this.shipData.repairTime.stern)}`,
             structure: formatInt(this.shipData.structure.armour),

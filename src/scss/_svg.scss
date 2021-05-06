@@ -18,6 +18,7 @@ svg {
     overflow: auto;
     text {
         pointer-events: none;
+        user-select: none;
         stroke: none;
         text-anchor: start;
         dominant-baseline: mathematical;
@@ -378,4 +379,28 @@ svg {
     .hoverer:hover {
         stroke-width: 3px;
     }
+}
+
+.compass-arc,
+.speed-circle {
+    stroke: $paper-400;
+}
+
+.speed-text text {
+    fill: $paper-500;
+    dominant-baseline: auto;
+}
+
+.base-profile,
+.comp-profile {
+    opacity: 0.5;
+}
+
+.base-profile {
+    fill: $paper-500;
+}
+
+.comp-profile {
+    stroke-width: 3px;
+    stroke: $secondary-800;
 }

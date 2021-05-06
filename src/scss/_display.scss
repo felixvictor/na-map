@@ -281,6 +281,31 @@ table {
     }
 }
 
+/////////////////////////////////////7
+// ship compare
+
+.column-comp {
+    border-left: $paper-100 solid medium;
+}
+
+$padding-small: $padding-third / 1.618;
+$padding-large: $padding-third;
+
+.row-small {
+    padding-bottom: $padding-small;
+}
+
+.compress {
+    line-height: 1;
+}
+
+.col-compress {
+    padding: $padding-large $padding-large 0;
+    .des {
+        top: -$padding-small / 2;
+    }
+}
+
 /*
 
 

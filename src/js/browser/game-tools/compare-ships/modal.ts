@@ -93,7 +93,7 @@ export default class CompareShipsModal extends Modal {
 
             const shipSelectDiv = columnDiv
                 .append("div")
-                .attr("class", "input-group justify-content-between flex-nowrap mb-1")
+                .attr("class", "input-group justify-content-between flex-nowrap mt-1")
 
             // Add clone icon except for first column
             if (columnId !== this.#columnIds[0]) {
