@@ -830,7 +830,7 @@ export default class DisplayPorts {
                     <img
                         alt="${port.icon}"
                         class="flag-icon me-3 align-self-stretch ${iconBorder}"
-                        src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
+                        src="${this.#nationIcons[port.icon]}"
                     />
 
                     <div class="text-start me-1">

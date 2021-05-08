@@ -1,7 +1,7 @@
 /*!
  * This file is part of na-map.
  *
- * @file      List flags.
+ * @file      List conquest flags.
  * @module    game-tools/list-flags
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
@@ -18,7 +18,7 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../../analytics"
-import { getIdFromBaseName, loadJsonFile } from "common/common-browser"
+import { getIcons, getIdFromBaseName, loadJsonFile } from "common/common-browser"
 
 import { Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
@@ -26,12 +26,14 @@ import { ServerId } from "common/servers"
 import { FlagsPerNation } from "common/types"
 
 import Modal from "util/modal"
+import { nations } from "common/common"
 
 type tableRow = [string, string, number]
 
 export default class ListFlags {
     readonly #baseId: HtmlString
     readonly #baseName = "List conquest flags"
+    readonly #inputId: HtmlString
     readonly #menuId: HtmlString
     readonly #serverId: ServerId
     #flagData = [] as FlagsPerNation[]
@@ -47,6 +49,7 @@ export default class ListFlags {
 
         this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
+        this.#inputId = `${this.#baseId}-input`
 
         if (serverId === "eu1") {
             this._setupListener()
@@ -158,6 +161,30 @@ export default class ListFlags {
             )
     }
 
+    _injectSelects(): void {
+        const nationIcons = getIcons()
+        const div = this.#modal!.selectsSel.append("div").attr("class", "mb-3")
+
+        for (const nation of nations
+            .filter((nation) => !(nation.short === "NT" || nation.short === "FT"))
+            .sort((a, b) => a.sortName.localeCompare(b.sortName))) {
+            div.append("input")
+                .attr("type", "radio")
+                .attr("class", "btn-check")
+                .attr("name", this.#inputId)
+                .attr("id", `${this.#inputId}-${nation.short}`)
+                .attr("autocomplete", "off")
+
+            div.append("label")
+                .attr("for", `${this.#inputId}-${nation.short}`)
+                .attr("class", "btn btn-outline-paper")
+                .append("img")
+                .attr("alt", nation.short)
+                .attr("class", "flag-icon-small")
+                .attr("src", `${nationIcons[nation.short]}`)
+        }
+    }
+
     _listSelected(): void {
         this.#table = this.#modal!.outputSel.append("table").attr(
             "class",
@@ -165,6 +192,7 @@ export default class ListFlags {
         )
 
         this._initTable()
+        this._injectSelects()
         this._updateTable()
         this._sortRows(1, false)
     }
