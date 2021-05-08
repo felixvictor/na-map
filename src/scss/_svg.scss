@@ -8,7 +8,7 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
-@mixin svg-text-center {
+@mixin text-center {
     dominant-baseline: central;
     text-anchor: middle;
 }
@@ -25,113 +25,95 @@ svg {
     }
 }
 
-.empty-svg {
-    fill: none;
-    stroke: none;
-}
-
-.svg-text-light {
-    text {
-        fill: $white;
-        stroke: none;
-    }
-}
-
-.svg-text-dark-yellow {
-    text {
-        fill: $yellow-900;
-    }
+.text-end {
+    text-anchor: end;
 }
 
 .svg-text-center {
-    text {
-        @include svg-text-center();
-    }
+    @include text-center();
 }
 
-.svg-text {
-    .rect-background {
-        opacity: 0.2;
-    }
+.opacity-low {
+    opacity: 0.2;
 }
 
-.svg-text-tiny {
+.text-tiny {
     font-size: 15%;
 }
 
-.svg-stroke-light {
-    circle,
-    line,
-    path,
-    rect {
-        fill: none;
-        stroke: $white;
-    }
+.click-circle {
+    cursor: pointer;
 }
 
-.svg-stroke-thick {
+.fill-empty {
+    fill: none;
+}
+
+.fill-white {
+    fill: $white;
+}
+
+.stroke-empty {
+    stroke: none;
+}
+
+.stroke-thick {
     stroke-width: 0.4rem;
 }
 
-.svg-light {
+.fill-yellow-dark {
+    fill: $yellow-900;
+}
+
+.fill-contrast-light {
     fill: $dark-overlay-text-colour-contrast;
-    stroke: none;
 }
 
-.svg-dark {
+.fill-contrast-text {
     fill: $overlay-text-colour-contrast;
-    stroke: none;
 }
 
-.svg-text-dark {
-    text {
-        fill: $overlay-text-colour-contrast;
-        stroke: none;
-        @include svg-text-center();
-    }
+.background-yellow {
+    opacity: 0.7;
+    fill: $yellow-300;
 }
 
-.svg-stroke-dark {
-    circle,
-    line,
-    path,
-    rect {
-        fill: none;
-        stroke: $overlay-text-colour-contrast;
-    }
+.background-primary-light {
+    fill-opacity: 0.3;
+    fill: $primary-300;
 }
 
-.compass {
-    circle {
-        fill: $overlay-background-colour;
-    }
+.background-red {
+    fill-opacity: 0.3;
+    fill: $red-600;
 }
 
-.svg-background-light {
-    path {
-        stroke: $overlay-text-colour-contrast;
-    }
+.stroke-contrast-text {
+    stroke: $overlay-text-colour-contrast;
+}
 
-    rect {
-        fill: $overlay-background;
-    }
+.stroke-primary-light {
+    stroke: $primary-300;
+}
 
-    text {
-        fill: $overlay-text-colour;
-        .des {
-            fill: $overlay-background-colour !important;
-        }
-    }
+.fill-background-light {
+    fill: $overlay-background-colour;
+}
 
-    circle,
-    line {
-        stroke: $overlay-text-colour;
-    }
+.fill-primary-light {
+    fill: $primary-300;
+}
 
-    .text-light-separation {
-        font-size: smaller;
-        fill: $overlay-text-colour-contrast !important;
-    }
+.fill-primary-dark {
+    fill: $primary-700;
+}
+
+.fill-red {
+    fill: $red-600;
+}
+
+.fill-dark {
+    fill: $primary-900;
 }
 
 .svg-background-dark {
@@ -156,139 +138,49 @@ svg {
     }
 }
 
-.svg-background-yellow {
-    opacity: 0.7;
-    fill: $yellow-300;
-}
-
-.path-stroke-primary-light {
-    stroke: $primary-300;
-}
-
-.path-fill-primary-light {
-    fill: $primary-300;
-}
-
-.path-fill-primary-dark {
-    fill: $primary-700;
-}
-
-.path-fill-red {
-    fill: $red-600;
-}
-
-.path-fill-dark {
-    fill: $primary-900;
-}
-
-.path-background-primary-light {
-    fill-opacity: 0.3;
-    fill: $primary-300;
-}
-
-.path-background-red {
-    fill-opacity: 0.3;
-    fill: $red-600;
-}
-
-.text-end {
-    text-anchor: end;
-}
-
-.xf11,
-.xingame-wind,
-.xjourney,
-.xwind-predict {
-    svg {
-        overflow: auto;
-    }
+$ship-outline-colour: $secondary-500;
+.ship-outline {
+    fill: $ship-outline-colour;
+    stroke: $ship-outline-colour;
+    stroke-width: 0.7rem;
 
     circle {
-        fill-opacity: 0.2;
-    }
-
-    path {
-        fill: none;
-        stroke-width: 0.3rem;
+        cursor: pointer;
     }
 
     text {
+        fill: color-contrast($ship-outline-colour);
+        @include text-center();
+    }
+}
+
+$wind-profile-colour: $paper-700;
+.wind-profile-arrow-head {
+    fill: $wind-profile-colour;
+}
+
+.wind-profile-arrow {
+    opacity: 0.5;
+    fill: $wind-profile-colour;
+    stroke: $wind-profile-colour;
+    stroke-width: 0.7rem;
+}
+
+.wind-profile {
+    text {
+        fill: color-contrast($wind-profile-colour);
+    }
+}
+
+.ship-outline,
+.wind-profile {
+    text {
+        font-size: small;
+        pointer-events: none;
+        stroke: none;
         text-anchor: middle;
-        dominant-baseline: central;
+        dominant-baseline: mathematical;
     }
-
-    line {
-        stroke-width: 0.1rem;
-    }
-}
-
-.xingame-wind,
-.xwind-predict {
-    circle {
-        fill: color-yiq($overlay-background);
-    }
-
-    path {
-        stroke: color-yiq($overlay-background);
-    }
-
-    rect {
-        fill: $overlay-background;
-    }
-
-    text {
-        fill: $overlay-text-colour;
-
-        .des {
-            fill: $overlay-background-colour !important;
-        }
-    }
-
-    circle,
-    line {
-        stroke: $overlay-text-colour;
-    }
-
-    .text-light-separation {
-        font-size: smaller;
-        fill: $overlay-text-colour-contrast !important;
-    }
-}
-
-.xf11,
-.xjourney {
-    circle {
-        fill: color-contrast($dark-overlay-background);
-    }
-
-    path {
-        stroke: color-contrast($dark-overlay-background);
-    }
-
-    rect {
-        fill: $dark-overlay-background;
-    }
-
-    text {
-        fill: $dark-overlay-text-colour;
-
-        .des {
-            fill: $dark-overlay-background-colour !important;
-        }
-    }
-
-    circle,
-    line {
-        stroke: $dark-overlay-text-colour;
-    }
-
-    .text-light-separation {
-        fill: $dark-overlay-text-colour-contrast !important;
-    }
-}
-
-.click-circle {
-    cursor: pointer;
 }
 
 .drag-circle {

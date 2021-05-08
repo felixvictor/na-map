@@ -100,7 +100,7 @@ export default class WindRose {
             .attr("markerHeight", width)
             .attr("orient", "auto")
             .append("path")
-            .attr("class", "svg-dark")
+            .attr("class", "fill-contrast-text")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
     }
 
@@ -145,7 +145,7 @@ export default class WindRose {
             .insert("div", ":first-child")
             .attr("id", this.#baseId)
             .attr("class", "block p-0")
-        this.#svg = this.#div.append("svg").attr("class", "small svg-text-dark svg-text-center svg-stroke-dark")
+        this.#svg = this.#div.append("svg").attr("class", "small fill-contrast-text svg-text-center svg-stroke-dark")
     }
 
     _initShowCurrentWind(): void {
@@ -197,7 +197,8 @@ export default class WindRose {
         // Compass rose
         const compassElement = this.#svg
             .append("svg")
-            .attr("class", "compass")
+            .attr("ui-component", "compass")
+            .attr("class", "fill-background-light")
             .attr("x", this.#xCompass)
             .attr("y", this.#yCompass)
         printSmallCompassRose({ element: compassElement, radius: this.#compassRadius })

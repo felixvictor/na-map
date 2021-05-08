@@ -133,7 +133,7 @@ export default class PredictWind {
         // Wind direction
         this.#svg
             .append("path")
-            .attr("class", "svg-stroke-thick")
+            .attr("class", "stroke-thick")
             .datum(lineData)
             .attr("d", line)
             .attr("marker-end", `url(#${this.#arrowId})`)

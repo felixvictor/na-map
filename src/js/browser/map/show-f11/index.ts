@@ -95,7 +95,7 @@ export default class ShowF11 {
         const g = this.#g
             .append("g")
             .attr("transform", `translate(${x},${y})`)
-            .attr("class", "svg-background-dark path-fill-primary-light")
+            .attr("class", "svg-background-dark fill-primary-light")
         const coordRect = g.append("rect")
         const timeRect = g.append("rect")
         g.append("circle").attr("r", circleSize)

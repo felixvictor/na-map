@@ -214,7 +214,6 @@ export default class ShowIncomeMap {
 
                 const svg = div
                     .append("svg")
-                    .attr("class", "svg-text")
                     .attr("width", columnWidth)
                     .attr("height", rowHeight * 2 + rowPadding)
 
@@ -230,7 +229,7 @@ export default class ShowIncomeMap {
                     .style("fill", (d) => getContrastColour(this.#colourScale(d.data.id!)))
 
                 svg.append("rect")
-                    .attr("class", "rect-background")
+                    .attr("class", "opacity-low")
                     .attr("y", rowHeight + rowPadding)
                     .attr("width", columnWidth)
                     .attr("height", rowHeight)

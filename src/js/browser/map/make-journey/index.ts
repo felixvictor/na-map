@@ -66,7 +66,7 @@ export default class MakeJourney {
     #summary: MakeJourneySummary
 
     readonly #arrowId = "journey-arrow"
-    readonly #arrowWidth = 10
+    readonly #arrowWidth = 5
     readonly #baseId: HtmlString
     readonly #baseName = "Make journey"
     readonly #compassId: HtmlString
@@ -178,7 +178,7 @@ export default class MakeJourney {
             .attr("markerHeight", width)
             .attr("orient", "auto")
             .append("path")
-            .attr("class", "svg-light")
+            .attr("class", "fill-contrast-light")
             .attr("d", `M0,-${width}L${doubleWidth},0L0,${width}`)
     }
 
@@ -239,7 +239,7 @@ export default class MakeJourney {
         this.#compass = this.#g
             .insert("svg", "path")
             .attr("id", this.#compassId)
-            .attr("class", "compass")
+            .attr("class", "fill-background-colour")
             .attr("x", x)
             .attr("y", y)
 

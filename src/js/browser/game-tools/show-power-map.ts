@@ -331,13 +331,13 @@ export default class PowerMap {
         const totalPorts = ports.length
 
         this.#legendNationItemContainer
-            .selectAll<HTMLDivElement, [number, number]>("svg.svg-text")
+            .selectAll<HTMLDivElement, [number, number]>("svg.legend")
             .data(nations, (d, index) => String(index).padStart(2, "0") + String(d[0]).padStart(2, "0"))
             .join(
                 (enter) => {
                     const svg = enter
                         .append("svg")
-                        .attr("class", "svg-text")
+                        .attr("class", "legend")
                         .attr("width", this.#legendColumnWidth)
                         .attr("height", this.#legendRowHeight + this.#legendRowPadding)
                         .style("position", "absolute")
@@ -364,7 +364,7 @@ export default class PowerMap {
                         .style("fill", (d) => getContrastColour(this.#colourScale(d[0])))
 
                     svg.append("rect")
-                        .attr("class", "rect-background")
+                        .attr("class", "opacity-low")
                         .attr("y", Math.floor(this.#legendRowHeight / 2 + this.#legendRowPadding))
                         .attr("width", "100%")
                         .attr("height", Math.floor(this.#legendRowHeight / 2))
@@ -654,7 +654,7 @@ export default class PowerMap {
 
     _adjustControllerHeight(): void {
         this.#legendControllerHeight = getElementHeight(this.#legendControllerElement)
-        this.#legendContainer.selectAll("svg.svg-text").style("top", (d, index) => this._getTopPosition(index))
+        this.#legendContainer.selectAll("svg.legend").style("top", (d, index) => this._getTopPosition(index))
         this.#legendContainer.selectAll("svg.index").style("top", (d, index) => this._getTopPosition(index))
     }
 

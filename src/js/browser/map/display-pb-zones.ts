@@ -145,11 +145,11 @@ export default class DisplayPbZones {
             .data(this._pbZonesFiltered, (d) => String(d.id))
             .join(
                 (enter): Selection<SVGGElement, PbZoneBasic, SVGGElement, unknown> => {
-                    const g = enter.append("g").attr("class", "pb-zones svg-text-center svg-text-light svg-text-tiny")
+                    const g = enter.append("g").attr("class", "pb-zones fill-white text-tiny")
 
                     // Port battle join circles
                     g.append("path")
-                        .attr("class", "path-stroke-primary-light")
+                        .attr("class", "stroke-primary-light")
                         .attr(
                             "d",
                             (d) =>
@@ -159,11 +159,12 @@ export default class DisplayPbZones {
 
                     // Port battle circles
                     g.append("path")
-                        .attr("class", "path-fill-primary-dark")
+                        .attr("class", "fill-primary-dark")
                         .attr("d", (d) =>
                             d.pbCircles.map((pbCircle) => drawSvgCircle(pbCircle[0], pbCircle[1], 3.5)).join("")
                         )
                     g.append("text")
+                        .attr("class", "svg-text-center")
                         .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
                         .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
                         .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
@@ -171,13 +172,14 @@ export default class DisplayPbZones {
                     // Spawn points
                     if (this.#serverType === "PVP") {
                         g.append("path")
-                            .attr("class", "path-fill-primary-light")
+                            .attr("class", "fill-primary-light")
                             .attr("d", (d) =>
                                 d.spawnPoints
                                     .map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5))
                                     .join("")
                             )
                         g.append("text")
+                            .attr("class", "svg-text-center")
                             .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
                             .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
                             .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
@@ -194,7 +196,7 @@ export default class DisplayPbZones {
             .data(this._defencesFiltered, (d) => String(d.id))
             .join(
                 (enter): Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
-                    const g = enter.append("g").attr("class", "defence svg-text-center svg-text-light svg-text-tiny")
+                    const g = enter.append("g").attr("class", "defence svg-text-center fill-white text-tiny")
 
                     // Shooting ranges
                     g.selectAll<SVGPathElement, Point[]>("path.tower-range")
@@ -202,7 +204,7 @@ export default class DisplayPbZones {
                         .join((enter) =>
                             enter
                                 .append("path")
-                                .attr("class", "tower-range path-background-primary-light")
+                                .attr("class", "tower-range background-primary-light")
                                 .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#towerRangeRadius))
                         )
                     g.selectAll<SVGPathElement, Point[]>("path.fort-range")
@@ -210,13 +212,13 @@ export default class DisplayPbZones {
                         .join((enter) =>
                             enter
                                 .append("path")
-                                .attr("class", "fort-range path-background-red")
+                                .attr("class", "fort-range background-red")
                                 .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#fortRangeRadius))
                         )
 
                     // Forts
                     g.append("path")
-                        .attr("class", "fort path-fill-red")
+                        .attr("class", "fort fill-red")
                         .attr("d", (d) => d.forts.map((fort) => drawSvgRect(fort[0], fort[1], fortSize)).join(""))
                     g.append("text")
                         .attr("class", "pb-text pb-fort-text")
@@ -226,7 +228,7 @@ export default class DisplayPbZones {
 
                     // Towers
                     g.append("path")
-                        .attr("class", "tower path-fill-dark")
+                        .attr("class", "tower fill-dark")
                         .attr("d", (d) =>
                             d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], towerSize)).join("")
                         )

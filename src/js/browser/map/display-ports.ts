@@ -367,11 +367,11 @@ export default class DisplayPorts {
         this.#gText = this.#gPort
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-names")
-            .attr("class", "svg-text-center svg-text-light")
+            .attr("class", "fill-white")
         this.#gPZ = this.#gPort
             .append<SVGGElement>("g")
             .attr("data-ui-component", "patrol-zone")
-            .attr("class", "svg-text-center svg-text-dark-yellow ")
+            .attr("class", "fill-yellow-dark")
     }
 
     _setupCounties(): void {
@@ -550,7 +550,7 @@ export default class DisplayPorts {
         const dy = Math.round(radius / dyFactor)
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
-        this.#gPZ.append("circle").attr("class", "svg-background-yellow").attr("cx", x).attr("cy", y).attr("r", radius)
+        this.#gPZ.append("circle").attr("class", "background-yellow").attr("cx", x).attr("cy", y).attr("r", radius)
         this.#gPZ
             .append("image")
             .attr("height", swordSize)
@@ -562,13 +562,19 @@ export default class DisplayPorts {
             .attr("alt", "Patrol zone")
         this.#gPZ
             .append("text")
-            .text(name)
+            .attr("class", "svg-text-center")
             .attr("x", x)
             .attr("y", y)
             .attr("dy", dy)
             .attr("font-size", Math.round(fontSize * 1.6))
+            .text(name)
         this.#gPZ
             .append("text")
+            .attr("class", "svg-text-center")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("dy", dy - fontSize * 1.6)
+            .attr("font-size", fontSize)
             .html(
                 shallow
                     ? "Shallow water ships"
@@ -576,10 +582,6 @@ export default class DisplayPorts {
                           shipClass ? `${getOrdinalSVG(shipClass.min)} to ${getOrdinalSVG(shipClass.max)} rate` : "All"
                       } ships`
             )
-            .attr("x", x)
-            .attr("y", y)
-            .attr("dy", dy - fontSize * 1.6)
-            .attr("font-size", fontSize)
     }
 
     _setupSummary(): void {
@@ -1250,7 +1252,12 @@ export default class DisplayPorts {
             this.#gText
                 .selectAll<SVGTextElement, PortWithTrades>("text")
                 .data(data, (d) => String(d.id))
-                .join((enter) => enter.append("text").text((d) => d.name))
+                .join((enter) =>
+                    enter
+                        .append("text")
+                        .attr("class", "svg-text-center")
+                        .text((d) => d.name)
+                )
                 .attr("x", (d) => this._updateTextsX(d, circleSize))
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
                 .attr("text-anchor", (d) => this._updateTextsAnchor(d))
@@ -1285,6 +1292,7 @@ export default class DisplayPorts {
                     (enter) =>
                         enter
                             .append("text")
+                            .attr("class", "svg-text-center")
                             .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                             .text((d) => d.name),
                     (update) =>
@@ -1323,6 +1331,7 @@ export default class DisplayPorts {
                 .join((enter) =>
                     enter
                         .append("text")
+                        .attr("class", "svg-text-center")
                         .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                         .text((d) => d.name)
                 )

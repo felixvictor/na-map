@@ -17,7 +17,7 @@ const setupArrow = (): void => {
         arrowNew.id = "wind-profile-arrow-head"
         if (arrowNew.hasChildNodes()) {
             for (const child of arrowNew.childNodes) {
-                ;(child as SVGPathElement).classList.replace("journey-arrow-head", "wind-profile-arrow-head")
+                ;(child as SVGPathElement).classList.replace("fill-contrast-light", "wind-profile-arrow-head")
             }
         }
 
