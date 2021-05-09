@@ -56,9 +56,9 @@ export default class F11Modal extends Modal {
     }
 
     _injectModal(): void {
-        const body = super.getBodySel()
+        const body = super.bodySel
         super.removeFooter()
-        console.log("injectModal", body)
+
         const form = body
             .append("form")
             .attr("id", this.#formId)
@@ -103,7 +103,7 @@ export default class F11Modal extends Modal {
             .attr("class", "form-text mt-1 mb-3")
             .html("In k units (divide by 1,000).<br>Example: <em>43</em> for value of <em>43,162.5</em>.")
 
-        const buttonGroup = form.append("div").classed("float-end btn-group", true).attr("role", "group")
+        const buttonGroup = form.append("div").classed("float-end", true).attr("role", "group")
 
         const button = buttonGroup
             .append("button")
@@ -114,7 +114,7 @@ export default class F11Modal extends Modal {
         button.append("i").classed("icon icon-copy", true)
         buttonGroup
             .append("button")
-            .classed("btn btn-outline-secondary", true)
+            .attr("class", "btn")
             .attr("id", this.#submitButtonId)
             .attr("title", "Go to")
             .attr("type", "submit")

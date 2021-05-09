@@ -84,7 +84,7 @@ export default class ShowF11 {
     _useUserInput(): void {
         const x = this.#modal!.getXCoord() * -1000
         const z = this.#modal!.getZCoord() * -1000
-        console.log("_useUserInput", x, z)
+
         if (Number.isFinite(x) && Number.isFinite(z)) {
             this._goToF11(x, z)
         }
