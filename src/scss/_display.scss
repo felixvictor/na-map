@@ -296,14 +296,21 @@ $padding-large: $padding-third;
 }
 
 .compress {
+    padding: $padding-large;
     line-height: 1;
 }
 
 .col-compress {
-    padding: $padding-large $padding-large 0;
+    padding: $padding-large $padding-large $padding-small;
     .des {
         top: -$padding-small / 2;
     }
+}
+
+.badge-highlight {
+    color: $text-muted;
+    background-color: $white;
+    box-shadow: $box-shadow-sm;
 }
 
 /*

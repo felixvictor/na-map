@@ -4,7 +4,6 @@ const purgecssSafelistDeep = [
     /bs-/,
     /btn/,
     /collaps/,
-    /col-4/,
     /disabled/,
     /dropdown-backdrop/,
     /fade/,
