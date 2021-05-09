@@ -18,6 +18,7 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../../analytics"
+import { findNationById, nations } from "common/common"
 import { getIcons, getIdFromBaseName, loadJsonFile } from "common/common-browser"
 
 import { Selection } from "d3-selection"
@@ -26,9 +27,11 @@ import { ServerId } from "common/servers"
 import { FlagsPerNation } from "common/types"
 
 import Modal from "util/modal"
-import { nations } from "common/common"
+import RadioButton from "util/radio-button"
+import Cookie from "util/cookie"
 
-type tableRow = [string, string, number]
+type TableRow = [number, string, number]
+type TableRowDisplay = [string, string, number]
 
 export default class ListFlags {
     readonly #baseId: HtmlString
@@ -36,13 +39,17 @@ export default class ListFlags {
     readonly #inputId: HtmlString
     readonly #menuId: HtmlString
     readonly #serverId: ServerId
+    #activeNationIds = [] as string[]
+    #cookie = {} as Cookie
+    #data = [] as TableRow[]
+    #dataDefault = [] as TableRow[]
     #flagData = [] as FlagsPerNation[]
-    #data = [] as tableRow[]
     #modal: Modal | undefined = undefined
-    #rows = {} as Selection<HTMLTableRowElement, tableRow, HTMLTableSectionElement, unknown>
+    #rows = {} as Selection<HTMLTableCellElement, TableRow, HTMLTableSectionElement, unknown>
     #sortAscending = true
     #sortIndex = 0
     #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
+    #toggleButtons = {} as RadioButton
 
     constructor(serverId: ServerId) {
         this.#serverId = serverId
@@ -71,7 +78,7 @@ export default class ListFlags {
     _setupData(): void {
         for (const flagsPerNation of this.#flagData) {
             for (const flag of flagsPerNation.flags) {
-                this.#data.push([flagsPerNation.nation, flag.expire, flag.number])
+                this.#dataDefault.push([flagsPerNation.nation, flag.expire, flag.number])
             }
         }
     }
@@ -143,16 +150,17 @@ export default class ListFlags {
 
     _updateTable(): void {
         // Data join rows
+        // @ts-expect-error
         this.#rows = this.#table
             .select<HTMLTableSectionElement>("tbody")
-            .selectAll<HTMLTableRowElement, tableRow>("tr")
-            .data(this.#data)
+            .selectAll<HTMLTableRowElement, TableRow>("tr")
+            .data(this.#data, (d: TableRow): TableRow => d as TableRow)
             .join((enter) => enter.append("tr"))
 
         // Data join cells
         this.#rows
-            .selectAll<HTMLTableCellElement, string>("td")
-            .data((row): tableRow => [row[0], this._getTime(row[1]), row[2]])
+            .selectAll<HTMLTableCellElement, number | string>("td")
+            .data((row): TableRowDisplay => [findNationById(row[0]).name, this._getTime(row[1]), row[2]])
             .join((enter) =>
                 enter
                     .append("td")
@@ -161,28 +169,55 @@ export default class ListFlags {
             )
     }
 
-    _injectSelects(): void {
-        const nationIcons = getIcons()
-        const div = this.#modal!.selectsSel.append("div").attr("class", "mb-3")
+    _getActiveNation(): number {
+        return Number(this.#toggleButtons.get())
+    }
 
-        for (const nation of nations
+    _injectToggleButtons(): void {
+        const activeNations = nations
             .filter((nation) => !(nation.short === "NT" || nation.short === "FT"))
-            .sort((a, b) => a.sortName.localeCompare(b.sortName))) {
+            .sort((a, b) => a.sortName.localeCompare(b.sortName))
+        this.#activeNationIds = activeNations.map((nation) => String(nation.id))
+        const nationIcons = getIcons()
+
+        const div = this.#modal!.selectsSel.append("div")
+            .attr("id", this.#inputId)
+            .attr("class", "d-flex justify-content-between mb-3")
+
+        for (const nation of activeNations) {
             div.append("input")
                 .attr("type", "radio")
                 .attr("class", "btn-check")
                 .attr("name", this.#inputId)
-                .attr("id", `${this.#inputId}-${nation.short}`)
+                .attr("id", `${this.#inputId}-${nation.id}`)
+                .attr("value", nation.id)
                 .attr("autocomplete", "off")
 
             div.append("label")
-                .attr("for", `${this.#inputId}-${nation.short}`)
-                .attr("class", "btn btn-outline-paper")
+                .attr("for", `${this.#inputId}-${nation.id}`)
+                .attr("class", "btn btn-outline-primary")
+                .attr("title", nation.name)
                 .append("img")
                 .attr("alt", nation.short)
                 .attr("class", "flag-icon-small")
                 .attr("src", `${nationIcons[nation.short]}`)
         }
+    }
+
+    _showSelected(): void {
+        const activeNation = this._getActiveNation()
+
+        this.#data = this.#dataDefault.filter((flag) => flag[0] === activeNation)
+        this.#cookie.set(String(activeNation))
+
+        this._updateTable()
+        this._sortRows(1, false)
+    }
+
+    _setupButtonListener(): void {
+        document.querySelector(`#${this.#inputId}`)?.addEventListener("change", async () => {
+            this._showSelected()
+        })
     }
 
     _listSelected(): void {
@@ -192,8 +227,11 @@ export default class ListFlags {
         )
 
         this._initTable()
-        this._injectSelects()
-        this._updateTable()
-        this._sortRows(1, false)
+        this._injectToggleButtons()
+        this.#toggleButtons = new RadioButton(this.#inputId, this.#activeNationIds)
+        this.#cookie = new Cookie({ id: this.#inputId, values: this.#activeNationIds })
+        this.#toggleButtons.set(this.#cookie.get())
+        this._setupButtonListener()
+        this._showSelected()
     }
 }

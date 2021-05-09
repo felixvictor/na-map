@@ -33,7 +33,7 @@ import { serverIds } from "../common/servers"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 import { FlagEntity, FlagsPerNation } from "../common/types"
-const flagsMap = new Map<string, Set<FlagEntity>>()
+const flagsMap = new Map<number, Set<FlagEntity>>()
 
 const commonPaths = getCommonPaths()
 
@@ -399,17 +399,18 @@ const cooledOff = (result: RegExpExecArray): void => {
  * @param result - Result from tweet regex
  */
 const flagAcquired = (result: RegExpExecArray): void => {
-    const nation = result[2]
+    const nationName = result[2]
+    const nationId = findNationByName(nationName)?.id ?? 0
     const numberOfFlags = Number(result[3])
     const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter)
     const active = getActiveTime(tweetTime).format(dateTimeFormat)
 
-    console.log("      --- conquest flag", numberOfFlags, nation, active)
+    console.log("      --- conquest flag", numberOfFlags, nationName, active)
 
     const flag = { expire: active, number: numberOfFlags }
-    const flagsSet = flagsMap.get(nation) ?? new Set<FlagEntity>()
+    const flagsSet = flagsMap.get(nationId) ?? new Set<FlagEntity>()
     flagsSet.add(flag)
-    flagsMap.set(nation, flagsSet)
+    flagsMap.set(nationId, flagsSet)
 }
 
 const cleanExpiredAndDoubleEntries = (flagSet: Set<FlagEntity>): Map<string, number> => {

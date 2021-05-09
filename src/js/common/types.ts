@@ -1,5 +1,3 @@
-import { NationFullName, NationShortName } from "../common/common";
-
 const frontlinesType = ["attacking", "defending"]!
 export type FrontlinesType = typeof frontlinesType[number]
 
@@ -26,8 +24,8 @@ export interface FlagEntity {
     number: number
 }
 export interface FlagsPerNation {
-    [index: string]: NationFullName | FlagEntity[]
-    nation: NationFullName
+    [index: string]: number | FlagEntity[]
+    nation: number
     flags: FlagEntity[]
 }
 
