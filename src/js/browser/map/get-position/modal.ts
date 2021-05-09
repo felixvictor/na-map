@@ -27,7 +27,7 @@ export default class GetPositionModal extends Modal {
     #selectSel = [] as HTMLSelectElement[]
 
     constructor(title: string, portDataDefault: PortWithTrades[]) {
-        super(title, "md", "Go")
+        super(title, "md", "Set")
 
         this.#portDataDefault = portDataDefault
 
@@ -48,7 +48,7 @@ export default class GetPositionModal extends Modal {
     }
 
     _injectModal(): void {
-        const body = super.getBodySel()
+        const body = super.bodySel
 
         const form = body.append("form")
         const dataList = form.append("datalist").attr("id", "defaultDistances")
