@@ -84,6 +84,7 @@ export default class ListPortBattles {
                         port.name,
                         `${port?.attackerNation ?? ""} (${displayClan(port?.attackerClan ?? "")})`,
                         defender,
+                        portBattleST.toISOString(),
                     ],
                 }
             })
@@ -107,6 +108,8 @@ export default class ListPortBattles {
         })
     }
 
+    _compareTime = (a: RowData, b: RowData, sign: 1 | -1): number => a[4].localeCompare(b[4]) * sign
+
     _sortRows(index: number, changeOrder = true): void {
         if (changeOrder && this.#sortIndex === index) {
             this.#sortAscending = !this.#sortAscending
@@ -115,11 +118,28 @@ export default class ListPortBattles {
         this.#sortIndex = index
         const sign = this.#sortAscending ? 1 : -1
         this.#rows.sort((a, b): number => {
+            // Sort by time
             if (index === 0) {
-                return a.sort.localeCompare(b.sort) * sign
+                return this._compareTime(a.data, b.data, sign)
             }
 
-            return a.data[index].localeCompare(b.data[index]) * sign
+            // Remove clan information
+            const regex = /\s\(.+\)/
+            const aa = a.data[index].replace(regex, "")
+            const bb = b.data[index].replace(regex, "")
+            let result = aa.localeCompare(bb) * sign
+
+            // Sort by port
+            if (index === 1) {
+                return result
+            }
+
+            // Sort by time when same nation defending or attacking
+            if (result === 0) {
+                result = this._compareTime(a.data, b.data, 1)
+            }
+
+            return result
         })
     }
 
@@ -150,7 +170,7 @@ export default class ListPortBattles {
         // Data join cells
         this.#rows
             .selectAll<HTMLTableCellElement, string>("td")
-            .data((row) => row.data)
+            .data((row) => row.data.slice(0, -1))
             .join((enter) => enter.append("td").html((d) => d))
     }
 
