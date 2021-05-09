@@ -11,21 +11,25 @@
 import Modal from "util/modal"
 import WindInput from "util/wind-input"
 
-import { CompareShips, initFromJourney } from "../../game-tools/compare-ships"
+import { initFromJourney } from "../../game-tools/compare-ships"
+import Select from "util/select"
 
 export default class MakeJourneyModal extends Modal {
     readonly #shipId = "ship-journey"
-    #shipCompare = {} as CompareShips
+    #shipSelect = {} as Select
+    #shipNameAndSpeed = {} as Map<number, { name: string; speedDegrees: number[] }>
     #windInput = {} as WindInput
 
     constructor(title: string) {
-        super(title, "sm")
+        super(title, "sm", "Set")
     }
 
     async init(): Promise<void> {
         this._injectModal()
 
-        this.#shipCompare = await initFromJourney()
+        const { select: shipSelect, shipNameAndSpeed } = await initFromJourney()
+        this.#shipSelect = shipSelect
+        this.#shipNameAndSpeed = shipNameAndSpeed
     }
 
     _injectModal(): void {
@@ -36,10 +40,10 @@ export default class MakeJourneyModal extends Modal {
 
         // Add ship input
         const form = body.select("form")
-        const shipId = `${this.#shipId}-Base-select`
-        const ship = form.append("div").attr("class", "alert alert-primary").attr("role", "alert")
+        const shipId = `${this.#shipId}-select`
+        const ship = form.append("div").attr("class", "mt-3")
         const div = ship.append("div").attr("class", "d-flex flex-column")
-        div.append("label").attr("for", shipId).text("Column (optional)")
+        div.append("label").attr("for", shipId).text("Ship (optional)")
         div.append("select").attr("name", shipId).attr("id", shipId)
     }
 
@@ -47,11 +51,17 @@ export default class MakeJourneyModal extends Modal {
         return this.#windInput.getWind() ?? 0
     }
 
+    _getShipId(): number {
+        return Number(this.#shipSelect.getValues())
+    }
+
     getShipName(): string | undefined {
-        return this.#shipCompare.singleShipData?.name
+        const id = this._getShipId()
+        return this.#shipNameAndSpeed.get(id)?.name
     }
 
     getSpeedDegrees(): number[] | undefined {
-        return this.#shipCompare.singleShipData?.speedDegrees
+        const id = this._getShipId()
+        return this.#shipNameAndSpeed.get(id)?.speedDegrees
     }
 }

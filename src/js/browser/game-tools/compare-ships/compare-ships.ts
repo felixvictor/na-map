@@ -22,7 +22,7 @@ import { hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShi
 import { getOrdinal } from "common/common-math"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
 
-import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "common/gen-json"
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime, ShipSpeed } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { WoodType, woodType } from "common/types"
 import { ShipColumnTypeList, ModuleType, SelectedData, SelectedId, ShipSelectData } from "compare-ships"
@@ -542,7 +542,7 @@ export class CompareShips {
         this.activeColumns[columnId] = columnData
     }
 
-    _getShipOptions(): HtmlString {
+    getShipOptions(): HtmlString {
         const selectData = [...d3Group(this.#shipData, (ship) => ship.class)]
             .map(([key, value]) => ({
                 key,
@@ -575,6 +575,9 @@ export class CompareShips {
             )
             .join("")
     }
+
+    getShipNameAndSpeed = (): Map<number, { name: string; speedDegrees: number[] }> =>
+        new Map(this.#shipData.map((ship) => [ship.id, { name: ship.name, speedDegrees: ship.speedDegrees }]))
 
     _initSelectListeners(): void {
         for (const columnId of this.#columnIds) {
@@ -662,7 +665,7 @@ export class CompareShips {
             )
 
             this.#selects = new CompareShipsSelect(this.#baseId, this.#columnIds, this.#modal)
-            this.#selects.initShipAndWoodSelects(this._getShipOptions(), this.#woodData)
+            this.#selects.initShipAndWoodSelects(this.getShipOptions(), this.#woodData)
             this._initSelectListeners()
             this._initCloneListeners()
 
