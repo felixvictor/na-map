@@ -144,8 +144,8 @@ export default class WindRose {
         this.#div = this.#portSummarySel
             .insert("div", ":first-child")
             .attr("id", this.#baseId)
-            .attr("class", "block p-0")
-        this.#svg = this.#div.append("svg").attr("class", "small fill-contrast-text svg-text-center svg-stroke-dark")
+            .attr("class", "block p-0 pe-2")
+        this.#svg = this.#div.append("svg").attr("class", "small svg-background-light stroke-thick")
     }
 
     _initShowCurrentWind(): void {

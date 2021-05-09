@@ -27,7 +27,7 @@
     &::before {
         position: absolute;
         top: 50%;
-        left: 100%;
+        left: 98%;
         width: 0;
         height: 0;
         pointer-events: none;
@@ -53,4 +53,8 @@
 
 .rs-control .rs-handle {
     background-color: $primary-900;
+}
+
+.rs-border {
+    border: 0;
 }

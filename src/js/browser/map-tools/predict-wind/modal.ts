@@ -26,7 +26,7 @@ export default class PredictWindModal extends Modal {
     #windInput = {} as WindInput
 
     constructor(title: string) {
-        super(title, "sm")
+        super(title, "sm", "Set")
 
         this.#timeGroupId = `input-group-${this.baseId}`
         this.#timeInputId = `input-${this.baseId}`
@@ -46,8 +46,7 @@ export default class PredictWindModal extends Modal {
 
         // Add time input
         const form = body.select("form")
-        const formGroupB = form.append("div").attr("class", "form-group")
-        const block = formGroupB.append("div").attr("class", "alert alert-primary")
+        const block = form.append("div").attr("class", "mt-3")
         block
             .append("label")
             .attr("for", this.#timeInputId)

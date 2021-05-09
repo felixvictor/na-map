@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// noinspection JSUnusedGlobalSymbols
 
-declare module "round-slider" {
-    interface RoundSliderPos {
-        "margin-top"?: number
-        "margin-left"?: number
+export {}
+
+declare global {
+    interface Window {
+        sliderTooltip: any
     }
-}
 
-interface JQuery {
-    roundSlider: (options?: Record<string, unknown> | string) => any
+    interface JQuery {
+        roundSlider: (options?: Record<string, unknown> | string) => any
+    }
 }

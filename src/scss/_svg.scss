@@ -58,7 +58,7 @@ svg {
 }
 
 .stroke-thick {
-    stroke-width: 0.4rem;
+    stroke-width: 0.3rem;
 }
 
 .fill-yellow-dark {
@@ -114,6 +114,35 @@ svg {
 
 .fill-dark {
     fill: $primary-900;
+}
+
+.svg-background-light {
+    path {
+        stroke: $overlay-text-colour-contrast;
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+        @include text-center();
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        fill: $overlay-background-contrast;
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        font-size: smaller;
+        fill: $overlay-text-colour-contrast !important;
+    }
 }
 
 .svg-background-dark {

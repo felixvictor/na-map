@@ -8,6 +8,8 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+import "round-slider/src/roundslider"
+
 import { displayCompass } from "../util"
 import { compassDirections, compassToDegrees, degreesToCompass } from "common/common-math"
 
@@ -35,8 +37,8 @@ export default class WindInput {
     }
 
     _setup(): void {
-        // @ts-expect-error
-        window.tooltip = (arguments_) => `${displayCompass(String(arguments_.value))}<br>${String(arguments_.value)}°`
+        window.sliderTooltip = (arguments_: Record<string, unknown>) =>
+            `${displayCompass(String(arguments_.value))}<br>${String(arguments_.value)}°`
 
         this.#slider$.roundSlider({
             sliderType: "default",
@@ -48,7 +50,7 @@ export default class WindInput {
             max: 359,
             step: 360 / compassDirections.length,
             editableTooltip: false,
-            tooltipFormat: "tooltip",
+            tooltipFormat: "sliderTooltip",
             create() {
                 // @ts-expect-error
                 this.control.css("display", "block")
@@ -59,8 +61,9 @@ export default class WindInput {
     _inject(): void {
         const form = this.#mainElement.append("form").attr("id", this.#formId)
 
-        const formGroupA = form.append("div").attr("class", "form-group")
-        const slider = formGroupA.append("div").classed("alert alert-primary text-center", true)
+        // const formGroupA = form.append("div").attr("class", "form-group")
+        const formGroupA = form
+        const slider = formGroupA.append("div").attr("class", "text-center")
         slider
             .append("label")
             .attr("for", this.#sliderId)
@@ -68,7 +71,7 @@ export default class WindInput {
         slider
             .append("div")
             .attr("id", this.#sliderId)
-            .attr("class", "rslider")
+            .attr("class", "rslider d-inline-block")
     }
 
     _getInputValue(): number {
