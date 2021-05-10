@@ -284,27 +284,22 @@ table {
 /////////////////////////////////////7
 // ship compare
 
-.column-comp {
+.column-comp:not(:first-child) {
     border-left: $paper-100 solid medium;
 }
 
 $padding-small: $padding-third / 1.618;
 $padding-large: $padding-third;
 
-.row-small {
-    padding-bottom: $padding-small;
-}
-
 .compress {
-    padding: $padding-large;
     line-height: 1;
+    .row {
+        --bs-gutter-x: 1rem;
+    }
 }
 
-.col-compress {
-    padding: $padding-large $padding-large $padding-small;
-    .des {
-        top: -$padding-small / 2;
-    }
+.badge {
+    font-stretch: condensed;
 }
 
 .badge-highlight {

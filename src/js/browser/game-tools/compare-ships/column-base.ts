@@ -459,6 +459,6 @@ export class ColumnBase extends Column {
             ship.gunsBack = "\u2013"
         }
 
-        super.outputDivSel.select("div").html(Column.getText(ship))
+        super.mainDiv.html(Column.getText(ship))
     }
 }

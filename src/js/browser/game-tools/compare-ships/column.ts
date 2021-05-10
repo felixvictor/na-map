@@ -21,8 +21,8 @@ type TextColumnSize = 4 | 6
 
 export class Column {
     readonly #outputDivSel: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #mainG = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
-    #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
 
     readonly ticksSpeed: number[]
     readonly ticksSpeedLabels: string[]
@@ -40,6 +40,10 @@ export class Column {
 
         this._setupSvg()
         this._setCompass()
+    }
+
+    get mainDiv(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
+        return this.#mainDiv
     }
 
     get mainG(): Selection<SVGGElement, unknown, HTMLElement, unknown> {
@@ -102,24 +106,17 @@ export class Column {
      */
     static getText(ship: ShipDisplayData): HtmlString {
         let row = 0
+
         /**
          * HTML format the first column
-         * @param element - Ship element
-         * @returns HTML formatted column
          */
         function displayFirstColumn(element: string): HtmlString {
             row += 1
-            return `<div class="row row-small${
-                row % 2 ? " row-light" : ""
-            }"><div class="col-compress col-3">${element}</div>`
+            return `<div class="row py-1 ${row % 2 ? " row-light" : ""}"><div class="col-3">${element}</div>`
         }
 
         /**
          * HTML format a single column
-         * @param element - Ship element
-         * @param description - Element description
-         * @param col - Number of columns
-         * @returns HTML formatted column
          */
         function displayColumn(
             element: keyof ShipDisplayData,
@@ -141,7 +138,7 @@ export class Column {
                 textColumnIndicator = "col-4"
             }
 
-            return `<div class="col-compress ${textColumnIndicator}">${elementText}<br><span class="des">${description}</span>${br}</div>`
+            return `<div class="${textColumnIndicator}">${elementText}<br><span class="des">${description}</span>${br}</div>`
         }
 
         let text = ""
@@ -271,20 +268,21 @@ export class Column {
      * Setup svg
      */
     _setupSvg(): void {
-        this.#outputDivSel.select("svg").remove()
+        this.#outputDivSel.selectAll("*").remove()
 
-        this.#svg = this.#outputDivSel
+        const svg = this.#outputDivSel
+            .append("div")
+            .attr("class", "")
             .append("svg")
             .attr("width", this._shipCompare.svgWidth)
             .attr("height", this._shipCompare.svgHeight)
             .attr("data-ui-component", "sailing-profile")
             .attr("fill", "none")
-        this.#mainG = this.#svg
+        this.#mainG = svg
             .append("g")
             .attr("transform", `translate(${this._shipCompare.svgWidth / 2},${this._shipCompare.svgHeight / 2})`)
-        this.#outputDivSel.select("div").remove()
 
-        this.#outputDivSel.append("div")
+        this.#mainDiv = this.#outputDivSel.append("div").attr("class", "compress")
     }
 
     /**

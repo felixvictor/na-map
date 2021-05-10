@@ -79,10 +79,10 @@ $table-cell-padding-x: 0;
 $table-cell-padding-x-sm: 0;
 
 // Badges
-$badge-font-size: 0.9rem;
+$badge-font-size: smaller;
 $badge-font-weight: 400;
-$badge-padding-y: map-get($spacers, 1) / 6;
-$badge-padding-x: map-get($spacers, 1);
+$badge-padding-y: 0.05rem;
+$badge-padding-x: 0.3rem;
 
 // https://shadows.brumm.af/
 $box-shadow: 0 2.6px 2.7px rgba($black, 0.022), 0 6.6px 6.9px rgba($black, 0.031), 0 13.5px 14.2px rgba($black, 0.039),
