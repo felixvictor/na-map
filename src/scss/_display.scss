@@ -8,6 +8,7 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
+@import "~bootstrap/scss/mixins";
 @import "mixins";
 
 $dark-overlay-background-colour: $paper-800;
@@ -306,6 +307,13 @@ $padding-large: $padding-third;
     color: $text-muted;
     background-color: $white;
     box-shadow: $box-shadow-sm;
+}
+
+/////////////////////////////////////7
+// toggle button
+
+.btn-toggle {
+    @include button-outline-variant($paper-400);
 }
 
 /*

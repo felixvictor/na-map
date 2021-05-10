@@ -195,7 +195,7 @@ export default class ListFlags {
 
             div.append("label")
                 .attr("for", `${this.#inputId}-${nation.id}`)
-                .attr("class", "btn btn-outline-primary")
+                .attr("class", "btn btn-toggle")
                 .attr("title", nation.name)
                 .append("img")
                 .attr("alt", nation.short)
