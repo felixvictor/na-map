@@ -1213,7 +1213,7 @@ export default class DisplayPorts {
     _updateTextsX(d: PortWithTrades, circleSize: number): number {
         return this.zoomLevel === "pbZone" &&
             (this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id))
-            ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
+            ? d.coordinates[0] + Math.round(circleSize * 1.3 * Math.cos(degreesToRadians(d.angle)))
             : d.coordinates[0]
     }
 
@@ -1226,7 +1226,7 @@ export default class DisplayPorts {
 
         const dy = d.angle > 90 && d.angle < 270 ? fontSize : 0
         return this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id)
-            ? d.coordinates[1] + Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.angle))) + dy
+            ? d.coordinates[1] + Math.round(circleSize * 1.3 * Math.sin(degreesToRadians(d.angle))) + dy
             : d.coordinates[1] + deltaY
     }
 
@@ -1252,15 +1252,11 @@ export default class DisplayPorts {
             this.#gText
                 .selectAll<SVGTextElement, PortWithTrades>("text")
                 .data(data, (d) => String(d.id))
-                .join((enter) =>
-                    enter
-                        .append("text")
-                        .attr("class", "svg-text-center")
-                        .text((d) => d.name)
-                )
+                .join((enter) => enter.append("text").text((d) => d.name))
                 .attr("x", (d) => this._updateTextsX(d, circleSize))
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
-                .attr("text-anchor", (d) => this._updateTextsAnchor(d))
+                .style("text-anchor", (d) => this._updateTextsAnchor(d))
+                .style("dominant-baseline", "auto")
 
             this.#gText.attr("font-size", `${fontSize}px`).classed("d-none", false)
         }

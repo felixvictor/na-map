@@ -14,7 +14,7 @@
 }
 
 svg {
-    stroke-width: 0.1rem;
+    stroke-width: 0.05rem;
     overflow: auto;
     text {
         pointer-events: none;
@@ -73,6 +73,10 @@ svg {
     fill: $overlay-text-colour-contrast;
 }
 
+.fill-text {
+    fill: $body-color;
+}
+
 .background-yellow {
     opacity: 0.7;
     fill: $yellow-300;
@@ -90,6 +94,10 @@ svg {
 
 .stroke-contrast-text {
     stroke: $overlay-text-colour-contrast;
+}
+
+.stroke-dark {
+    stroke: $primary-600;
 }
 
 .stroke-primary-light {
