@@ -13,7 +13,7 @@ import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 import { registerEvent } from "../../analytics"
 import { sortBy } from "common/common"
 import { getIdFromBaseName } from "common/common-browser"
-import { formatSignInt, formatSignPercent } from "common/common-format"
+import { formatSignInt, formatSignPercentOldstyle } from "common/common-format"
 import { chunkify } from "../../util"
 
 import { Module, RecipeIngredientEntity } from "common/gen-json"
@@ -75,7 +75,7 @@ export default class ListIngredients {
                 properties = `${module.properties
                     .map((property) => {
                         const amount = property.isPercentage
-                            ? formatSignPercent(property.amount / 100)
+                            ? formatSignPercentOldstyle(property.amount / 100)
                             : formatSignInt(property.amount)
                         return `${property.modifier} ${amount}`
                     })

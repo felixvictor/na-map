@@ -18,7 +18,7 @@ import {
     lineRadial as d3LineRadial,
 } from "d3-shape"
 
-import { formatFloat, formatInt, formatPercent, formatSignFloat, formatSignInt } from "common/common-format"
+import { formatFloat, formatInt, formatPercentOldstyle, formatSignFloat, formatSignInt } from "common/common-format"
 import { degreesToCompass, getOrdinal, roundToThousands } from "common/common-math"
 import { rotationAngleInDegrees } from "../../util"
 import { default as shipIcon } from "icons/icon-ship.svg"
@@ -316,7 +316,7 @@ export class ColumnCompare extends Column {
                 formattedDiff = formatFloat(Math.abs(diff))
             } else {
                 diff = 1 - a / b
-                formattedDiff = formatPercent(Math.abs(diff), 0).replace("%", '<span class="x-small">%</span>')
+                formattedDiff = formatPercentOldstyle(Math.abs(diff), 0)
             }
 
             if (diff < 0) {

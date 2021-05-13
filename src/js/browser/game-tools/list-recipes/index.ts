@@ -11,7 +11,7 @@
 import { select as d3Select } from "d3-selection"
 import { registerEvent } from "../../analytics"
 import { getIdFromBaseName } from "common/common-browser"
-import { formatInt, formatSignPercent } from "common/common-format"
+import { formatInt, formatSignPercentOldstyle } from "common/common-format"
 import { getCurrencyAmount } from "common/common-game-tools"
 import { getServerType, ServerId, ServerType } from "common/servers"
 
@@ -159,7 +159,7 @@ export default class ListRecipes {
                 properties = `<tr><td>${module.properties
                     .map((property) => {
                         const amount = property.isPercentage
-                            ? formatSignPercent(property.amount / 100)
+                            ? formatSignPercentOldstyle(property.amount / 100)
                             : property.amount
                         return `${property.modifier} ${amount}`
                     })

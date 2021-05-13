@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { formatFloat, formatPercent, formatSignFloat } from "common/common-format"
+import { formatFloat, formatPercentOldstyle, formatSignFloat } from "common/common-format"
 
 import { HtmlString } from "common/interface"
 import { Amount, SelectedWood, WoodCompareAmount } from "compare-woods"
@@ -33,7 +33,7 @@ export class ColumnCompare extends Column {
 
     static _getDiff(a: number, b: number, isPercentage: boolean, decimals = 1): HtmlString {
         const diff = Number.parseFloat((a - b).toFixed(decimals))
-        const value = isPercentage ? formatPercent(a / 100, decimals) : formatFloat(a)
+        const value = isPercentage ? formatPercentOldstyle(a / 100, decimals) : formatFloat(a)
 
         return `${value} <span class="badge bg-white text-dark">${formatSignFloat(diff)}</span>`
     }

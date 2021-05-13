@@ -41,7 +41,7 @@ import {
     loadJsonFiles,
     primary300,
 } from "common/common-browser"
-import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
+import { formatInt, formatPercentHtml, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
 import {
     Coordinate,
     defaultCircleSize,
@@ -110,7 +110,7 @@ interface PortForDisplay {
     brLimit: string
     portPoints: string
     taxIncome: HtmlResult
-    portTax: string
+    portTax: HtmlResult
     netIncome: HtmlResult
     tradingCompany: number
     laborHoursDiscount: number
@@ -728,7 +728,7 @@ export default class DisplayPorts {
             ? html`${displayClanLitHtml(portProperties.attackerClan)} (${portProperties.attackerNation})
               attack${portProperties.portBattle
                   ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-                  : html`s: ${formatPercent(portProperties.attackHostility ?? 0)} hostility`}`
+                  : html`s: ${formatPercentHtml(portProperties.attackHostility ?? 0)} hostility`}`
             : html``
 
         const port = {
@@ -750,7 +750,7 @@ export default class DisplayPorts {
             brLimit: formatInt(portProperties.brLimit),
             portPoints: portProperties.capturable ? formatInt(portProperties.portPoints) : "",
             taxIncome: formatSiIntHtml(portProperties.taxIncome),
-            portTax: formatPercent(portProperties.portTax),
+            portTax: formatPercentHtml(portProperties.portTax),
             netIncome: formatSiIntHtml(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany,
             laborHoursDiscount: portProperties.laborHoursDiscount,
@@ -1084,7 +1084,7 @@ export default class DisplayPorts {
         const rMin = roundToThousands(scaledCircleSize * this.#minRadiusFactor)
         const rMax = roundToThousands(scaledCircleSize * this.#maxRadiusFactor)
 
-        const incomeThreshold = 100000
+        const incomeThreshold = 100_000
         const portPointThreshold = 30
         let data = this.#portDataFiltered
         // eslint-disable-next-line unicorn/consistent-function-scoping

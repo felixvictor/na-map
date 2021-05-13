@@ -9,7 +9,7 @@
  */
 
 import { registerEvent } from "../../analytics"
-import { formatPP, formatSignInt, formatSignPercent } from "common/common-format"
+import { formatPP, formatSignInt, formatSignPercentOldstyle } from "common/common-format"
 import { getOrdinal } from "common/common-math"
 import { chunkify } from "../../util"
 
@@ -133,7 +133,7 @@ export default class ListModules {
                                 .map((property) => {
                                     let amount
                                     if (property.isPercentage) {
-                                        amount = formatSignPercent(property.amount / 100)
+                                        amount = formatSignPercentOldstyle(property.amount / 100)
                                     } else {
                                         amount =
                                             property.amount < 1 && property.amount > 0

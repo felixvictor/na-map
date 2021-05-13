@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { formatFloat, formatPercent } from "common/common-format"
+import { formatFloat, formatPercentOldstyle } from "common/common-format"
 
 import { HtmlString } from "common/interface"
 import { Amount, SelectedWood, WoodBaseAmount } from "compare-woods"
@@ -45,7 +45,7 @@ export class ColumnBase extends Column {
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
         for (const [key, value] of properties) {
             text += `<tr><td>${key}</td><td>${
-                value.isPercentage ? formatPercent(value.amount / 100) : formatFloat(value.amount)
+                value.isPercentage ? formatPercentOldstyle(value.amount / 100) : formatFloat(value.amount)
             }`
             text += '<span class="rate">'
             if (value.amount > 0) {

@@ -17,7 +17,7 @@ import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { registerEvent } from "../../analytics"
 import { sortBy } from "common/common"
 import { colourGreenDark, colourRedDark, colourWhite, getElementWidth } from "common/common-browser"
-import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
+import { formatPP, formatSignFloat, formatSignPercentOldstyle } from "common/common-format"
 import { hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShipName } from "common/common-game-tools"
 import { getOrdinal } from "common/common-math"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
@@ -103,7 +103,7 @@ export class CompareShips {
             .map((property) => {
                 let amount
                 if (property.isPercentage) {
-                    amount = formatSignPercent(property.amount / 100)
+                    amount = formatSignPercentOldstyle(property.amount / 100)
                 } else {
                     amount =
                         property.amount < 1 && property.amount > 0
