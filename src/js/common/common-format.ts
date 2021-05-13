@@ -165,17 +165,23 @@ export const formatPercentOldstyle = (x: number, f = 1, svg = false): HtmlString
     formatLocale
         .format(`.${f}%`)(x)
         .replace(".0", "")
-        .replace("%", `\u2009${svg ? pTSpan : pSpan}`)
+        .replace("%", `${svg ? pTSpan : pSpan}`)
 
 /**
  * Format percent value (% sign in small caps)
  * @param   x - Integer
  * @param   f - digits following decimal point
- * @param svg - True when tspan for SVG needed
  * @returns htm percent value
  */
-export const formatPercentHtml = (x: number, f = 1, svg = false): HtmlResult =>
-    html`${formatPercentOldstyle(x, f, svg)}`
+export const formatPercentHtml = (x: number, f = 1): HtmlResult => {
+    const string = formatPercentOldstyle(x, f)
+
+    if (string.endsWith(pSpan)) {
+        return html`${string.replace(pSpan, "")}<span class="caps">%</span>`
+    }
+
+    return html`${string}`
+}
 
 /**
  * Format percent value with SI suffix
@@ -202,4 +208,4 @@ export const formatSignPercentOldstyle = (x: number, svg = false): HtmlString | 
     formatLocale
         .format("+.1%")(x)
         .replace(".0", "")
-        .replace("%", `\u2009${svg ? pTSpan : pSpan}`)
+        .replace("%", `\u202F${svg ? pTSpan : pSpan}`)
