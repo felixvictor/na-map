@@ -9,8 +9,6 @@
  */
 
 import path from "path"
-import Twit from "twit"
-import filterXSS from "xss"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
@@ -18,178 +16,29 @@ import utc from "dayjs/plugin/utc.js"
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
-import {
-    currentServerStartDateTime,
-    findNationByName,
-    findNationByNationShortName,
-    simpleStringSort,
-    sortBy,
-} from "../common/common"
+import { findNationByName, findNationByNationShortName, sortBy } from "../common/common"
+import { readJson, saveJsonAsync } from "../common/common-file"
 import { getCommonPaths } from "../common/common-dir"
-import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file"
-import { cleanName } from "../common/common-node"
 import { flagValidity, portBattleCooldown } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
 import { AttackerNationName, PortBattlePerServer } from "../common/gen-json"
 import { FlagEntity, FlagsPerNation } from "../common/types"
+
+import { getTweets, runType } from "./get-tweets"
+
 const flagsMap = new Map<number, Set<FlagEntity>>()
-
 const commonPaths = getCommonPaths()
-
-const consumerKey = process.argv[2]
-const consumerSecret = process.argv[3]
-const accessToken = process.argv[4]
-const accessTokenSecret = process.argv[5]
-const runType = process.argv[6] ?? "full"
-
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`)
-let ports: PortBattlePerServer[] = []
-
 const flagsFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-flags.json`)
-let flagsPerNations: FlagsPerNation[] = []
 
-let Twitter: Twit
+let ports: PortBattlePerServer[] = []
+let flagsPerNations: FlagsPerNation[] = []
 let tweets: string[] = []
-const refreshDefault = "0"
-let refresh = "0"
-const queryFrom = "from:zz569k"
 let isPortDataChanged = false
 
 const dateTimeFormat = "YYYY-MM-DD HH:mm"
 const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm"
-
-/**
- * Get refresh id, either from file or set default value (0)
- * @returns Refresh id
- */
-const getRefreshId = (): string =>
-    fileExists(commonPaths.fileTwitterRefreshId)
-        ? String(readTextFile(commonPaths.fileTwitterRefreshId))
-        : refreshDefault
-
-/**
- * Save refresh id to file
- */
-const saveRefreshId = (refresh: string): void => {
-    saveTextFile(commonPaths.fileTwitterRefreshId, refresh)
-}
-
-/**
- * Add new data to tweets and update refresh id
- */
-const addTwitterData = (data: Twit.Twitter.SearchResults): void => {
-    tweets.push(
-        ...data.statuses
-            .flatMap((status: Twit.Twitter.Status) => cleanName(filterXSS(status.full_text ?? "")))
-            .sort(simpleStringSort)
-    )
-    refresh = data.search_metadata.max_id_str ?? ""
-    /*
-    console.log(
-        data.statuses.length,
-        tweets.length,
-        refresh,
-        data.statuses.flatMap(status => cleanName(xss(status.full_text))).sort()
-    );
-     */
-}
-
-/**
- * Load data from twitter
- * @param query - Twitter query
- * @param since_id - Last tweet id
- */
-const getTwitterData = async (query: string, since_id: string = refresh): Promise<void> => {
-    // console.log("getTwitterData", "query:", query, "since_id:", since_id, "refresh:", refresh);
-    await Twitter.get("search/tweets", {
-        count: 100,
-        include_entities: false,
-        q: query,
-        result_type: "recent",
-        since_id,
-        tweet_mode: "extended",
-    })
-        .catch((error) => {
-            throw error.stack
-        })
-        .then((result) => {
-            addTwitterData(result.data as Twit.Twitter.SearchResults)
-        })
-}
-
-/**
- * Get tweets since sinceDateTime
- * @param sinceDateTime - Start dateTime
- */
-const getTweetsSince = async (sinceDateTime: dayjs.Dayjs): Promise<void> => {
-    const now = dayjs.utc()
-
-    for (let queryTime = sinceDateTime; queryTime.isBefore(now); queryTime = queryTime.add(1, "hour")) {
-        const query = `"[${queryTime.format("DD-MM-YYYY")}+${String(queryTime.hour()).padStart(2, "0")}:"+${queryFrom}`
-        // eslint-disable-next-line no-await-in-loop
-        await getTwitterData(query, refreshDefault)
-    }
-}
-
-/**
- * Get all available tweets from the 2 last days
- */
-const getTweetsFull = async (): Promise<void> => {
-    await getTweetsSince(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))
-}
-
-/**
- * Get tweets since maintenance
- */
-const getTweetsSinceMaintenance = async (): Promise<void> => {
-    await getTweetsSince(dayjs.utc(currentServerStartDateTime))
-}
-
-/**
- * Get tweets since last refresh id
- */
-const getTweetsSinceRefresh = async (): Promise<void> => {
-    await getTwitterData(queryFrom)
-}
-
-/**
- * Get partial data since maintenance or later based on refresh id
- */
-const getTweetsPartial = async (): Promise<void> => {
-    // eslint-disable-next-line unicorn/prefer-ternary
-    if (refresh === refreshDefault) {
-        await getTweetsSinceMaintenance()
-    } else {
-        await getTweetsSinceRefresh()
-    }
-}
-
-/**
- * Get tweets
- */
-const getTweets = async (): Promise<void> => {
-    tweets = []
-    refresh = getRefreshId()
-    Twitter = new Twit({
-        consumer_key: consumerKey,
-        consumer_secret: consumerSecret,
-        access_token: accessToken,
-        access_token_secret: accessTokenSecret,
-        timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-        strictSSL: true, // optional - requires SSL certificates to be valid.
-    })
-
-    // eslint-disable-next-line unicorn/prefer-ternary
-    if (runType.startsWith("full")) {
-        await getTweetsFull()
-    } else {
-        await getTweetsPartial()
-    }
-
-    saveRefreshId(refresh)
-    // console.log(tweets);
-}
 
 /**
  * Find port by name of port owning clan
@@ -434,12 +283,14 @@ const cleanFlags = (): FlagsPerNation[] => {
     for (const [nation, flagSet] of flagsMap) {
         const cleanedFlags = cleanExpiredAndDoubleEntries(flagSet)
 
-        if (cleanedFlags.size) {
+        if (cleanedFlags.size > 0) {
             // Map to FlagEntity[]
-            const flags = ([...cleanedFlags].map(([expire, number]) => ({
-                expire,
-                number,
-            })) as FlagEntity[]).sort(sortBy(["expire"]))
+            const flags = (
+                [...cleanedFlags].map(([expire, number]) => ({
+                    expire,
+                    number,
+                })) as FlagEntity[]
+            ).sort(sortBy(["expire"]))
 
             cleanedFlagsPerNation.push({
                 nation,
@@ -576,7 +427,8 @@ const updateTwitter = async (): Promise<void> => {
     flagsPerNations = readJson(flagsFilename)
 
     initFlags()
-    await getTweets()
+
+    tweets = await getTweets()
     await updatePorts()
     await updateFlags()
     if (runType.startsWith("partial")) {
