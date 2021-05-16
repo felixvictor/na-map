@@ -813,10 +813,10 @@ export default class DisplayPorts {
         const getPortBonus = (): HtmlResult => {
             return html`${portBonusType.map((bonus) => {
                 return html`${port?.portBonus?.[bonus]
-                    ? html`<div>
-                          <i class="icon icon-light icon-${bonus} me-1" aria-hidden="true"></i>
+                    ? html`<div class="me-1">
+                          <i class="icon icon-light icon-${bonus}" aria-hidden="true"></i>
                           <span class="visually-hidden">${bonus} bonus </span>
-                          <span class="x-large text-lighter align-top me-1">${port.portBonus[bonus]}</span>
+                          <div class="x-large text-lighter text-center">${port.portBonus[bonus]}</div>
                       </div>`
                     : html``}`
             })}`
@@ -825,8 +825,8 @@ export default class DisplayPorts {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center">
+            <div class="d-flex justify-content-between mb-4">
+                <div class="d-flex">
                     <img
                         alt="${port.icon}"
                         class="flag-icon me-3 align-self-stretch ${iconBorder}"
@@ -840,9 +840,9 @@ export default class DisplayPorts {
                     </div>
                 </div>
 
-                ${port.portBonus ? html`<div class="d-flex me-1">${getPortBonus()}</div>` : html``}
+                ${port.portBonus ? html`<div class="d-flex align-self-end me-1">${getPortBonus()}</div>` : html``}
 
-                <div class="d-flex flex-column justify-content-end">
+                <div class="d-flex flex-column justify-content-end align-self-center">
                     <div class="ms-auto">
                         ${port.portPoints ? html`<span class="x-large text-lighter">${port.portPoints}</span>` : html``}
                     </div>
