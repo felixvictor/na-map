@@ -7,7 +7,7 @@
     "scripts": {
         "build:commit-js": "git commit -m 'build: update dist' -- ./dist || true",
         "build:data:convert": "yarn node --experimental-specifier-resolution=node dist/js/node/convert-api-data.mjs",
-        "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter.mjs ${CONSUMER_KEY} ${CONSUMER_SECRET} ${ACCESS_TOKEN} ${ACCESS_TOKEN_SECRET}",
+        "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter.mjs ${BEARER_TOKEN}",
         "build:deploy-main": "       TARGET=na-map       run-s prod       build:push-prod deploy:netlify",
         "build:deploy-main-quiet": " TARGET=na-map       run-s prod-quiet build:push-prod deploy:netlify",
         "build:deploy-test": "       TARGET=na-map-test  run-s prod                         deploy:netlify-test",
@@ -206,7 +206,6 @@
         "svgo": "^2.3.0",
         "terser-webpack-plugin": "^5.1.2",
         "ts-node": "^9.1.1",
-        "twitter-v2": "^1.1.0",
         "typescript": "^4.2.4",
         "utility-types": "^3.10.0",
         "webpack": "5.37.0",

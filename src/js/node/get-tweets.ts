@@ -1,5 +1,5 @@
 import filterXSS from "xss"
-import Twitter, { RequestParameters } from "twitter-v2"
+import { default as nodeFetch, RequestInit } from "node-fetch"
 
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
@@ -16,7 +16,6 @@ type NextToken = string | undefined
 interface TwitterSearchResult {
     data: TwitterData[]
     meta: TwitterMetaData
-    errors: string
 }
 interface TwitterData {
     id: string
@@ -40,15 +39,12 @@ interface TwitterQueryParameters {
 
 const maxResults = "100"
 const queryFrom = "from:zz569k"
+const endpointUrl = "https://api.twitter.com/2/tweets/search/recent"
 
 const commonPaths = getCommonPaths()
-const consumerKey = process.argv[2]
-const consumerSecret = process.argv[3]
-const accessToken = process.argv[4]
-const accessTokenSecret = process.argv[5]
-export const runType = process.argv[6] ?? "full"
+const bearerToken = process.argv[2]
+export const runType = process.argv[3] ?? "full"
 
-let TwitterClient: Twitter
 const tweets: string[] = []
 const refreshDefault = "0"
 let refresh = refreshDefault
@@ -82,6 +78,33 @@ const addTwitterData = (data: TwitterData[]): void => {
     tweets.push(...data.map((tweet: TwitterData) => cleanName(filterXSS(tweet.text ?? ""))))
 }
 
+const readTwitterJson = async (parameters: TwitterQueryParameters): Promise<Error | TwitterSearchResult> => {
+    const url = new URL(endpointUrl)
+    const headers = {
+        authorization: `Bearer ${bearerToken}`,
+    }
+    const options: RequestInit = {
+        method: "GET",
+        headers,
+    }
+
+    for (const [key, value] of Object.entries(parameters)) {
+        url.searchParams.set(key, String(value))
+    }
+
+    try {
+        const response = await nodeFetch(url, options)
+
+        if (response.ok) {
+            return (await response.json()) as TwitterSearchResult
+        }
+
+        return new Error(`Cannot load ${url.toString()}: ${response.statusText}`)
+    } catch (error: unknown) {
+        throw new Error(error as string)
+    }
+}
+
 /**
  * Load data from twitter
  */
@@ -107,25 +130,27 @@ const getTwitterData = async (
         parameters.next_token = nextToken
     }
 
-    try {
-        const { data: tweetsRaw, meta }: TwitterSearchResult = await TwitterClient.get(
-            "tweets/search/recent",
-            parameters as RequestParameters
-        )
+    const result = await readTwitterJson(parameters)
 
-        if (tweetsRaw) {
-            addTwitterData(tweetsRaw)
-        }
-
-        // Test for new refresh id
-        if (BigInt(meta.newest_id ?? 0) > BigInt(refresh)) {
-            refresh = meta.newest_id!
-        }
-
-        return meta.next_token
-    } catch (error: unknown) {
-        throw new Error(error as string)
+    if (result instanceof Error) {
+        throw result
     }
+
+    const {
+        data: twitterDataRaw,
+        meta: { newest_id, next_token },
+    } = result
+
+    if (twitterDataRaw) {
+        addTwitterData(twitterDataRaw)
+    }
+
+    // Test for new refresh id
+    if (BigInt(newest_id ?? 0) > BigInt(refresh)) {
+        refresh = newest_id!
+    }
+
+    return next_token
 }
 
 /**
@@ -180,13 +205,6 @@ const getTweetsPartial = async (): Promise<void> => {
  */
 export const getTweets = async (): Promise<string[]> => {
     refresh = getRefreshId()
-
-    TwitterClient = new Twitter({
-        consumer_key: consumerKey,
-        consumer_secret: consumerSecret,
-        access_token_key: accessToken,
-        access_token_secret: accessTokenSecret,
-    })
 
     // eslint-disable-next-line unicorn/prefer-ternary
     if (runType.startsWith("full")) {
