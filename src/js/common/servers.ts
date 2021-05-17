@@ -16,12 +16,13 @@ export interface Server {
     id: ServerId
     name: string
     type: ServerType
+    icon: string
 }
 
 // If changed check also webpack.config
 export const servers: Server[] = [
-    { id: "eu1", name: "War", type: "PVP" },
-    { id: "eu2", name: "Peace", type: "PVE" },
+    { id: "eu1", name: "War", type: "PVP", icon: "war" },
+    { id: "eu2", name: "Peace", type: "PVE", icon: "peace" },
 ]
 
 /* testbed

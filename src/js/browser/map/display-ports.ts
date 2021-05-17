@@ -814,8 +814,7 @@ export default class DisplayPorts {
             return html`${portBonusType.map((bonus) => {
                 return html`${port?.portBonus?.[bonus]
                     ? html`<div class="me-1">
-                          <i class="icon icon-light icon-${bonus}" aria-hidden="true"></i>
-                          <span class="visually-hidden">${bonus} bonus </span>
+                          <i class="icon icon-light icon-${bonus}" role="img" aria-label="${bonus} bonus"></i>
                           <div class="x-large text-lighter text-center">${port.portBonus[bonus]}</div>
                       </div>`
                     : html``}`
@@ -848,24 +847,17 @@ export default class DisplayPorts {
                     </div>
                     <div class="ms-auto">
                         ${port.laborHoursDiscount
-                            ? html`<i class="icon icon-light icon-labour me-1" aria-hidden="true"></i
-                                  ><span class="visually-hidden"
-                                      >Labour hour discount level ${port.laborHoursDiscount}</span
-                                  >`
+                            ? html`<i class="icon icon-light icon-labour me-1" role="img" aria-label="Labour hour discount level ${port.laborHoursDiscount}"></i>`
                             : html``}
                         ${port.tradingCompany
-                            ? html`<i class="icon icon-light icon-trading me-1" aria-hidden="true"></i
-                                  ><span class="visually-hidden">Trading company level ${port.tradingCompany}</span>`
+                            ? html`<i class="icon icon-light icon-trading me-1" role="img" aria-label="Trading company level ${port.tradingCompany}"></i>`
                             : html``}
                         ${port.availableForAll
-                            ? html`<i class="icon icon-light icon-open me-1" aria-hidden="true"></i
-                                  ><span class="visually-hidden">Accessible to all</span>`
+                            ? html`<i class="icon icon-light icon-open me-1" role="img" aria-label="Accessible to all"></i>`
                             : html``}
                         ${port.shallow
-                            ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
-                                  ><span class="visually-hidden">Shallow</span>`
-                            : html`<i class="icon icon-light icon-deep" aria-hidden="true"></i
-                                  ><span class="visually-hidden">Deep</span>`}
+                            ? html`<i class="icon icon-light icon-shallow" role="img" aria-label="Shallow"></i>`
+                            : html`<i class="icon icon-light icon-deep" role="img" aria-label="Deep"></i>`}
                     </div>
                 </div>
             </div>

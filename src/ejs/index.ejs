@@ -8,16 +8,39 @@
 
 <% function makeRadioGroup(data) { %>
     <h6 class="dropdown-header"><%= data.title %></h6>
-    <div class="ms-3" id="<%= data.name %>">
+    <div class="ms-3 mb-3" id="<%= data.name %>">
         <% data.radios.forEach(function(radio) { %>
-            <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input"
-                       name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>" value="<%= radio.id %>">
-                <label class="form-check-label" for="<%= data.name %>-<%= radio.id %>"><%= radio.title %></label>
-            </div>
+            <input type="radio" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>"
+                   autocomplete="off" value="<%= radio.id %>">
+            <label class="btn btn-toggle text-body" for="<%= data.name %>-<%= radio.id %>"><%= radio.title %></label>
         <% }) %>
     </div>
 <% } %>
+
+<% function makeRadioToggleButtons(data) { %>
+    <h6 class="dropdown-header"><%= data.title %></h6>
+    <div class="ms-3 mb-3" id="<%= data.name %>">
+        <% data.radios.forEach(function(radio) { %>
+            <input type="radio" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>"
+                   autocomplete="off" value="<%= radio.id %>">
+            <label class="btn btn-toggle" for="<%= data.name %>-<%= radio.id %>" title="<%= radio.title %>">
+                <i class="icon icon-<%= radio.icon %> icon-navbar" role="img" aria-label="<%= radio.title %>"></i>
+            </label>
+        <% }) %>
+    </div>
+<% } %>
+
+<% function makeCheckboxGroup(data) { %>
+    <h6 class="dropdown-header"><%= data.title %></h6>
+    <div class="ms-3 mb-3" id="<%= data.name %>">
+        <input type="checkbox" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= data.name %>"
+               autocomplete="off">
+        <label class="btn btn-toggle" for="<%= data.name %>-<%= data.name %>" title="<%= data.title %>">
+            <i class="icon icon-<%= data.name %> icon-navbar" role="img" aria-label="<%= data.title %>"></i>
+        </label>
+    </div>
+<% } %>
+
 
 <% function makeSelects(data) { %>
     <% data.forEach(function(select) { %>
@@ -193,8 +216,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
                        role="button" title="Map tools" aria-label="Map tools"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="icon icon-map icon-navbar" aria-hidden="true"></i><span
-                                class="visually-hidden">Map tools</span>
+                        <i class="icon icon-map icon-navbar" role="img" aria-label="Map tools"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
                          aria-labelledby="map-tools-dropdown">
@@ -214,8 +236,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="game-tools-dropdown"
                        role="button" title="Game tools" aria-label="Game tools"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="icon icon-bar-chart icon-navbar" aria-hidden="true"></i><span
-                                class="visually-hidden">Game tools</span>
+                        <i class="icon icon-bar-chart icon-navbar" role="img" aria-label="Game tools"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
                          aria-labelledby="game-tools-dropdown">
@@ -257,23 +278,21 @@
                     <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false" title="Settings"
                        aria-label="Settings">
-                        <i class="icon icon-options icon-navbar" aria-hidden="true"></i><span
-                                class="visually-hidden">Settings</span>
+                        <i class="icon icon-options icon-navbar" role="img" aria-label="Settings"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end extra-large-width" id="settingsMenu"
                          aria-labelledby="settingsDropdown">
-
+                    <form>
                         <% let dataRadio = {
                             title: "Game server",
                             name: "server-name",
                             radios: []
                         }%>
                         <% for (const server of htmlWebpackPlugin.options.servers) {
-                            dataRadio.radios.push({ id: server.id, title: `${server.name} (${server.type})` })
+                            dataRadio.radios.push({ id: server.id, title: server.name, icon: server.icon })
                         } %>
-                        <% makeRadioGroup(dataRadio) %>
+                        <% makeRadioToggleButtons(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Show per port",
                             name: "show-radius",
@@ -289,60 +308,55 @@
                         }%>
                         <% makeRadioGroup(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Zones</h6>
-                        <div class="ms-3" id="show-zones">
-                        </div>
+                        <% dataRadio = {
+                            title: "Zones",
+                            name: "show-zones",
+                            radios: [
+                                { id: "pb-all", title: "All ports" },
+                                { id: "pb-single", title: "Single port" },
+                                { id: "raid-all", title: "All raid" },
+                                { id: "raid-single", title: "Single raid" },
+                                { id: "off", title: "Off" }
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Show Trades",
-                            name: "show-trades",
-                            radios: [
-                                {id: "on", title: "On"},
-                                {id: "off", title: "Off"}
-                            ]
+                            name: "show-trades"
                         }%>
-                        <% makeRadioGroup(dataRadio) %>
+                        <% makeCheckboxGroup(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Show grid",
-                            name: "show-grid",
-                            radios: [
-                                {id: "on", title: "On"},
-                                {id: "off", title: "Off"}
-                            ]
+                            name: "show-grid"
                         }%>
-                        <% makeRadioGroup(dataRadio) %>
+                        <% makeCheckboxGroup(dataRadio) %>
 
-                        <div class="dropdown-divider"></div>
                         <% dataRadio = {
                             title: "Double click to",
                             name: "double-click-action",
                             radios: [
-                                {id: "compass", title: "Plot a course"},
-                                {id: "f11", title: "Show F11 coordinates"}
+                                {id: "compass", title: "Plot a course", icon: "show-course"},
+                                {id: "f11", title: "Show F11 coordinates", icon: "show-f11"}
                             ]
                         }%>
-                        <% makeRadioGroup(dataRadio) %>
+                        <% makeRadioToggleButtons(dataRadio) %>
+                    </form>
                     </div>
                 </li>
 
                 <form>
                     <div class="btn-group" role="group">
                         <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
-                            <i class="icon icon-clear icon-navbar" aria-hidden="true"></i><span
-                                    class="visually-hidden">Clear</span>
+                            <i class="icon icon-clear icon-navbar" role="img" aria-label="Clear"></i>
                         </button>
                         <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
                            href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
-                            <i class="icon icon-gift icon-navbar" aria-hidden="true"></i><span
-                                    class="visually-hidden">Donate</span>
+                            <i class="icon icon-gift icon-navbar" role="img" aria-label="Donate"></i>
                         </a>
                         <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
-                            <i class="icon icon-info icon-navbar" aria-hidden="true"></i><span
-                                    class="visually-hidden">About</span>
+                            <i class="icon icon-info icon-navbar" role="img" aria-label="About"></i>
                         </button>
                     </div>
                 </form>

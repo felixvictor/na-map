@@ -69,6 +69,7 @@ const getSearchParams = (): URLSearchParams => new URL(document.location.href).s
  */
 const serverNameSelected = (): void => {
     const serverId = radios.get()
+
     cookie.set(serverId)
     document.location.reload()
 }
@@ -163,8 +164,7 @@ const main = (): void => {
     registerPage("Homepage")
 
     setupListener()
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    load()
+    void load()
 }
 
 main()

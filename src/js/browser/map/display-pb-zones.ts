@@ -29,7 +29,7 @@ export default class DisplayPbZones {
     #upperBound = {} as Point
     private readonly _ports!: DisplayPorts
     private readonly _showId: string
-    private readonly _showValues: Array<{ id: string; label: string }>
+    private readonly _showValues: string[]
     private readonly _showCookie: Cookie
     private readonly _showRadios: RadioButton
     private _isDataLoaded: boolean
@@ -48,28 +48,17 @@ export default class DisplayPbZones {
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          */
-        this._showValues = [
-            { id: "pb-all", label: "All ports" },
-            { id: "pb-single", label: "Single port" },
-            { id: "raid-all", label: "All raid" },
-            { id: "raid-single", label: "Single raid" },
-            { id: "off", label: "Off" },
-        ]
-
-        this._setupRadios()
+        this._showValues = ["All ports", "Single port", "All raid", "Single raid", "Off"]
 
         /**
          * Show port battle zones cookie
          */
-        this._showCookie = new Cookie({ id: this._showId, values: this._showValues.map((item) => item.id) })
+        this._showCookie = new Cookie({ id: this._showId, values: this._showValues })
 
         /**
          * Show port battle zones radio buttons
          */
-        this._showRadios = new RadioButton(
-            this._showId,
-            this._showValues.map((item) => item.id)
-        )
+        this._showRadios = new RadioButton(this._showId, this._showValues)
 
         /**
          * Get showLayer setting from cookie or use default value
@@ -84,23 +73,6 @@ export default class DisplayPbZones {
 
     _setupSvg(): void {
         this._g = d3Select<SVGSVGElement, unknown>("#map").insert<SVGGElement>("g", "#ports").attr("class", "pb")
-    }
-
-    _setupRadios(): void {
-        const divMain = d3Select("#show-zones")
-        for (const radioItem of this._showValues) {
-            const div = divMain.append("div").attr("class", "form-check form-check-inline")
-            div.append("input")
-                .attr("type", "radio")
-                .attr("class", "form-check-input")
-                .attr("name", "show-zones")
-                .attr("id", `show-zones-${radioItem.id}`)
-                .attr("value", radioItem.id)
-            div.append("label")
-                .attr("class", "form-check-label")
-                .attr("for", `show-zones-${radioItem.id}`)
-                .text(radioItem.label)
-        }
     }
 
     async _loadData(): Promise<void> {

@@ -52,13 +52,13 @@ $icon-size-large: math.round($icon-size * 1.2);
 }
 
 $icon-list: back bar-chart calendar chevron-bottom chevron-left chevron-right chevron-top clear clock clone-left
-    clone-right close copy crew deep end faster forward gift gunnery hull image info labour map mast pb-list normal open
-    options pause play sailing shallow slower start stop trading;
+    clone-right close copy crew deep end faster forward gift gunnery hull image info labour map mast pb-list peace
+    normal open options pause play sailing shallow show-course show-f11 show-grid show-trades slower start stop trading war;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {
         // vendor prefix to avoid double entries (Firefox can also accept -webkit-mask-image)
         //noinspection Stylelint
-        -webkit-mask-image: url("#{$icon-dir}/icon-#{$icon}.svg");
+        mask-image: url("#{$icon-dir}/icon-#{$icon}.svg");
     }
 }
