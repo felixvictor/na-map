@@ -24,7 +24,7 @@ import { formatFloatFixed } from "common/common-format"
 
 import { Selection } from "d3-selection"
 import { Cannon, CannonDamage, CannonEntity, CannonGeneric, CannonPenetration } from "common/gen-json"
-import { HeaderMap, HtmlResult, HtmlString } from "common/interface"
+import { HeaderMap, HtmlResult, HtmlString, Key } from "common/interface"
 import Modal from "util/modal"
 
 interface FamilyRowData {
@@ -41,10 +41,10 @@ interface RowData {
  */
 export default class ListCannons {
     readonly #baseId: HtmlString
-    readonly #baseName = "List cannons"
+    readonly #baseName = "List of cannons"
     readonly #checkboxId: HtmlString
     readonly #groupOrder = ["name", "damage", "penetration", "generic", "family"]
-    readonly #header = { group: new Map(), element: new Set() } as HeaderMap
+    readonly #header = { group: new Map<Key, number>(), element: new Set<Key>() } as HeaderMap
     readonly #menuId: HtmlString
     readonly #rows = {} as CannonTypeList<Selection<HTMLTableRowElement, RowData[], HTMLTableSectionElement, unknown>>
     readonly #switchesSel = {} as CannonTypeList<HTMLInputElement[]>
@@ -102,35 +102,33 @@ export default class ListCannons {
 
         // Get data, sort by groupOrder
         for (const type of cannonType) {
-            this.#cannonDataDefault[type] = cannonData[type].map(
-                (cannon: CannonEntity): FamilyRowData => {
-                    const elements = [] as RowData[]
-                    const cannonSorted = Object.entries(cannon).sort(
-                        (a, b) => this.#groupOrder.indexOf(a[0]) - this.#groupOrder.indexOf(b[0])
-                    )
-                    for (const [groupKey, groupValue] of cannonSorted) {
-                        if (groupKey === "name") {
-                            elements.push(this._getFormattedName(groupValue as string))
-                        } else if (groupKey !== "family") {
-                            for (const [, elementValue] of Object.entries(
-                                groupValue as CannonDamage | CannonGeneric | CannonPenetration
-                            )) {
-                                if (elementValue) {
-                                    elements.push({
-                                        value: elementValue.value,
-                                        formattedValue:
-                                            elementValue.value === 0
-                                                ? ""
-                                                : formatFloatFixed(elementValue.value, elementValue?.digits ?? 0),
-                                    })
-                                }
+            this.#cannonDataDefault[type] = cannonData[type].map((cannon: CannonEntity): FamilyRowData => {
+                const elements = [] as RowData[]
+                const cannonSorted = Object.entries(cannon).sort(
+                    (a, b) => this.#groupOrder.indexOf(a[0]) - this.#groupOrder.indexOf(b[0])
+                )
+                for (const [groupKey, groupValue] of cannonSorted) {
+                    if (groupKey === "name") {
+                        elements.push(this._getFormattedName(groupValue as string))
+                    } else if (groupKey !== "family") {
+                        for (const [, elementValue] of Object.entries(
+                            groupValue as CannonDamage | CannonGeneric | CannonPenetration
+                        )) {
+                            if (elementValue) {
+                                elements.push({
+                                    value: elementValue.value,
+                                    formattedValue:
+                                        elementValue.value === 0
+                                            ? ""
+                                            : formatFloatFixed(elementValue.value, elementValue?.digits ?? 0),
+                                })
                             }
                         }
                     }
-
-                    return { family: cannon.family, data: elements }
                 }
-            )
+
+                return { family: cannon.family, data: elements }
+            })
         }
     }
 

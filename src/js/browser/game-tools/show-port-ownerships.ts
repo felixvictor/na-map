@@ -49,7 +49,7 @@ export default class ShowPortOwnerships {
     #div = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     readonly #baseId: HtmlString
-    readonly #baseName = "Ownership overview"
+    readonly #baseName = "Port ownership overview"
     readonly #menuId: HtmlString
 
     private _ownershipData = {} as Ownership[]
@@ -59,7 +59,7 @@ export default class ShowPortOwnerships {
     constructor(serverId: ServerId) {
         this.#serverId = serverId
 
-        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
         this.#menuId = `menu-${this.#baseId}`
 
         this._colourScale = d3ScaleOrdinal<string>().range(colourList)

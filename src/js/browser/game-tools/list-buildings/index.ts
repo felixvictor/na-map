@@ -23,7 +23,7 @@ import Select from "util/select"
 
 export default class ListBuildings {
     readonly #baseId: HtmlString
-    readonly #baseName = "List buildings"
+    readonly #baseName = "List of buildings"
     readonly #menuId: HtmlString
     #buildingData = {} as Building[]
     #labelSel = {} as Selection<HTMLLabelElement, unknown, HTMLElement, unknown>

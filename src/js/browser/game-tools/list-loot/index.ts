@@ -42,7 +42,7 @@ export default class ListLoot {
     #selectedItemId = 0
     #selectedType: LootType = "" as LootType
     readonly #baseId: HtmlString
-    readonly #baseName = "List loot and chests"
+    readonly #baseName = "List of loot and chests"
     readonly #menuId: HtmlString
     readonly #regularLootTypes = new Set<LootType>(["chest", "fish", "loot"])
     readonly #types: LootType[] = lootType

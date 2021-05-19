@@ -57,7 +57,7 @@ export default class ListShipBlueprints {
     #tables = {} as TableTypeList<Selection<HTMLTableElement, unknown, HTMLElement, unknown>>
     #woodData = {} as WoodData
     readonly #baseId: HtmlString
-    readonly #baseName = "List ship blueprint"
+    readonly #baseName = "List of ship blueprints"
     readonly #menuId: HtmlString
 
     constructor() {

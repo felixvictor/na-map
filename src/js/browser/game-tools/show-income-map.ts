@@ -64,14 +64,14 @@ export default class ShowIncomeMap {
     #tree = {} as TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>
     #width = 0
     readonly #baseId: HtmlString
-    readonly #baseName = "Show port net income"
+    readonly #baseName = "Port net income"
     readonly #colourScale: ScaleOrdinal<string, string>
     readonly #menuId: HtmlString
 
     constructor(serverId: ServerId) {
         this.#serverId = serverId
 
-        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
         this.#menuId = `menu-${this.#baseId}`
 
         this.#colourScale = d3ScaleOrdinal<string>().range(colourList)

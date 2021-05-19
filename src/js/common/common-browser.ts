@@ -299,4 +299,4 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
 }
 
 export const getIdFromBaseName = (baseName: string): HtmlString =>
-    baseName.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", "")
+    baseName.toLocaleLowerCase().replace("of ", "").replaceAll(" ", "-").replaceAll("’", "")

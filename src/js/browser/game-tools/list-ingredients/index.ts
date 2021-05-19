@@ -26,7 +26,7 @@ export default class ListIngredients {
     #modal: Modal | undefined = undefined
     #moduleData = [] as Module[]
     readonly #baseId: HtmlString
-    readonly #baseName = "List recipe ingredients"
+    readonly #baseName = "List of recipe ingredients"
     readonly #menuId: HtmlString
 
     constructor() {

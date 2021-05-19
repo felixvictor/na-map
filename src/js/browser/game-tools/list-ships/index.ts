@@ -32,7 +32,7 @@ export default class ShipList {
     #sortIndex = 0
     #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
     readonly #baseId: HtmlString
-    readonly #baseName = "List ships"
+    readonly #baseName = "List of ships"
     readonly #menuId: HtmlString
 
     constructor() {
@@ -71,8 +71,6 @@ export default class ShipList {
                 [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
             ]
         )
-
-        console.log(shipData, this.#shipListData)
     }
 
     async _menuClicked(): Promise<void> {

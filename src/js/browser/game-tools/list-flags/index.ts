@@ -35,7 +35,7 @@ type TableRowDisplay = [string, string, number]
 
 export default class ListFlags {
     readonly #baseId: HtmlString
-    readonly #baseName = "List conquest flags"
+    readonly #baseName = "List of conquest flags"
     readonly #inputId: HtmlString
     readonly #menuId: HtmlString
     readonly #serverId: ServerId

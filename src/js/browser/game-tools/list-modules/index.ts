@@ -22,7 +22,7 @@ import Select from "util/select"
 
 export default class ListModules {
     readonly #baseId: HtmlString
-    readonly #baseName = "List modules"
+    readonly #baseName = "List of modules"
     readonly #menuId: HtmlString
     #modal: Modal | undefined = undefined
     #select = {} as Select

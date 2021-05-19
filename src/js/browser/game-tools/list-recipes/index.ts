@@ -28,7 +28,7 @@ const replacer = (match: string, p1: number, p2: number): string =>
 
 export default class ListRecipes {
     readonly #baseId: HtmlString
-    readonly #baseName = "List admiralty items and recipes"
+    readonly #baseName = "List of admiralty items and recipes"
     readonly #menuId: HtmlString
     readonly #serverType: ServerType
     #modal: Modal | undefined = undefined

@@ -35,7 +35,7 @@ interface PortData {
  */
 export default class ListPortBonus {
     readonly #baseId: HtmlString
-    readonly #baseName = "List port bonuses"
+    readonly #baseName = "List of port bonuses"
     readonly #menuId: HtmlString
     #modal: Modal | undefined = undefined
 

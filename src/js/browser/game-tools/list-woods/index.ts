@@ -27,7 +27,7 @@ import Modal from "util/modal"
 export default class ListWoods {
     #modal: Modal | undefined = undefined
     readonly #baseId: HtmlString
-    readonly #baseName = "List woods"
+    readonly #baseName = "List of woods"
     readonly #checkboxId: HtmlString
     readonly #menuId: HtmlString
 

@@ -65,7 +65,7 @@ interface DivDimension {
 export default class PowerMap {
     #serverId: ServerId
     readonly #baseId: HtmlString
-    readonly #baseName = "Ownership map"
+    readonly #baseName = "Port ownership map"
     readonly #menuId: HtmlString
 
     #columnsPerRow = 0
@@ -106,7 +106,7 @@ export default class PowerMap {
         this.#serverId = serverId
         this.#NAMap = map
 
-        this.#baseId = getIdFromBaseName(this.#baseName)
+        this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
         this.#menuId = `menu-${this.#baseId}`
 
         this.#coord = coord
