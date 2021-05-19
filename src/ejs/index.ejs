@@ -41,12 +41,39 @@
     </div>
 <% } %>
 
+<% function makeSimpleList(data) { %>
+    <% data.forEach(function(item) { %>
+        <% const id = getBaseId(item.name) %>
+        <li><a class="dropdown-item d-flex align-items-center" id="menu-<%= id %>"><span
+                        class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
+                            class="icon icon-menu icon-<%= item.icon %>" role="img"
+                            aria-label="<%= item.name %>"></i></span>
+                <div class="menu-item-text">
+                    <% if(item.name==="Go to F11") { %>
+                        Go to <span class="caps">F11</span>
+                        <span
+                                class="small text-end badge badge-pill bg-primary">shift+<span
+                                class="caps">F11</span></span>
+                    <% } else { %>
+                        <%= item.name %>
+                    <% } %>
+                </div>
+            </a></li>
+    <% }) %>
+<% } %>
 
 <% function makeList(type, data) { %>
-    <% data.forEach(function(item) { %>
-        <% const id = getBaseId(item) %>
-        <a class="dropdown-item" id="menu-<%= type %>-<%= id %>"><%= item %></a>
-    <% }) %>
+    <div class="row row-cols-2 g-0">
+        <% data.forEach(function(item) { %>
+            <% const id = getBaseId(item.name) %>
+            <li><a class="dropdown-item d-flex align-items-center" id="menu-<%= type %>-<%= id %>"><span
+                            class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
+                                class="icon icon-menu icon-<%= item.icon %>" role="img"
+                                aria-label="<%= item.name %>"></i></span>
+                    <div class="menu-item-text"><%= item.name %></div>
+                </a></li>
+        <% }) %>
+    </div>
 <% } %>
 
 <% function makeSelects(data) { %>
@@ -179,31 +206,29 @@
                            data-bs-toggle="dropdown" aria-expanded="false">
                             Select ports on
                         </a>
-                        <div class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
-                            <h6 class="dropdown-header">Port owner</h6>
-                                <label class="dropend">
+                        <ul class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
+                            <li><h6 class="dropdown-header">Port owner</h6></li>
+                            <li><label class="dropend">
                                     <select title="Select nation" name="port-select-nation-select"
                                             id="port-select-nation-select"></select>
-                                </label>
-                                <label class="dropend">
+                                </label></li>
+                            <li><label class="dropend">
                                     <select title="Select clan" name="port-select-clan-select"
                                             id="port-select-clan-select"></select>
-                                </label>
+                                </label></li>
 
-                            <div class="dropdown-divider"></div>
-                            <h6 class="dropdown-header">Port property</h6>
-                            <a class="dropdown-item" id="menu-prop-deep">Deep water</a>
-                            <a class="dropdown-item" id="menu-prop-shallow">Shallow water</a>
-                            <a class="dropdown-item" id="menu-prop-all">Available to all</a>
-                            <a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a>
+                            <li><h6 class="dropdown-header mt-3">Port property</h6></li>
+                            <li><a class="dropdown-item" id="menu-prop-deep">Deep water</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-shallow">Shallow water</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-all">Available to all</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a></li>
 
-                            <div class="dropdown-divider"></div>
-                            <h6 class="dropdown-header">Port capture time</h6>
-                            <a class="dropdown-item" id="menu-prop-today">Today</a>
-                            <a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a>
-                            <a class="dropdown-item" id="menu-prop-this-week">This week</a>
-                            <a class="dropdown-item" id="menu-prop-last-week">Last week</a>
-                        </div>
+                            <li><h6 class="dropdown-header mt-3">Port capture time</h6></li>
+                            <li><a class="dropdown-item" id="menu-prop-today">Today</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-this-week">This week</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-last-week">Last week</a></li>
+                        </ul>
                     </div>
                 </div>
 
@@ -223,20 +248,21 @@
                     <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
                        role="button" title="Map tools" aria-label="Map tools"
                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="icon icon-map icon-navbar" role="img" aria-label="Map tools"></i>
+                        <i class="icon icon-map-tools icon-navbar" role="img" aria-label="Map tools"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" id="map-tools-menu"
+                    <ul class="dropdown-menu dropdown-menu-md dropdown-menu-end" id="map-tools-menu"
                          aria-labelledby="map-tools-dropdown">
 
-                        <a class="dropdown-item" id="menu-predict-wind" href="#">Predict wind</a>
-                        <a class="dropdown-item" id="menu-in-game-wind" href="#">In-game wind</a>
-                        <a class="dropdown-item" id="menu-go-to-f11" href="#">Go to <span class="caps">F11</span>
-                            <span
-                                    class="small text-end badge badge-pill bg-primary">shift+<span
-                                        class="caps">F11</span></span></a>
-                        <a class="dropdown-item" id="menu-get-position" href="#">Get position</a>
-                        <a class="dropdown-item" id="menu-make-journey" href="#">Make journey</a>
-                    </div>
+                        <% let dataList = [
+                            { name: "Predict wind", icon: "wind" },
+                            { name: "In-game wind", icon: "info" },
+                            { name: "Go to F11", icon: "info" },
+                            { name: "Get position", icon: "info" },
+                            { name: "Make journey", icon: "info" }
+                        ] %>
+                        <% makeSimpleList(dataList) %>
+
+                    </ul>
                 </li>
 
                 <li class="nav-item dropdown pe-2">
@@ -245,49 +271,51 @@
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="icon icon-bar-chart icon-navbar" role="img" aria-label="Game tools"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" id="game-tools-menu"
+                    <ul class="dropdown-menu dropdown-menu-xl dropdown-menu-end" id="game-tools-menu"
                          aria-labelledby="game-tools-dropdown">
 
-                        <h6 class="dropdown-header">Compare</h6>
-                        <% let dataList = [
-                            "Ships",
-                            "Woods"
+                        <li><h6 class="dropdown-header">Compare</h6></li>
+                        <% dataList = [
+                            { name: "Ships", icon: "sailing" },
+                            { name: "Woods", icon: "wood" }
                         ] %>
                         <% makeList("compare", dataList) %>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">List</h6>
+                        <li><h6 class="dropdown-header mt-3">List</h6></li>
                         <% dataList = [
-                            "Admiralty items and recipes",
-                            "Buildings",
-                            "Cannons",
-                            "Conquest flags",
-                            "Loot and chests",
-                            "Modules",
-                            "Port battles",
-                            "Port bonuses",
-                            "Recipe ingredients",
-                            "Ships",
-                            "Ship blueprints",
-                            "Woods"
+                            { name: "Admiralty items and recipes", icon: "admiralty" },
+                            { name: "Buildings", icon: "building" },
+                            { name: "Cannons", icon: "cannon" },
+                            { name: "Conquest flags", icon: "flag" },
+                            { name: "Loot and chests", icon: "loot" },
+                            { name: "Modules", icon: "modules" },
+                            { name: "Port battles", icon: "war" },
+                            { name: "Port bonuses", icon: "bonus" },
+                            { name: "Recipe ingredients", icon: "ingredient" },
+                            { name: "Ships", icon: "sailing" },
+                            { name: "Ship blueprints", icon: "labour" },
+                            { name: "Woods", icon: "wood" }
                         ] %>
                         <% makeList("list", dataList) %>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Show</h6>
+                        <li><h6 class="dropdown-header mt-3">Show</h6></li>
                         <% dataList = [
-                            "Port net income",
-                            "Port ownership overview",
-                            "Port ownership map"
+                            { name: "Port net income", icon: "income" },
+                            { name: "Port ownership overview", icon: "overview" },
+                            { name: "Port ownership map", icon: "map" }
                         ] %>
                         <% makeList("show", dataList) %>
 
-                        <div class="dropdown-divider"></div>
-                        <h6 class="dropdown-header">Download</h6>
+                        <li><h6 class="dropdown-header mt-3">Download</h6></li>
                         <!--suppress HtmlUnknownTarget -->
-                        <a class="dropdown-item" id="menu-download-pb-calc" href="data/port-battle.xlsx"
-                           download="port-battle-calculator.xlsx">Port battle calculator</a>
-                    </div>
+                        <li><a class="dropdown-item d-flex align-items-center" id="menu-download-pb-calc"
+                               href="data/port-battle.xlsx" download="port-battle-calculator.xlsx"><span
+                                        class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
+                                            class="icon icon-menu icon-spreadsheet" role="img"
+                                            aria-label="Port battle calculator"></i></span>Port battle calculator</a>
+                        </li>
+                    </ul>
+
                 </li>
 
                 <li class="nav-item dropdown pe-2">
@@ -296,7 +324,7 @@
                        aria-label="Settings">
                         <i class="icon icon-options icon-navbar" role="img" aria-label="Settings"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end extra-large-width" id="settingsMenu"
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg" id="settingsMenu"
                          aria-labelledby="settingsDropdown">
                     <form>
                         <% let dataRadio = {
@@ -359,7 +387,7 @@
                         }%>
                         <% makeRadioToggleButtons(dataRadio) %>
                     </form>
-                    </div>
+                    </ul>
                 </li>
 
                 <form>

@@ -158,14 +158,6 @@ text,
     letter-spacing: 0.3rem;
 }
 
-.extra-large-width {
-    min-width: 25rem;
-}
-
-.large-width {
-    min-width: 18rem;
-}
-
 .column-base .row-light {
     background-color: $paper-200;
 }
@@ -174,7 +166,7 @@ text,
     background-color: $paper-300;
 }
 
-/////////////////////////////////////7
+/////////////////////////////////////
 // tooltip
 
 .tooltip {
@@ -201,7 +193,7 @@ text,
     }
 }
 
-/////////////////////////////////////7
+/////////////////////////////////////
 // table
 
 .table-sort {
@@ -235,7 +227,7 @@ table {
     text-align: start;
 }
 
-/////////////////////////////////////7
+/////////////////////////////////////
 // dropdown
 
 .bootstrap-select {
@@ -244,15 +236,24 @@ table {
     }
 }
 
-.dropdown-divider {
-    border: unset;
+.dropdown-menu-md {
+    min-width: 15rem;
 }
 
-.dropdown-header {
-    font-size: medium;
+.dropdown-menu-lg {
+    min-width: 20rem;
 }
 
-/////////////////////////////////////7
+.dropdown-menu-xl {
+    min-width: 28rem;
+}
+
+.menu-item-text {
+    line-height: 1;
+    white-space: normal;
+}
+
+/////////////////////////////////////
 // bar
 
 .rate {
