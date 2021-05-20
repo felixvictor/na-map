@@ -465,6 +465,17 @@ export default class DisplayPorts {
             circleCapital.setAttribute("cx", String(this.#iconSize / 2))
             circleCapital.setAttribute("cy", String(this.#iconSize / 2))
             circleCapital.setAttribute("r", "16")
+            circleCapital.setAttribute("class", "circle-highlight-yellow")
+
+            return circleCapital
+        }
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const getCircleRegionCapital = (): SVGCircleElement => {
+            const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+            circleCapital.setAttribute("cx", String(this.#iconSize / 2))
+            circleCapital.setAttribute("cy", String(this.#iconSize / 2))
+            circleCapital.setAttribute("r", "16")
             circleCapital.setAttribute("class", "circle-highlight")
 
             return circleCapital
@@ -490,22 +501,27 @@ export default class DisplayPorts {
             const patternNode = svgDefNode.appendChild(patternElement)
 
             if (nation !== "FT") {
+                const patternRegionCapital = patternNode.cloneNode(true) as SVGPatternElement
+                patternRegionCapital.id = `${nation}r`
+                patternRegionCapital.append(getCircleRegionCapital())
+                svgDefNode.append(patternRegionCapital)
+            }
+
+            if (nation !== "NT" && nation !== "FT") {
                 const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
                 patternCapital.id = `${nation}c`
                 patternCapital.append(getCircleCapital())
                 svgDefNode.append(patternCapital)
-            }
 
-            if (nation !== "NT" && nation !== "FT") {
                 const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
                 patternAvail.id = `${nation}a`
                 patternAvail.append(getRectAvail())
                 svgDefNode.append(patternAvail)
 
-                const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
-                patternCapitalAvail.id = `${nation}ca`
-                patternCapitalAvail.append(getCircleCapital())
-                svgDefNode.append(patternCapitalAvail)
+                const patternRegionCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
+                patternRegionCapitalAvail.id = `${nation}ra`
+                patternRegionCapitalAvail.append(getCircleRegionCapital())
+                svgDefNode.append(patternRegionCapitalAvail)
             }
         }
     }
@@ -856,9 +872,9 @@ export default class DisplayPorts {
                 enter
                     .append("circle")
                     .attr("fill", (d) => {
-                        const appendix = `${d.countyCapital && d.capturable ? "c" : ""}${
-                            d.availableForAll && d.nation !== "NT" ? "a" : ""
-                        }`
+                        const appendix = `${d.nation === "FT" || d.nation === "NT" || d.capturable ? "" : "c"}${
+                            d.countyCapital && d.capturable ? "r" : ""
+                        }${d.availableForAll && d.nation !== "NT" ? "a" : ""}`
                         return `url(#${d.nation}${appendix})`
                     })
                     .attr("cx", (d) => d.coordinates[0])

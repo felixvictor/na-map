@@ -76,10 +76,18 @@ text,
     text-align: left;
 }
 
-// capital ports
+// Region capital ports
 .circle-highlight {
     fill: none;
     stroke: $white;
+    stroke-opacity: 0.8;
+    stroke-width: 0.4rem;
+}
+
+// Capital ports
+.circle-highlight-yellow {
+    fill: none;
+    stroke: $yellow;
     stroke-opacity: 0.8;
     stroke-width: 0.4rem;
 }
