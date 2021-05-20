@@ -21,7 +21,7 @@ import { WoodData } from "./data"
 import { woodType, WoodType } from "common/types"
 import Select from "util/select"
 
-type CompareWoodsBaseId = "compare-woods" | "compare-ships" | "ship-journey"
+type CompareWoodsBaseId = "compare-wood" | "compare-ship" | "ship-journey"
 
 export class CompareWoods {
     #columnIds = {} as WoodColumnType[]
@@ -34,13 +34,13 @@ export class CompareWoods {
     readonly #baseId: CompareWoodsBaseId
     readonly #menuId: HtmlString
 
-    constructor(id = "compare-woods" as CompareWoodsBaseId) {
+    constructor(id = "compare-wood" as CompareWoodsBaseId) {
         this.#baseId = id
 
-        this.#baseName = this.#baseId === "compare-woods" ? "Compare woods" : this.#baseId
+        this.#baseName = this.#baseId === "compare-wood" ? "Compare woods" : this.#baseId
         this.#menuId = `menu-${this.#baseId}`
 
-        if (this.#baseId === "compare-woods") {
+        if (this.#baseId === "compare-wood") {
             this._setupMenuListener()
         }
 
@@ -76,7 +76,7 @@ export class CompareWoods {
         await this.#woodData.init()
         for (const columnId of this.#columnIds) {
             this.#isColumnActive[columnId] = false
-            if (this.#baseId === "compare-woods") {
+            if (this.#baseId === "compare-wood") {
                 this.initSelects(columnId, this.#modal!.getBaseIdSelects(columnId))
                 this._setupSelectListener(columnId)
                 if (columnId !== "base") {
@@ -87,11 +87,11 @@ export class CompareWoods {
     }
 
     _setupData(): void {
-        if (this.#baseId === "compare-woods") {
+        if (this.#baseId === "compare-wood") {
             this.#columnIdsCompare = ["c1", "c2", "c3"]
         } else if (this.#baseId === "ship-journey") {
             this.#columnIdsCompare = []
-        } else if (this.#baseId === "compare-ships") {
+        } else if (this.#baseId === "compare-ship") {
             this.#columnIdsCompare = ["c1", "c2"]
         }
 
@@ -124,7 +124,7 @@ export class CompareWoods {
             for (const columnId of this.#columnIdsCompare) {
                 // For wood-compare: add instances with enabling selects
                 // For ship-compare: add instances without enabling selects
-                if (this.#baseId === "compare-woods") {
+                if (this.#baseId === "compare-wood") {
                     this._enableSelects(columnId)
                 }
 
@@ -161,7 +161,7 @@ export class CompareWoods {
     woodSelected(columnId: WoodColumnType, type: WoodType): void {
         this._setOtherSelect(columnId, type)
 
-        if (this.#baseId === "compare-woods") {
+        if (this.#baseId === "compare-wood") {
             this._setColumns(columnId)
         }
     }

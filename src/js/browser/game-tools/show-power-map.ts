@@ -65,7 +65,7 @@ interface DivDimension {
 export default class PowerMap {
     #serverId: ServerId
     readonly #baseId: HtmlString
-    readonly #baseName = "Port ownership map"
+    readonly #baseName = "Power map"
     readonly #menuId: HtmlString
 
     #columnsPerRow = 0

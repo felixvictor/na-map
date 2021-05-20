@@ -38,7 +38,7 @@ import { ColumnBase } from "./column-base"
 import { ColumnCompare } from "./column-compare"
 import ModulesAndWoodData from "./module-wood-data"
 
-type CompareShipsBaseId = "compare-ships" | "ship-journey"
+type CompareShipsBaseId = "compare-ship" | "ship-journey"
 type ModuleOptionType = [number, ModuleEntity]
 
 export class CompareShips {
@@ -75,17 +75,17 @@ export class CompareShips {
     #woodData = {} as WoodData
     #selects = {} as CompareShipsSelect
 
-    constructor(id: CompareShipsBaseId = "compare-ships") {
+    constructor(id: CompareShipsBaseId = "compare-ship") {
         this.#baseId = id
 
-        this.#baseName = this.#baseId === "compare-ships" ? "Compare ships" : this.#baseId
+        this.#baseName = this.#baseId === "compare-ship" ? "Compare ships" : this.#baseId
         this.#menuId = `menu-${this.#baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
-        this.columnsCompare = this.#baseId === "compare-ships" ? ["c1", "c2"] : []
+        this.columnsCompare = this.#baseId === "compare-ship" ? ["c1", "c2"] : []
         this.#columnIds = [...this.columnsCompare]
         this.#columnIds.unshift("base")
 

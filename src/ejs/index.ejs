@@ -65,7 +65,7 @@
 <% function makeList(type, data) { %>
     <div class="row row-cols-2 g-0">
         <% data.forEach(function(item) { %>
-            <% const id = getBaseId(item.name) %>
+            <% const id = getBaseId(item.name.replace(" compare", "")) %>
             <li><a class="dropdown-item d-flex align-items-center" id="menu-<%= type %>-<%= id %>"><span
                             class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
                                 class="icon icon-menu icon-<%= item.icon %>" role="img"
@@ -255,10 +255,10 @@
 
                         <% let dataList = [
                             { name: "Predict wind", icon: "wind" },
-                            { name: "In-game wind", icon: "info" },
-                            { name: "Go to F11", icon: "info" },
-                            { name: "Get position", icon: "info" },
-                            { name: "Make journey", icon: "info" }
+                            { name: "In-game wind", icon: "ingame-wind" },
+                            { name: "Go to F11", icon: "geo" },
+                            { name: "Get position", icon: "position" },
+                            { name: "Make journey", icon: "journey" }
                         ] %>
                         <% makeSimpleList(dataList) %>
 
@@ -274,14 +274,13 @@
                     <ul class="dropdown-menu dropdown-menu-xl dropdown-menu-end" id="game-tools-menu"
                          aria-labelledby="game-tools-dropdown">
 
-                        <li><h6 class="dropdown-header">Compare</h6></li>
                         <% dataList = [
-                            { name: "Ships", icon: "sailing" },
-                            { name: "Woods", icon: "wood" }
+                            { name: "Ship compare", icon: "sailing" },
+                            { name: "Wood compare", icon: "wood" }
                         ] %>
                         <% makeList("compare", dataList) %>
 
-                        <li><h6 class="dropdown-header mt-3">List</h6></li>
+                        <li><div class="dropdown-divider my-3"></div></li>
                         <% dataList = [
                             { name: "Admiralty items and recipes", icon: "admiralty" },
                             { name: "Buildings", icon: "building" },
@@ -298,15 +297,15 @@
                         ] %>
                         <% makeList("list", dataList) %>
 
-                        <li><h6 class="dropdown-header mt-3">Show</h6></li>
+                        <li><div class="dropdown-divider my-3"></div></li>
                         <% dataList = [
-                            { name: "Port net income", icon: "income" },
-                            { name: "Port ownership overview", icon: "overview" },
-                            { name: "Port ownership map", icon: "map" }
+                            { name: "Net income", icon: "income" },
+                            { name: "Ownership overview", icon: "overview" },
+                            { name: "Power map", icon: "map" }
                         ] %>
                         <% makeList("show", dataList) %>
 
-                        <li><h6 class="dropdown-header mt-3">Download</h6></li>
+                        <li><div class="dropdown-divider my-3"></div></li>
                         <!--suppress HtmlUnknownTarget -->
                         <li><a class="dropdown-item d-flex align-items-center" id="menu-download-pb-calc"
                                href="data/port-battle.xlsx" download="port-battle-calculator.xlsx"><span

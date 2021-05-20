@@ -84,7 +84,7 @@ export class WoodData {
             ...new Map<number, WoodTrimOrFrame>(woodJsonData.trim.map((wood) => [wood.id, wood])),
         ])
 
-        if (this.#baseId === "compare-woods") {
+        if (this.#baseId === "compare-wood") {
             this.#defaultWoodId = {
                 frame: this.findWoodId("frame", "Fir"),
                 trim: this.findWoodId("trim", "Crew Space"),

@@ -236,8 +236,12 @@ table {
     }
 }
 
+.dropdown-divider {
+    border: none;
+}
+
 .dropdown-menu-md {
-    min-width: 15rem;
+    min-width: 14rem;
 }
 
 .dropdown-menu-lg {
@@ -245,7 +249,7 @@ table {
 }
 
 .dropdown-menu-xl {
-    min-width: 28rem;
+    min-width: 26rem;
 }
 
 .menu-item-text {

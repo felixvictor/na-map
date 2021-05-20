@@ -60,9 +60,9 @@ $icon-size-large: math.round($icon-size * 1.2);
 }
 
 $icon-list: admiralty back bar-chart bonus building calendar cannon chevron-bottom chevron-left chevron-right
-    chevron-top clear clock clone-left clone-right close copy crew deep end faster flag forward gift gunnery hull image
-    income info ingredient labour loot map map-tools mast modules normal open options overview pause pb-list peace play
-    sailing shallow show-course show-f11 show-grid show-trades slower spreadsheet start stop trading war wood;
+    chevron-top clear clock clone-left clone-right close copy crew deep end faster flag forward geo gift gunnery hull image
+    income info ingame-wind ingredient journey labour loot map map-tools mast modules normal open options overview pause pb-list peace play
+    position sailing shallow show-course show-f11 show-grid show-trades slower spreadsheet start stop trading war wind wood;
 
 @each $icon in $icon-list {
     .icon-#{$icon} {

@@ -64,7 +64,7 @@ export default class ShowIncomeMap {
     #tree = {} as TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>
     #width = 0
     readonly #baseId: HtmlString
-    readonly #baseName = "Port net income"
+    readonly #baseName = "Net income"
     readonly #colourScale: ScaleOrdinal<string, string>
     readonly #menuId: HtmlString
 

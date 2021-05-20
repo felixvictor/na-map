@@ -49,7 +49,7 @@ export default class ShowPortOwnerships {
     #div = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
     readonly #baseId: HtmlString
-    readonly #baseName = "Port ownership overview"
+    readonly #baseName = "Ownership overview"
     readonly #menuId: HtmlString
 
     private _ownershipData = {} as Ownership[]
