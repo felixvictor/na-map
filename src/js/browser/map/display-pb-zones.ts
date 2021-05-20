@@ -48,7 +48,7 @@ export default class DisplayPbZones {
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          */
-        this._showValues = ["All ports", "Single port", "All raid", "Single raid", "Off"]
+        this._showValues = ["pb-all", "pb-single", "raid-all", "raid-single", "off"]
 
         /**
          * Show port battle zones cookie
@@ -100,7 +100,7 @@ export default class DisplayPbZones {
     }
 
     _refreshPBZones(): void {
-        this.refresh()
+        void this.refresh()
         this._ports.updateTexts()
     }
 
@@ -120,7 +120,7 @@ export default class DisplayPbZones {
 
                 // Port battle join circles
                 g.append("path")
-                    .attr("class", "stroke-dark")
+                    .attr("class", "stroke-primary-light")
                     .attr(
                         "d",
                         (d) =>
@@ -214,7 +214,7 @@ export default class DisplayPbZones {
 
                 // Raid join circles
                 g.append("path")
-                    .attr("class", "stroke-dark")
+                    .attr("class", "stroke-primary-light")
                     .attr("d", (d) => drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 35))
 
                 // Raid circles
@@ -253,16 +253,14 @@ export default class DisplayPbZones {
         )
     }
 
-    _setData(): void {
+    async _setData(): Promise<void> {
         if (this._ports.zoomLevel === "pbZone" && this.showPB !== "off") {
-            if (this._isDataLoaded) {
-                this._filterVisible()
-            } else {
-                void this._loadData().then(() => {
-                    this._isDataLoaded = true
-                    this._filterVisible()
-                })
+            if (!this._isDataLoaded) {
+                await this._loadData()
+                this._isDataLoaded = true
             }
+
+            this._filterVisible()
         } else {
             this._defencesFiltered = []
             this._pbZonesFiltered = []
@@ -311,8 +309,8 @@ export default class DisplayPbZones {
         this.#upperBound = viewport[1]
     }
 
-    refresh(): void {
-        this._setData()
+    async refresh(): Promise<void> {
+        await this._setData()
         this._update()
     }
 }

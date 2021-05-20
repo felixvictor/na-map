@@ -455,7 +455,7 @@ class NAMap {
             this._grid.update()
         }
 
-        this._pbZone.refresh()
+        void this._pbZone.refresh()
         this._ports.update(this.#currentMapScale)
     }
 
