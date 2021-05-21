@@ -19,7 +19,7 @@ dayjs.locale("en-gb")
 
 import { registerEvent } from "../../analytics"
 import { findNationById, nations } from "common/common"
-import { getIcons, getIdFromBaseName, loadJsonFile } from "common/common-browser"
+import { getIdFromBaseName, loadJsonFile, nationFlags } from "common/common-browser"
 
 import { Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
@@ -178,7 +178,6 @@ export default class ListFlags {
             .filter((nation) => !(nation.short === "NT" || nation.short === "FT"))
             .sort((a, b) => a.sortName.localeCompare(b.sortName))
         this.#activeNationIds = activeNations.map((nation) => String(nation.id))
-        const nationIcons = getIcons()
 
         const div = this.#modal!.selectsSel.append("div")
             .attr("id", this.#inputId)
@@ -200,7 +199,7 @@ export default class ListFlags {
                 .append("img")
                 .attr("alt", nation.short)
                 .attr("class", "flag-icon-small")
-                .attr("src", `${nationIcons[nation.short]}`)
+                .attr("src", `${nationFlags[nation.short]}`)
         }
     }
 

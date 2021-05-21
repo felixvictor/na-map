@@ -36,9 +36,9 @@ import {
     colourLight,
     colourList,
     colourRedDark,
-    getIcons,
     loadJsonFile,
     loadJsonFiles,
+    nationFlags,
     primary300,
 } from "common/common-browser"
 import { formatInt, formatPercentHtml, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
@@ -63,7 +63,6 @@ import {
     PortBasic,
     PortPerServer,
     PortWithTrades,
-    NationListAlternative,
     TradeItem,
     TradeGoodProfit,
 } from "common/gen-json"
@@ -161,7 +160,6 @@ export default class DisplayPorts {
     #minNetIncome!: number
     #minPortPoints!: number
     #minTaxIncome!: number
-    #nationIcons!: NationListAlternative<string>
     #portDataFiltered!: PortWithTrades[]
     #portRadius!: ScaleLinear<number, number>
     #portSummaryNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
@@ -436,8 +434,6 @@ export default class DisplayPorts {
     }
 
     _setupFlags(): void {
-        this.#nationIcons = getIcons()
-
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const getPattern = (id: string): SVGPatternElement => {
             const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern")
@@ -454,7 +450,7 @@ export default class DisplayPorts {
             const image = document.createElementNS("http://www.w3.org/2000/svg", "image")
             image.setAttribute("width", String(this.#iconSize))
             image.setAttribute("height", String(this.#iconSize))
-            image.setAttribute("href", this.#nationIcons[nation].replace('"', "").replace('"', ""))
+            image.setAttribute("href", nationFlags[nation].replace('"', "").replace('"', ""))
 
             return image
         }
@@ -673,7 +669,7 @@ export default class DisplayPorts {
                     <img
                         alt="${port.icon}"
                         class="flag-icon me-3 align-self-stretch ${iconBorder}"
-                        src="${this.#nationIcons[port.icon]}"
+                        src="${nationFlags[port.icon]}"
                     />
 
                     <div class="text-start me-1">
@@ -944,7 +940,7 @@ export default class DisplayPorts {
 
         // noinspection IfStatementWithTooManyBranchesJS
         switch (this.showRadius) {
-            case "tax": {
+            case "tax":
                 data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
                 this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
                 cssClass = (): string => "bubble"
@@ -952,9 +948,8 @@ export default class DisplayPorts {
                 r = (d): number => this.#portRadius(d.taxIncome) ?? 0
 
                 break
-            }
 
-            case "net": {
+            case "net":
                 data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
                 this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
                 cssClass = (): string => "bubble"
@@ -962,9 +957,8 @@ export default class DisplayPorts {
                 r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
 
                 break
-            }
 
-            case "points": {
+            case "points":
                 data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints > portPointThreshold)
                 this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
                 cssClass = (): string => "bubble"
@@ -972,16 +966,14 @@ export default class DisplayPorts {
                 r = (d): number => this.#portRadius(d.portPoints) ?? 0
 
                 break
-            }
 
-            case "position": {
+            case "position":
                 cssClass = (): string => "bubble here"
                 r = (d): number => d.distance ?? 0
 
                 break
-            }
 
-            case "attack": {
+            case "attack":
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
                 this.#attackRadius.range([rMin, rMax / 1.5])
@@ -991,15 +983,14 @@ export default class DisplayPorts {
                 r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
 
                 break
-            }
 
-            default: {
+            default:
                 if (this.circleType === "currentGood") {
                     cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
                     r = (): number => rMax / 2
-                } else
+                } else {
                     switch (this.showRadius) {
-                        case "county": {
+                        case "county":
                             cssClass = (d): string =>
                                 d.capturable
                                     ? d.countyCapital
@@ -1010,38 +1001,34 @@ export default class DisplayPorts {
                             r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
 
                             break
-                        }
 
-                        case "tradePorts": {
+                        case "tradePorts":
                             cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
                             r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
 
                             break
-                        }
 
-                        case "frontline": {
+                        case "frontline":
                             cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
                             r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
                             data = data.filter((d) => d.enemyPort ?? d.ownPort)
 
                             break
-                        }
 
-                        case "currentGood": {
+                        case "currentGood":
                             cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
                             r = (): number => rMax / 2
 
                             break
-                        }
 
-                        case "off": {
+                        case "off":
                             data = []
 
                             break
-                        }
+
                         // No default
                     }
-            }
+                }
         }
 
         this.#gPortCircle
@@ -1304,14 +1291,6 @@ export default class DisplayPorts {
 
     get portDataDefault(): PortWithTrades[] {
         return this.#portDataDefault
-    }
-
-    get showCurrentGood(): boolean {
-        return this.#showCurrentGood
-    }
-
-    set showCurrentGood(newShowCurrentGood: boolean) {
-        this.#showCurrentGood = newShowCurrentGood
     }
 
     get showRadius(): string {

@@ -28,11 +28,11 @@ import {
     loadJsonFiles,
     showCursorDefault,
     showCursorWait,
-    getIcons,
     colourWhite,
     getElementHeight,
     getElementWidth,
     getIdFromBaseName,
+    nationFlags,
 } from "common/common-browser"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
@@ -184,7 +184,7 @@ export default class PowerMap {
     }
 
     async _setPattern(): Promise<void> {
-        const icons = Object.values(getIcons())
+        const icons = Object.values(nationFlags)
 
         try {
             const images = await loadImage(icons)

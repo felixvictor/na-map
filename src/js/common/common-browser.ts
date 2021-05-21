@@ -8,15 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="webpack-env" />
-
 import { default as BSDropdown } from "bootstrap/js/dist/dropdown"
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
 import { BaseModalPure, DataSource, HtmlString } from "./interface"
 import { NationListAlternative } from "./gen-json"
-import { findNationByNationShortName } from "./common"
+import { findNationByNationShortName, NationShortNameAlternative } from "./common"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -126,9 +124,9 @@ export const initMultiDropdownNavbar = (id: string): void => {
             }
 
             // @ts-expect-error
-            let dd = this._element.closest(".dropdown").parentNode.closest(".dropdown")
-            for (; dd && dd !== document; dd = dd.parentNode.closest(".dropdown")) {
-                dd.classList.add(CLASS_NAME)
+            let dd = this._element.closest(".dropdown").parentNode.closest(".dropdown") as Element | Document | null
+            for (; dd && dd !== document; dd = (dd.parentNode as Element).closest(".dropdown")) {
+                ;(dd as Element).classList.add(CLASS_NAME)
             }
 
             // @ts-expect-error
@@ -268,7 +266,8 @@ export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRe
 const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<string> => {
     const images = {} as NationListAlternative<string>
     for (const item of r.keys()) {
-        images[item.replace("./", "").replace(".svg", "")!] = r(item)
+        const index = item.replace("./", "").replace(".svg", "")
+        images[index] = r(item) as string
     }
 
     // Sort by nation
@@ -281,10 +280,12 @@ const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<
     return sortedImages
 }
 
-export const getIcons = (): NationListAlternative<string> => {
+const getIcons = (): NationListAlternative<string> => {
     // eslint-disable-next-line unicorn/prefer-module
     return importAll((require as __WebpackModuleApi.RequireFunction).context("../../images/flags", false, /\.svg$/))
 }
+
+export const nationFlags = getIcons()
 
 export const getElementHeight = (element: HTMLElement | SVGElement): number => {
     const { height } = element.getBoundingClientRect()
