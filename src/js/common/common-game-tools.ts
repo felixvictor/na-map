@@ -46,10 +46,10 @@ export const isImported = (name: string): boolean => name.includes(importedFlag)
 export const stripShipName = (name: string): string => name.replace(importedFlag, "")
 
 export const beautifyShipName = (name: string): HtmlString =>
-    stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "")
+    stripShipName(name) + (isImported(name) ? ' <span class="caps small condensed">imported</span>' : "")
 
 export const beautifyShipNameHTML = (name: string): HtmlResult =>
-    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small">imported</span>` : html``}`
+    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small condensed">imported</span>` : html``}`
 
 /**
  * Format float for htm

@@ -42,7 +42,7 @@ export default class CompareWoodsModal extends Modal {
         for (const columnId of this.#columnIds) {
             const columnDiv = row
                 .append("div")
-                .attr("class", `col-md-3 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp"}`)
+                .attr("class", `col-md-3 ms-auto pt-2 ${columnId === "base" ? "column-base" : "column-comp bg-paper"}`)
 
             columnDiv.append("div").attr("id", `${this.getBaseIdSelects(columnId)}`)
             columnDiv.append("div").attr("id", `${this.getBaseIdOutput(columnId)}`)

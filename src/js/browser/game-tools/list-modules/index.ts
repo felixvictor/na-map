@@ -65,7 +65,7 @@ export default class ListModules {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select module category" }
+        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select module category", width: "fit" }
 
         this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
     }
@@ -129,7 +129,9 @@ export default class ListModules {
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td><span class="name">${module.name}<br>${rate}</span></td><td>${module.properties
+                            `<tr><td class="pe-2">${
+                                module.name
+                            }<br>${rate}</td><td><table class="table table-sm table-hover text-table text-start mb-0"><tbody>${module.properties
                                 .map((property) => {
                                     let amount
                                     if (property.isPercentage) {
@@ -141,9 +143,9 @@ export default class ListModules {
                                                 : formatSignInt(property.amount)
                                     }
 
-                                    return `${property.modifier} ${amount}`
+                                    return `<tr><td>${property.modifier}</td><td>${amount}</td></tr>`
                                 })
-                                .join("<br>")}</td></tr>`
+                                .join("")}</tbody></table></td></tr>`
                         )
                     }
                 }
@@ -164,8 +166,8 @@ export default class ListModules {
         let text = ""
         for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm small table-striped table-hover text-table text-start"><thead>'
-            text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"
+            text += '<table class="table table-sm table-striped table-hover text-table text-start"><thead>'
+            text += '<tr><th class="pe-2">Module</th><th>Modifier</th></tr></thead><tbody>'
             text += splitRows[column].join("")
             text += "</tbody></table></div>"
         }

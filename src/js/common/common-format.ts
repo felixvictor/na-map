@@ -29,7 +29,7 @@ export const formatLocale = d3FormatLocale({
     grouping: [3],
     currency: ["", "\u00A0reales"],
     percent: "\u202F%",
-    minus: "\u2212\u2009",
+    minus: "\u2212\u202F",
 } as FormatLocaleDefinition)
 
 // noinspection MagicNumberJS
@@ -208,4 +208,4 @@ export const formatSignPercentOldstyle = (x: number, svg = false): HtmlString | 
     formatLocale
         .format("+.1%")(x)
         .replace(".0", "")
-        .replace("%", `\u202F${svg ? pTSpan : pSpan}`)
+        .replace("%", `${svg ? pTSpan : pSpan}`)

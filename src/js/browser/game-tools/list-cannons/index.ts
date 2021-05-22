@@ -235,7 +235,10 @@ export default class ListCannons {
         type: CannonType
     ): void {
         this.#sortAscending[type] = true
-        this.#tables[type] = tabContent.append("table").attr("class", "table table-sm small table-striped table-hover")
+        this.#tables[type] = tabContent
+            .append("table")
+            .attr("class", "table table-sm table-sort table-striped table-hover")
+
         const head = this.#tables[type].append("thead")
         head.append("tr")
             .attr("class", "thead-group")

@@ -57,7 +57,7 @@ export default class ListLoot {
     static _printAmount(amount: LootAmount): string {
         return amount.min === amount.max
             ? formatInt(amount.min)
-            : `${formatInt(amount.min)} to ${formatInt(amount.max)}`
+            : `${formatInt(amount.min)}\u202F\u2013\u202F${formatInt(amount.max)}`
     }
 
     static _printChance(chance: number): string {
@@ -95,9 +95,7 @@ export default class ListLoot {
 
     _getTypeOptions(type: LootType): HtmlString {
         return this.#data[type]
-            .sort(
-                sortBy<LootLootEntity | LootChestsEntity, "id" | "name">(["name"])
-            )
+            .sort(sortBy<LootLootEntity | LootChestsEntity, "id" | "name">(["name"]))
             .map((item: LootLootEntity | LootChestsEntity) => `<option value="${item.id}">${item.name}</option>`)
             .join("")
     }
@@ -170,6 +168,10 @@ export default class ListLoot {
                 virtualScroll: true,
             }
 
+            if (type === "item") {
+                selectpickerOptions.width = "440px" // 2 * 220
+            }
+
             this.#select[type] = new Select(
                 `${this.#baseId}-${type}`,
                 this.#modal!.baseIdSelects,
@@ -194,11 +196,11 @@ export default class ListLoot {
         chance = true
     ): HtmlResult {
         return html`
-            <table class="table table-sm small table-striped table-hover">
+            <table class="table table-sm table-striped table-hover">
                 <thead>
                     <tr>
                         <th scope="col" class="text-start">${title}</th>
-                        ${chance ? html`<th scope="col">Chance (0 − 100)</th>` : ""}
+                        ${chance ? html`<th scope="col">Chance<br />(0 − 100)</th>` : ""}
                         <th scope="col">Amount</th>
                     </tr>
                 </thead>

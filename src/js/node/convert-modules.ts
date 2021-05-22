@@ -345,60 +345,62 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             }
 
             return modifiers.get(apiModifierName) !== ""
-        }).flatMap((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
-            const modifierName = modifiers.get(apiModifierName) ?? ""
-
-            let amount = modifier.Percentage
-            let isPercentage = true
-
-            if (modifier.Absolute) {
-                if (
-                    Math.abs(modifier.Absolute) >= 1 ||
-                    modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
-                    modifier.MappingIds[0] === "REPAIR_PERCENT"
-                ) {
-                    amount = modifier.Absolute
-                    isPercentage = false
-                } else {
-                    amount = Math.round(modifier.Absolute * 10000) / 100
-                }
-            }
-
-            if (flipAmountForModule.has(modifierName)) {
-                amount *= -1
-            } else if (modifierName === "Splinter resistance") {
-                amount = Math.round(modifier.Absolute * 10000) / 100
-                isPercentage = true
-            }
-
-            // Some modifiers are wrongly indicated as a percentage
-            if (notPercentage.has(modifierName)) {
-                isPercentage = false
-            }
-
-            // Special case dispersion: split entry up in horizontal and vertical
-            if (modifierName === "Cannon horizontal/vertical dispersion") {
-                return [
-                    {
-                        modifier: "Cannon horizontal dispersion",
-                        amount,
-                        isPercentage,
-                    },
-                    {
-                        modifier: "Cannon vertical dispersion",
-                        amount,
-                        isPercentage,
-                    },
-                ]
-            }
-
-            return {
-                modifier: modifierName,
-                amount,
-                isPercentage,
-            }
         })
+            .flatMap((modifier) => {
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+                const modifierName = modifiers.get(apiModifierName) ?? ""
+
+                let amount = modifier.Percentage
+                let isPercentage = true
+
+                if (modifier.Absolute) {
+                    if (
+                        Math.abs(modifier.Absolute) >= 1 ||
+                        modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
+                        modifier.MappingIds[0] === "REPAIR_PERCENT"
+                    ) {
+                        amount = modifier.Absolute
+                        isPercentage = false
+                    } else {
+                        amount = Math.round(modifier.Absolute * 10_000) / 100
+                    }
+                }
+
+                if (flipAmountForModule.has(modifierName)) {
+                    amount *= -1
+                } else if (modifierName === "Splinter resistance") {
+                    amount = Math.round(modifier.Absolute * 10_000) / 100
+                    isPercentage = true
+                }
+
+                // Some modifiers are wrongly indicated as a percentage
+                if (notPercentage.has(modifierName)) {
+                    isPercentage = false
+                }
+
+                // Special case dispersion: split entry up in horizontal and vertical
+                if (modifierName === "Cannon horizontal/vertical dispersion") {
+                    return [
+                        {
+                            modifier: "Cannon horizontal dispersion",
+                            amount,
+                            isPercentage,
+                        },
+                        {
+                            modifier: "Cannon vertical dispersion",
+                            amount,
+                            isPercentage,
+                        },
+                    ]
+                }
+
+                return {
+                    modifier: modifierName,
+                    amount,
+                    isPercentage,
+                }
+            })
+            .sort(sortBy(["modifier"]))
     }
 
     /**

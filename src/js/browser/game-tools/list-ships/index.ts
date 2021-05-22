@@ -55,11 +55,11 @@ export default class ShipList {
                 [ship.class, String(ship.class)],
                 [ship.name, beautifyShipName(ship.name)],
                 [ship.guns.total, String(ship.guns.total)],
+                [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
                 [ship.battleRating, formatInt(ship.battleRating)],
                 [ship.crew.max, formatInt(ship.crew.max)],
                 [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed)],
                 [ship.ship.turnSpeed, formatFloatFixed(ship.ship.turnSpeed)],
-                [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
                 [
                     ship.guns.gunsPerDeck[4].amount,
                     ship.guns.gunsPerDeck[4].amount ? String(ship.guns.gunsPerDeck[4].amount) : "",
@@ -68,7 +68,12 @@ export default class ShipList {
                     ship.guns.gunsPerDeck[5].amount,
                     ship.guns.gunsPerDeck[5].amount ? String(ship.guns.gunsPerDeck[5].amount) : "",
                 ],
-                [ship.sides.armour, `${formatInt(ship.sides.armour)} (${ship.sides.thickness})`],
+                [
+                    ship.sides.armour,
+                    `${formatInt(ship.sides.armour)} <span class="badge badge-highlight">${
+                        ship.sides.thickness
+                    }</span>`,
+                ],
             ]
         )
     }
@@ -110,21 +115,23 @@ export default class ShipList {
     _initTable(): void {
         const header: HeaderMap = {
             group: new Map([
-                ["dummy1", 5],
-                ["Speed", 2],
+                ["dummy1", 2],
+                ["Broadside", 2],
                 ["dummy2", 1],
-                ["Chasers", 2],
+                ["Speed", 2],
                 ["dummy3", 1],
+                ["Chasers", 2],
+                ["dummy4", 1],
             ]),
             element: new Set([
-                "Class",
+                "",
                 "Name",
-                "Guns",
-                "Battle rating",
+                "No.",
+                "Weight",
+                "<span class='caps'>br</span>",
                 "Crew",
-                "Maximum",
+                "Max",
                 "Turn",
-                "Broadside",
                 "Bow",
                 "Stern",
                 "Sides",
@@ -147,9 +154,9 @@ export default class ShipList {
             .data([...header.element])
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
-            .classed("border-top-0", true)
-            .classed("text-start", (d, i) => i <= 1)
-            .text((d) => d.data)
+            .classed("text-start", (d, i) => i === 1)
+            .classed("pe-1", (d, i) => i !== 1)
+            .html((d) => d.data)
             .on("click", (_event, d) => {
                 this._sortRows(d.index)
             })
@@ -172,7 +179,8 @@ export default class ShipList {
             .join((enter) =>
                 enter
                     .append("td")
-                    .classed("text-start", (d, i) => i <= 1)
+                    .classed("pe-1", (d, i) => i !== 1)
+                    .classed("text-start", (d, i) => i === 1)
                     .html((d) => d[1])
             )
     }
@@ -180,7 +188,7 @@ export default class ShipList {
     _shipListSelected(): void {
         this.#table = this.#modal!.outputSel.append("table").attr(
             "class",
-            "table table-sm small table-striped table-hove"
+            "table table-sm table-striped table-hover table-sort"
         )
 
         this._initTable()

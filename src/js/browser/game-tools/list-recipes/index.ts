@@ -103,6 +103,7 @@ export default class ListRecipes {
             liveSearchPlaceholder: "Search ...",
             title: "Select item",
             virtualScroll: true,
+            width: "fit",
         }
 
         this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())

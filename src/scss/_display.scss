@@ -48,6 +48,10 @@ text,
     @include caps();
 }
 
+.condensed {
+    font-stretch: condensed;
+}
+
 .overlay-des {
     @include caps();
     @include des();
@@ -205,7 +209,7 @@ text,
 // table
 
 .table-sort {
-    thead th {
+    tr:not(.thead-group) th {
         cursor: s-resize;
     }
 }

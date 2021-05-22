@@ -65,7 +65,7 @@ export class ColumnCompare extends Column {
         let diff = 0
         let neutral = 0
         let diffColour = ""
-        let text = '<table class="table table-striped small wood mt-4"><thead>'
+        let text = '<table class="table table-striped table-hover text-table mt-4"><thead>'
         text += '<tr><th scope="col">Property</th><th scope="col">Change</th></tr></thead><tbody>'
         for (const [key, value] of properties) {
             text += `<tr><td>${key}</td><td>${ColumnCompare._getDiff(value.compare, value.base, value.isPercentage)}`

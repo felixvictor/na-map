@@ -75,16 +75,16 @@ export default class ListIngredients {
                 properties = `${module.properties
                     .map((property) => {
                         const amount = property.isPercentage
-                            ? formatSignPercentOldstyle(property.amount / 100)
+                            ? formatSignPercentOldstyle(property.amount / 100).replace(/"/g, "'")
                             : formatSignInt(property.amount)
-                        return `${property.modifier} ${amount}`
+                        return `<tr><td class='text-start pe-3'>${property.modifier}</td><td>${amount}</td></tr>`
                     })
-                    .join("<br>")}`
+                    .join("")}`
             }
         }
 
         text = `<h6 class='text-muted'>${moduleType}</h6>`
-        text += `<table class='table table-sm'><tbody>${properties}</tbody></table>`
+        text += `<table class='table table-striped w-auto'><tbody>${properties}</tbody></table>`
 
         return properties ? text : ""
     }
@@ -115,7 +115,7 @@ export default class ListIngredients {
 
         for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
-            text += '<table class="table table-sm small table-striped table-hover text-table text-start"><thead>'
+            text += '<table class="table table-sm table-striped table-hover text-table text-start"><thead>'
             text += "<tr><th>Ingredient</th><th>Recipes</th></tr></thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"

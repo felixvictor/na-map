@@ -1,7 +1,7 @@
 const frontlinesType = ["attacking", "defending"]!
 export type FrontlinesType = typeof frontlinesType[number]
 
-export const lootType = ["loot", "chest", "item", "fish"]!
+export const lootType = ["item", "loot", "chest", "fish"]!
 export type LootType = typeof lootType[number]
 
 export const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]!
