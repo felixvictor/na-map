@@ -18,7 +18,7 @@ dayjs.extend(utc)
 dayjs.locale("en-gb")
 
 import { registerEvent } from "../../analytics"
-import { findNationById, nations } from "common/common"
+import { nations } from "common/common"
 import { getIdFromBaseName, loadJsonFile, nationFlags } from "common/common-browser"
 
 import { Selection } from "d3-selection"
@@ -30,8 +30,8 @@ import Modal from "util/modal"
 import RadioButton from "util/radio-button"
 import Cookie from "util/cookie"
 
-type TableRow = [number, string, number]
-type TableRowDisplay = [string, string, number]
+type TableRow = [string, number, string, string, string, number]
+type TableRowDisplay = [string, string, string, number]
 
 export default class ListFlags {
     readonly #baseId: HtmlString
@@ -45,9 +45,9 @@ export default class ListFlags {
     #dataDefault = [] as TableRow[]
     #flagData = [] as FlagsPerNation[]
     #modal: Modal | undefined = undefined
-    #rows = {} as Selection<HTMLTableCellElement, TableRow, HTMLTableSectionElement, unknown>
+    #rows = {} as Selection<HTMLTableRowElement, TableRow, HTMLTableSectionElement, unknown>
     #sortAscending = true
-    #sortIndex = 0
+    #dataIndexSorted = 0
     #table = {} as Selection<HTMLTableElement, unknown, HTMLElement, unknown>
     #toggleButtons = {} as RadioButton
 
@@ -78,7 +78,14 @@ export default class ListFlags {
     _setupData(): void {
         for (const flagsPerNation of this.#flagData) {
             for (const flag of flagsPerNation.flags) {
-                this.#dataDefault.push([flagsPerNation.nation, flag.expire, flag.number])
+                this.#dataDefault.push([
+                    flag.expire,
+                    flagsPerNation.nation,
+                    this._fromNow(flag.expire),
+                    this._getDate(flag.expire),
+                    this._getTime(flag.expire),
+                    flag.number,
+                ])
             }
         }
     }
@@ -106,29 +113,40 @@ export default class ListFlags {
         })
     }
 
-    _sortRows(index: number, changeOrder = true): void {
-        if (changeOrder && this.#sortIndex === index) {
+    _sortRows(columnIndex: number, changeOrder = true): void {
+        let dataIndex = 0
+
+        if (columnIndex === 3) {
+            dataIndex = 5
+        }
+
+        if (changeOrder && this.#dataIndexSorted === dataIndex) {
             this.#sortAscending = !this.#sortAscending
         }
 
-        this.#sortIndex = index
+        this.#dataIndexSorted = dataIndex
         const sign = this.#sortAscending ? 1 : -1
         this.#rows.sort((a, b): number => {
-            if (index === 2) {
-                return (a[index] - b[index]) * sign
+            console.log("sort", columnIndex, dataIndex, a[dataIndex], b[dataIndex])
+            // Sort by number of flags
+            if (columnIndex === 3) {
+                return ((a[dataIndex] as number) - (b[dataIndex] as number)) * sign
             }
 
-            return (a[index] as string).localeCompare(b[index] as string) * sign
+            // Sort by date
+            return (a[dataIndex] as string).localeCompare(b[dataIndex] as string) * sign
         })
     }
 
     _initTable(): void {
+        const columnHeads = ["Expires in", "Date", "Time", "Flags"]
+
         this.#sortAscending = true
         this.#table
             .append("thead")
             .append("tr")
             .selectAll("th")
-            .data(["Nation", "Expires in", "Number of flags"])
+            .data(columnHeads)
             .join("th")
             .datum((d, i) => ({ data: d, index: i }))
             .classed("text-start", (d, i) => i <= 1)
@@ -140,27 +158,38 @@ export default class ListFlags {
         this.#table.append("tbody")
     }
 
+    _fromNow(time: string): string {
+        const timeST = dayjs.utc(time)
+
+        return `${timeST.fromNow().replace("in ", "").replace("a ", "1 ")}`
+    }
+
+    _getDate(time: string): string {
+        const timeST = dayjs.utc(time)
+
+        return `${timeST.format("dddd, D MMM")}`
+    }
+
     _getTime(time: string): string {
         const timeLT = dayjs.utc(time).local()
         const timeST = dayjs.utc(time)
         const localTime = timeST === timeLT ? "" : ` (${timeLT.format("H.mm")} local)`
 
-        return `${timeST.fromNow().replace("in", "")} on ${timeST.format("dddd, D MMM, H.mm")} ${localTime}`
+        return `${timeST.format("H.mm")} ${localTime}`
     }
 
     _updateTable(): void {
         // Data join rows
-        // @ts-expect-error
         this.#rows = this.#table
             .select<HTMLTableSectionElement>("tbody")
             .selectAll<HTMLTableRowElement, TableRow>("tr")
-            .data(this.#data, (d: TableRow): TableRow => d as TableRow)
+            .data(this.#data, (d) => d[0])
             .join((enter) => enter.append("tr"))
 
         // Data join cells
         this.#rows
             .selectAll<HTMLTableCellElement, number | string>("td")
-            .data((row): TableRowDisplay => [findNationById(row[0]).name, this._getTime(row[1]), row[2]])
+            .data((row): TableRowDisplay => row.slice(2) as TableRowDisplay)
             .join((enter) =>
                 enter
                     .append("td")
@@ -181,7 +210,7 @@ export default class ListFlags {
 
         const div = this.#modal!.selectsSel.append("div")
             .attr("id", this.#inputId)
-            .attr("class", "d-flex justify-content-between mb-3")
+            .attr("class", "d-flex flex-wrap justify-content-between mb-3")
 
         for (const nation of activeNations) {
             div.append("input")
@@ -206,11 +235,11 @@ export default class ListFlags {
     _showSelected(): void {
         const activeNation = this._getActiveNation()
 
-        this.#data = this.#dataDefault.filter((flag) => flag[0] === activeNation)
+        this.#data = this.#dataDefault.filter((data) => data[1] === activeNation)
         this.#cookie.set(String(activeNation))
 
         this._updateTable()
-        this._sortRows(1, false)
+        this._sortRows(0, false)
     }
 
     _setupButtonListener(): void {
@@ -222,7 +251,7 @@ export default class ListFlags {
     _listSelected(): void {
         this.#table = this.#modal!.outputSel.append("table").attr(
             "class",
-            "table table-sm table-striped table-hover table-sort text-table"
+            "table table-sm table-striped table-hover table-sort text-table mt-3"
         )
 
         this._initTable()
