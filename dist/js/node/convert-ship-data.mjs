@@ -34,6 +34,8 @@ const shipsNotUsed = new Set([
     2343,
     2352,
     2454,
+    2483,
+    2487,
 ]);
 const blueprintsNotUsed = new Set([
     665,
@@ -49,6 +51,8 @@ const blueprintsNotUsed = new Set([
     2239,
     2381,
     2382,
+    2484,
+    2541,
 ]);
 const shipNames = new Map([
     ["agamemnon", { id: 694, master: [] }],

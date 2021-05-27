@@ -123,7 +123,6 @@ const addData = (fileData) => {
     };
     cannon.name = getName();
     cannon.family = getFamily(cannon.name);
-    console.log("name", cannon.name, "family", cannon.family, "type", getType());
     if (cannon.family !== "unicorn") {
         cannons[getType()].push(cannon);
     }
