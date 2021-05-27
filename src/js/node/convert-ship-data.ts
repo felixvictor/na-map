@@ -65,6 +65,8 @@ const shipsNotUsed = new Set([
     2343, // tutorial brig
     2352, // Diana (i)
     2454, // tutorial brig 2
+    2483, // Travel Balloon
+    2487, // Santa Ana
 ])
 const blueprintsNotUsed = new Set([
     665, // Santa Cecilia
@@ -80,6 +82,8 @@ const blueprintsNotUsed = new Set([
     2239, // Yacht silver
     2381, // Diana (i)
     2382, // Victory1765
+    2484, // Travel Balloon
+    2541, // Santa Ana
 ])
 
 // noinspection SpellCheckingInspection
