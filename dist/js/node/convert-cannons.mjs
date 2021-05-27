@@ -34,6 +34,7 @@ const getBaseFileNames = (directory) => {
         const fileNameFirstPart = fileName.slice(0, fileName.indexOf(" "));
         if ((fileNameFirstPart === "cannon" && fileName !== "cannon repair kit.xml") ||
             fileNameFirstPart === "carronade" ||
+            fileNameFirstPart === "carr" ||
             fileName.startsWith("tower cannon")) {
             fileNames.add(fileName);
         }
@@ -53,34 +54,45 @@ for (const type of cannonType) {
 }
 const defenseFamily = new Set(["fort", "tower"]);
 const getFamily = (name) => {
-    const regex = /\((.+)\)/;
+    const regex = /\s+\(?(\w+)\)?/;
     let family = regex.exec(name)?.[1].toLocaleLowerCase() ?? "regular";
+    if (family === "medium") {
+        family = "regular";
+    }
     if (defenseFamily.has(family)) {
         family = "defense";
+    }
+    if (name.startsWith("Carr ")) {
+        family = "obusiers";
     }
     return family;
 };
 const addData = (fileData) => {
     const getType = () => {
-        if (fileData._attributes.Name.includes("Carronade")) {
+        if (fileData._attributes.Name.includes("Carronade") || fileData._attributes.Name.includes("Obusiers")) {
             return "carronade";
         }
-        if (fileData._attributes.Name.includes("Long")) {
+        if (fileData._attributes.Name.includes("Long") ||
+            fileData._attributes.Name.includes("Blomfield") ||
+            fileData._attributes.Name.includes("Navy Gun")) {
             return "long";
         }
         return "medium";
     };
     const getName = () => fileData._attributes.Name.replace("Cannon ", "")
+        .replace("Carr ", "")
         .replace("Carronade ", "")
         .replace(" pd", "")
         .replace(" Long", "")
         .replace("Salvaged ", "")
         .replace("0.5 E", "E")
-        .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
-        .replace(/^Tower (\d+)$/g, "$1 (Tower)")
         .replace("Blomfield", "Blomefield")
         .replace(" Gun", "")
-        .replace("24 (Edinorog)", "18 (Edinorog)");
+        .replace(/^(\d+) - (\w+)$/g, "$1 ($2)")
+        .replace(/^(\d+) (\w+)$/g, "$1 ($2)")
+        .replace(/^Tower (\d+)$/g, "$1 (Tower)")
+        .replace("24 (Edinorog)", "18 (Edinorog)")
+        .replace(" (Medium)", "");
     const cannon = {};
     for (const [value, { group, element }] of dataMapping) {
         if (!cannon[group]) {
@@ -111,6 +123,7 @@ const addData = (fileData) => {
     };
     cannon.name = getName();
     cannon.family = getFamily(cannon.name);
+    console.log("name", cannon.name, "family", cannon.family, "type", getType());
     if (cannon.family !== "unicorn") {
         cannons[getType()].push(cannon);
     }
