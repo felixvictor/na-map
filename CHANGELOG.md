@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.6.5](///compare/v12.6.4...v12.6.5) (2021-05-27)
+
+
+### Bug Fixes
+
+* 27 May patch f17b02c
+
 ### [12.6.4](///compare/v12.6.3...v12.6.4) (2021-03-13)
 
 
