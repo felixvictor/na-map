@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [12.6.8](///compare/v12.6.7...v12.6.8) (2021-05-28)
+
+
+### Bug Fixes
+
+* 27 May patch - Santa Ana addded 9454642
+
 ### [12.6.7](///compare/v12.6.6...v12.6.7) (2021-05-27)
 
 ### [12.6.6](///compare/v12.6.5...v12.6.6) (2021-05-27)
