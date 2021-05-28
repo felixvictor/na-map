@@ -66,7 +66,6 @@ const shipsNotUsed = new Set([
     2352, // Diana (i)
     2454, // tutorial brig 2
     2483, // Travel Balloon
-    2487, // Santa Ana
 ])
 const blueprintsNotUsed = new Set([
     665, // Santa Cecilia
@@ -102,6 +101,7 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["bucentaure", { id: 268, master: [] }],
     ["cerberus", { id: 269, master: [] }],
     ["christian", { id: 1664, master: [] }],
+    ["christian2", { id: 2487, master: [] }],
     ["constitution", { id: 270, master: [] }],
     ["constitution2", { id: 1674, master: [] }],
     ["cutter", { id: 271, master: [] }],
