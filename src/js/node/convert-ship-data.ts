@@ -55,6 +55,7 @@ const shipsWith36lb = new Set([
     2229, // Redoutable (i)
     2235, // Implacable
     2318, // Admiraal de Ruyter
+    2487, // Santa Ana (i)
 ])
 const shipsNotUsed = new Set([
     1535, // rookie brig
@@ -82,7 +83,7 @@ const blueprintsNotUsed = new Set([
     2381, // Diana (i)
     2382, // Victory1765
     2484, // Travel Balloon
-    2541, // Santa Ana
+    2541, // Santa Ana (i)
 ])
 
 // noinspection SpellCheckingInspection
