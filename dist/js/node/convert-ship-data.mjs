@@ -24,6 +24,7 @@ const shipsWith36lb = new Set([
     2229,
     2235,
     2318,
+    2487,
 ]);
 const shipsNotUsed = new Set([
     1535,
