@@ -65,6 +65,7 @@ import {
     PortWithTrades,
     TradeItem,
     TradeGoodProfit,
+    GoodList,
 } from "common/gen-json"
 import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
@@ -526,7 +527,26 @@ export default class DisplayPorts {
         return id ? this.#portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
-    // eslint-disable-next-line complexity
+    _showItems = (items: GoodList | undefined): string =>
+        items
+            ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+            .sort(simpleStringSort)
+            .join(", ") ?? ""
+
+    _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profitPerTon - a.profit.profitPerTon
+
+    _showProfits = (profits: TradeGoodProfit[]): HtmlResult =>
+        html`${profits
+            ?.sort(this._sortByProfit)
+            ?.map(
+                (good, index) =>
+                    html`<span class="small" style="white-space: nowrap;"
+                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)}/${formatSiIntHtml(
+                                good.profit.profit
+                            )})</span
+                        >${index === profits.length - 1 ? html`` : html`, `}`
+            )}`
+
     _getText(portProperties: PortWithTrades): PortForDisplay {
         /*
         const getCoord = (portId: number): Coordinate => {
@@ -551,8 +571,6 @@ export default class DisplayPorts {
             return html`${formatFromToTime(from, to)} (${formatFromToTime(fromLocal, toLocal)})`
         }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         const portBattleST = dayjs.utc(portProperties.portBattle)
         const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
@@ -594,41 +612,13 @@ export default class DisplayPorts {
             netIncome: formatSiIntHtml(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany,
             laborHoursDiscount: portProperties.laborHoursDiscount,
-            dropsTrading:
-                portProperties.dropsTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
-            consumesTrading:
-                portProperties.consumesTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
-            producesNonTrading:
-                portProperties.producesNonTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
-            dropsNonTrading:
-                portProperties.dropsNonTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
+            dropsTrading: this._showItems(portProperties.dropsTrading),
+            consumesTrading: this._showItems(portProperties.consumesTrading),
+            producesNonTrading: this._showItems(portProperties.producesNonTrading),
+            dropsNonTrading: this._showItems(portProperties.dropsNonTrading),
             tradePort: this._getPortName(this.tradePortId),
-            goodsToSellInTradePort: html`${portProperties.goodsToSellInTradePort
-                ?.sort(sortByProfit)
-                ?.map(
-                    (good, index) =>
-                        html`<span style="white-space: nowrap;">${good.name} (${formatSiInt(good.profit.profit)})</span
-                            >${index === portProperties.goodsToSellInTradePort.length - 1 ? html`` : html`, `}`
-                )}`,
-            goodsToBuyInTradePort: html`${portProperties.goodsToBuyInTradePort
-                ?.sort(sortByProfit)
-                ?.map(
-                    (good, index) =>
-                        html`<span style="white-space: nowrap;">${good.name} (${formatSiInt(good.profit.profit)})</span
-                            >${index === portProperties.goodsToBuyInTradePort.length - 1 ? html`` : html`, `}`
-                )}`,
+            goodsToSellInTradePort: this._showProfits(portProperties.goodsToSellInTradePort),
+            goodsToBuyInTradePort: this._showProfits(portProperties.goodsToBuyInTradePort),
         } as PortForDisplay
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
@@ -777,12 +767,14 @@ export default class DisplayPorts {
                 ? html`${port.goodsToSellInTradePort?.[0] === undefined
                       ? html``
                       : html`<div class="alert alert-success mt-2 mb-2 text-start" role="alert">
-                            <span class="caps">Buy here and sell in ${port.tradePort}</span> (net profit)<br />${port.goodsToSellInTradePort}
+                            <span class="caps">Buy here and sell in ${port.tradePort}</span> (net profit per ton/net
+                            profit per item)<br />${port.goodsToSellInTradePort}
                         </div>`}
                   ${port.goodsToBuyInTradePort?.[0] === undefined
                       ? html``
                       : html`<div class="alert alert-danger mt-2 mb-2 text-start" role="alert">
-                            <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit)<br />${port.goodsToBuyInTradePort}
+                            <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit per ton/net
+                            profit per item)<br />${port.goodsToBuyInTradePort}
                         </div>`}`
                 : html``}
         `

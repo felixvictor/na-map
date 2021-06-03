@@ -11,7 +11,7 @@
 import path from "path"
 
 import { getCommonPaths } from "./common-dir"
-import { currentServerDateMonth, currentServerDateYear } from "./common"
+import { capitalizeFirstLetter, currentServerDateMonth, currentServerDateYear } from "./common"
 
 /**
  * Clean API name
@@ -23,6 +23,9 @@ export const cleanName = (name: string): string =>
         .replace(" oak", " Oak")
         .replace(" (S)", "\u202F(S)")
         .trim()
+
+export const cleanItemName = (name: string): string =>
+    capitalizeFirstLetter(cleanName(name).toLocaleLowerCase().replace("east indian", "East Indian"))
 
 /**
  * Simple sort of numbers a and b

@@ -122,6 +122,7 @@ export interface TradeItem {
     name: string
     price: number
     distanceFactor?: number
+    weight?: number
 }
 
 /****************************
@@ -283,7 +284,7 @@ export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
 
 export interface TradeProfit {
     profit: number
-    profitPerDistance: number
+    profitPerTon: number
 }
 
 export interface TradeGoodProfit {

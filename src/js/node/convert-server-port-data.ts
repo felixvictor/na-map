@@ -25,7 +25,7 @@ import {
 import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
-import { baseAPIFilename, cleanName, simpleNumberSort } from "../common/common-node"
+import { baseAPIFilename, cleanItemName, cleanName, simpleNumberSort } from "../common/common-node"
 import { serverTwitterNames } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
@@ -43,7 +43,7 @@ interface Item {
     buyPrice: number
 }
 
-const minProfit = 30000
+const minProfit = 30_000
 const frontlinePorts = 2
 
 let apiItems: APIItemGeneric[]
@@ -67,6 +67,9 @@ const getDistance = (fromPortId: number, toPortId: number): number =>
         : distances.get(toPortId * numberPorts + fromPortId) ?? 0
 
 const getPriceTierQuantity = (id: number): number => apiItems.find((item) => item.Id === id)?.PriceTierQuantity ?? 0
+
+const isTradeItem = (item: APIItemGeneric): boolean =>
+    item.SortingGroup === "Resource.Trading" || item.Name === "American Cotton" || item.Name === "Tobacco"
 
 /**
  *
@@ -206,12 +209,16 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
         .map((item) => {
             const tradeItem = {
                 id: item.Id,
-                name: cleanName(item.Name),
+                name: isTradeItem(item) ? cleanItemName(item.Name) : cleanName(item.Name),
                 price: item.BasePrice,
             } as TradeItem
 
             if (item.PortPrices.RangePct) {
                 tradeItem.distanceFactor = item.PortPrices.RangePct
+            }
+
+            if (item.ItemWeight) {
+                tradeItem.weight = item.ItemWeight
             }
 
             return tradeItem
@@ -220,9 +227,9 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items)
 }
 
-const baseTimeInTicks = 621355968000000000
+const baseTimeInTicks = 621_355_968_000_000_000
 const getTimeFromTicks = (timeInTicks: number): string => {
-    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10000).format("YYYY-MM-DD HH:mm")
+    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10_000).format("YYYY-MM-DD HH:mm")
 }
 
 const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
@@ -408,10 +415,7 @@ export const convertServerPortData = (): void => {
                         weight: item.ItemWeight,
                         itemType: item.ItemType,
                         buyPrice: item.BasePrice,
-                        trading:
-                            item.SortingGroup === "Resource.Trading" ||
-                            item.Name === "American Cotton" ||
-                            item.Name === "Tobacco",
+                        trading: isTradeItem(item),
                     },
                 ])
         )

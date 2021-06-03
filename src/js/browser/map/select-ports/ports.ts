@@ -115,6 +115,10 @@ export default class SelectPortsSelectPorts {
         return this.#ports.tradeItem.get(itemId)?.price ?? 0
     }
 
+    _getWeight(itemId: number): number {
+        return this.#ports.tradeItem.get(itemId)?.weight ?? 0
+    }
+
     _getDistanceFactor(itemId: number): number {
         return this.#ports.tradeItem.get(itemId)?.distanceFactor ?? 0
     }
@@ -156,12 +160,12 @@ export default class SelectPortsSelectPorts {
         const buyTax = this._getPortTax(buyPort.id)
         const sellTax = this._getPortTax(sellPort.id)
         let buyPrice = this._getBuyPrice(itemId)
-        let sellPrice = buyPrice * 3 + (planarDistance * buyPrice * this._getDistanceFactor(itemId)) / 6 / 100
+        let sellPrice = buyPrice * 1.8 + (planarDistance * buyPrice * this._getDistanceFactor(itemId)) / 1000
         buyPrice *= 1 + buyTax
         sellPrice /= 1 + sellTax
         const profit = Math.round(sellPrice - buyPrice)
 
-        return { profit, profitPerDistance: profit / sailingDistance }
+        return { profit, profitPerTon: Math.round(profit / this._getWeight(itemId)) }
     }
 
     _getProfit(buyPort: PortWithTrades, sellPort: PortWithTrades, itemId: number): TradeProfit {
@@ -196,6 +200,7 @@ export default class SelectPortsSelectPorts {
     }
 
     _setTradeRelations(): void {
+        this.#sellProfit.clear()
         this.#ports.portData = this.#ports.portDataDefault
             .map((port) => {
                 port.sailingDistanceToTradePort = this._getSailingDistance(port.id, this.#tradePort.id)
