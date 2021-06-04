@@ -2510,10 +2510,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^15.9.0":
-  version "15.9.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.9.0.tgz#0b7f6c33ca5618fe329a9d832b478b4964d325a8"
-  integrity sha512-AR1Vq1Ei1GaA5FjKL5PBqblTZsL5M+monvGSZwe6sSIdGiuu7Xr/pNwWJY+0ZQuN8AapD/XMB5IzBAyYRFbocA==
+"@types/node@*", "@types/node@^15.12.0":
+  version "15.12.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.12.0.tgz#6a459d261450a300e6865faeddb5af01c3389bb3"
+  integrity sha512-+aHJvoCsVhO2ZCuT4o5JtcPrCPyDE3+1nvbDprYes+pPkEsbjH7AGUCNtjMOXS0fqH14t+B7yLzaqSz92FPWyw==
 
 "@types/node@^14.0.1", "@types/node@^14.0.27", "@types/node@^14.14.28":
   version "14.17.2"
@@ -3625,8 +3625,10 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-"bootstrap-select@file:../bootstrap-select":
+bootstrap-select@^1.14.0-beta2:
   version "1.14.0-beta2"
+  resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.14.0-beta2.tgz#3abc9f778435238669f70d0af3615d0198ec4291"
+  integrity sha512-Q63QUbConUwA+/Te7tCJcv0nE3SI/J+rNI5A1mdX1KxP6lW0pFQy+4KVP6VwgZEcwkoPfrwjvAo6WT7fdl+Sdg==
 
 bootstrap@^5.0.1:
   version "5.0.1"
@@ -5256,10 +5258,10 @@ d3-format@^3.0.0:
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-3.0.0.tgz#49971ce004d9969a2d6eb8385e3bac735a843a2f"
   integrity sha512-vzHbrRFaD/Jx1zpiQWojO2Lvgmf7pIsA/D4b6ipd1hxBYzMKsZRsF3i+SWlHz8IpMF4epyKUdG+vhxEYUYB/1g==
 
-d3-hierarchy@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/d3-hierarchy/-/d3-hierarchy-2.0.0.tgz#dab88a58ca3e7a1bc6cab390e89667fcc6d20218"
-  integrity sha512-SwIdqM3HxQX2214EG9GTjgmCc/mbSx4mQBn+DuEETubhOw6/U3fmnji4uCVrmzOydMHSO1nZle5gh6HB/wdOzw==
+d3-hierarchy@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/d3-hierarchy/-/d3-hierarchy-3.0.0.tgz#dedd5a0f5dd46494229c9da73aa254f3627119c3"
+  integrity sha512-vJfouQ06V71rSK6YYnhfybog7SUJjDP7GMhgbl/4FC6g23U6v2Zs5n8dxYePbIgjSS9iXvE50h6p2M058y06Dg==
 
 "d3-interpolate@1 - 2", "d3-interpolate@1.2.0 - 2", d3-interpolate@^2.0.1:
   version "2.0.1"
