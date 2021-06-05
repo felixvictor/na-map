@@ -215,5 +215,5 @@ export const getTweets = async (): Promise<string[]> => {
 
     saveRefreshId(refresh)
 
-    return tweets.sort(simpleStringSort)
+    return tweets.reverse()
 }
