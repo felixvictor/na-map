@@ -77,9 +77,10 @@ export const formatF11 = (x: number): string => formatPrefix(x * -1).replace("k"
 /**
  * Format integer
  * @param   x - Integer
+ * @param   f - Digits following decimal point
  * @returns Formatted Integer
  */
-export const formatInt = (x: number): string => formatLocale.format(",d")(x)
+export const formatInt = (x: number, f = 2): string => formatLocale.format(`,.${f}d`)(x)
 
 // noinspection MagicNumberJS
 /**

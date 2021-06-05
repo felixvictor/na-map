@@ -58,8 +58,8 @@ export default class ShipList {
                 [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
                 [ship.battleRating, formatInt(ship.battleRating)],
                 [ship.crew.max, formatInt(ship.crew.max)],
-                [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed)],
-                [ship.ship.turnSpeed, formatFloatFixed(ship.ship.turnSpeed)],
+                [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed, 1)],
+                [ship.ship.turnSpeed, formatFloatFixed(ship.ship.turnSpeed, 1)],
                 [
                     ship.guns.gunsPerDeck[4].amount,
                     ship.guns.gunsPerDeck[4].amount ? String(ship.guns.gunsPerDeck[4].amount) : "",
