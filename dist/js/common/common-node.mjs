@@ -7,30 +7,16 @@
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
+import path from "path";
+import { getCommonPaths } from "./common-dir";
+import { capitalizeFirstLetter, currentServerDateMonth, currentServerDateYear } from "./common";
 export const cleanName = (name) => name
     .replace(/u([\da-f]{4})/gi, (match) => String.fromCharCode(Number.parseInt(match.replace(/u/g, ""), 16)))
     .replace(/'/g, "’")
     .replace(" oak", " Oak")
     .replace(" (S)", "\u202F(S)")
     .trim();
-export const simpleStringSort = (a, b) => a && b ? a.localeCompare(b) : 0;
+export const cleanItemName = (name) => capitalizeFirstLetter(cleanName(name).toLocaleLowerCase().replace("east indian", "East Indian"));
 export const simpleNumberSort = (a, b) => (a && b ? a - b : 0);
-export const sortBy = (propertyNames) => (a, b) => {
-    let r = 0;
-    propertyNames.some((propertyName) => {
-        let sign = 1;
-        if (String(propertyName).startsWith("-")) {
-            sign = -1;
-            propertyName = String(propertyName).slice(1);
-        }
-        if (Number.isNaN(Number(a[propertyName])) && Number.isNaN(Number(b[propertyName]))) {
-            r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign;
-        }
-        else {
-            r = (Number(a[propertyName]) - Number(b[propertyName])) * sign;
-        }
-        return r !== 0;
-    });
-    return r;
-};
+export const baseAPIFilename = path.resolve(getCommonPaths().dirAPI, currentServerDateYear, currentServerDateMonth);
 //# sourceMappingURL=common-node.js.map

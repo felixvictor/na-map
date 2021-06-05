@@ -57,6 +57,7 @@ const shipsWith36lb = new Set([
     2229, // Redoutable (i)
     2235, // Implacable
     2318, // Admiraal de Ruyter
+    2487, // Santa Ana (i)
 ])
 const shipsNotUsed = new Set([
     1535, // rookie brig
@@ -67,6 +68,7 @@ const shipsNotUsed = new Set([
     2343, // tutorial brig
     2352, // Diana (i)
     2454, // tutorial brig 2
+    2483, // Travel Balloon
 ])
 const blueprintsNotUsed = new Set([
     665, // Santa Cecilia
@@ -82,6 +84,8 @@ const blueprintsNotUsed = new Set([
     2239, // Yacht silver
     2381, // Diana (i)
     2382, // Victory1765
+    2484, // Travel Balloon
+    2541, // Santa Ana (i)
 ])
 
 // noinspection SpellCheckingInspection
@@ -100,6 +104,7 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["bucentaure", { id: 268, master: [] }],
     ["cerberus", { id: 269, master: [] }],
     ["christian", { id: 1664, master: [] }],
+    ["christian2", { id: 2487, master: [] }],
     ["constitution", { id: 270, master: [] }],
     ["constitution2", { id: 1674, master: [] }],
     ["cutter", { id: 271, master: [] }],

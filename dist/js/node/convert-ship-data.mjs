@@ -25,6 +25,7 @@ const shipsWith36lb = new Set([
     2229,
     2235,
     2318,
+    2487,
 ]);
 const shipsNotUsed = new Set([
     1535,
@@ -35,6 +36,7 @@ const shipsNotUsed = new Set([
     2343,
     2352,
     2454,
+    2483,
 ]);
 const blueprintsNotUsed = new Set([
     665,
@@ -50,6 +52,8 @@ const blueprintsNotUsed = new Set([
     2239,
     2381,
     2382,
+    2484,
+    2541,
 ]);
 const shipNames = new Map([
     ["agamemnon", { id: 694, master: [] }],
@@ -63,6 +67,7 @@ const shipNames = new Map([
     ["bucentaure", { id: 268, master: [] }],
     ["cerberus", { id: 269, master: [] }],
     ["christian", { id: 1664, master: [] }],
+    ["christian2", { id: 2487, master: [] }],
     ["constitution", { id: 270, master: [] }],
     ["constitution2", { id: 1674, master: [] }],
     ["cutter", { id: 271, master: [] }],

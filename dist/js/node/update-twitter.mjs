@@ -8,106 +8,27 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import path from "path";
-import Twit from "twit";
-import filterXSS from "xss";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
-import { currentServerStartDateTime, findNationByName, findNationByNationShortName, simpleStringSort, } from "../common/common";
+import { findNationByName, findNationByNationShortName, sortBy } from "../common/common";
+import { readJson, saveJsonAsync } from "../common/common-file";
 import { getCommonPaths } from "../common/common-dir";
-import { fileExists, readJson, readTextFile, saveJsonAsync, saveTextFile } from "../common/common-file";
-import { cleanName } from "../common/common-node";
 import { flagValidity, portBattleCooldown } from "../common/common-var";
 import { serverIds } from "../common/servers";
+import { getTweets, runType } from "./get-tweets";
+const flagsMap = new Map();
 const commonPaths = getCommonPaths();
-const consumerKey = process.argv[2];
-const consumerSecret = process.argv[3];
-const accessToken = process.argv[4];
-const accessTokenSecret = process.argv[5];
-const runType = process.argv[6] ?? "full";
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`);
+const flagsFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-flags.json`);
 let ports = [];
-let Twitter;
+let flagsPerNations = [];
 let tweets = [];
-const refreshDefault = "0";
-let refresh = "0";
-const queryFrom = "from:zz569k";
 let isPortDataChanged = false;
 const dateTimeFormat = "YYYY-MM-DD HH:mm";
 const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm";
-const getRefreshId = () => fileExists(commonPaths.fileTwitterRefreshId)
-    ? String(readTextFile(commonPaths.fileTwitterRefreshId))
-    : refreshDefault;
-const saveRefreshId = (refresh) => {
-    saveTextFile(commonPaths.fileTwitterRefreshId, refresh);
-};
-const addTwitterData = (data) => {
-    tweets.push(...data.statuses
-        .flatMap((status) => cleanName(filterXSS(status.full_text ?? "")))
-        .sort(simpleStringSort));
-    refresh = data.search_metadata.max_id_str ?? "";
-};
-const getTwitterData = async (query, since_id = refresh) => {
-    await Twitter.get("search/tweets", {
-        count: 100,
-        include_entities: false,
-        q: query,
-        result_type: "recent",
-        since_id,
-        tweet_mode: "extended",
-    })
-        .catch((error) => {
-        throw error.stack;
-    })
-        .then((result) => {
-        addTwitterData(result.data);
-    });
-};
-const getTweetsSince = async (sinceDateTime) => {
-    const now = dayjs.utc();
-    for (let queryTime = sinceDateTime; queryTime.isBefore(now); queryTime = queryTime.add(1, "hour")) {
-        const query = `"[${queryTime.format("DD-MM-YYYY")}+${String(queryTime.hour()).padStart(2, "0")}:"+${queryFrom}`;
-        await getTwitterData(query, refreshDefault);
-    }
-};
-const getTweetsFull = async () => {
-    await getTweetsSince(dayjs.utc(currentServerStartDateTime).subtract(2, "day"));
-};
-const getTweetsSinceMaintenance = async () => {
-    await getTweetsSince(dayjs.utc(currentServerStartDateTime));
-};
-const getTweetsSinceRefresh = async () => {
-    await getTwitterData(queryFrom);
-};
-const getTweetsPartial = async () => {
-    if (refresh === refreshDefault) {
-        await getTweetsSinceMaintenance();
-    }
-    else {
-        await getTweetsSinceRefresh();
-    }
-};
-const getTweets = async () => {
-    tweets = [];
-    refresh = getRefreshId();
-    Twitter = new Twit({
-        consumer_key: consumerKey,
-        consumer_secret: consumerSecret,
-        access_token: accessToken,
-        access_token_secret: accessTokenSecret,
-        timeout_ms: 60 * 1000,
-        strictSSL: true,
-    });
-    if (runType.startsWith("full")) {
-        await getTweetsFull();
-    }
-    else {
-        await getTweetsPartial();
-    }
-    saveRefreshId(refresh);
-};
 const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
 const guessNationFromClanName = (clanName) => {
     const port = findPortByClanName(clanName);
@@ -124,7 +45,7 @@ const getCooldownTime = (tweetTime) => {
     const portBattleEndTimeEstimated = tweetTimeDayjs.subtract((5 * 60) / 2, "second");
     return portBattleEndTimeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat);
 };
-const getActiveTime = (time) => dayjs.utc(time, dateTimeFormat).add(flagValidity, "hour").format(dateTimeFormat);
+const getActiveTime = (time) => time.add(flagValidity, "days");
 const updatePort = (portName, updatedPort) => {
     const portIndex = getPortIndex(portName);
     const { captured, capturer } = ports[portIndex];
@@ -221,11 +142,57 @@ const cooledOff = (result) => {
     updatePort(portName, updatedPort);
 };
 const flagAcquired = (result) => {
-    const nation = result[2];
+    const nationName = result[2];
+    const nationId = findNationByName(nationName)?.id ?? 0;
     const numberOfFlags = Number(result[3]);
-    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter).format(dateTimeFormat);
-    const active = getActiveTime(tweetTime);
-    console.log("      --- conquest flag", numberOfFlags, nation, active);
+    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter);
+    const active = getActiveTime(tweetTime).format(dateTimeFormat);
+    console.log("      --- conquest flag", numberOfFlags, nationName, active);
+    const flag = { expire: active, number: numberOfFlags };
+    const flagsSet = flagsMap.get(nationId) ?? new Set();
+    flagsSet.add(flag);
+    flagsMap.set(nationId, flagsSet);
+};
+const cleanExpiredAndDoubleEntries = (flagSet) => {
+    const now = dayjs.utc();
+    const cleanedFlags = new Map();
+    for (const flag of flagSet) {
+        const expire = dayjs.utc(flag.expire, dateTimeFormat);
+        if (expire.isAfter(now)) {
+            cleanedFlags.set(flag.expire, flag.number);
+        }
+    }
+    return cleanedFlags;
+};
+const cleanFlags = () => {
+    const cleanedFlagsPerNation = [];
+    for (const [nation, flagSet] of flagsMap) {
+        const cleanedFlags = cleanExpiredAndDoubleEntries(flagSet);
+        if (cleanedFlags.size > 0) {
+            const flags = [...cleanedFlags].map(([expire, number]) => ({
+                expire,
+                number,
+            })).sort(sortBy(["expire"]));
+            cleanedFlagsPerNation.push({
+                nation,
+                flags,
+            });
+        }
+    }
+    return cleanedFlagsPerNation;
+};
+const initFlags = () => {
+    for (const flagsPerNation of flagsPerNations) {
+        const flagsSet = new Set();
+        for (const flag of flagsPerNation.flags) {
+            flagsSet.add(flag);
+        }
+        flagsMap.set(flagsPerNation.nation, flagsSet);
+    }
+};
+const updateFlags = async () => {
+    const cleanedFlagsPerNation = cleanFlags();
+    await saveJsonAsync(flagsFilename, cleanedFlagsPerNation);
 };
 const portR = "[A-zÀ-ÿ’ -]+";
 const portHashR = "[A-zÀ-ÿ]+";
@@ -306,8 +273,11 @@ const updatePorts = async () => {
 };
 const updateTwitter = async () => {
     ports = readJson(portFilename);
-    await getTweets();
+    flagsPerNations = readJson(flagsFilename);
+    initFlags();
+    tweets = await getTweets();
     await updatePorts();
+    await updateFlags();
     if (runType.startsWith("partial")) {
         process.exitCode = Number(!isPortDataChanged);
     }

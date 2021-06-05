@@ -7,55 +7,51 @@
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-import path from "path";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc.js";
-dayjs.extend(utc);
-import { serverMaintenanceHour } from "./common-var";
-const appRoot = process.env.PWD ?? "";
-const dirOut = path.resolve(appRoot, "public", "data");
-const dirBuild = path.resolve(appRoot, "build");
-const dirAPI = path.resolve(dirBuild, "API");
-const dirModules = path.resolve(dirBuild, "Modules");
-const dirSrc = path.resolve(appRoot, "src");
-const dirLib = path.resolve(dirSrc, "lib");
-const dirGenServer = path.resolve(dirLib, "gen-server");
-const dirGenGeneric = path.resolve(dirLib, "gen-generic");
-export const commonPaths = {
-    dirAPI,
-    dirBuild,
-    dirGenGeneric,
-    dirGenServer,
-    dirModules,
-    dirOut,
-    dirSrc,
-    fileTwitterRefreshId: path.resolve(dirAPI, "response-id.txt"),
-    filePbSheet: path.resolve(dirGenGeneric, "port-battle.xlsx"),
-    filePortBonusCSV: path.resolve(dirGenServer, "eu1-port-bonus.csv"),
-    filePortBonus: path.resolve(dirGenServer, "eu1-port-bonus.json"),
-    fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
-    fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
-    fileLoot: path.resolve(dirGenGeneric, "loot.json"),
-    fileModules: path.resolve(dirGenGeneric, "modules.json"),
-    filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
-    filePort: path.resolve(dirGenGeneric, "ports.json"),
-    filePrices: path.resolve(dirGenGeneric, "prices.json"),
-    fileRecipe: path.resolve(dirGenGeneric, "recipes.json"),
-    fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
-    fileShip: path.resolve(dirGenGeneric, "ships.json"),
-    fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json"),
-    fileWood: path.resolve(dirGenGeneric, "woods.json"),
+const buildPath = (...args) => {
+    return args
+        .map((part, i) => {
+        if (i === 0) {
+            return part.trim().replace(/\/*$/g, "");
+        }
+        return part.trim().replace(/(^\/*|\/*$)/g, "");
+    })
+        .filter((x) => x.length)
+        .join("/");
 };
-const getServerStartDateTime = () => {
-    let serverStart = dayjs().utc().hour(serverMaintenanceHour).minute(0).second(0);
-    if (dayjs.utc().isBefore(serverStart)) {
-        serverStart = dayjs.utc(serverStart).subtract(1, "day");
-    }
-    return serverStart;
-};
-export const serverStartDateTime = getServerStartDateTime().format("YYYY-MM-DD HH:mm");
-export const serverStartDate = getServerStartDateTime().format("YYYY-MM-DD");
-const serverDateYear = String(dayjs(serverStartDate).year());
-const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0");
-export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth);
+export function getCommonPaths(appRoot = process.env.PWD ?? "") {
+    const dirOutput = buildPath(appRoot, "public");
+    const dirBuild = buildPath(appRoot, "build");
+    const dirAPI = buildPath(dirBuild, "API");
+    const dirLib = buildPath(appRoot, "lib");
+    const dirGenServer = buildPath(dirLib, "gen-server");
+    const dirGenGeneric = buildPath(dirLib, "gen-generic");
+    const dirSrc = buildPath(appRoot, "src");
+    return {
+        dirOutput,
+        dirDataOut: buildPath(dirOutput, "data"),
+        dirBuild,
+        dirAPI,
+        dirModules: buildPath(dirBuild, "Modules"),
+        dirSrc,
+        dirLib,
+        dirGenServer,
+        dirGenGeneric,
+        fileTwitterRefreshId: buildPath(dirAPI, "response-id.txt"),
+        filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
+        filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),
+        fileBuilding: buildPath(dirGenGeneric, "buildings.json"),
+        fileCannon: buildPath(dirGenGeneric, "cannons.json"),
+        fileLoot: buildPath(dirGenGeneric, "loot.json"),
+        fileModules: buildPath(dirGenGeneric, "modules.json"),
+        filePbSheet: buildPath(dirGenGeneric, "port-battle.xlsx"),
+        filePbZone: buildPath(dirGenGeneric, "pb-zones.json"),
+        filePort: buildPath(dirGenGeneric, "ports.json"),
+        filePrices: buildPath(dirGenGeneric, "prices.json"),
+        fileRecipe: buildPath(dirGenGeneric, "recipes.json"),
+        fileRepair: buildPath(dirGenGeneric, "repairs.json"),
+        fileShip: buildPath(dirGenGeneric, "ships.json"),
+        fileShipBlueprint: buildPath(dirGenGeneric, "ship-blueprints.json"),
+        fileWood: buildPath(dirGenGeneric, "woods.json"),
+    };
+}
 //# sourceMappingURL=common-dir.js.map

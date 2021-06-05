@@ -230,7 +230,7 @@ function fillSheet(sheet, ships, ports) {
     row.fill = fillPattern(colourContrastMiddle);
     row.font = fontColourBold(colourContrastNearWhite);
     sheet.getCell(currentRowNumber, 1).value = "Rate";
-    sheet.getCell(currentRowNumber, 2).value = "Ship";
+    sheet.getCell(currentRowNumber, 2).value = "Column";
     sheet.getCell(currentRowNumber, 3).value = "BR";
     sheet.getCell(currentRowNumber, 4).value = "# Players";
     sheet.getCell(currentRowNumber, 5).value = "BR total";

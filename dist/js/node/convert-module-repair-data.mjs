@@ -1,7 +1,7 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Convert repair data from modules.
+ * @file      Convert repair data from setModules.
  * @module    src/node/convert-module-repair
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021

@@ -1,5 +1,6 @@
 const frontlinesType = ["attacking", "defending"];
-export const lootType = ["loot", "chest", "item", "fish"];
-const woodColumnType = ["Base", "C1", "C2", "C3"];
+export const lootType = ["item", "loot", "chest", "fish"];
 export const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"];
+export const woodFamily = ["regular", "seasoned", "exceptional"];
+export const woodType = ["frame", "trim"];
 //# sourceMappingURL=types.js.map

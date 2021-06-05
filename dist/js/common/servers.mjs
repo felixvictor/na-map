@@ -9,7 +9,8 @@
  */
 export const serverIds = ["eu1", "eu2"];
 export const servers = [
-    { id: "eu1", name: "War", type: "PVP" },
-    { id: "eu2", name: "Peace", type: "PVE" },
+    { id: "eu1", name: "War", type: "PVP", icon: "war" },
+    { id: "eu2", name: "Peace", type: "PVE", icon: "peace" },
 ];
+export const getServerType = (serverId) => servers.find((server) => server.id === serverId).type;
 //# sourceMappingURL=servers.js.map

@@ -65,6 +65,7 @@ const getBaseFileNames = (directory: string): void => {
         if (
             (fileNameFirstPart === "cannon" && fileName !== "cannon repair kit.xml") ||
             fileNameFirstPart === "carronade" ||
+            fileNameFirstPart === "carr" ||
             fileName.startsWith("tower cannon")
         ) {
             fileNames.add(fileName)
@@ -117,10 +118,19 @@ for (const type of cannonType) {
 const defenseFamily = new Set(["fort", "tower"])
 
 const getFamily = (name: string): string => {
-    const regex = /\((.+)\)/
+    const regex = /\s+\(?(\w+)\)?/
     let family = regex.exec(name)?.[1].toLocaleLowerCase() ?? "regular"
+
+    if (family === "medium") {
+        family = "regular"
+    }
+
     if (defenseFamily.has(family)) {
         family = "defense"
+    }
+
+    if (name.startsWith("Carr ")) {
+        family = "obusiers"
     }
 
     return family
@@ -132,11 +142,15 @@ const getFamily = (name: string): string => {
  */
 const addData = (fileData: XmlGeneric): void => {
     const getType = (): CannonType => {
-        if (fileData._attributes.Name.includes("Carronade")) {
+        if (fileData._attributes.Name.includes("Carronade") || fileData._attributes.Name.includes("Obusiers")) {
             return "carronade"
         }
 
-        if (fileData._attributes.Name.includes("Long")) {
+        if (
+            fileData._attributes.Name.includes("Long") ||
+            fileData._attributes.Name.includes("Blomfield") ||
+            fileData._attributes.Name.includes("Navy Gun")
+        ) {
             return "long"
         }
 
@@ -145,17 +159,20 @@ const addData = (fileData: XmlGeneric): void => {
 
     const getName = (): string =>
         fileData._attributes.Name.replace("Cannon ", "")
+            .replace("Carr ", "")
             .replace("Carronade ", "")
             .replace(" pd", "")
             .replace(" Long", "")
             .replace("Salvaged ", "")
             .replace("0.5 E", "E")
-            .replace(/^(\d+) - (.+)$/g, "$1 ($2)")
-            .replace(/^Tower (\d+)$/g, "$1 (Tower)")
             .replace("Blomfield", "Blomefield")
             .replace(" Gun", "")
+            .replace(/^(\d+) - (\w+)$/g, "$1 ($2)")
+            .replace(/^(\d+) (\w+)$/g, "$1 ($2)")
+            .replace(/^Tower (\d+)$/g, "$1 (Tower)")
             // Edinorog are 18lb now
             .replace("24 (Edinorog)", "18 (Edinorog)")
+            .replace(" (Medium)", "")
 
     const cannon = {} as CannonEntity
     for (const [value, { group, element }] of dataMapping) {
@@ -174,11 +191,10 @@ const addData = (fileData: XmlGeneric): void => {
 
     // Calculate penetrations
     const penetrations: Map<number, number> = new Map(
-        (fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
-            .Value as TangentEntity[]).map((penetration) => [
-            Number(penetration.Time._text) * 1000,
-            Number(penetration.Value._text),
-        ])
+        (
+            fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")
+                ?.Value.Value as TangentEntity[]
+        ).map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
     )
 
     penetrations.set(50, ((penetrations.get(0) ?? 0) + (penetrations.get(100) ?? 0)) / 2)
