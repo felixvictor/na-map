@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap-select"
-
 import Modal from "util/modal"
 
 import { PortWithTrades } from "common/gen-json"

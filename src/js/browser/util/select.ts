@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap-select"
+import "bootstrap-select/js/bootstrap-select"
 
 import { select as d3Select, Selection } from "d3-selection"
 import { HtmlString } from "common/interface"

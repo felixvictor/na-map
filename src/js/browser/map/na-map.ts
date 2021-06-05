@@ -8,7 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap-select"
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, ZoomBehavior, ZoomTransform, D3ZoomEvent } from "d3-zoom"
 
