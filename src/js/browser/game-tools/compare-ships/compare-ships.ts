@@ -22,7 +22,7 @@ import { hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShi
 import { getOrdinal } from "common/common-math"
 import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
 
-import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime, ShipSpeed } from "common/gen-json"
+import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { WoodType, woodType } from "common/types"
 import { ShipColumnTypeList, ModuleType, SelectedData, SelectedId, ShipSelectData } from "compare-ships"
@@ -191,7 +191,7 @@ export class CompareShips {
         for (const moduleType of this.#moduleTypes) {
             this.#selects.initModuleSelects(columnId, moduleType, this._getModuleOption(moduleType, shipClass))
 
-            console.log(moduleType, this.#selects.getModule$(columnId, moduleType))
+            // console.log(moduleType, this.#selects.getModule$(columnId, moduleType))
             this.#selects
                 .getModule$(columnId, moduleType)
                 .on("show.bs.select", (event: Event) => {
@@ -299,7 +299,7 @@ export class CompareShips {
         // Group module data by sub type (e.g. "Gunnery")
         const modulesGrouped = this._getModulesGrouped(moduleType, shipClass)
         let options: string
-        const moduleTypeWithSingleOption = new Set(["Permanent", "Column trim"])
+        const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
 
         // eslint-disable-next-line unicorn/prefer-ternary
         if (modulesGrouped.length > 1) {
@@ -409,9 +409,9 @@ export class CompareShips {
             // Clone left
             if (columnId !== this.#columnIds[0]) {
                 // Add listener except for first column
-                ;(document.querySelector(
-                    `#${this.#modal!.getCloneLeftButtonId(columnId)}`
-                ) as HTMLButtonElement).addEventListener("click", () => {
+                ;(
+                    document.querySelector(`#${this.#modal!.getCloneLeftButtonId(columnId)}`) as HTMLButtonElement
+                ).addEventListener("click", () => {
                     this._cloneToLeft(columnId)
                 })
             }
@@ -419,9 +419,9 @@ export class CompareShips {
             // Clone right
             if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
                 // Add listener except for last right column
-                ;(document.querySelector(
-                    `#${this.#modal!.getCloneRightButtonId(columnId)}`
-                ) as HTMLButtonElement).addEventListener("click", () => {
+                ;(
+                    document.querySelector(`#${this.#modal!.getCloneRightButtonId(columnId)}`) as HTMLButtonElement
+                ).addEventListener("click", () => {
                     this._cloneToRight(columnId)
                 })
             }

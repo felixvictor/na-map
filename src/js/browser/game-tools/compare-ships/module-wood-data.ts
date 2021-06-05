@@ -121,7 +121,7 @@ export default class ModulesAndWoodData {
         // Add modifier amount for both frame and trim
         for (const [, woodProperties] of Object.entries(woodData)) {
             for (const property of woodProperties?.properties ?? []) {
-                console.log("_setModifierAmountWoods", property)
+                // console.log("_setModifierAmountWoods", property)
                 if (this.#moduleAndWoodChanges.has(property.modifier)) {
                     this._setModifier(property)
                 }
@@ -132,7 +132,7 @@ export default class ModulesAndWoodData {
     _setModifierAmountModules(moduleData: ModuleEntity[]): void {
         for (const module of moduleData) {
             for (const property of module?.properties ?? []) {
-                console.log("_setModifierAmountModules", property)
+                // console.log("_setModifierAmountModules", property)
                 if (this.#moduleAndWoodChanges.has(property.modifier)) {
                     this._setModifier(property)
                 }

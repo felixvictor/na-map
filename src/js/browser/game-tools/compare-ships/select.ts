@@ -126,7 +126,7 @@ export class CompareShipsSelect {
             liveSearch: true,
             liveSearchNormalize: true,
             liveSearchPlaceholder: "Search ...",
-            maxOptions: moduleType.startsWith("Column trim") ? 6 : 5,
+            maxOptions: moduleType.startsWith("Ship trim") ? 6 : 5,
             selectedTextFormat: "count > 1",
             title: `${moduleType}`,
             width: "170px",
