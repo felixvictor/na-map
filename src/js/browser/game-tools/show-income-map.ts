@@ -123,14 +123,14 @@ export default class ShowIncomeMap {
                     return {
                         id: port.name,
                         value: port.netIncome,
-                        parentId: findNationByNationShortName(port.nation)?.sortName,
+                        parentId: port.nation,
                     }
                 }),
             // Nation nodes
             ...nations
                 .filter((nation) => nationWithIncome.has(nation.short))
                 .map((nation) => ({
-                    id: nation.sortName,
+                    id: nation.short,
                     value: 0,
                     parentId: "World",
                 })),
@@ -193,6 +193,7 @@ export default class ShowIncomeMap {
 
     _drawLegend(): void {
         const rowHeight = Math.floor(20 * ϕ)
+        const iconHeight = rowHeight * 0.8
         const rowPadding = Math.floor(2 * ϕ)
         const columnPadding = Math.floor(5 * ϕ)
         const nations = (this.#tree.children ?? []).sort((a, b) => b.value! - a.value!)
@@ -222,10 +223,18 @@ export default class ShowIncomeMap {
                     .attr("height", rowHeight)
                     .style("fill", (d) => this.#colourScale(d.data.id!))
 
-                svg.append("text")
+                svg.append("rect")
                     .attr("x", columnPadding)
+                    .attr("y", "5%")
+                    .attr("width", (iconHeight * 4) / 3)
+                    .attr("height", iconHeight)
+                    .attr("fill", (d) => `url(#${d.data.id!})`)
+
+                svg.append("text")
+                    .attr("x", columnWidth - columnPadding)
                     .attr("y", "25%")
                     .text((d) => d.data.id!)
+                    .attr("class", "text-end")
                     .style("fill", (d) => getContrastColour(this.#colourScale(d.data.id!)))
 
                 svg.append("rect")
@@ -255,7 +264,9 @@ export default class ShowIncomeMap {
         return `
             <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex flex-column text-start mt-1 me-3 p-0">
-                <div><span class="x-large">${d.data.id ?? ""}</span><br />${d.parent?.data?.id ?? ""}</div>
+                <div><span class="flag-icon-${d.parent?.data?.id as string} me-2"></span><span class="x-large">${
+            d.data.id ?? ""
+        }</span></div>
             </div>
             <div class="d-flex flex-column text-start mt-1 p-0">
                 <div class="me-3">
