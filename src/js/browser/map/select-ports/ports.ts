@@ -61,7 +61,7 @@ export default class SelectPortsSelectPorts {
         return `${selectPorts
             .map(
                 (port: SelectPort): HtmlString =>
-                    `<option data-subtext="${port.nation}" value="${port.coord.toString()}/${port.id}">${
+                    `<option data-icon="flag-icon-${port.nation}" value="${port.coord.toString()}/${port.id}">${
                         port.name
                     }</option>`
             )

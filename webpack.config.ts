@@ -346,7 +346,7 @@ const config: webpack.Configuration = {
                 generator: {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
                     dataUrl: (content: any): string => {
-                        let svg: string = content.toString()
+                        let svg: string = content.toString() as string
 
                         // Replace with custom colours
                         svg = svg.replace('fill="#fff" fill-opacity="0"/>', `fill="${primary700}" fill-opacity="0.3"/>`)
@@ -367,7 +367,7 @@ const config: webpack.Configuration = {
                 generator: {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
                     dataUrl: (content: any): string => {
-                        let svg: string = content.toString()
+                        let svg: string = content.toString() as string
 
                         // Replace with custom colours
                         svg = svg.replace('fill="$themeColour"', `fill="${themeColour}"`)

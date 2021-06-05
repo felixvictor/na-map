@@ -8,6 +8,8 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
+$icon-dir: "../images/flags";
+
 .flag-icon {
     width: 6rem;
     margin-right: 0.4rem;
@@ -24,4 +26,18 @@
 
 .flag-icon-border-middle {
     border: 0.3rem solid transparentize($yellow, 0.1);
+}
+
+$nations: "CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP";
+
+@each $nation in $nations {
+    .flag-icon-#{$nation} {
+        display: inline-block;
+        width: 1.3333rem;
+        height: 1rem;
+        vertical-align: baseline;
+        background-image: url("#{$icon-dir}/#{$nation}.svg");
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
 }
