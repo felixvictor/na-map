@@ -69,11 +69,15 @@ export default class ListPortBattles {
                 const portBattleLT = dayjs.utc(port.portBattle).local()
                 const portBattleST = dayjs.utc(port.portBattle)
                 const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
-                const defenderNation = findNationByNationShortName(port.nation)?.name
-                const defender =
-                    !port.capturer || port.capturer === "RAIDER"
-                        ? defenderNation ?? ""
-                        : `${defenderNation ?? ""} (${displayClan(port.capturer)})`
+                const iconDefenderNation = `<span class="flag-icon-${port.nation}" role="img" title="${
+                    findNationByNationShortName(port.nation)?.sortName ?? ""
+                }"></span>`
+                const defenderClan =
+                    !port.capturer || port.capturer === "RAIDER" ? "" : ` ${displayClan(port.capturer)}`
+                const iconAttackerNation = `<span class="flag-icon-${port.attackerNation!}" role="img" title="${
+                    findNationByNationShortName(port.attackerNation!)?.sortName ?? ""
+                }"></span>`
+                const attackerClan = ` ${displayClan(port?.attackerClan ?? "")}`
 
                 return {
                     sort: port.portBattle ?? "",
@@ -82,8 +86,8 @@ export default class ListPortBattles {
                             "H.mm"
                         )} ${localTime}`,
                         port.name,
-                        `${port?.attackerNation ?? ""} (${displayClan(port?.attackerClan ?? "")})`,
-                        defender,
+                        iconAttackerNation + attackerClan,
+                        iconDefenderNation + defenderClan,
                         portBattleST.toISOString(),
                     ],
                 }
@@ -97,7 +101,7 @@ export default class ListPortBattles {
             this.#modal.show()
         } else {
             await this._loadAndSetupData()
-            this.#modal = new Modal(this.#baseName, "xl")
+            this.#modal = new Modal(this.#baseName, "lg")
             this._pbListSelected()
         }
     }
@@ -109,6 +113,13 @@ export default class ListPortBattles {
     }
 
     _compareTime = (a: RowData, b: RowData, sign: 1 | -1): number => a[4].localeCompare(b[4]) * sign
+
+    _getNationSortName = (text: string): string => {
+        const regex = /flag-icon-(\w{2})/
+        const nationShortName = regex.exec(text)?.[1] ?? ""
+
+        return findNationByNationShortName(nationShortName)?.sortName ?? ""
+    }
 
     _sortRows(index: number, changeOrder = true): void {
         if (changeOrder && this.#sortIndex === index) {
@@ -123,10 +134,10 @@ export default class ListPortBattles {
                 return this._compareTime(a.data, b.data, sign)
             }
 
-            // Remove clan information
-            const regex = /\s\(.+\)/
-            const aa = a.data[index].replace(regex, "")
-            const bb = b.data[index].replace(regex, "")
+            // Extract nation short name information
+            const aa = this._getNationSortName(a.data[index])
+            const bb = this._getNationSortName(b.data[index])
+
             let result = aa.localeCompare(bb) * sign
 
             // Sort by port

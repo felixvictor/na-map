@@ -16,9 +16,9 @@ import { ValuesType } from "utility-types"
 import { Group } from "timelines-chart"
 
 import {
+    AttackerNationShortName,
     CannonFamily,
     CannonType,
-    NationFullName,
     NationShortName,
     NationShortNameAlternative,
     PeneDistance,
@@ -342,14 +342,13 @@ export interface InventoryEntity {
  * <servername>-pb.json
  */
 
-type AttackerNationName = NationFullName | "n/a" | ""
 export interface PortBattlePerServer {
     id: number
     name: string
     nation: NationShortName
     capturer?: string
     captured?: string
-    attackerNation?: AttackerNationName
+    attackerNation?: AttackerNationShortName
     attackerClan?: string
     attackHostility?: number
     portBattle?: string
