@@ -30,7 +30,13 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
-import { capitalizeFirstLetter, nations, NationShortName, simpleStringSort } from "common/common"
+import {
+    capitalizeFirstLetter,
+    findNationByNationShortName,
+    nations,
+    NationShortName,
+    simpleStringSort,
+} from "common/common"
 import {
     colourGreenDark,
     colourLight,
@@ -562,8 +568,8 @@ export default class DisplayPorts {
         */
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
-        const formatFromToTime = (from: number, to: number): HtmlString =>
-            `${String(from)}\u2009\u2012\u2009${String(to)}`
+        const formatFromToTime = (from: number, to: number): HtmlResult =>
+            html`<span style="white-space: nowrap;">${String(from)} ‒ ${String(to)}</span>`
 
         const formatTime = (from: number, to: number): HtmlResult => {
             const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
@@ -583,10 +589,14 @@ export default class DisplayPorts {
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
         const attackHostility = portProperties.portBattle
-            ? html`${displayClanLitHtml(portProperties.attackerClan)} (${portProperties.attackerNation})
-              attack${portProperties.portBattle
-                  ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-                  : html`s: ${formatPercentHtml(portProperties.attackHostility ?? 0)} hostility`}`
+            ? html`<span
+                      class="flag-icon-${portProperties.attackerNation} me-1"
+                      role="img"
+                      title="${findNationByNationShortName(portProperties?.attackerNation ?? "")?.sortName ?? ""}"
+                  ></span
+                  >${displayClanLitHtml(portProperties.attackerClan)} attack${portProperties.portBattle
+                      ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+                      : html`s: ${formatPercentHtml(portProperties.attackHostility ?? 0)} hostility`}`
             : html``
 
         const port = {
@@ -603,7 +613,7 @@ export default class DisplayPorts {
                 ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
                 : "",
             attack: portProperties.attackHostility ? attackHostility : html``,
-            isNPCAttacker: portProperties.attackerNation === "Neutral",
+            isNPCAttacker: portProperties.attackerNation === "NT",
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: portProperties.capturable ? formatInt(portProperties.portPoints) : "",
@@ -728,36 +738,36 @@ export default class DisplayPorts {
                       ${port.attack}
                   </div>`}
 
-            <div class="d-flex text-start mb-2">
+            <div class="d-flex text-start mb-2 compress">
                 ${port.capital || port.icon === "FT"
-                    ? html`<div>${port.portTax}<br /><span class="des">Tax rate</span></div>`
+                    ? html`<div>${port.portTax}<br /><span class="des top-0">Tax rate</span></div>`
                     : html`
                           <div class="me-3">
                               ${port.pbTimeRange}<br />
-                              <span class="des">Battle timer</span>
+                              <span class="des top-0">Battle timer</span>
                           </div>
                           <div class="me-3">
                               ${port.brLimit}<br />
-                              <span class="des">Rating</span>
+                              <span class="des top-0">Rating</span>
                           </div>
                           ${port.capturer
                               ? html` <div class="me-3">
                                         ${port.capturer}<br />
-                                        <span class="des">Capturer</span>
+                                        <span class="des top-0">Capturer</span>
                                     </div>
                                     <div class="me-5">
                                         ${port.captureTime}<br />
-                                        <span class="des">Capture</span>
+                                        <span class="des top-0">Capture</span>
                                     </div>`
                               : html``}
 
                           <div class="ms-auto me-3">
                               ${port.taxIncome} (${port.portTax})<br />
-                              <span class="des">Tax income</span>
+                              <span class="des top-0">Tax income</span>
                           </div>
                           <div>
                               ${port.netIncome}<br />
-                              <span class="des">Net income</span>
+                              <span class="des top-0">Net income</span>
                           </div>
                       `}
             </div>
@@ -912,7 +922,7 @@ export default class DisplayPorts {
         let marker = ""
         if (port.cooldownTime) {
             marker = "cooldown"
-        } else if (port.attackerNation === "Neutral") {
+        } else if (port.attackerNation === "NT") {
             marker = "raider"
         }
 
@@ -987,7 +997,7 @@ export default class DisplayPorts {
                 this.#attackRadius.range([rMin, rMax / 1.5])
                 cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
                 fill = (d): string =>
-                    d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
+                    d.attackerNation === "NT" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
                 r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
 
                 break
