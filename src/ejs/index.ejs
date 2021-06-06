@@ -63,7 +63,7 @@
 <% } %>
 
 <% function makeList(type, data) { %>
-    <div class="row row-cols-2 g-0">
+    <div class="row row-cols-md-2 row-cols-1 g-0">
         <% data.forEach(function(item) { %>
             <% const id = getBaseId(item.name.replace(" compare", "")) %>
             <li><a class="dropdown-item d-flex align-items-center" id="menu-<%= type %>-<%= id %>"><span
@@ -188,7 +188,7 @@
 </div>
 <%          */ %>
 
-<nav class="navbar navbar-expand-lg navbar-light">
+<nav class="navbar navbar-expand-xl navbar-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
             <img src="<%= htmlWebpackPlugin.options.iconSmall %>" width="32" height="32" alt="Brand">
