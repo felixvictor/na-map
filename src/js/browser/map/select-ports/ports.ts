@@ -156,7 +156,7 @@ export default class SelectPortsSelectPorts {
 
     _calculateSellProfit(buyPort: PortWithTrades, sellPort: PortWithTrades, itemId: number): TradeProfit {
         const planarDistance = this._findClosestSourcePort(sellPort, itemId)
-        const sailingDistance = this._getSailingDistance(buyPort.id, sellPort.id)
+        // const sailingDistance = this._getSailingDistance(buyPort.id, sellPort.id)
         const buyTax = this._getPortTax(buyPort.id)
         const sellTax = this._getPortTax(sellPort.id)
         let buyPrice = this._getBuyPrice(itemId)

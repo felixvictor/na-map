@@ -130,8 +130,8 @@ export default class ListIngredients {
         div.select("div").remove()
         div.append("div").attr("class", "row").html(this._getText())
 
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
+        const tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl: HTMLElement) {
             return new BSTooltip(tooltipTriggerEl, {
                 html: true,
                 placement: "auto",

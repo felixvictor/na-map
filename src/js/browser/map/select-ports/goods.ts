@@ -71,24 +71,30 @@ export default class SelectPortsSelectGoods {
     _selectSelected(): void {
         const goodSelectedId = Number(this.#select.getValues())
 
-        const sourcePorts = (JSON.parse(
-            JSON.stringify(
-                this.#ports.portDataDefault.filter(
-                    (port) =>
-                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                        port.dropsTrading?.includes(goodSelectedId) ||
-                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                        port.dropsNonTrading?.includes(goodSelectedId) ||
-                        port.producesNonTrading?.includes(goodSelectedId)
+        const sourcePorts = (
+            JSON.parse(
+                JSON.stringify(
+                    this.#ports.portDataDefault.filter(
+                        (port) =>
+                            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                            port.dropsTrading?.includes(goodSelectedId) ||
+                            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                            port.dropsNonTrading?.includes(goodSelectedId) ||
+                            port.producesNonTrading?.includes(goodSelectedId)
+                    )
                 )
-            )
-        ) as PortWithTrades[]).map((port) => {
+            ) as PortWithTrades[]
+        ).map((port) => {
             port.isSource = true
             return port
         })
-        const consumingPorts = (JSON.parse(
-            JSON.stringify(this.#ports.portDataDefault.filter((port) => port.consumesTrading?.includes(goodSelectedId)))
-        ) as PortWithTrades[]).map((port) => {
+        const consumingPorts = (
+            JSON.parse(
+                JSON.stringify(
+                    this.#ports.portDataDefault.filter((port) => port.consumesTrading?.includes(goodSelectedId))
+                )
+            ) as PortWithTrades[]
+        ).map((port) => {
             port.isSource = false
             return port
         })

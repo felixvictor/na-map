@@ -98,7 +98,7 @@ export default class SelectPortsSelectInventory {
         console.log(goodIdSelected)
 
         h += `<h5>${this.#ports.tradeItem.get(goodIdSelected)?.name ?? ""}</h5>`
-        if (buyGoods.size) {
+        if (buyGoods.size > 0) {
             h += "<h6>Buy</h6>"
             for (const [, value] of buyGoods) {
                 h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
@@ -111,7 +111,7 @@ export default class SelectPortsSelectInventory {
             h += "<p></p>"
         }
 
-        if (sellGoods.size) {
+        if (sellGoods.size > 0) {
             h += "<h6>Sell</h6>"
             for (const [, value] of sellGoods) {
                 h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(

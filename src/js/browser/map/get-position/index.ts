@@ -109,7 +109,7 @@ export default class TrilateratePosition {
         ])
         */
 
-        const ports = new Map()
+        const ports = new Map<string, number>()
         for (const id of this.#modal!.ids) {
             const port = this.#modal!.getPort(id)
             const distance = this.#modal!.getDistance(id)

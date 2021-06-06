@@ -252,12 +252,11 @@ const processFiles = async (serverId: ServerId, fileNames: string[]): Promise<un
  * @param serverId - Server id
  */
 const writeResult = async (serverId: ServerId): Promise<void> => {
-    const groups = (d3Group<Port, string>(
+    const groups = d3Group<Port, string, string>(
         [...ports[serverId].values()],
         (d) => d.region,
-        // @ts-expect-error
         (d) => d.county
-    ) as unknown) as RegionGroup
+    ) as RegionGroup
 
     // Convert to data structure needed for timelines-chart
     // region

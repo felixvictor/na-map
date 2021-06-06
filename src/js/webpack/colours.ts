@@ -16,9 +16,11 @@ const getColours = (): ColourMap => {
         .css.toString()
     const parsedCss = parseCss.parse(compiledCss)
     return new Map(
-        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
-            rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[])
+        (
+            parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+                rule.selectors?.[0].startsWith(".colour-palette ")
+            ) as Rule[]
+        )
             .filter((rule: Rule) =>
                 rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
             )
@@ -32,17 +34,18 @@ const getColours = (): ColourMap => {
 }
 
 const colours = getColours()
-export const backgroundColour = colours.get("primary-500") ?? "#e11"
-export const themeColour = colours.get("secondary-500") ?? "#e11"
-export const colourYellowDark = colours.get("yellow-dark") ?? "#e11"
-export const primary700 = colours.get("primary-700") ?? "#e11"
-export const primary200 = colours.get("primary-200") ?? "#e11"
-export const primary300 = colours.get("primary-300") ?? "#e11"
-export const colourGreen = colours.get("green") ?? "#e11"
-export const colourGreenLight = colours.get("green-light") ?? "#e11"
-export const colourGreenDark = colours.get("green-dark") ?? "#e11"
-export const colourRed = colours.get("red") ?? "#e11"
-export const colourRedLight = colours.get("red-light") ?? "#e11"
-export const colourRedDark = colours.get("red-dark") ?? "#e11"
-export const colourWhite = colours.get("white") ?? "#e11"
-export const colourLight = colours.get("light") ?? "#e11"
+const defaultColour = "#e11"
+export const backgroundColour = colours.get("primary-500") ?? defaultColour
+export const themeColour = colours.get("secondary-500") ?? defaultColour
+export const colourYellowDark = colours.get("yellow-dark") ?? defaultColour
+export const primary700 = colours.get("primary-700") ?? defaultColour
+export const primary200 = colours.get("primary-200") ?? defaultColour
+export const primary300 = colours.get("primary-300") ?? defaultColour
+export const colourGreen = colours.get("green") ?? defaultColour
+export const colourGreenLight = colours.get("green-light") ?? defaultColour
+export const colourGreenDark = colours.get("green-dark") ?? defaultColour
+export const colourRed = colours.get("red") ?? defaultColour
+export const colourRedLight = colours.get("red-light") ?? defaultColour
+export const colourRedDark = colours.get("red-dark") ?? defaultColour
+export const colourWhite = colours.get("white") ?? defaultColour
+export const colourLight = colours.get("light") ?? defaultColour

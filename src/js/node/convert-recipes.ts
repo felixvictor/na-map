@@ -68,9 +68,9 @@ const convertRecipes = async (): Promise<void> => {
     const itemNames = new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]))
 
     const moduleNames = new Map(
-        ((apiItems.filter(
-            (item) => item.ItemType === "ShipUpgradeBookItem"
-        ) as unknown) as APIShipUpgradeBookItem[]).map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""])
+        (apiItems.filter((item) => item.ItemType === "ShipUpgradeBookItem") as unknown as APIShipUpgradeBookItem[]).map(
+            (item) => [item.Id, itemNames.get(item.Upgrade) ?? ""]
+        )
     )
 
     const ingredientIds = new Map(

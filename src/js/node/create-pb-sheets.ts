@@ -87,9 +87,11 @@ const setColours = (): ColourMap => {
         .css.toString()
     const parsedCss = css.parse(compiledCss)
     return new Map(
-        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
-            rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[])
+        (
+            parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+                rule.selectors?.[0].startsWith(".colour-palette ")
+            ) as Rule[]
+        )
             .filter((rule: Rule) =>
                 rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
             )
@@ -147,9 +149,10 @@ const defaultFont: Partial<Excel.Font> = {
  */
 // @ts-expect-error
 import StylesXform from "exceljs/lib/xlsx/xform/style/styles-xform"
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const origStylesXformInit = StylesXform.prototype.init
 StylesXform.prototype.init = function () {
-    // eslint-disable-next-line prefer-rest-params
+    // eslint-disable-next-line prefer-rest-params,@typescript-eslint/no-unsafe-argument
     Reflect.apply(origStylesXformInit, this, arguments)
     this._addFont(defaultFont)
 }

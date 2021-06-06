@@ -321,117 +321,115 @@ const convertGenericShipData = (): ShipData[] => {
             })
     )
 
-    return ((apiItems.filter(
-        (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
-    ) as unknown) as APIShip[]).map(
-        (apiShip: APIShip): ShipData => {
-            const guns = {
-                total: 0,
-                decks: apiShip.Decks,
-                broadside: { cannons: 0, carronades: 0 },
-                gunsPerDeck: [],
-                weight: { cannons: 0, carronades: 0 },
-            } as ShipGuns
-            let totalCannonCrew = 0
-            let totalCarroCrew = 0
+    return (
+        apiItems.filter(
+            (item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)
+        ) as unknown as APIShip[]
+    ).map((apiShip: APIShip): ShipData => {
+        const guns = {
+            total: 0,
+            decks: apiShip.Decks,
+            broadside: { cannons: 0, carronades: 0 },
+            gunsPerDeck: [],
+            weight: { cannons: 0, carronades: 0 },
+        } as ShipGuns
+        let totalCannonCrew = 0
+        let totalCarroCrew = 0
 
-            const { calcPortSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs)
+        const { calcPortSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs)
 
-            const addDeck = (deckLimit: Limit, index: number) => {
-                if (deckLimit) {
-                    const gunsPerDeck = apiShip.GunsPerDeck[index]
-                    const currentDeck = {
-                        amount: gunsPerDeck,
-                        // French-build 3rd rates have 36lb cannons on gun deck (instead of 32lb)
-                        maxCannonLb:
-                            shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1
-                                ? 36
-                                : cannonLb[deckLimit.Limitation1.Min],
-                        maxCarroLb: carroLb[deckLimit.Limitation2.Min],
-                    }
-                    guns.gunsPerDeck.push(currentDeck)
-
-                    const cannonWeight = Math.round(
-                        gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.weight ?? 0)
-                    )
-                    const cannonCrew = gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.crew ?? 0)
-
-                    guns.weight.cannons += cannonWeight
-                    totalCannonCrew += cannonCrew
-
-                    if (currentDeck.maxCarroLb) {
-                        guns.weight.carronades += Math.round(
-                            gunsPerDeck * (cannonData.get(currentDeck.maxCarroLb)?.weight ?? 0)
-                        )
-                        totalCarroCrew += gunsPerDeck * (carroData.get(currentDeck.maxCarroLb)?.crew ?? 0)
-                    } else {
-                        guns.weight.carronades += cannonWeight
-                        totalCarroCrew += cannonCrew
-                    }
-                } else {
-                    guns.gunsPerDeck.push(emptyDeck)
+        const addDeck = (deckLimit: Limit, index: number) => {
+            if (deckLimit) {
+                const gunsPerDeck = apiShip.GunsPerDeck[index]
+                const currentDeck = {
+                    amount: gunsPerDeck,
+                    // French-build 3rd rates have 36lb cannons on gun deck (instead of 32lb)
+                    maxCannonLb:
+                        shipsWith36lb.has(apiShip.Id) && index === apiShip.Decks - 1
+                            ? 36
+                            : cannonLb[deckLimit.Limitation1.Min],
+                    maxCarroLb: carroLb[deckLimit.Limitation2.Min],
                 }
+                guns.gunsPerDeck.push(currentDeck)
+
+                const cannonWeight = Math.round(gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.weight ?? 0))
+                const cannonCrew = gunsPerDeck * (cannonData.get(currentDeck.maxCannonLb)?.crew ?? 0)
+
+                guns.weight.cannons += cannonWeight
+                totalCannonCrew += cannonCrew
+
+                if (currentDeck.maxCarroLb) {
+                    guns.weight.carronades += Math.round(
+                        gunsPerDeck * (cannonData.get(currentDeck.maxCarroLb)?.weight ?? 0)
+                    )
+                    totalCarroCrew += gunsPerDeck * (carroData.get(currentDeck.maxCarroLb)?.crew ?? 0)
+                } else {
+                    guns.weight.carronades += cannonWeight
+                    totalCarroCrew += cannonCrew
+                }
+            } else {
+                guns.gunsPerDeck.push(emptyDeck)
             }
-
-            for (let deckIndex = 0; deckIndex <= sideDeckMaxIndex; deckIndex += 1) {
-                addDeck(apiShip.DeckClassLimit[deckIndex], deckIndex)
-                const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount
-                const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2
-
-                guns.total += gunsPerDeck
-                guns.broadside.carronades += guns.gunsPerDeck[deckIndex].maxCarroLb
-                    ? (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
-                    : cannonBroadside
-
-                guns.broadside.cannons += cannonBroadside
-            }
-
-            addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex)
-            addDeck(apiShip.BackDeckClassLimit[0], backDeckIndex)
-
-            const ship = {
-                id: Number(apiShip.Id),
-                name: cleanName(apiShip.Name),
-                class: apiShip.Class,
-                guns,
-                shipMass: apiShip.ShipMass,
-                battleRating: apiShip.BattleRating,
-                holdSize: apiShip.HoldSize,
-                maxWeight: apiShip.MaxWeight,
-                crew: {
-                    min: apiShip.MinCrewRequired,
-                    max: apiShip.HealthInfo.Crew,
-                    cannons: totalCannonCrew,
-                    carronades: totalCarroCrew,
-                },
-                speedDegrees,
-                speed: {
-                    // eslint-disable-next-line unicorn/no-array-reduce
-                    min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                    max: roundToThousands(calcPortSpeed),
-                },
-                sides: { armour: apiShip.HealthInfo.LeftArmor },
-                bow: { armour: apiShip.HealthInfo.FrontArmor },
-                stern: { armour: apiShip.HealthInfo.BackArmor },
-                structure: { armour: apiShip.HealthInfo.InternalStructure },
-                sails: { armour: apiShip.HealthInfo.Sails },
-                pump: { armour: apiShip.HealthInfo.Pump },
-                rudder: {
-                    armour: apiShip.HealthInfo.Rudder,
-                },
-                upgradeXP: apiShip.OverrideTotalXpForUpgradeSlots,
-                premium: apiShip.Premium,
-                tradeShip: apiShip.ShipType === 1,
-                // hostilityScore: ship.HostilityScore
-            } as ShipData
-
-            if (ship.id === 1535) {
-                ship.name = "Rookie Brig"
-            }
-
-            return ship
         }
-    )
+
+        for (let deckIndex = 0; deckIndex <= sideDeckMaxIndex; deckIndex += 1) {
+            addDeck(apiShip.DeckClassLimit[deckIndex], deckIndex)
+            const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount
+            const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2
+
+            guns.total += gunsPerDeck
+            guns.broadside.carronades += guns.gunsPerDeck[deckIndex].maxCarroLb
+                ? (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
+                : cannonBroadside
+
+            guns.broadside.cannons += cannonBroadside
+        }
+
+        addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex)
+        addDeck(apiShip.BackDeckClassLimit[0], backDeckIndex)
+
+        const ship = {
+            id: Number(apiShip.Id),
+            name: cleanName(apiShip.Name),
+            class: apiShip.Class,
+            guns,
+            shipMass: apiShip.ShipMass,
+            battleRating: apiShip.BattleRating,
+            holdSize: apiShip.HoldSize,
+            maxWeight: apiShip.MaxWeight,
+            crew: {
+                min: apiShip.MinCrewRequired,
+                max: apiShip.HealthInfo.Crew,
+                cannons: totalCannonCrew,
+                carronades: totalCarroCrew,
+            },
+            speedDegrees,
+            speed: {
+                // eslint-disable-next-line unicorn/no-array-reduce
+                min: speedDegrees.reduce((a, b) => Math.min(a, b)),
+                max: roundToThousands(calcPortSpeed),
+            },
+            sides: { armour: apiShip.HealthInfo.LeftArmor },
+            bow: { armour: apiShip.HealthInfo.FrontArmor },
+            stern: { armour: apiShip.HealthInfo.BackArmor },
+            structure: { armour: apiShip.HealthInfo.InternalStructure },
+            sails: { armour: apiShip.HealthInfo.Sails },
+            pump: { armour: apiShip.HealthInfo.Pump },
+            rudder: {
+                armour: apiShip.HealthInfo.Rudder,
+            },
+            upgradeXP: apiShip.OverrideTotalXpForUpgradeSlots,
+            premium: apiShip.Premium,
+            tradeShip: apiShip.ShipType === 1,
+            // hostilityScore: ship.HostilityScore
+        } as ShipData
+
+        if (ship.id === 1535) {
+            ship.name = "Rookie Brig"
+        }
+
+        return ship
+    })
 }
 
 /**
@@ -577,9 +575,9 @@ const convertAddShipData = (ships: ShipData[]): ShipData[] => {
 const convertShipBlueprints = async (): Promise<void> => {
     const itemNames = getItemNames()
 
-    const apiBlueprints = (apiItems.filter(
+    const apiBlueprints = apiItems.filter(
         (apiItem) => apiItem.ItemType === "RecipeShip" && !blueprintsNotUsed.has(apiItem.Id)
-    ) as unknown) as APIShipBlueprint[]
+    ) as unknown as APIShipBlueprint[]
     const shipBlueprints = apiBlueprints
         .map((apiBlueprint) => {
             const shipMass = getShipMass(apiBlueprint.Results[0].Template)

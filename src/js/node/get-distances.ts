@@ -187,10 +187,11 @@ class Map {
         this.visit(startIndex)
 
         // Queue holds unchecked positions ([index, distance from start port])
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const queue = new Deque([[startIndex, 0]])
 
         while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length > 0) {
-            let [index, pixelDistance]: [Index, PixelDistance] = queue.shift()
+            let [index, pixelDistance] = queue.shift() as [Index, PixelDistance]
             const spot = this.getPortId(this.getSpot(index))
 
             // Check if port is found

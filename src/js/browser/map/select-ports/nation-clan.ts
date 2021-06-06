@@ -61,7 +61,7 @@ export default class SelectPortsNationClan {
             clanList.add(d.capturer!)
         }
 
-        if (clanList.size) {
+        if (clanList.size > 0) {
             return `${[...clanList]
                 .sort(simpleStringSort)
                 .map((clan) => `<option value="${clan}" class="caps">${clan}</option>`)

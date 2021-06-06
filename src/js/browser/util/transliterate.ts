@@ -101,7 +101,7 @@ export const trilaterate = (
 
     // floating point math flaw in IEEE 754 standard
     // see https://github.com/gheja/trilateration.js/issues/2
-    if (Math.abs(b) < 0.0000000001) {
+    if (Math.abs(b) < 0.000_000_000_1) {
         b = 0
     }
 

@@ -7,7 +7,7 @@ import utc from "dayjs/plugin/utc.js"
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
-import { currentServerStartDateTime, simpleStringSort } from "../common/common"
+import { currentServerStartDateTime } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
 import { fileExists, readTextFile, saveTextFile } from "../common/common-file"
 import { cleanName } from "../common/common-node"

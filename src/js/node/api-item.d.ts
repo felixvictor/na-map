@@ -530,7 +530,7 @@ export interface APITimeBasedConvertibleItem {
     ItemType: "TimeBasedConvertibleItem"
     MongoID: string
     GeneralChest: boolean
-    LifetimeSeconds: 10800
+    LifetimeSeconds: 10_800
     ExtendedLootTable: number[]
     CanBeConverted: "Port"
     ConvertsTo: unknown[]

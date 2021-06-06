@@ -10,8 +10,6 @@
 
 /* global ga */
 
-/// <reference types="google.analytics" />
-
 import { appName, appVersion } from "common/common-browser"
 import { GA_TRACKING_ID } from "common/common-var"
 

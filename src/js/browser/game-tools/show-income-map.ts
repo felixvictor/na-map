@@ -18,7 +18,7 @@ import { Point, voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 import seedrandom from "seedrandom"
 
 import { registerEvent } from "../analytics"
-import { findNationByNationShortName, nations } from "common/common"
+import { nations } from "common/common"
 import { colourList, getIdFromBaseName, loadJsonFiles, showCursorDefault, showCursorWait } from "common/common-browser"
 import { formatPercentSig, formatSiCurrency, formatSiInt } from "common/common-format"
 import { getContrastColour } from "common/common-game-tools"
