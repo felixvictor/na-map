@@ -93,7 +93,7 @@ export default class ListPortBonus {
                 (port): PortData => ({
                     id: port.id,
                     name: portNames.get(port.id)?.name ?? "",
-                    nation: findNationByNationShortName(portNation.get(port.id) ?? "")?.name ?? "",
+                    nation: portNation.get(port.id) ?? "",
                     portBonusLevel: Object.values({ ...portBonusDefault, ...port.portBonus }),
                     points: portNames.get(port.id)?.points ?? 0,
                     pointsInvested: d3Sum(Object.values(port.portBonus!).map((bonusLevel) => pointsNeeded[bonusLevel])),
@@ -137,7 +137,10 @@ export default class ListPortBonus {
             }
 
             if (index === 1) {
-                return a.nation.localeCompare(b.nation) * sign
+                const aa = findNationByNationShortName(a.nation)?.sortName ?? ""
+                const bb = findNationByNationShortName(b.nation)?.sortName ?? ""
+
+                return aa.localeCompare(bb) * sign
             }
 
             if (index === 7) {
@@ -195,7 +198,15 @@ export default class ListPortBonus {
                 enter
                     .append("td")
                     .classed("text-start", (d, i) => i <= 1)
-                    .text((d) => (d === 0 ? "" : String(d)))
+                    .html((d, i) =>
+                        d === 0
+                            ? ""
+                            : i === 1
+                            ? `<span class="flag-icon-${String(d)}" role="img" title="${
+                                  findNationByNationShortName(String(d))?.sortName ?? ""
+                              }"></span>`
+                            : String(d)
+                    )
             )
     }
 
