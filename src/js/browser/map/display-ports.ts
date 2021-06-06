@@ -527,7 +527,7 @@ export default class DisplayPorts {
         return id ? this.#portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
 
-    _showItems = (items: GoodList | undefined): string =>
+    _formatItems = (items: GoodList | undefined): string =>
         items
             ?.map((item) => this.tradeItem.get(item)?.name ?? "")
             .sort(simpleStringSort)
@@ -535,13 +535,13 @@ export default class DisplayPorts {
 
     _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profitPerTon - a.profit.profitPerTon
 
-    _showProfits = (profits: TradeGoodProfit[]): HtmlResult =>
+    _formatProfits = (profits: TradeGoodProfit[]): HtmlResult =>
         html`${profits
             ?.sort(this._sortByProfit)
             ?.map(
                 (good, index) =>
-                    html`<span class="small" style="white-space: nowrap;"
-                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)}/${formatSiIntHtml(
+                    html`<span style="white-space: nowrap;"
+                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)} / ${formatSiIntHtml(
                                 good.profit.profit
                             )})</span
                         >${index === profits.length - 1 ? html`` : html`, `}`
@@ -612,13 +612,13 @@ export default class DisplayPorts {
             netIncome: formatSiIntHtml(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany,
             laborHoursDiscount: portProperties.laborHoursDiscount,
-            dropsTrading: this._showItems(portProperties.dropsTrading),
-            consumesTrading: this._showItems(portProperties.consumesTrading),
-            producesNonTrading: this._showItems(portProperties.producesNonTrading),
-            dropsNonTrading: this._showItems(portProperties.dropsNonTrading),
+            dropsTrading: this._formatItems(portProperties.dropsTrading),
+            consumesTrading: this._formatItems(portProperties.consumesTrading),
+            producesNonTrading: this._formatItems(portProperties.producesNonTrading),
+            dropsNonTrading: this._formatItems(portProperties.dropsNonTrading),
             tradePort: this._getPortName(this.tradePortId),
-            goodsToSellInTradePort: this._showProfits(portProperties.goodsToSellInTradePort),
-            goodsToBuyInTradePort: this._showProfits(portProperties.goodsToBuyInTradePort),
+            goodsToSellInTradePort: this._formatProfits(portProperties.goodsToSellInTradePort),
+            goodsToBuyInTradePort: this._formatProfits(portProperties.goodsToBuyInTradePort),
         } as PortForDisplay
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
@@ -636,6 +636,20 @@ export default class DisplayPorts {
         }
 
         return port
+    }
+
+    _showProfits = (goods: HtmlResult[], tradePort: string, tradeDirection: string): HtmlResult => {
+        const colour = tradeDirection === "buy" ? "alert-danger" : "alert-success"
+
+        return goods?.[0] === undefined
+            ? html``
+            : html` <div class="alert ${colour} mt-2 mb-2 text-start" role="alert">
+                  <div class="alert-heading">
+                      <span class="caps">Buy here and sell in ${tradePort}</span> (profit per ton / profit per item, net
+                      value in reales)
+                  </div>
+                  ${goods}
+              </div>`
     }
 
     // eslint-disable-next-line complexity
@@ -748,21 +762,6 @@ export default class DisplayPorts {
                       `}
             </div>
 
-            ${port.producesNonTrading.length > 0
-                ? html`<p class="mb-2">
-                      <span class="caps">Produces—</span><span class="non-trading">${port.producesNonTrading}</span>
-                  </p>`
-                : html``}
-            ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
-                ? html`<p class="mb-2">
-                      <span class="caps">Drops—</span>
-                      ${port.dropsNonTrading ? html`<span class="non-trading">${port.dropsNonTrading}</span>` : html``}
-                      ${port.dropsTrading}
-                  </p> `
-                : html``}
-            ${port.consumesTrading.length > 0
-                ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
-                : html``}
             ${this.showRadius === "tradePorts"
                 ? html`${port.goodsToSellInTradePort?.[0] === undefined
                       ? html``
@@ -776,7 +775,24 @@ export default class DisplayPorts {
                             <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit per ton/net
                             profit per item)<br />${port.goodsToBuyInTradePort}
                         </div>`}`
-                : html``}
+                : html` ${port.producesNonTrading.length > 0
+                      ? html`<p class="mb-2">
+                            <span class="caps">Produces—</span
+                            ><span class="non-trading">${port.producesNonTrading}</span>
+                        </p>`
+                      : html``}
+                  ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
+                      ? html`<p class="mb-2">
+                            <span class="caps">Drops—</span>
+                            ${port.dropsNonTrading
+                                ? html`<span class="non-trading">${port.dropsNonTrading}</span>`
+                                : html``}
+                            ${port.dropsTrading}
+                        </p> `
+                      : html``}
+                  ${port.consumesTrading.length > 0
+                      ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
+                      : html``}`}
         `
         return h as VNode
     }
