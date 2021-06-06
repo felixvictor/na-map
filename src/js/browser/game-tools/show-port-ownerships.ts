@@ -25,9 +25,10 @@ import {
     stack as d3Stack,
     stackOffsetNone as d3StackOffsetNone,
 } from "d3-shape"
+import textures, { Textures } from "textures"
 
 import { registerEvent } from "../analytics"
-import { NationFullName, nations, NationShortName } from "common/common"
+import { NationFullName, nations, NationShortName, NationShortNameList } from "common/common"
 import { colourList, getIdFromBaseName, loadJsonFile, showCursorDefault, showCursorWait } from "common/common-browser"
 
 import { getContrastColour } from "common/common-game-tools"
@@ -48,12 +49,14 @@ export default class ShowPortOwnerships {
     #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #div = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    #textures = {} as NationShortNameList<Textures>
     readonly #baseId: HtmlString
     readonly #baseName = "Ownership overview"
-    readonly #menuId: HtmlString
 
+    readonly #menuId: HtmlString
     private _ownershipData = {} as Ownership[]
     private _nationData = {} as Array<OwnershipNation<number>>
+
     private readonly _colourScale: ScaleOrdinal<string, string>
 
     constructor(serverId: ServerId) {
@@ -98,6 +101,7 @@ export default class ShowPortOwnerships {
             await this._loadAndSetupData()
             this.#modal = new Modal(this.#baseName, "xl")
             this._setupOutput()
+            this._setupTextures()
             this._setupSelect()
             this._setupSelectListener()
             this._injectArea()
@@ -114,6 +118,20 @@ export default class ShowPortOwnerships {
         this.#mainDiv = this.#modal!.outputSel
         this.#div = this.#mainDiv.append("div")
         this.#svg = this.#mainDiv.append("svg").attr("class", "area")
+    }
+
+    _setupTextures(): void {
+        for (const { short: nationShortName } of nations) {
+            this.#textures[nationShortName] = textures
+                .lines()
+                .stroke(this._colourScale(nationShortName))
+                .thicker()
+                .id(`texture-${nationShortName}`)
+
+            // @ts-expect-error
+            // eslint-disable-next-line unicorn/prefer-prototype-methods
+            this.#svg.call(this.#textures[nationShortName])
+        }
     }
 
     _getOptions(): HtmlString {
@@ -214,12 +232,13 @@ export default class ShowPortOwnerships {
 
             // Paths
             this.#svg
-                .selectAll("path")
+                .selectAll("path.nation")
                 .data(stacked)
                 .join((enter) =>
                     enter
                         .append("path")
-                        .attr("fill", (d) => this._colourScale(d.key))
+                        .attr("class", "nation")
+                        .attr("fill", (d) => this.#textures[d.key].url())
                         .attr("stroke", (d) => this._colourScale(d.key))
                         // @ts-expect-error
                         .attr("d", area)

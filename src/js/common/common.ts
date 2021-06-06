@@ -42,6 +42,9 @@ export interface Nation {
 
 export const nationShortName = ["CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"]!
 export type NationShortName = typeof nationShortName[number]
+export type NationShortNameList<T> = {
+    [K in NationShortName]: T
+}
 const attackerNationShortName = [...nationShortName, "n/a", ""]
 export type AttackerNationShortName = typeof attackerNationShortName[number]
 

@@ -102,6 +102,7 @@
         "resize-observer": "^1.0.2",
         "round-slider": "^1.6.1",
         "seedrandom": "^3.0.5",
+        "textures": "^1.2.3",
         "timelines-chart": "2.11.2"
     },
     "devDependencies": {
