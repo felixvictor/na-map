@@ -11,8 +11,7 @@
 import path from "path"
 import dayjs from "dayjs"
 
-import d3Array from "d3-array"
-const { group: d3Group } = d3Array
+import { group as d3Group } from "d3-array"
 
 import {
     currentServerStartDate as serverDate,

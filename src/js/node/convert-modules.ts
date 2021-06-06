@@ -10,8 +10,7 @@
 
 import path from "path"
 
-import d3Array from "d3-array"
-const { group: d3Group } = d3Array
+import { group as d3Group } from "d3-array"
 
 import { capitalizeFirstLetter, currentServerStartDate as serverDate, sortBy } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
@@ -275,12 +274,12 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         wood.properties = module.APImodifiers
             // filter unused modifiers
             .filter((modifier) => {
-                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join("")}`
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
 
                 return modifiers.get(apiModifierName)
             })
             .map((modifier) => {
-                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join("")}`
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
                 // Add modifier if in modifier map
                 const modifierName = modifiers.get(apiModifierName)!
                 let amount = modifier.Percentage
@@ -338,7 +337,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
         return APImodifiers.filter((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join("")}`
+            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
             if (!modifiers.has(apiModifierName)) {
                 console.log(`${apiModifierName} modifier not defined`)
                 return true
@@ -347,7 +346,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
             return modifiers.get(apiModifierName) !== ""
         })
             .flatMap((modifier) => {
-                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join("")}`
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
                 const modifierName = modifiers.get(apiModifierName) ?? ""
 
                 let amount = modifier.Percentage
