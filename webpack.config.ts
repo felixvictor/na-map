@@ -348,10 +348,6 @@ const config: webpack.Configuration = {
                     dataUrl: (content: any): string => {
                         let svg: string = content.toString() as string
 
-                        // Replace with custom colours
-                        svg = svg.replace('fill="#fff" fill-opacity="0"/>', `fill="${primary700}" fill-opacity="0.3"/>`)
-                        svg = svg.replace('fill="#fff" fill-opacity="1"/>', `fill="${primary200}" fill-opacity="1"/>`)
-
                         // svgo
                         svg = optimize(svg, svgoOpt).data
 

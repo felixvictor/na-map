@@ -23,7 +23,6 @@ dayjs.extend(customParseFormat)
 import { registerEvent } from "../analytics"
 import { findNationById, nations, range, sleep } from "common/common"
 import {
-    nationColourList,
     getCanvasRenderingContext2D,
     loadJsonFiles,
     showCursorDefault,
@@ -111,8 +110,8 @@ export default class PowerMap {
 
         this.#coord = coord
         this.#colourScale = d3ScaleOrdinal<number, string>()
-            .domain(range(0, nations.length - 1))
-            .range(nationColourList)
+            .domain(nations.map((nation) => nation.id))
+            .range(nations.map((nation) => nation.colours[0]))
 
         this._setupListener()
     }

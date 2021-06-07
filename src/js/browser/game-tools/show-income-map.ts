@@ -19,7 +19,7 @@ import seedrandom from "seedrandom"
 
 import { registerEvent } from "../analytics"
 import { nations } from "common/common"
-import { colourList, getIdFromBaseName, loadJsonFiles, showCursorDefault, showCursorWait } from "common/common-browser"
+import { getIdFromBaseName, loadJsonFiles, showCursorDefault, showCursorWait } from "common/common-browser"
 import { formatPercentSig, formatSiCurrency, formatSiInt } from "common/common-format"
 import { getContrastColour } from "common/common-game-tools"
 
@@ -74,7 +74,9 @@ export default class ShowIncomeMap {
         this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
         this.#menuId = `menu-${this.#baseId}`
 
-        this.#colourScale = d3ScaleOrdinal<string>().range(colourList)
+        this.#colourScale = d3ScaleOrdinal<string, string>()
+            .domain(nations.map((nation) => nation.short))
+            .range(nations.map((nation) => nation.colours[0]))
 
         this._setupListener()
     }

@@ -24,7 +24,7 @@ declare module "textures" {
 
     export interface TexturesLines extends TexturesBase {
         shapeRendering(shapeRendering: string): this
-        orientation(orientation: string[]): this
+        orientation(...orientation: string[]): this
     }
 
     export interface TexturesPath extends TexturesBase {

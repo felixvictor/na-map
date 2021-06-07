@@ -28,8 +28,21 @@ import {
 import textures, { Textures } from "textures"
 
 import { registerEvent } from "../analytics"
-import { NationFullName, nations, NationShortName, NationShortNameList } from "common/common"
-import { colourList, getIdFromBaseName, loadJsonFile, showCursorDefault, showCursorWait } from "common/common-browser"
+import {
+    findNationByNationShortName,
+    NationFullName,
+    nations,
+    NationShortName,
+    NationShortNameList,
+} from "common/common"
+import {
+    colourList,
+    getIdFromBaseName,
+    loadJsonFile,
+    primary300,
+    showCursorDefault,
+    showCursorWait,
+} from "common/common-browser"
 
 import { getContrastColour } from "common/common-game-tools"
 import { Group } from "timelines-chart"
@@ -121,12 +134,36 @@ export default class ShowPortOwnerships {
     }
 
     _setupTextures(): void {
-        for (const { short: nationShortName } of nations) {
-            this.#textures[nationShortName] = textures
-                .lines()
-                .stroke(this._colourScale(nationShortName))
-                .thicker()
-                .id(`texture-${nationShortName}`)
+        const orientation = ["2/8", "4/8", "6/8"]
+        let index = 0
+        for (const { short: nationShortName, colours } of nations) {
+            if (colours.length === 1) {
+                this.#textures[nationShortName] = textures
+                    .lines()
+                    .stroke(colours[0])
+                    .background(colours[0])
+                    .id(`texture-${nationShortName}`)
+            } else if (colours.length === 2) {
+                this.#textures[nationShortName] = textures
+                    .lines()
+                    .orientation(orientation[index])
+                    .size(40)
+                    .strokeWidth(20)
+                    .stroke(colours[0])
+                    .background(colours[1])
+                    .id(`texture-${nationShortName}`)
+
+                index = (index + 1) % orientation.length
+            } else {
+                this.#textures[nationShortName] = textures
+                    .circles()
+                    .radius(5)
+                    .strokeWidth(3)
+                    .stroke(colours[1])
+                    .fill(colours[2])
+                    .background(colours[0])
+                    .id(`texture-${nationShortName}`)
+            }
 
             // @ts-expect-error
             // eslint-disable-next-line unicorn/prefer-prototype-methods
@@ -239,7 +276,8 @@ export default class ShowPortOwnerships {
                         .append("path")
                         .attr("class", "nation")
                         .attr("fill", (d) => this.#textures[d.key].url())
-                        .attr("stroke", (d) => this._colourScale(d.key))
+                        .attr("stroke", primary300)
+                        .attr("stroke-width", "3px")
                         // @ts-expect-error
                         .attr("d", area)
                 )
@@ -254,7 +292,7 @@ export default class ShowPortOwnerships {
                         .append("text")
                         .attr("class", "area-label")
                         .text((d) => labelNames.get(d.key))
-                        .attr("fill", (d) => getContrastColour(this._colourScale(d.key)))
+                        .attr("fill", (d) => getContrastColour(findNationByNationShortName(d.key)?.colours[0] ?? ""))
                         .attr("transform", d3AreaLabel(area))
                 )
         }
