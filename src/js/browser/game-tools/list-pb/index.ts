@@ -69,15 +69,16 @@ export default class ListPortBattles {
                 const portBattleLT = dayjs.utc(port.portBattle).local()
                 const portBattleST = dayjs.utc(port.portBattle)
                 const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
-                const iconDefenderNation = `<span class="flag-icon-${port.nation}" role="img" title="${
+                const iconDefenderNation = `<span class="flag-icon-${
+                    port.nation
+                } flag-icon-small me-1" role="img" title="${
                     findNationByNationShortName(port.nation)?.sortName ?? ""
                 }"></span>`
-                const defenderClan =
-                    !port.capturer || port.capturer === "RAIDER" ? "" : ` ${displayClan(port.capturer)}`
-                const iconAttackerNation = `<span class="flag-icon-${port.attackerNation!}" role="img" title="${
+                const defenderClan = !port.capturer || port.capturer === "RAIDER" ? "" : `${displayClan(port.capturer)}`
+                const iconAttackerNation = `<span class="flag-icon-${port.attackerNation!} flag-icon-small me-1" role="img" title="${
                     findNationByNationShortName(port.attackerNation!)?.sortName ?? ""
                 }"></span>`
-                const attackerClan = ` ${displayClan(port?.attackerClan ?? "")}`
+                const attackerClan = `${displayClan(port?.attackerClan ?? "")}`
 
                 return {
                     sort: port.portBattle ?? "",

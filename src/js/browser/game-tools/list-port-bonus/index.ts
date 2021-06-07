@@ -202,7 +202,7 @@ export default class ListPortBonus {
                         d === 0
                             ? ""
                             : i === 1
-                            ? `<span class="flag-icon-${String(d)}" role="img" title="${
+                            ? `<span class="flag-icon-${String(d)} flag-icon-small" role="img" title="${
                                   findNationByNationShortName(String(d))?.sortName ?? ""
                               }"></span>`
                             : String(d)

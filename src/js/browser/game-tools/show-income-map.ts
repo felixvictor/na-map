@@ -264,9 +264,9 @@ export default class ShowIncomeMap {
         return `
             <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex flex-column text-start mt-1 me-3 p-0">
-                <div><span class="flag-icon-${d.parent?.data?.id as string} me-2"></span><span class="x-large">${
-            d.data.id ?? ""
-        }</span></div>
+                <div><i class="flag-icon-${
+                    d.parent?.data?.id as string
+                } flag-icon-small me-2" role="img"></i><span class="x-large">${d.data.id ?? ""}</span></div>
             </div>
             <div class="d-flex flex-column text-start mt-1 p-0">
                 <div class="me-3">

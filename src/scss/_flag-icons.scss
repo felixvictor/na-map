@@ -1,6 +1,6 @@
 ////
 /// This file is part of na-map.
-/// flag-icons definitions.
+/// flag icon definitions.
 ///
 /// @group    scss
 /// @author   iB aka Felix Victor
@@ -10,22 +10,28 @@
 
 $icon-dir: "../images/flags";
 
-.flag-icon {
-    width: 6rem;
-    margin-right: 0.4rem;
+.flag-icon-large {
+    width: 4rem * 1.2;
+    height: 3rem * 1.2;
+}
+
+.flag-icon-button {
+    width: 2rem;
+    height: 1.5rem;
+    vertical-align: middle !important;
 }
 
 .flag-icon-small {
-    width: 2rem;
-    //margin-right: 0.4rem;
+    width: 1.3333rem;
+    height: 1rem;
 }
 
 .flag-icon-border-light {
-    border: 0.3rem solid transparentize($white, 0.2);
+    box-shadow: 0 0 0 0.4rem $white;
 }
 
 .flag-icon-border-middle {
-    border: 0.3rem solid transparentize($yellow, 0.1);
+    box-shadow: 0 0 0 0.3rem $yellow;
 }
 
 $nations: "CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP";
@@ -33,8 +39,6 @@ $nations: "CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE"
 @each $nation in $nations {
     .flag-icon-#{$nation} {
         display: inline-block;
-        width: 1.3333rem;
-        height: 1rem;
         vertical-align: baseline;
         background-image: url("#{$icon-dir}/#{$nation}.svg");
         background-repeat: no-repeat;

@@ -567,7 +567,6 @@ export default class DisplayPorts {
         }
         */
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
         const formatFromToTime = (from: number, to: number): HtmlResult =>
             html`<span style="white-space: nowrap;">${String(from)} ‒ ${String(to)}</span>`
 
@@ -590,7 +589,7 @@ export default class DisplayPorts {
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
         const attackHostility = portProperties.portBattle
             ? html`<span
-                      class="flag-icon-${portProperties.attackerNation} me-1"
+                      class="flag-icon-${portProperties.attackerNation} flag-icon-small me-1"
                       role="img"
                       title="${findNationByNationShortName(portProperties?.attackerNation ?? "")?.sortName ?? ""}"
                   ></span
@@ -680,14 +679,10 @@ export default class DisplayPorts {
         const h = html`
             <div class="d-flex justify-content-between mb-4">
                 <div class="d-flex">
-                    <img
-                        alt="${port.icon}"
-                        class="flag-icon me-3 align-self-stretch ${iconBorder}"
-                        src="${nationFlags[port.icon]}"
-                    />
+                    <i class="flag-icon-${port.icon} flag-icon-large ${iconBorder}" role="img" />
 
-                    <div class="text-start me-1">
-                        <div class="large">${port.name}</div>
+                    <div class="text-start  align-self-center compress mx-3">
+                        <div class="large mb-1">${port.name}</div>
                         <div class="caps">${port.county}</div>
                         <div class="caps">${port.region}</div>
                     </div>

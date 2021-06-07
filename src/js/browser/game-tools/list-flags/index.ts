@@ -19,7 +19,7 @@ dayjs.locale("en-gb")
 
 import { registerEvent } from "../../analytics"
 import { nations } from "common/common"
-import { getIdFromBaseName, loadJsonFile, nationFlags } from "common/common-browser"
+import { getIdFromBaseName, loadJsonFile } from "common/common-browser"
 
 import { Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
@@ -225,10 +225,9 @@ export default class ListFlags {
                 .attr("for", `${this.#inputId}-${nation.id}`)
                 .attr("class", "btn btn-toggle")
                 .attr("title", nation.name)
-                .append("img")
-                .attr("alt", nation.short)
-                .attr("class", "flag-icon-small")
-                .attr("src", `${nationFlags[nation.short]}`)
+                .append("i")
+                .attr("class", `flag-icon-${nation.short} flag-icon-button`)
+                .attr("role", "img")
         }
     }
 
