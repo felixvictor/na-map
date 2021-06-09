@@ -209,8 +209,12 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
             const tradeItem = {
                 id: item.Id,
                 name: isTradeItem(item) ? cleanItemName(item.Name) : cleanName(item.Name),
-                price: item.BasePrice,
+                buyPrice: item.BasePrice,
             } as TradeItem
+
+            if (item.PortPrices.Consumed.SellPrice.Min > 0) {
+                tradeItem.sellPrice = item.PortPrices.Consumed.SellPrice.Min
+            }
 
             if (item.PortPrices.RangePct) {
                 tradeItem.distanceFactor = item.PortPrices.RangePct

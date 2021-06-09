@@ -120,7 +120,8 @@ export interface CannonValue {
 export interface TradeItem {
     id: number
     name: string
-    price: number
+    buyPrice: number
+    sellPrice?: number
     distanceFactor?: number
     weight?: number
 }
