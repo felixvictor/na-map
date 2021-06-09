@@ -25,10 +25,6 @@ $overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
 $overlay-text-colour-contrast: $paper-700;
 $overlay-text-colour: color-contrast($overlay-background);
 
-.modal-footer {
-    background-color: $paper-200;
-}
-
 .bg-map {
     background-color: $primary;
 }
@@ -176,6 +172,17 @@ text,
 
 .column-comp .row-light {
     background-color: $paper-300;
+}
+
+/////////////////////////////////////
+// modal
+
+.modal-content {
+    border-top: $paper-400 solid 1rem;
+}
+
+.modal-footer {
+    background-color: $paper-200;
 }
 
 /////////////////////////////////////
