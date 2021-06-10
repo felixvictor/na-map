@@ -290,7 +290,7 @@ export default class ShowPortOwnerships {
                     // @ts-expect-error
                     enter
                         .append("text")
-                        .attr("class", "area-label")
+                        .attr("class", "area-label text-shadow")
                         .text((d) => labelNames.get(d.key))
                         .attr("fill", (d) => getContrastColour(findNationByNationShortName(d.key)?.colours[0] ?? ""))
                         .attr("transform", d3AreaLabel(area))

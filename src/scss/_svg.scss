@@ -25,6 +25,10 @@ svg {
     }
 }
 
+.text-shadow {
+    text-shadow: 0.15rem 0.15rem 0.3rem $body-color;
+}
+
 .text-end {
     text-anchor: end;
 }
