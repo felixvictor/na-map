@@ -81,14 +81,12 @@ export default class MakeJourney {
     readonly #menuId: HtmlString
     readonly #minOWSpeed = 2
     readonly #owSpeedFactor = 2
-    readonly #shadowId: HtmlString
     readonly #speedScale: ScaleLinear<number, number>
 
     constructor(fontSize: number) {
         this.#baseId = getIdFromBaseName(this.#baseName)
         this.#menuId = `menu-${this.#baseId}`
         this.#compassId = `compass-${this.#baseId}`
-        this.#shadowId = `filter-${this.#baseId}`
         this.#deleteLastLegButtonId = `button-delete-leg-${this.#baseId}`
 
         this.#line = d3Line<Point>()
@@ -100,7 +98,7 @@ export default class MakeJourney {
         this._setupSvg()
         this._initJourneyData()
 
-        this.#label = new MakeJourneyLabelPrinter(this.#gLabels, this.#gJourneyPath, fontSize, this.#shadowId)
+        this.#label = new MakeJourneyLabelPrinter(this.#gLabels, this.#gJourneyPath, fontSize)
         this.#summary = new MakeJourneySummary(this.#deleteLastLegButtonId)
         this._setupListener()
     }
@@ -338,7 +336,7 @@ export default class MakeJourney {
                         : [[0, 0] as Point]
                 )
                 .attr("marker-end", "url(#journey-arrow)")
-                .attr("filter", `url(#${this.#shadowId})`)
+                .attr("class", "svg-shadow")
                 .attr("d", this.#line)
         }
     }

@@ -28,46 +28,17 @@ export default class MakeJourneyLabel {
     readonly #textPadding = this.#labelPadding * 1.3
     readonly #textTransform = d3ZoomIdentity.translate(this.#labelPadding, this.#labelPadding)
     readonly #gJourneyPath: Selection<SVGPathElement, unknown, HTMLElement, unknown>
-    readonly #shadowId: HtmlString
 
     constructor(
         g: Selection<SVGGElement, unknown, HTMLElement, unknown>,
         gJourneyPath: Selection<SVGPathElement, unknown, HTMLElement, unknown>,
-        fontSize: number,
-        shadowId: HtmlString
+        fontSize: number
     ) {
         this.#g = g
         this.#gJourneyPath = gJourneyPath
         this.#fontSize = fontSize
-        this.#shadowId = shadowId
         this.#lineHeight = this.#fontSize * 1.4
 
-        this._setupShadow()
-    }
-
-    _setupShadow(): void {
-        const filter = d3Select("#na-svg defs")
-            .append("filter")
-            .attr("id", this.#shadowId)
-            .attr("x", "-100%")
-            .attr("y", "-100%")
-            .attr("width", "600%")
-            .attr("height", "600%")
-
-        filter.append("feFlood").attr("flood-opacity", "0.5").attr("flood-color", "#000").attr("result", "flood")
-
-        filter
-            .append("feComposite")
-            .attr("in", "flood")
-            .attr("in2", "SourceGraphic")
-            .attr("operator", "in")
-            .attr("result", "comp")
-
-        filter.append("feOffset").attr("result", "offset").attr("dx", "0").attr("dy", "1")
-
-        filter.append("feGaussianBlur").attr("result", "blur").attr("in", "offOut").attr("stdDeviation", "10")
-
-        filter.append("feBlend").attr("in", "SourceGraphic").attr("in2", "blur").attr("mode", "normal")
     }
 
     /** Correct Text Box
@@ -98,17 +69,16 @@ export default class MakeJourneyLabel {
         const bbText = (text.node() as SVGTextElement).getBBox()
         const width = d.label ? bbText.width + this.#textPadding * 2 : 0
         const height = d.label ? bbText.height + this.#textPadding : 0
-        node.select("rect")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("filter", `url(#${this.#shadowId})`)
+        node.select("rect").attr("width", width).attr("height", height).attr("class", "svg-shadow")
 
         // Enlarge circles
         const circle = node
             .select("circle")
             .attr("r", i === 0 || i === this.#numberSegments ? this.#circleRadius * 4 : this.#circleRadius)
-            .attr("class", `click-circle ${i === 0 || i === this.#numberSegments ? "drag-hidden" : "drag-circle"}`)
-            .attr("filter", `url(#${this.#shadowId})`)
+            .attr(
+                "class",
+                `click-circle svg-shadow ${i === 0 || i === this.#numberSegments ? "drag-hidden" : "drag-circle"}`
+            )
 
         // Move circles down and visually above text box
         node.append(() => circle.remove().node())

@@ -29,6 +29,10 @@ svg {
     text-shadow: 0.15rem 0.15rem 0.3rem $body-color;
 }
 
+.svg-shadow {
+    filter: drop-shadow(0 1rem 1rem $paper-800);
+}
+
 .text-end {
     text-anchor: end;
 }
