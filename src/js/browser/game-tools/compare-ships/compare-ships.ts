@@ -685,7 +685,7 @@ export class CompareShips {
             document.querySelector(`#${this.#modal.imageButtonId}`)?.addEventListener("click", async (event) => {
                 registerEvent("Menu", "Ship compare image")
                 event.preventDefault()
-                const saveImage = new SaveImage(this.#baseId, this._getSelectedData(), this.#modal!.getModalNode())
+                const saveImage = new SaveImage(this.#baseId, this._getSelectedData(), this.#modal as CompareShipsModal)
                 await saveImage.init()
             })
         }

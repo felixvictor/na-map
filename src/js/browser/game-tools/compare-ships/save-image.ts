@@ -20,16 +20,17 @@ import { showCursorDefault, showCursorWait } from "common/common-browser"
 import { ShipColumnType } from "./index"
 import { ShipColumnTypeList, SelectedData } from "compare-ships"
 import { HtmlString } from "common/interface"
+import CompareShipsModal from "./modal"
 
 export default class SaveImage {
     #baseId: HtmlString
     #data: ShipColumnTypeList<SelectedData>
-    #modalSel: HTMLDivElement
+    #modal: CompareShipsModal
 
-    constructor(id: HtmlString, data: ShipColumnTypeList<SelectedData>, modalSel: HTMLDivElement) {
+    constructor(id: HtmlString, data: ShipColumnTypeList<SelectedData>, modal: CompareShipsModal) {
         this.#baseId = id
         this.#data = data
-        this.#modalSel = modalSel
+        this.#modal = modal
     }
 
     static _saveCanvasAsImage(uri: string): void {
@@ -51,16 +52,14 @@ export default class SaveImage {
     }
 
     _printSelectedData(clonedDocument: Document, selectedData: SelectedData, columnId: ShipColumnType): void {
-        const labels = clonedDocument.querySelectorAll<HTMLElement>(`#${this.#baseId}-${columnId.toLowerCase()} label`)
-        const parent = labels[0].parentNode as HTMLElement
-        const labelHeight = labels[0].offsetHeight
-        for (const label of labels) {
-            label.remove()
-        }
+        const selectShip = clonedDocument.querySelector<HTMLElement>(`#${this.#modal.getBaseIdSelectsShip(columnId)}`)
+        const selectShipParent = selectShip?.parentNode as HTMLElement
+        const mainDivElem = selectShipParent?.parentNode as HTMLElement
 
-        const mainDiv = d3Select(parent)
-            .insert("div", ":first-child")
-            .style("height", `${labelHeight * 5}px`)
+        selectShipParent.remove()
+        clonedDocument.querySelector<HTMLElement>(`#${this.#modal.getBaseIdSelects(columnId)}`)?.remove()
+
+        const mainDiv = d3Select(mainDivElem).insert("div", ":first-child").style("height", "5rem")
 
         if (selectedData.ship) {
             mainDiv.append("div").style("margin-bottom", "5px").style("line-height", "1.1").text(selectedData.ship)
@@ -116,7 +115,7 @@ export default class SaveImage {
 
     async init(): Promise<void> {
         showCursorWait()
-        await this._save(this.#modalSel)
+        await this._save(this.#modal.getModalNode())
         showCursorDefault()
     }
 }
