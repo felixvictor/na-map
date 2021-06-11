@@ -58,6 +58,8 @@ class Map {
     #pngData!: Buffer
     #distances: Distance[] = []
     #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
+    #neighbours!: Set<number>
+    #offset!: number
     #map: GridMap = [] as GridMap
     #mapHeight!: number
     #mapScale!: number
@@ -105,6 +107,17 @@ class Map {
         this.#mapWidth = png.width // x
         this.#mapScale = this.#mapWidth / mapSize
         this.#pngData = png.data
+        this.#offset = Math.ceil(Math.log2(this.#mapWidth))
+        this.#neighbours = new Set([
+            -this.#mapWidth - 1,
+            -this.#mapWidth,
+            -this.#mapWidth + 1,
+            -1,
+            1,
+            this.#mapWidth - 1,
+            this.#mapWidth,
+            this.#mapWidth + 1,
+        ])
 
         console.log(this.#mapHeight, this.#mapWidth)
     }
@@ -203,15 +216,13 @@ class Map {
 
             pixelDistance++
 
-            // Check all nine neighbour positions ([-1, 0, 1][-1, 0, 1])
-            for (let y = -this.#mapWidth; y <= this.#mapWidth; y += this.#mapWidth) {
-                for (let x = -1; x <= 1; x += 1) {
-                    const neighbourIndex: Index = index + y + x
-                    // Add not visited non-land neighbour index
-                    if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
-                        this.visit(neighbourIndex)
-                        queue.push([neighbourIndex, pixelDistance])
-                    }
+            // Check all eight neighbour positions ([-1, 0, 1][-1, 0, 1])
+            for (const neighbour of this.#neighbours) {
+                const neighbourIndex: Index = index + neighbour
+                // Add not visited non-land neighbour index
+                if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
+                    this.visit(neighbourIndex)
+                    queue.push([neighbourIndex, pixelDistance])
                 }
             }
         }
@@ -272,10 +283,7 @@ class Map {
         }
     }
 
-    getIndex(y: number, x: number): Index {
-        return y * this.#mapWidth + x
-    }
-
+    getIndex = (y: number, x: number): Index => (y << this.#offset) + x
     getSpot(index: number): SpotType {
         return this.#map[index]
     }
