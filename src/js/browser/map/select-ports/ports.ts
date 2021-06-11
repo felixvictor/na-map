@@ -165,10 +165,11 @@ export default class SelectPortsSelectPorts {
         const sellTax = this._getPortTax(sellPort.id)
         let buyPrice = this._getBuyPrice(itemId)
         let sellPrice =
-            this._getSellPrice(itemId) + (planarDistance * buyPrice * this._getDistanceFactor(itemId)) / 1400
+            this._getSellPrice(itemId) + (planarDistance * buyPrice * this._getDistanceFactor(itemId)) / 1050
         buyPrice *= 1 + buyTax
         sellPrice /= 1 + sellTax
         const profit = Math.round(sellPrice - buyPrice)
+        const profitPerTon = Math.round(profit / this._getWeight(itemId))
 
         /*
         console.log(
@@ -180,14 +181,14 @@ export default class SelectPortsSelectPorts {
             planarDistance,
             this._getBuyPrice(itemId) * this._getDistanceFactor(itemId),
             planarDistance * this._getBuyPrice(itemId) * this._getDistanceFactor(itemId),
-            (planarDistance * this._getBuyPrice(itemId) * this._getDistanceFactor(itemId)) / 1400,
+            (planarDistance * this._getBuyPrice(itemId) * this._getDistanceFactor(itemId)) / 1050,
             this._getSellPrice(itemId) +
-                (planarDistance * this._getBuyPrice(itemId) * this._getDistanceFactor(itemId)) / 1400,
+                (planarDistance * this._getBuyPrice(itemId) * this._getDistanceFactor(itemId)) / 1050,
             profit
         )
         */
 
-        return { profit, profitPerTon: Math.round(profit / this._getWeight(itemId)) }
+        return { profit, profitPerTon }
     }
 
     _getProfit(buyPort: PortWithTrades, sellPort: PortWithTrades, itemId: number): TradeProfit {
