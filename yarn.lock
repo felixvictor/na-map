@@ -1521,14 +1521,14 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@netlify/build@^11.37.2":
-  version "11.38.0"
-  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-11.38.0.tgz#90d84057668eb02ee6bc665adaefadbda3d92fcf"
-  integrity sha512-Uak1NnO+hHRzahuRrrq/3TczRM4b99/svjVNGe+Hy75HdCRHLhc8SYd8NYOCzUvdYGxnGb4r6ms82PcyuxtLsw==
+"@netlify/build@^12.1.0":
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-12.1.0.tgz#bd1da3e4ae9919851849260745099d5095c9082f"
+  integrity sha512-DvKkNgfwzrQc3lFHJjHfoX7/l2qNd5F6i8urIEthYCH98SLMKrwuCcw3MSkgcmVKI4e+YE0H2PF2MiWWgQ+WLw==
   dependencies:
     "@bugsnag/js" "^7.0.0"
     "@netlify/cache-utils" "^1.0.7"
-    "@netlify/config" "^6.0.0"
+    "@netlify/config" "^7.0.0"
     "@netlify/functions-utils" "^1.3.13"
     "@netlify/git-utils" "^1.0.8"
     "@netlify/plugin-edge-handlers" "^1.11.16"
@@ -1595,10 +1595,10 @@
     path-exists "^4.0.0"
     readdirp "^3.4.0"
 
-"@netlify/config@^6.0.0", "@netlify/config@^6.9.2":
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/@netlify/config/-/config-6.10.0.tgz#4eba4252a808d5cae05cfa6dfba568f1cb064a66"
-  integrity sha512-bhnJL/6BsenXoYEM6etx46/Zyj6oKGBlRJc/y+qxCPWTIGC7JHsqUkGCGyU30g9vhYXgpWbreOUFCX1A3UjcbQ==
+"@netlify/config@^7.0.0", "@netlify/config@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@netlify/config/-/config-7.2.0.tgz#bb0bb463227b85e3ddf386f71c0a7473310c9f21"
+  integrity sha512-bxjAO6EvROkDtHZtaJg6phiZnR+cXYDTrlsrws9uOV5fuwT2hN0+82ICxUw5dSv+PHnz36nKqJCaC2F2J459Vw==
   dependencies:
     "@ungap/from-entries" "^0.2.1"
     array-flat-polyfill "^1.0.1"
@@ -1615,6 +1615,7 @@
     js-yaml "^4.0.0"
     map-obj "^4.0.0"
     netlify "^7.0.1"
+    netlify-redirect-parser "^5.1.1"
     omit.js "^2.0.2"
     p-locate "^4.1.0"
     path-exists "^4.0.0"
@@ -1624,10 +1625,10 @@
     validate-npm-package-name "^3.0.0"
     yargs "^15.3.0"
 
-"@netlify/framework-info@^5.1.4":
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/@netlify/framework-info/-/framework-info-5.1.4.tgz#da0995197f70dc4298231ef4363f7f1ee2aa894f"
-  integrity sha512-u995zzabQ+L6MKSNw4oVsN4wXiPfgN2Cb20yxC+7lmsRJWXdaEVHh9CASc7UmTrXELGXIAROS16+vlHv63fZ7A==
+"@netlify/framework-info@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@netlify/framework-info/-/framework-info-5.2.0.tgz#383e9f53ff21297df5e0e3059ac6999d6c85a99e"
+  integrity sha512-8naCC254shxLqsLAbeGpV6iGB1drgVUr5Y8D19WtYm3o9TovmYnma8yYaTwsg59sKokFZZtE1jfxUBeHWFtscQ==
   dependencies:
     ajv "^8.0.0"
     filter-obj "^2.0.1"
@@ -10583,14 +10584,14 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-netlify-cli@^3.37.7:
-  version "3.37.7"
-  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-3.37.7.tgz#59523272a4b18873b0bd722911d86586dfc072ae"
-  integrity sha512-nDMhEX/G/J6QSYy5yTgbYdYX3M7VUQIslWT9eeLekZdY3kmlbkvaRE6EUCkfOeJt63W/NIUj8y0qPhDNw7HUag==
+netlify-cli@^3.37.17:
+  version "3.37.17"
+  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-3.37.17.tgz#61057cd4f75bcea9417bf500f07045803f4a8503"
+  integrity sha512-2l7lrDTCBWQUngfNKc/S0aHweeCgHCOnGZI9RBtoo6r5VQBYkoZQMYg3xAIqUKKELEsg4d5HWUhrWN9QOyXLtw==
   dependencies:
-    "@netlify/build" "^11.37.2"
-    "@netlify/config" "^6.9.2"
-    "@netlify/framework-info" "^5.1.4"
+    "@netlify/build" "^12.1.0"
+    "@netlify/config" "^7.2.0"
+    "@netlify/framework-info" "^5.2.0"
     "@netlify/plugin-edge-handlers" "^1.11.16"
     "@netlify/plugins-list" "^2.15.0"
     "@netlify/routing-local-proxy" "^0.30.0"
@@ -10661,7 +10662,7 @@ netlify-cli@^3.37.7:
     minimist "^1.2.5"
     multiparty "^4.2.1"
     netlify "^7.0.1"
-    netlify-redirect-parser "^4.0.5"
+    netlify-redirect-parser "^5.1.1"
     netlify-redirector "^0.2.1"
     node-fetch "^2.6.0"
     node-version-alias "^1.0.1"
@@ -10699,15 +10700,15 @@ netlify-cli@^3.37.7:
     wrap-ansi "^7.0.0"
     write-file-atomic "^3.0.0"
 
-netlify-redirect-parser@^4.0.5:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/netlify-redirect-parser/-/netlify-redirect-parser-4.1.0.tgz#dd899b3416d2d6d877ca5caa2b142cda7c4d9ce9"
-  integrity sha512-EySe02AlDGTdQFFyS46DiO1H7ev9R1MC/WR5nQW17LOFkzRZmgnV9RHx/pyblu+8+Ona/SlGye+YGIitrmmI1g==
+netlify-redirect-parser@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/netlify-redirect-parser/-/netlify-redirect-parser-5.1.1.tgz#1df2a752c532f338ff10d9dac4bbc5520f917d76"
+  integrity sha512-TDJShXyaMwQaVtzWjK6U1UAWzWHnFzTVULAduaGroVlQha5Hi6WaRCZLg64FvQx4MUMOH8qOgSyByCqIMXqZWA==
   dependencies:
-    "@netlify/config" "^6.9.2"
     filter-obj "^2.0.2"
     is-plain-obj "^2.1.0"
     path-exists "^4.0.0"
+    toml "^3.0.0"
 
 netlify-redirector@^0.2.1:
   version "0.2.1"
@@ -11814,14 +11815,14 @@ postcss-load-config@^3.0.0:
     cosmiconfig "^7.0.0"
     import-cwd "^3.0.0"
 
-postcss-loader@^5.3.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-5.3.0.tgz#1657f869e48d4fdb018a40771c235e499ee26244"
-  integrity sha512-/+Z1RAmssdiSLgIZwnJHwBMnlABPgF7giYzTN2NOfr9D21IJZ4mQC1R2miwp80zno9M4zMD/umGI8cR+2EL5zw==
+postcss-loader@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-6.1.0.tgz#13c800a00b3c7d434a1319a73d85e2df0714cdde"
+  integrity sha512-yA/cXBfACkthZNA2hQxOnaReVfQ6uLmvbEDQzNafpbK40URZJvP/28dL1DG174Gvz3ptkkHbbwDBCh+gXR94CA==
   dependencies:
     cosmiconfig "^7.0.0"
     klona "^2.0.4"
-    semver "^7.3.4"
+    semver "^7.3.5"
 
 postcss-media-query-parser@^0.2.3:
   version "0.2.3"
@@ -12102,10 +12103,10 @@ postcss-values-parser@^2.0.1:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.1.7, postcss@^8.2.1, postcss@^8.2.15, postcss@^8.2.9, postcss@^8.3.1:
-  version "8.3.1"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.1.tgz#71f380151c227f83b898294a46481f689f86b70a"
-  integrity sha512-9qH0MGjsSm+fjxOi3GnwViL1otfi7qkj+l/WX5gcRGmZNGsIcqc+A5fBkE6PUobEQK4APqYVaES+B3Uti98TCw==
+postcss@^8.1.7, postcss@^8.2.1, postcss@^8.2.15, postcss@^8.2.9, postcss@^8.3.3:
+  version "8.3.3"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.3.3.tgz#ef412a7a67e85c5b2c9f0ab3c4d9e8a3814d55cc"
+  integrity sha512-gnXd9C4bGKevvlNFd80I8WfxHX+g6MR+W2h19PlDNHUuT9248rHTvCIDeZI3Hvs5mB3gzXiNDwVK3S153WJbZA==
   dependencies:
     colorette "^1.2.2"
     nanoid "^3.1.23"
@@ -13174,10 +13175,10 @@ sass-convert@^0.5.0:
     through2 "^2.0.0"
     which "^1.0.5"
 
-sass-loader@^12.0.0:
-  version "12.0.0"
-  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-12.0.0.tgz#ba91df5725cb9676c8e0937002a647ab011eb94a"
-  integrity sha512-LJQMyDdNdhcvoO2gJFw7KpTaioVFDeRJOuatRDUNgCIqyu4s4kgDsNofdGzAZB1zFOgo/p3fy+aR/uGXamcJBg==
+sass-loader@^12.1.0:
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-12.1.0.tgz#b73324622231009da6fba61ab76013256380d201"
+  integrity sha512-FVJZ9kxVRYNZTIe2xhw93n3xJNYZADr+q69/s98l9nTCrWASo+DR2Ot0s5xTKQDDEosUkatsGeHxcH4QBp5bSg==
   dependencies:
     klona "^2.0.4"
     neo-async "^2.6.2"
