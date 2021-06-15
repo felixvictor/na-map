@@ -16,6 +16,10 @@ export const initFromClipboard = async (searchParams: ShipCompareSearchParamsRea
     setSelectedIds(selectedIds)
 }
 
+/*
+http://localhost:8080/?v=12.6.9&cmp=gZ5H2WGcm9Ri8jF11t9B&00=Lo2&01=0D0&02=kvL&03=vbb9&10=xZA&11=7lG&12=MlM&13=KBLJTnnA
+ */
+
 const setSelectedIds = (selectedIds: ShipColumnTypeList<SelectedId>): void => {
     for (const columnId of Object.keys(selectedIds)) {
         shipCompare.selects.setShip(columnId, selectedIds[columnId].ship)

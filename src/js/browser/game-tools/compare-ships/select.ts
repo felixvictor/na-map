@@ -50,6 +50,7 @@ export class CompareShipsSelect {
     setWoods(columnId: ShipColumnType, woodIds: Map<string, number>): void {
         for (const [woodType, woodId] of woodIds) {
             this.setWood(columnId, woodType, woodId)
+            this.enableWoodSelects(columnId)
         }
     }
 

@@ -30,7 +30,7 @@ export class ShipCompareSearchParamsWrite extends ShipCompareSearchParams {
 
         for (const columnId of shipColumnType) {
             if (this.#selectedIds[columnId]) {
-                ids = [...ids, this.#selectedIds[columnId].ship, ...this.#selectedIds[columnId].wood]
+                ids = [...ids, this.#selectedIds[columnId].ship, ...this.#selectedIds[columnId].wood.values()]
             }
         }
 

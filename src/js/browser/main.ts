@@ -62,7 +62,7 @@ const getServerName = (): ServerId => {
     return r
 }
 
-const getSearchParams = (): URLSearchParams => new URL(document.location.href).searchParams
+const getSearchParams = (): URLSearchParams => new URLSearchParams(new URL(document.location.href).search)
 
 /**
  * Change server name
