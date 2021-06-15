@@ -416,7 +416,6 @@ if (isProduction) {
                     },
                 ],
             },
-            // @ts-expect-error
             minify: CssMinimizerPlugin.cssoMinify,
         }),
         new TerserPlugin({
