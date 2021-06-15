@@ -127,7 +127,6 @@ export default class ListFlags {
         this.#dataIndexSorted = dataIndex
         const sign = this.#sortAscending ? 1 : -1
         this.#rows.sort((a, b): number => {
-            console.log("sort", columnIndex, dataIndex, a[dataIndex], b[dataIndex])
             // Sort by number of flags
             if (columnIndex === 3) {
                 return ((a[dataIndex] as number) - (b[dataIndex] as number)) * sign
