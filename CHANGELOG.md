@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.0](///compare/v12.6.9...v13.0.0) (2021-06-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* new layout
+
+### Features
+
+* list of active conquest flags a32fb7e
+
+
+### Bug Fixes
+
+* **cannons:** 24lb fort and tower cannons removed 275c1e0
+* **list port battle:** sorting corrected 8db7810
+* **port bonus:** remove menu item on PvE server ecc240f
+* **port investments:** February 2021 data 732a3ff
+* **port-bonus:** March 2021 data f721059
+* **trades:** 11 June 2021 trade changes 73eb831
+* **trades:** 9 June 2021 trade changes 15f44d1
+* **trading:** trade profit calculation adapted to May 2021 patch 1987d2d
+
+
+* new layout aa37051
+
 ### [12.6.9](///compare/v12.6.8...v12.6.9) (2021-05-29)
 
 ### [12.6.8](///compare/v12.6.7...v12.6.8) (2021-05-28)
