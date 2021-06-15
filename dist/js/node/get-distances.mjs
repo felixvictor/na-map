@@ -41,6 +41,8 @@ class Map {
     #pngData;
     #distances = [];
     #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json");
+    #neighbours;
+    #offset;
     #map = [];
     #mapHeight;
     #mapScale;
@@ -79,6 +81,17 @@ class Map {
         this.#mapWidth = png.width;
         this.#mapScale = this.#mapWidth / mapSize;
         this.#pngData = png.data;
+        this.#offset = Math.ceil(Math.log2(this.#mapWidth));
+        this.#neighbours = new Set([
+            -this.#mapWidth - 1,
+            -this.#mapWidth,
+            -this.#mapWidth + 1,
+            -1,
+            1,
+            this.#mapWidth - 1,
+            this.#mapWidth,
+            this.#mapWidth + 1,
+        ]);
         console.log(this.#mapHeight, this.#mapWidth);
     }
     mapInit() {
@@ -133,13 +146,11 @@ class Map {
                 foundPortIds.add(spot);
             }
             pixelDistance++;
-            for (let y = -this.#mapWidth; y <= this.#mapWidth; y += this.#mapWidth) {
-                for (let x = -1; x <= 1; x += 1) {
-                    const neighbourIndex = index + y + x;
-                    if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
-                        this.visit(neighbourIndex);
-                        queue.push([neighbourIndex, pixelDistance]);
-                    }
+            for (const neighbour of this.#neighbours) {
+                const neighbourIndex = index + neighbour;
+                if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
+                    this.visit(neighbourIndex);
+                    queue.push([neighbourIndex, pixelDistance]);
                 }
             }
         }
@@ -175,9 +186,7 @@ class Map {
             console.error("Map distance error:", error);
         }
     }
-    getIndex(y, x) {
-        return y * this.#mapWidth + x;
-    }
+    getIndex = (y, x) => (y << this.#offset) + x;
     getSpot(index) {
         return this.#map[index];
     }

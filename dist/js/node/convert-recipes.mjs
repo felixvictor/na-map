@@ -8,8 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import path from "path";
-import d3Array from "d3-array";
-const { group: d3Group } = d3Array;
+import { group as d3Group } from "d3-array";
 import { currentServerStartDate as serverDate, simpleStringSort, sortBy } from "../common/common";
 import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";

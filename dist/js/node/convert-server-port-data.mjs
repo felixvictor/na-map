@@ -9,8 +9,7 @@
  */
 import path from "path";
 import dayjs from "dayjs";
-import d3Array from "d3-array";
-const { group: d3Group } = d3Array;
+import { group as d3Group } from "d3-array";
 import { currentServerStartDate as serverDate, findNationById, nations, nationShortName, sortBy, } from "../common/common";
 import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
@@ -138,8 +137,11 @@ const setAndSaveDroppedItems = async (serverName) => {
         const tradeItem = {
             id: item.Id,
             name: isTradeItem(item) ? cleanItemName(item.Name) : cleanName(item.Name),
-            price: item.BasePrice,
+            buyPrice: item.BasePrice,
         };
+        if (item.PortPrices.Consumed.SellPrice.Min > 0) {
+            tradeItem.sellPrice = item.PortPrices.Consumed.SellPrice.Min;
+        }
         if (item.PortPrices.RangePct) {
             tradeItem.distanceFactor = item.PortPrices.RangePct;
         }

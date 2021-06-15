@@ -163,8 +163,8 @@ const getPrices = (buildings) => {
             labour: apiSeasonedItem.LaborPrice,
             doubloon: apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
                 ?.Amount ?? 0,
-            tool: apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)
-                ?.Amount ?? 0,
+            tool: apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)?.Amount ??
+                0,
         };
     })
         .sort((a, b) => a.id - b.id);

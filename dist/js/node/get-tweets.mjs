@@ -5,7 +5,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
-import { currentServerStartDateTime, simpleStringSort } from "../common/common";
+import { currentServerStartDateTime } from "../common/common";
 import { getCommonPaths } from "../common/common-dir";
 import { fileExists, readTextFile, saveTextFile } from "../common/common-file";
 import { cleanName } from "../common/common-node";
@@ -116,6 +116,6 @@ export const getTweets = async () => {
         await getTweetsPartial();
     }
     saveRefreshId(refresh);
-    return tweets.sort(simpleStringSort);
+    return tweets.reverse();
 };
 //# sourceMappingURL=get-tweets.js.map

@@ -8,8 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 import path from "path";
-import d3Array from "d3-array";
-const { group: d3Group } = d3Array;
+import { group as d3Group } from "d3-array";
 import { capitalizeFirstLetter, currentServerStartDate as serverDate, sortBy } from "../common/common";
 import { getCommonPaths } from "../common/common-dir";
 import { baseAPIFilename, cleanName } from "../common/common-node";
@@ -223,11 +222,11 @@ export const convertModulesAndWoodData = async () => {
         wood.id = module.id;
         wood.properties = module.APImodifiers
             .filter((modifier) => {
-            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`;
             return modifiers.get(apiModifierName);
         })
             .map((modifier) => {
-            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`;
             const modifierName = modifiers.get(apiModifierName);
             let amount = modifier.Percentage;
             let isPercentage = true;
@@ -273,7 +272,7 @@ export const convertModulesAndWoodData = async () => {
     };
     const getModuleProperties = (APImodifiers) => {
         return APImodifiers.filter((modifier) => {
-            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`;
             if (!modifiers.has(apiModifierName)) {
                 console.log(`${apiModifierName} modifier not defined`);
                 return true;
@@ -281,7 +280,7 @@ export const convertModulesAndWoodData = async () => {
             return modifiers.get(apiModifierName) !== "";
         })
             .flatMap((modifier) => {
-            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`;
             const modifierName = modifiers.get(apiModifierName) ?? "";
             let amount = modifier.Percentage;
             let isPercentage = true;

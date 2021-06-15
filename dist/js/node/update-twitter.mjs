@@ -13,7 +13,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
-import { findNationByName, findNationByNationShortName, sortBy } from "../common/common";
+import { findNationByName, sortBy } from "../common/common";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { getCommonPaths } from "../common/common-dir";
 import { flagValidity, portBattleCooldown } from "../common/common-var";
@@ -32,7 +32,7 @@ const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm";
 const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
 const guessNationFromClanName = (clanName) => {
     const port = findPortByClanName(clanName);
-    return port ? findNationByNationShortName(port.nation)?.name ?? "" : "n/a";
+    return port ? port.nation : "n/a";
 };
 const getPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
 const getPortBattleTime = (portName) => {
@@ -96,7 +96,7 @@ const hostilityLevelUp = (result) => {
     const portName = result[4];
     console.log("      --- hostilityLevelUp", portName);
     const updatedPort = {
-        attackerNation: result[3],
+        attackerNation: findNationByName(result[3])?.short,
         attackerClan: result[2].trim(),
         attackHostility: Number(result[6]) / 100,
     };
@@ -106,7 +106,7 @@ const hostilityLevelDown = (result) => {
     const portName = result[4];
     console.log("      --- hostilityLevelDown", portName);
     const updatedPort = {
-        attackerNation: result[3],
+        attackerNation: findNationByName(result[3])?.short,
         attackerClan: result[2].trim(),
         attackHostility: Number(result[6]) / 100,
     };
@@ -117,7 +117,7 @@ const portBattleScheduled = (result) => {
     const clanName = result[6].trim();
     console.log("      --- portBattleScheduled", portName);
     const updatedPort = {
-        attackerNation: result[7] ? result[7] : guessNationFromClanName(clanName),
+        attackerNation: result[7] ? findNationByName(result[7])?.short : guessNationFromClanName(clanName),
         attackerClan: clanName,
         attackHostility: 1,
         portBattle: dayjs.utc(result[4], "D MMM YYYY HH:mm").format(dateTimeFormat),
@@ -128,7 +128,7 @@ const npcPortBattleScheduled = (result) => {
     const portName = result[2];
     console.log("      --- npcPortBattleScheduled", portName);
     const updatedPort = {
-        attackerNation: "Neutral",
+        attackerNation: "NT",
         attackerClan: "RAIDER",
         attackHostility: 1,
         portBattle: dayjs.utc(result[3], "D MMM YYYY HH:mm").format(dateTimeFormat),

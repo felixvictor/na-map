@@ -7,3 +7,8 @@
     for = "*.js"
     [headers.values]
         Cache-Control = "public, max-age=31557600, immutable"
+
+[[headers]]
+    for = "*.mjs"
+    [headers.values]
+        Cache-Control = "public, max-age=31557600, immutable"
