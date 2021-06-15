@@ -14572,8 +14572,9 @@ timed-out@^4.0.1:
   resolved "https://registry.yarnpkg.com/timed-out/-/timed-out-4.0.1.tgz#f32eacac5a175bea25d7fab565ab3ed8741ef56f"
   integrity sha1-8y6srFoXW+ol1/q1Zas+2HQe9W8=
 
-"timelines-chart@file:../timelines-chart":
+"timelines-chart@https://github.com/felixvictor/timelines-chart":
   version "2.11.2"
+  resolved "https://github.com/felixvictor/timelines-chart#9ace7d7c836dc505576dc3a1d47c9f4aacc707f6"
   dependencies:
     d3-array "^3.0.1"
     d3-axis "^3.0.0"
