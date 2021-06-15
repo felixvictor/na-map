@@ -539,7 +539,7 @@ export default class DisplayPorts {
             .sort(simpleStringSort)
             .join(", ") ?? ""
 
-    _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profitPerTon - a.profit.profitPerTon
+    _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
 
     _formatProfits = (profits: TradeGoodProfit[]): HtmlResult =>
         html`${profits
@@ -547,8 +547,8 @@ export default class DisplayPorts {
             ?.map(
                 (good, index) =>
                     html`<span style="white-space: nowrap;"
-                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)} / ${formatSiIntHtml(
-                                good.profit.profit
+                            >${good.name} (${formatSiIntHtml(good.profit.profit)} / ${formatSiIntHtml(
+                                good.profit.profitPerTon
                             )})</span
                         >${index === profits.length - 1 ? html`` : html`, `}`
             )}`
@@ -649,13 +649,14 @@ export default class DisplayPorts {
 
     _showProfits = (goods: HtmlResult[], tradePort: string, tradeDirection: string): HtmlResult => {
         const colour = tradeDirection === "buy" ? "alert-danger" : "alert-success"
+        const instruction =
+            tradeDirection === "buy" ? `Buy here and sell in ${tradePort}` : `Buy in ${tradePort} and sell here`
 
         return goods?.[0] === undefined
             ? html``
             : html` <div class="alert ${colour} mt-2 mb-2 text-start" role="alert">
                   <div class="alert-heading">
-                      <span class="caps">Buy here and sell in ${tradePort}</span> (profit per ton / profit per item, net
-                      value in reales)
+                      <span class="caps">${instruction}</span> (profit per item / profit per ton, net value in reales)
                   </div>
                   ${goods}
               </div>`
@@ -768,18 +769,11 @@ export default class DisplayPorts {
             </div>
 
             ${this.showRadius === "tradePorts"
-                ? html`${port.goodsToSellInTradePort?.[0] === undefined
-                      ? html``
-                      : html`<div class="alert alert-success mt-2 mb-2 text-start" role="alert">
-                            <span class="caps">Buy here and sell in ${port.tradePort}</span> (net profit per ton/net
-                            profit per item)<br />${port.goodsToSellInTradePort}
-                        </div>`}
-                  ${port.goodsToBuyInTradePort?.[0] === undefined
-                      ? html``
-                      : html`<div class="alert alert-danger mt-2 mb-2 text-start" role="alert">
-                            <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit per ton/net
-                            profit per item)<br />${port.goodsToBuyInTradePort}
-                        </div>`}`
+                ? html`${this._showProfits(port.goodsToSellInTradePort, port.tradePort, "buy")}${this._showProfits(
+                      port.goodsToBuyInTradePort,
+                      port.tradePort,
+                      "sell"
+                  )}`
                 : html` ${port.producesNonTrading.length > 0
                       ? html`<p class="mb-2">
                             <span class="caps">Produces—</span
