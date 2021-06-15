@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.0.2](///compare/v13.0.1...v13.0.2) (2021-06-15)
+
+
+### Bug Fixes
+
+* **port bonus:** May 2021 data 2a11d65
+
 ### [13.0.1](///compare/v13.0.0...v13.0.1) (2021-06-15)
 
 
