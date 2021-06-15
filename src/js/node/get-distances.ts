@@ -13,10 +13,11 @@ import path from "path"
 import Deque from "collections/deque"
 import { default as PNG } from "pngjs"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { currentServerStartDate as serverDate } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { convertCoordX, convertCoordY, Distance, Point } from "../common/common-math"
-import { simpleNumberSort } from "../common/common-node"
+import { baseAPIFilename, simpleNumberSort } from "../common/common-node"
 import { distanceMapSize, mapSize } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
@@ -28,6 +29,8 @@ type SpotType = number
 
 // type (spotLand, spotWater, port id)
 type GridMap = SpotType[]
+
+const commonPaths = getCommonPaths()
 
 class Port {
     apiPorts: APIPort[] = []
@@ -55,6 +58,8 @@ class Map {
     #pngData!: Buffer
     #distances: Distance[] = []
     #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json")
+    #neighbours!: Set<number>
+    #offset!: number
     #map: GridMap = [] as GridMap
     #mapHeight!: number
     #mapScale!: number
@@ -102,6 +107,17 @@ class Map {
         this.#mapWidth = png.width // x
         this.#mapScale = this.#mapWidth / mapSize
         this.#pngData = png.data
+        this.#offset = Math.ceil(Math.log2(this.#mapWidth))
+        this.#neighbours = new Set([
+            -this.#mapWidth - 1,
+            -this.#mapWidth,
+            -this.#mapWidth + 1,
+            -1,
+            1,
+            this.#mapWidth - 1,
+            this.#mapWidth,
+            this.#mapWidth + 1,
+        ])
 
         console.log(this.#mapHeight, this.#mapWidth)
     }
@@ -184,10 +200,11 @@ class Map {
         this.visit(startIndex)
 
         // Queue holds unchecked positions ([index, distance from start port])
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const queue = new Deque([[startIndex, 0]])
 
         while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length > 0) {
-            let [index, pixelDistance]: [Index, PixelDistance] = queue.shift()
+            let [index, pixelDistance] = queue.shift() as [Index, PixelDistance]
             const spot = this.getPortId(this.getSpot(index))
 
             // Check if port is found
@@ -199,15 +216,13 @@ class Map {
 
             pixelDistance++
 
-            // Check all nine neighbour positions ([-1, 0, 1][-1, 0, 1])
-            for (let y = -this.#mapWidth; y <= this.#mapWidth; y += this.#mapWidth) {
-                for (let x = -1; x <= 1; x += 1) {
-                    const neighbourIndex: Index = index + y + x
-                    // Add not visited non-land neighbour index
-                    if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
-                        this.visit(neighbourIndex)
-                        queue.push([neighbourIndex, pixelDistance])
-                    }
+            // Check all eight neighbour positions ([-1, 0, 1][-1, 0, 1])
+            for (const neighbour of this.#neighbours) {
+                const neighbourIndex: Index = index + neighbour
+                // Add not visited non-land neighbour index
+                if (this.isSpotNotVisitedNonLand(neighbourIndex)) {
+                    this.visit(neighbourIndex)
+                    queue.push([neighbourIndex, pixelDistance])
                 }
             }
         }
@@ -268,10 +283,7 @@ class Map {
         }
     }
 
-    getIndex(y: number, x: number): Index {
-        return y * this.#mapWidth + x
-    }
-
+    getIndex = (y: number, x: number): Index => (y << this.#offset) + x
     getSpot(index: number): SpotType {
         return this.#map[index]
     }

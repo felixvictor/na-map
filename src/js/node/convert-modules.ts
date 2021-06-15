@@ -1,8 +1,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Convert modules.
- * @module    src/node/convert-modules
+ * @file      Convert setModules.
+ * @module    src/node/convert-setModules
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -10,28 +10,39 @@
 
 import path from "path"
 
-import d3Array from "d3-array"
-const { group: d3Group } = d3Array
+import { group as d3Group } from "d3-array"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
-import { capitalizeFirstLetter, woodType } from "../common/common"
-import { cleanName, sortBy } from "../common/common-node"
+import { capitalizeFirstLetter, currentServerStartDate as serverDate, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { serverIds } from "../common/servers"
+import { woodType } from "../common/types"
 
 import { APIItemGeneric, APIModule, ModifiersEntity } from "./api-item"
 import {
     ModuleConvertEntity,
     ModuleEntity,
     ModulePropertiesEntity,
-    WoodData,
+    WoodJsonData,
     WoodTrimOrFrame,
 } from "../common/gen-json"
 import { ModifierName } from "../common/interface"
 
 type APIModifierName = string
+type CleanedModule = {
+    id: number
+    name: string
+    usageType: string
+    moduleLevel: string
+    properties: ModulePropertiesEntity[]
+    type: string
+    hasSamePropertiesAsPrevious?: boolean | undefined
+}
 
 let apiItems: APIItemGeneric[]
+
+const commonPaths = getCommonPaths()
 
 // noinspection SpellCheckingInspection
 const notUsedExceptionalWoodIds = new Set([
@@ -69,9 +80,9 @@ const exceptionalWoodIds = new Set([
  */
 // eslint-disable-next-line complexity
 export const convertModulesAndWoodData = async (): Promise<void> => {
-    const modules = new Map()
+    const modules = new Map<string, CleanedModule>()
 
-    const woods = {} as WoodData
+    const woods = {} as WoodJsonData
     woods.trim = []
     woods.frame = []
 
@@ -112,7 +123,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
-        ["NONE SHIP_MATERIAL", "Ship material"],
+        // ["NONE SHIP_MATERIAL", "Ship material"],
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acceleration"],
@@ -260,38 +271,45 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         const wood = {} as WoodTrimOrFrame
         wood.id = module.id
 
-        wood.properties = module.APImodifiers.map((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
-            // Add modifier if in modifier map
-            const modifierName = modifiers.get(apiModifierName) ?? ""
-            let amount = modifier.Percentage
-            let isPercentage = true
+        wood.properties = module.APImodifiers
+            // filter unused modifiers
+            .filter((modifier) => {
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
 
-            if (modifier.Absolute) {
-                amount = modifier.Absolute
-                isPercentage = false
-            }
+                return modifiers.get(apiModifierName)
+            })
+            .map((modifier) => {
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
+                // Add modifier if in modifier map
+                const modifierName = modifiers.get(apiModifierName)!
+                let amount = modifier.Percentage
+                let isPercentage = true
 
-            // Some modifiers are wrongly indicated as a percentage
-            if (notPercentage.has(modifierName)) {
-                isPercentage = false
-            }
+                if (modifier.Absolute) {
+                    amount = modifier.Absolute
+                    isPercentage = false
+                }
 
-            if (flipAmountForModule.has(modifierName)) {
-                amount *= -1
-            }
+                // Some modifiers are wrongly indicated as a percentage
+                if (notPercentage.has(modifierName)) {
+                    isPercentage = false
+                }
 
-            if (modifierName === "Splinter resistance") {
-                amount = Math.round(amount * 100)
-                isPercentage = true
-            }
+                if (flipAmountForModule.has(modifierName)) {
+                    amount *= -1
+                }
 
-            return {
-                modifier: modifierName ?? "",
-                amount,
-                isPercentage,
-            }
-        })
+                if (modifierName === "Splinter resistance") {
+                    amount = Math.round(amount * 100)
+                    isPercentage = true
+                }
+
+                return {
+                    modifier: modifierName,
+                    amount,
+                    isPercentage,
+                }
+            })
 
         if (module.name.includes("(S)")) {
             wood.family = "seasoned"
@@ -319,67 +337,69 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
         return APImodifiers.filter((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
+            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
             if (!modifiers.has(apiModifierName)) {
                 console.log(`${apiModifierName} modifier not defined`)
                 return true
             }
 
             return modifiers.get(apiModifierName) !== ""
-        }).flatMap((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`
-            const modifierName = modifiers.get(apiModifierName) ?? ""
-
-            let amount = modifier.Percentage
-            let isPercentage = true
-
-            if (modifier.Absolute) {
-                if (
-                    Math.abs(modifier.Absolute) >= 1 ||
-                    modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
-                    modifier.MappingIds[0] === "REPAIR_PERCENT"
-                ) {
-                    amount = modifier.Absolute
-                    isPercentage = false
-                } else {
-                    amount = Math.round(modifier.Absolute * 10000) / 100
-                }
-            }
-
-            if (flipAmountForModule.has(modifierName)) {
-                amount *= -1
-            } else if (modifierName === "Splinter resistance") {
-                amount = Math.round(modifier.Absolute * 10000) / 100
-                isPercentage = true
-            }
-
-            // Some modifiers are wrongly indicated as a percentage
-            if (notPercentage.has(modifierName)) {
-                isPercentage = false
-            }
-
-            // Special case dispersion: split entry up in horizontal and vertical
-            if (modifierName === "Cannon horizontal/vertical dispersion") {
-                return [
-                    {
-                        modifier: "Cannon horizontal dispersion",
-                        amount,
-                        isPercentage,
-                    },
-                    {
-                        modifier: "Cannon vertical dispersion",
-                        amount,
-                        isPercentage,
-                    },
-                ]
-            }
-
-            return {
-                modifier: modifierName,
-                amount,
-                isPercentage,
-            }
         })
+            .flatMap((modifier) => {
+                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
+                const modifierName = modifiers.get(apiModifierName) ?? ""
+
+                let amount = modifier.Percentage
+                let isPercentage = true
+
+                if (modifier.Absolute) {
+                    if (
+                        Math.abs(modifier.Absolute) >= 1 ||
+                        modifier.MappingIds[0].endsWith("PERCENT_MODIFIER") ||
+                        modifier.MappingIds[0] === "REPAIR_PERCENT"
+                    ) {
+                        amount = modifier.Absolute
+                        isPercentage = false
+                    } else {
+                        amount = Math.round(modifier.Absolute * 10_000) / 100
+                    }
+                }
+
+                if (flipAmountForModule.has(modifierName)) {
+                    amount *= -1
+                } else if (modifierName === "Splinter resistance") {
+                    amount = Math.round(modifier.Absolute * 10_000) / 100
+                    isPercentage = true
+                }
+
+                // Some modifiers are wrongly indicated as a percentage
+                if (notPercentage.has(modifierName)) {
+                    isPercentage = false
+                }
+
+                // Special case dispersion: split entry up in horizontal and vertical
+                if (modifierName === "Cannon horizontal/vertical dispersion") {
+                    return [
+                        {
+                            modifier: "Cannon horizontal dispersion",
+                            amount,
+                            isPercentage,
+                        },
+                        {
+                            modifier: "Cannon vertical dispersion",
+                            amount,
+                            isPercentage,
+                        },
+                    ]
+                }
+
+                return {
+                    modifier: modifierName,
+                    amount,
+                    isPercentage,
+                }
+            })
+            .sort(sortBy(["modifier"]))
     }
 
     /**
@@ -389,11 +409,11 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleType = (module: ModuleConvertEntity): string => {
         let type: string
-        let { moduleLevel, moduleType, permanentType, sortingGroup, usageType } = module
+        let { moduleLevel, moduleType, name, permanentType, sortingGroup, usageType } = module
 
         if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim"
-        } else if (moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
+        } else if (moduleType === "Permanent" && !name.endsWith(" Bonus")) {
             type = "Permanent"
         } else if (usageType === "All" && !sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Perk"
@@ -404,12 +424,12 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         }
 
         // Correct sorting group
-        if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
+        if (name.endsWith("French Rig Refit") || name === "Bridgetown Frame Refit") {
             sortingGroup = "survival"
         }
 
         if (type === "Ship trim") {
-            const result = bonusRegex.exec(module.name)
+            const result = bonusRegex.exec(name)
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : ""
         } else {
             sortingGroup = sortingGroup
@@ -523,13 +543,15 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 }
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
-            modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? {} : cleanedModule)
+            modules.set(
+                cleanedModule.name + cleanedModule.moduleLevel,
+                dontSave ? ({} as CleanedModule) : cleanedModule
+            )
         }
     }
 
-    // Get the not empty modules and sort
+    // Get the non-empty setModules and sort
     const result = [...modules.values()].filter((module) => Object.keys(module).length > 0).sort(sortBy(["type", "id"]))
     // Group by type
     const modulesGrouped = d3Group(result, (module: ModuleEntity): string => module.type)

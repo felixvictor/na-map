@@ -11,10 +11,10 @@ import path from "path";
 import css from "css";
 import Excel from "exceljs";
 import sass from "sass";
-import { range } from "../common/common";
-import { commonPaths, serverStartDate } from "../common/common-dir";
+import { currentServerStartDate, range, sortBy } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { executeCommand, readJson } from "../common/common-file";
-import { sortBy } from "../common/common-node";
+const commonPaths = getCommonPaths();
 const shallowWaterFrigates = new Set(["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"]);
 const minDeepWaterBR = 80;
 const maxNumPlayers = 25;
@@ -230,7 +230,7 @@ function fillSheet(sheet, ships, ports) {
     row.fill = fillPattern(colourContrastMiddle);
     row.font = fontColourBold(colourContrastNearWhite);
     sheet.getCell(currentRowNumber, 1).value = "Rate";
-    sheet.getCell(currentRowNumber, 2).value = "Ship";
+    sheet.getCell(currentRowNumber, 2).value = "Column";
     sheet.getCell(currentRowNumber, 3).value = "BR";
     sheet.getCell(currentRowNumber, 4).value = "# Players";
     sheet.getCell(currentRowNumber, 5).value = "BR total";
@@ -337,7 +337,7 @@ function fillSheet(sheet, ships, ports) {
     sheet.getCell(numRowsHeader + 2, numColumnsHeader + 3).value = "x";
 }
 const createPortBattleSheets = async () => {
-    const date = new Date(serverStartDate);
+    const date = new Date(currentServerStartDate);
     workbook = new Excel.Workbook();
     workbook.creator = "Felix Victor";
     workbook.lastModifiedBy = "Felix Victor";

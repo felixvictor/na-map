@@ -1,53 +1,32 @@
 ////
 /// This file is part of na-map.
-/// Mixins.
+/// FMixins.
 ///
-/// copyright 2017-18
-/// license   http://www.gnu.org/licenses/gpl.html
-/// @group    main/mixins
+/// @group    scss
 /// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
 ////
 
-/// Defines background colour with opacity
-/// @param {color} $colour - Colour
-/// @param {number} $opac [0.4] - Opacity
-/// @output `background-color`
-@mixin background-opac($colour, $opac: 0.4) {
-    background-color: rgba(red($colour), green($colour), blue($colour), $opac) !important;
+@mixin caps {
+    font-variant-caps: all-small-caps;
+    font-variant-numeric: oldstyle-nums proportional-nums;
+    letter-spacing: 0.08em;
 }
 
-/// Defines light background colour ($primary-300) with opacity
-/// @param {number} $opac [0.4] - Opacity
-/// @output `background-color`
-@mixin background-primary-light-opac($opac: 0.4) {
-    @include background-opac($primary-300, $opac);
-}
-
-/// Defines light background colour ($primary) with opacity
-/// @param {number} $opac [0.4] - Opacity
-/// @output `background-color`
-@mixin background-primary-opac($opac: 0.4) {
-    @include background-opac($primary, $opac);
-}
-
-/// Defines dark background colour ($primary-800) with opacity
-/// @param {number} $opac [0.4] - Opacity
-/// @output `background-color`
-@mixin background-primary-dark-opac($opac: 0.4) {
-    @include background-opac($primary-800, $opac);
-}
-
-/// Defines light background colour ($secondary) with opacity
-/// @param {number} $opac [0.4] - Opacity
-/// @output `background-color`
-@mixin background-secondary-opac($opac: 0.4) {
-    @include background-opac($secondary, $opac);
+@mixin des {
+    position: relative;
+    top: -0.2rem;
+    display: inline-flex;
+    font-size: small;
+    font-stretch: condensed;
+    line-height: 1;
 }
 
 /// Defines background colour and a contrasting text colour
 /// @param {color} $colour - Colour
 /// @output `color` and `background-color`
 @mixin colour($colour) {
-    color: color-yiq($colour);
+    color: color-contrast($colour);
     background-color: $colour;
 }

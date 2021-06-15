@@ -8,14 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="webpack-env" />
-
+import { default as BSDropdown } from "bootstrap/js/dist/dropdown"
 import { select as d3Select } from "d3-selection"
 
 import { degreesFullCircle } from "./common-math"
-import { BaseModalPure, DataSource } from "./interface"
-import { NationListAlternative } from "common/gen-json"
-import { findNationByNationShortName } from "common/common"
+import { BaseModalPure, DataSource, HtmlString } from "./interface"
+import { NationListAlternative } from "./gen-json"
+import { findNationByNationShortName } from "./common"
 
 // eslint-disable-next-line one-var
 declare const CGREEN: string,
@@ -93,44 +92,46 @@ export const colourList = [
     "#f2b6be",
 ]
 
-export const nationColourList = [
-    "#ffffff", // Neutral
-    "#111111", // Pirates
-    "#f1bf00", // España
-    "#0039a6", // France
-    "#cf142b", // Great Britain
-    "#21468b", // Verenigde Provinciën
-    "#ac0234", // Danmark-Norge
-    "#006aa7", // Sverige
-    "#bf0a30", // United States
-    "#aaa", // Free Town
-    "#0039a6", // Russian Empire
-    "#333", // Kingdom of Prussia
-    "#eb001a", // Commonwealth of Poland
-    "#fecd21", // China
-]
-
 /**
  * Enable nested dropdowns in navbar
- * {@link https://github.com/bootstrapthemesco/bootstrap-4-multi-dropdown-navbar}
- * @param id - nav-item id
+ * {@link https://stackoverflow.com/a/66470962}
  */
 export const initMultiDropdownNavbar = (id: string): void => {
-    $(`#${id} .dropdown-menu .bootstrap-select .dropdown-toggle`).on("click", (event) => {
-        const element = $(event.currentTarget)
-        element.next(".dropdown-menu").toggleClass("show")
-        element.parent("li").toggleClass("show")
-        element.parents("li.nav-item.dropdown.show").on("hidden.bs.dropdown", (event2) => {
-            $(event2.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
+    const CLASS_NAME = "has-child-dropdown-show"
+    const mainElement = document.querySelector(`#${id}`) as HTMLElement
+
+    BSDropdown.prototype.toggle = (function (_original) {
+        return function () {
+            for (const e of document.querySelectorAll(`.${CLASS_NAME}`)) {
+                e.classList.remove(CLASS_NAME)
+            }
+
+            // @ts-expect-error
+            let dd = this._element.closest(".dropdown").parentNode.closest(".dropdown") as Element | Document | null
+            for (; dd && dd !== document; dd = (dd.parentNode as Element).closest(".dropdown")) {
+                ;(dd as Element).classList.add(CLASS_NAME)
+            }
+
+            // @ts-expect-error
+            _original.call(this)
+        }
+    })(BSDropdown.prototype.toggle)
+
+    for (const dd of mainElement.querySelectorAll(".dropdown")) {
+        dd.addEventListener("hide.bs.dropdown", function (this: HTMLElement, e: Event) {
+            if (this.classList.contains(CLASS_NAME)) {
+                this.classList.remove(CLASS_NAME)
+                e.preventDefault()
+            }
+
+            // @ts-expect-error
+            if (e.clickEvent?.composedPath().some((el) => el.classList?.contains("dropdown-toggle"))) {
+                e.preventDefault()
+            }
+
+            e.stopPropagation() // do not need pop in multi level mode
         })
-
-        return false
-    })
-
-    $(`#${id} div.dropdown.bootstrap-select`).on("hidden", (event) => {
-        // hide any open menus when parent closes
-        $(event.currentTarget).find(".dropdown-menu.show").not(".inner").removeClass("show")
-    })
+    }
 }
 
 /**
@@ -166,7 +167,7 @@ export const insertBaseModal = ({ id, title, size = "modal-xl", buttonText = "Cl
         .text(buttonText)
         .attr("type", "button")
         .attr("class", "btn btn-secondary")
-        .attr("data-dismiss", "modal")
+        .attr("data-bs-dismiss", "modal")
 }
 
 export const pluralise = (number: number, word: string): string => `${number} ${word + (number === 1 ? "" : "s")}`
@@ -248,7 +249,8 @@ export const getCanvasRenderingContext2D = (canvas: HTMLCanvasElement): CanvasRe
 const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<string> => {
     const images = {} as NationListAlternative<string>
     for (const item of r.keys()) {
-        images[item.replace("./", "").replace(".svg", "")!] = r(item)
+        const index = item.replace("./", "").replace(".svg", "")
+        images[index] = r(item) as string
     }
 
     // Sort by nation
@@ -261,9 +263,12 @@ const importAll = (r: __WebpackModuleApi.RequireContext): NationListAlternative<
     return sortedImages
 }
 
-export const getIcons = (): NationListAlternative<string> => {
+const getIcons = (): NationListAlternative<string> => {
+    // eslint-disable-next-line unicorn/prefer-module
     return importAll((require as __WebpackModuleApi.RequireFunction).context("../../images/flags", false, /\.svg$/))
 }
+
+export const nationFlags = getIcons()
 
 export const getElementHeight = (element: HTMLElement | SVGElement): number => {
     const { height } = element.getBoundingClientRect()
@@ -276,3 +281,6 @@ export const getElementWidth = (element: HTMLElement | SVGElement): number => {
 
     return Math.floor(width)
 }
+
+export const getIdFromBaseName = (baseName: string): HtmlString =>
+    baseName.toLocaleLowerCase().replace("of ", "").replaceAll(" ", "-").replaceAll("’", "")

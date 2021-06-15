@@ -1,7 +1,7 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Convert repair data from modules.
+ * @file      Convert repair data from setModules.
  * @module    src/node/convert-module-repair
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
@@ -9,8 +9,9 @@
  */
 import path from "path";
 import convert from "xml-js";
-import { commonPaths } from "../common/common-dir";
+import { getCommonPaths } from "../common/common-dir";
 import { readTextFile, saveJsonAsync } from "../common/common-file";
+const commonPaths = getCommonPaths();
 function toCamelCase(str) {
     str = str.replace(/[\s-_]+(.)?/g, (_match, ch) => (ch ? ch.toUpperCase() : ""));
     return str.slice(0, 1).toLowerCase() + str.slice(1);

@@ -8,10 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util"
-import "bootstrap/js/dist/modal"
-
-import "bootstrap-select"
 import { areaLabel as d3AreaLabel } from "d3-area-label"
 import { extent as d3Extent, max as d3Max, min as d3Min } from "d3-array"
 import { axisBottom as d3AxisBottom } from "d3-axis"
@@ -21,7 +17,7 @@ import {
     scaleOrdinal as d3ScaleOrdinal,
     scaleTime as d3ScaleTime,
 } from "d3-scale"
-import { select as d3Select, Selection } from "d3-selection"
+import { Selection } from "d3-selection"
 import {
     Area,
     area as d3Area,
@@ -29,33 +25,58 @@ import {
     stack as d3Stack,
     stackOffsetNone as d3StackOffsetNone,
 } from "d3-shape"
+import textures, { Textures } from "textures"
 
 import { registerEvent } from "../analytics"
-import { BaseModal } from "./base-modal"
-import { NationFullName, nations, NationShortName } from "common/common"
-import { colourList, insertBaseModal, loadJsonFile, showCursorDefault, showCursorWait } from "common/common-browser";
+import {
+    findNationByNationShortName,
+    NationFullName,
+    nations,
+    NationShortName,
+    NationShortNameList,
+} from "common/common"
+import {
+    colourList,
+    getIdFromBaseName,
+    loadJsonFile,
+    primary300,
+    showCursorDefault,
+    showCursorWait,
+} from "common/common-browser"
 
 import { getContrastColour } from "common/common-game-tools"
-import JQuery from "jquery"
-import { Ownership, OwnershipNation } from "common/gen-json"
-import { HtmlString } from "common/interface"
 import { Group } from "timelines-chart"
+import { Ownership, OwnershipNation } from "common/gen-json"
+import { ServerId } from "common/servers"
+import { HtmlString } from "common/interface"
+import Modal from "util/modal"
+import Select from "util/select"
 
 /**
  *
  */
-export default class ShowPortOwnerships extends BaseModal {
-    #serverId!: string
-    private _ownershipData: Ownership[] = {} as Ownership[]
-    // noinspection JSMismatchedCollectionQueryUpdate
-    private _nationData: Array<OwnershipNation<number>> = {} as Array<OwnershipNation<number>>
-    private readonly _colourScale: ScaleOrdinal<string, string>
-    private _mainDiv!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _div!: Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    private _svg!: Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+export default class ShowPortOwnerships {
+    #modal: Modal | undefined = undefined
+    #select = {} as Select
+    #serverId: ServerId
+    #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #div = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+    #textures = {} as NationShortNameList<Textures>
+    readonly #baseId: HtmlString
+    readonly #baseName = "Ownership overview"
 
-    constructor(serverId: string) {
-        super(serverId, "Ownership overview")
+    readonly #menuId: HtmlString
+    private _ownershipData = {} as Ownership[]
+    private _nationData = {} as Array<OwnershipNation<number>>
+
+    private readonly _colourScale: ScaleOrdinal<string, string>
+
+    constructor(serverId: ServerId) {
+        this.#serverId = serverId
+
+        this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
+        this.#menuId = `menu-${this.#baseId}`
 
         this._colourScale = d3ScaleOrdinal<string>().range(colourList)
 
@@ -74,48 +95,80 @@ export default class ShowPortOwnerships extends BaseModal {
      * Get width of baseId
      */
     _getWidth(): number {
-        return Math.floor(this._mainDiv.node()!.offsetWidth) ?? 0
+        return Math.floor(this.#mainDiv.node()!.offsetWidth) ?? 0
     }
 
     async _loadAndSetupData(): Promise<void> {
         showCursorWait()
-        this._nationData = await loadJsonFile<Array<OwnershipNation<number>>>(`${this.serverId}-nation.json`)
-        this._ownershipData = await loadJsonFile<Ownership[]>(`${this.serverId}-ownership.json`)
+        this._nationData = await loadJsonFile<Array<OwnershipNation<number>>>(`${this.#serverId}-nation.json`)
+        this._ownershipData = await loadJsonFile<Ownership[]>(`${this.#serverId}-ownership.json`)
         showCursorDefault()
     }
 
-    /**
-     * Setup listener
-     */
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "xl")
+            this._setupOutput()
+            this._setupTextures()
+            this._setupSelect()
+            this._setupSelectListener()
+            this._injectArea()
+        }
+    }
+
     _setupListener(): void {
-        let firstClick = true
-
-        document.querySelector(`#${this.buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this.baseName)
-
-            this._ownershipListSelected()
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
-    /**
-     * Inject modal
-     */
-    _injectModal(): void {
-        insertBaseModal({ id: this.modalId, title: this.baseName })
+    _setupOutput(): void {
+        this.#mainDiv = this.#modal!.outputSel
+        this.#div = this.#mainDiv.append("div")
+        this.#svg = this.#mainDiv.append("svg").attr("class", "area")
+    }
 
-        const select = `${this.baseId}-select`
-        const body = d3Select(`#${this.modalId} .modal-body`)
+    _setupTextures(): void {
+        const orientation = ["2/8", "4/8", "6/8"]
+        let index = 0
+        for (const { short: nationShortName, colours } of nations) {
+            if (colours.length === 1) {
+                this.#textures[nationShortName] = textures
+                    .lines()
+                    .stroke(colours[0])
+                    .background(colours[0])
+                    .id(`texture-${nationShortName}`)
+            } else if (colours.length === 2) {
+                this.#textures[nationShortName] = textures
+                    .lines()
+                    .orientation(orientation[index])
+                    .size(40)
+                    .strokeWidth(20)
+                    .stroke(colours[0])
+                    .background(colours[1])
+                    .id(`texture-${nationShortName}`)
 
-        body.append("label").append("select").attr("name", select).attr("id", select)
+                index = (index + 1) % orientation.length
+            } else {
+                this.#textures[nationShortName] = textures
+                    .circles()
+                    .radius(5)
+                    .strokeWidth(3)
+                    .stroke(colours[1])
+                    .fill(colours[2])
+                    .background(colours[0])
+                    .id(`texture-${nationShortName}`)
+            }
 
-        this._mainDiv = body.append("div").attr("id", `${this.baseId}`)
-        this._div = this._mainDiv.append("div")
-        this._svg = this._mainDiv.append("svg").attr("class", "area")
+            // @ts-expect-error
+            // eslint-disable-next-line unicorn/prefer-prototype-methods
+            this.#svg.call(this.#textures[nationShortName])
+        }
     }
 
     _getOptions(): HtmlString {
@@ -125,55 +178,15 @@ export default class ShowPortOwnerships extends BaseModal {
     }
 
     _setupSelect(): void {
-        const select$ = $(`#${this.baseId}-select`)
-        const options = this._getOptions()
-        select$.append(options)
+        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select region" }
+
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
     }
 
     _setupSelectListener(): void {
-        const select$ = $(`#${this.baseId}-select`)
-
-        select$
-            .addClass("selectpicker")
-            .on("change", (event) => {
-                this._regionSelected(event)
-            })
-            .selectpicker({ noneSelectedText: "Select region" })
-            .val("default")
-            .selectpicker("refresh")
-    }
-
-    /**
-     * Init modal
-     */
-    _initModal(): void {
-        this._injectModal()
-        this._setupSelect()
-        this._setupSelectListener()
-    }
-
-    /**
-     * Action when menu item is clicked
-     */
-    _ownershipListSelected(): void {
-        let emptyModal = false
-
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this.modalId}`)) {
-            emptyModal = true
-            this._initModal()
-        }
-
-        // Show modal
-        $(`#${this.modalId}`)
-            .on("shown.bs.modal", () => {
-                // Inject chart after modal is shown to calculate modal width
-                if (emptyModal) {
-                    this._injectArea()
-                    emptyModal = false
-                }
-            })
-            .modal("show")
+        this.#select.select$.on("change", () => {
+            this._regionSelected()
+        })
     }
 
     /**
@@ -187,7 +200,7 @@ export default class ShowPortOwnerships extends BaseModal {
         const width = this._getWidth()
         const maxHeight = 1000
         const height = Math.min(maxHeight, ShowPortOwnerships.getHeight())
-        const margin = { right: 32, bottom: 32, left: 32 }
+        const margin = { right: 0, bottom: 32, left: 0 }
 
         const keys = nations.filter((nation) => nation.id !== 9).map((nation) => nation.short)
         const nationData = this._nationData
@@ -255,36 +268,38 @@ export default class ShowPortOwnerships extends BaseModal {
             this._colourScale.domain(keys)
 
             // Paths
-            this._svg
-                .selectAll("path")
+            this.#svg
+                .selectAll("path.nation")
                 .data(stacked)
                 .join((enter) =>
                     enter
                         .append("path")
-                        .attr("fill", (d) => this._colourScale(d.key))
-                        .attr("stroke", (d) => this._colourScale(d.key))
+                        .attr("class", "nation")
+                        .attr("fill", (d) => this.#textures[d.key].url())
+                        .attr("stroke", primary300)
+                        .attr("stroke-width", "3px")
                         // @ts-expect-error
                         .attr("d", area)
                 )
 
             // Labels
-            this._svg
+            this.#svg
                 .selectAll(".area-label")
                 .data(stacked)
                 .join((enter) =>
                     // @ts-expect-error
                     enter
                         .append("text")
-                        .attr("class", "area-label")
+                        .attr("class", "area-label text-shadow")
                         .text((d) => labelNames.get(d.key))
-                        .attr("fill", (d) => getContrastColour(this._colourScale(d.key)))
+                        .attr("fill", (d) => getContrastColour(findNationByNationShortName(d.key)?.colours[0] ?? ""))
                         .attr("transform", d3AreaLabel(area))
                 )
         }
 
-        this._svg.attr("width", width).attr("height", height)
+        this.#svg.attr("width", width).attr("height", height)
         render()
-        this._svg.append("g").call(setXAxis)
+        this.#svg.append("g").call(setXAxis)
     }
 
     /**
@@ -300,18 +315,17 @@ export default class ShowPortOwnerships extends BaseModal {
             .timeFormat("%-d %B %Y")
             .zQualitative(true)
             .zColorScale(this._colourScale as ScaleOrdinal<string | number, string>)
-            .width(this._getWidth())(this._div.node()!)
+            .width(this._getWidth())(this.#div.node()!)
     }
 
     /**
      * Show data for selected region
-     * @param event - Event
      */
-    _regionSelected(event: JQuery.ChangeEvent): void {
-        const regionSelected = $(event.currentTarget).find(":selected").val()
+    _regionSelected(): void {
+        const regionSelected = String(this.#select.getValues())
 
         // Remove current display
-        this._div.selectAll("*").remove()
+        this.#div.selectAll("*").remove()
 
         const regionData = this._ownershipData
             .filter((region) => region.region === regionSelected)

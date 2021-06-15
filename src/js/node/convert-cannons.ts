@@ -13,13 +13,15 @@ import path from "path"
 
 import convert, { ElementCompact } from "xml-js"
 
-import { commonPaths } from "../common/common-dir"
+import { getCommonPaths } from "../common/common-dir"
 import { readTextFile, saveJsonAsync } from "../common/common-file"
 import { round } from "../common/common-math"
 
 import { cannonEntityType, CannonEntityType, CannonType, cannonType, peneDistance } from "../common/common"
 import { Cannon, CannonEntity, CannonPenetration, CannonValue } from "../common/gen-json"
 import { PairEntity, TangentEntity, TextEntity, XmlGeneric } from "./xml"
+
+const commonPaths = getCommonPaths()
 
 const countDecimals = (value: number | undefined): number => {
     if (value === undefined) {
@@ -189,11 +191,10 @@ const addData = (fileData: XmlGeneric): void => {
 
     // Calculate penetrations
     const penetrations: Map<number, number> = new Map(
-        (fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
-            .Value as TangentEntity[]).map((penetration) => [
-            Number(penetration.Time._text) * 1000,
-            Number(penetration.Value._text),
-        ])
+        (
+            fileData.Attributes.Pair.find((pair: PairEntity) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")
+                ?.Value.Value as TangentEntity[]
+        ).map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)])
     )
 
     penetrations.set(50, ((penetrations.get(0) ?? 0) + (penetrations.get(100) ?? 0)) / 2)
@@ -219,8 +220,11 @@ const addData = (fileData: XmlGeneric): void => {
 
     cannon.name = getName()
     cannon.family = getFamily(cannon.name)
-
-    if (cannon.family !== "unicorn") {
+    if (
+        cannon.family !== "unicorn" &&
+        !(cannon.family === "defense" && cannon.name === "24 (Fort)") &&
+        !(cannon.family === "defense" && cannon.name === "24 (Tower)")
+    ) {
         cannons[getType()].push(cannon)
     }
 }

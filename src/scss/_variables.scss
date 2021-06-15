@@ -2,149 +2,93 @@
 /// This file is part of na-map.
 /// Bootstrap variables.
 ///
-/// copyright 2017, 2018, 2019, 2020
-/// license   http://www.gnu.org/licenses/gpl.html
-/// @group    main
+/// @group    scss
 /// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
 ////
 
-// Options
-$enable-rounded: false;
-// $enable-shadows:                              false !default;
-// $enable-gradients:                            false !default;
-// $enable-transitions:                          true !default;
-$enable-prefers-reduced-motion-media-query: false;
-// $enable-hover-media-query:                    false !default; // Deprecated, no longer affects any compiled CSS
-// $enable-grid-classes:                         true !default;
-// $enable-caret:                                true !default;
-// $enable-pointer-cursor-for-buttons:           true !default;
-$enable-print-styles: false;
-// $enable-responsive-font-sizes:                false !default;
-$enable-validation-icons: false;
-$enable-deprecation-messages: false;
+//$enable-caret: true !default;
+//$enable-rounded: true !default;
+$enable-shadows: true;
+//$enable-gradients: false !default;
+//$enable-transitions: true !default;
+//$enable-reduced-motion: true !default;
+//$enable-smooth-scroll: true !default;
+//$enable-grid-classes: true !default;
+//$enable-button-pointers: true !default;
+//$enable-rfs: true !default;
+//$enable-validation-icons: true !default;
+$enable-negative-margins: true;
+//$enable-deprecation-messages: true !default;
+//$enable-important-utilities: true !default;
+
+$min-contrast-ratio: 3;
+
+$body-bg: $paper-200;
+$body-color: $primary-800;
+$body-text-align: left;
+$border-color: $primary-300;
+$text-muted: $paper-700;
 
 // Spacing
 $spacer: 1rem;
 $spacers: (
     0: 0,
-    1: (
-        $spacer * 0.382
-    ),
-    2: (
-        $spacer * 0.618
-    ),
+    1: $spacer * 0.382,
+    2: $spacer * 0.618,
     3: $spacer,
-    4: (
-        $spacer * 1.618
-    ),
-    5: (
-        $spacer * 2.618
-    )
+    4: $spacer * 1.618,
+    5: $spacer * 2.618,
 );
 
-// Body
-$body-bg: $primary-050;
-//$body-color: $secondary-900;
-$body-color: $gray-900;
-//$yiq-text-dark: $body-color;
-//$yiq-text-light: $white;
-$yiq-contrasted-threshold: 127;
-
-$border-color: $primary-300;
-$text-muted: $primary-700;
-
-// Navbar
-//$navbar-light-color:                $secondary-700; // rgba($black, .5) !default;
-//$navbar-light-hover-color:          $secondary-800; // rgba($black, .7) !default;
-//$navbar-light-active-color:         $secondary-900; // rgba($black, .9) !default;
-//$navbar-light-disabled-color:       $secondary-700; // rgba($black, .3) !default;
-
-// Links
-$link-color: $secondary-400;
-$link-hover-color: $secondary-500;
-
-// Grid columns
-//$grid-columns: 12 !default;
-$grid-gutter-width: $spacer * 2;
-
-//$input-color: $body-color;
-//$input-group-addon-bg: $primary-100;
-//$input-border-color: $primary-400;
-//$input-border-radius: 0;
-
-// Fonts
+// Font
 $font-size-base: 1.2rem;
 $font-size-lg: map-get($spacers, 4);
 $font-size-sm: map-get($spacers, 2) * 1.2;
 
-$line-height-base: map-get($spacers, 4) / $font-size-base;
-
-$h6-font-size: $font-size-base;
-$h5-font-size: $h6-font-size + $font-size-base / $font-size-lg / 2;
-$h4-font-size: $font-size-lg;
-$h3-font-size: $h4-font-size + $h6-font-size / 2;
-$h2-font-size: $h3-font-size + $h5-font-size / 2;
-$h1-font-size: $h2-font-size + $h4-font-size / 2;
-
-$lead-font-size: $font-size-lg;
-
-// Tables
-$table-hover-bg: $primary-100;
-$table-border-color: $primary-050;
-
-// Forms
-$input-focus-border-color: $primary-200;
-$input-focus-box-shadow: $primary-200;
-
-// Toast
-$toast-font-size: $font-size-base;
-$toast-border-width: 0;
-$toast-border-radius: 0;
-
 // Tooltip
-$tooltip-max-width: 40em;
+$tooltip-font-size: smaller;
+$tooltip-max-width: 50rem;
 $tooltip-color: $body-color;
-$tooltip-bg: $primary-100;
+$tooltip-bg: $paper-200;
 $tooltip-opacity: 1;
 $tooltip-padding-y: 1rem;
 $tooltip-padding-x: 1rem;
-//$tooltip-margin:              0 !default;
 
 $tooltip-arrow-width: 0;
 $tooltip-arrow-height: 0;
 
-// Dropdown
-$dropdown-link-hover-bg: $primary-100;
+// Toast
+$toast-font-size: $font-size-base;
 
-// Pagination
-$pagination-color: $body-color;
-$pagination-bg: $secondary-100;
-$pagination-border-color: $pagination-bg;
+$dropdown-header-color: $secondary-600;
+$dropdown-header-padding: 1rem 1rem;
+$table-bg-scale: -85%; // -80% !default;
 
-$pagination-hover-color: $body-bg;
-$pagination-hover-bg: $secondary-300;
-$pagination-hover-border-color: $pagination-hover-bg;
+$navbar-light-color: rgba($primary-800, 0.75);
+$navbar-light-hover-color: rgba($primary-800, 0.8);
+$navbar-light-active-color: rgba($primary-800, 1);
+$navbar-light-disabled-color: rgba($primary-800, 0.4);
+$navbar-light-toggler-border-color: rgba($primary-800, 0.2);
 
-$pagination-active-color: $pagination-hover-color;
-$pagination-active-bg: $pagination-hover-bg;
-$pagination-active-border-color: $pagination-active-bg;
-
-$pagination-disabled-color: $gray-500;
-$pagination-disabled-bg: $pagination-bg;
-$pagination-disabled-border-color: $pagination-bg;
+$card-border-width: 0;
+$modal-header-border-width: 0;
+$modal-footer-border-width: 0;
+$table-border-width: 0;
+$table-cell-padding-x: 0;
+$table-cell-padding-x-sm: 0;
 
 // Badges
-$badge-font-size: 65%;
+$badge-font-size: smaller;
 $badge-font-weight: 400;
-$badge-padding-y: 0;
-$badge-padding-x: map-get($spacers, 1)/1.618;
-//$badge-border-radius:               $border-radius !default;
-//$badge-pill-padding-x:              .6em !default;
-// Use a higher than normal value to ensure completely rounded edges when
-// customizing padding or font-size on labels.
-//$badge-pill-border-radius:          10rem !default;
+$badge-padding-y: 0.05rem;
+$badge-padding-x: 0.3rem;
 
-// Cards
-$card-border-width: 0;
-$card-border-radius: 0;
-$card-bg: $primary-050;
+// https://shadows.brumm.af/
+$box-shadow: 0 2.6px 2.7px rgba($black, 0.022), 0 6.6px 6.9px rgba($black, 0.031), 0 13.5px 14.2px rgba($black, 0.039),
+    0 27.7px 29.2px rgba($black, 0.048), 0 76px 80px rgba($black, 0.07);
+$box-shadow-sm: 0 1.6px 3.6px rgba($black, 0.024), 0 4.5px 10px rgba($black, 0.035), 0 10.9px 24.1px rgba($black, 0.046),
+    0 36px 80px rgba($black, 0.07);
+$box-shadow-lg: 0 2.8px 2.2px rgba($black, 0.02), 0 6.7px 5.3px rgba($black, 0.028), 0 12.5px 10px rgba($black, 0.035),
+    0 22.3px 17.9px rgba($black, 0.042), 0 41.8px 33.4px rgba($black, 0.05), 0 100px 80px rgba($black, 0.07);

@@ -8,8 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util"
-import "bootstrap/js/dist/tooltip"
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
@@ -17,7 +16,8 @@ import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import htm from "htm"
-import { h, render } from "preact"
+import { h, VNode } from "preact"
+import render from "preact-render-to-string"
 // import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import dayjs from "dayjs"
@@ -25,19 +25,29 @@ import "dayjs/locale/en-gb"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import utc from "dayjs/plugin/utc.js"
+dayjs.extend(customParseFormat)
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
+dayjs.locale("en-gb")
 
-import { capitalizeFirstLetter, nations, NationShortName } from "common/common"
+import {
+    capitalizeFirstLetter,
+    findNationByNationShortName,
+    nations,
+    NationShortName,
+    simpleStringSort,
+} from "common/common"
 import {
     colourGreenDark,
     colourLight,
     colourList,
     colourRedDark,
-    getIcons,
     loadJsonFile,
     loadJsonFiles,
+    nationFlags,
     primary300,
 } from "common/common-browser"
-import { formatInt, formatPercent, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
+import { formatInt, formatPercentHtml, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
 import {
     Coordinate,
     defaultCircleSize,
@@ -51,21 +61,21 @@ import {
     roundToThousands,
     ϕ,
 } from "common/common-math"
-import { simpleStringSort } from "common/common-node"
 import { displayClanLitHtml } from "common/common-game-tools"
+import { serverMaintenanceHour } from "common/common-var"
 
-import JQuery from "jquery"
 import {
     PortBattlePerServer,
     PortBasic,
     PortPerServer,
     PortWithTrades,
-    NationListAlternative,
     TradeItem,
     TradeGoodProfit,
+    GoodList,
 } from "common/gen-json"
 import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
+import { Area, countyPolygon, patrolZones, regionPolygon } from "./map-data"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
@@ -73,20 +83,18 @@ import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "./na-map"
 import ShowF11 from "./show-f11"
 
-dayjs.extend(customParseFormat)
-dayjs.extend(relativeTime)
-dayjs.extend(utc)
-dayjs.locale("en-gb")
-
 const html = htm.bind(h)
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
 
-interface Area {
-    name: string
-    centroid: Point
-    angle: number
+interface CurrentPort {
+    id: number
+    coord: Coordinate
+}
+interface Profit {
+    profit: HtmlResult[]
+    profitPerTon: HtmlResult[]
 }
 
 interface PortForDisplay {
@@ -107,7 +115,7 @@ interface PortForDisplay {
     brLimit: string
     portPoints: string
     taxIncome: HtmlResult
-    portTax: string
+    portTax: HtmlResult
     netIncome: HtmlResult
     tradingCompany: number
     laborHoursDiscount: number
@@ -117,8 +125,8 @@ interface PortForDisplay {
     dropsNonTrading: string
     tradePort: string
     tradePortId?: number
-    goodsToSellInTradePort: HtmlResult[]
-    goodsToBuyInTradePort: HtmlResult[]
+    goodsToSellInTradePort: Profit
+    goodsToBuyInTradePort: Profit
     portBonus?: PortBonus
 }
 
@@ -129,38 +137,25 @@ interface ReadData {
     pb: PortBattlePerServer[]
 }
 
-interface PatrolZone {
-    name: string
-    coordinates: Point
-    radius: number
-    shallow: boolean
-    shipClass?: MinMax<number>
-}
-
-interface MinMax<amount> {
-    min: amount
-    max: amount
-}
-
 export default class DisplayPorts {
-    circleType = ""
-    currentPort!: { id: number; coord: Coordinate }
-    portData!: PortWithTrades[]
-    portDataDefault!: PortWithTrades[]
-    showCurrentGood: boolean
-    showRadius: string
-    showTradePortPartners: boolean
-    tradeItem!: Map<number, TradeItem>
-    tradePortId!: number
-    zoomLevel: ZoomLevel = "initial"
+    #circleType = ""
+    #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
+    #portData = {} as PortWithTrades[]
+    #portDataDefault!: PortWithTrades[]
+    #showCurrentGood = false
+    #showRadius = ""
+    #showTradePortPartners = false
+    #tradeItem = {} as Map<number, TradeItem>
+    #tradePortId = 0
+    #zoomLevel: ZoomLevel = "initial"
     #attackRadius!: ScaleLinear<number, number>
     #colourScaleCounty!: ScaleOrdinal<string, string>
     #colourScaleHostility!: ScaleLinear<string, string>
     #colourScaleNet!: ScaleLinear<string, string>
     #colourScalePoints!: ScaleLinear<string, string>
     #colourScaleTax!: ScaleLinear<string, string>
-    #countyPolygon!: Area[]
-    #countyPolygonFiltered!: Area[]
+    #countyPolygon = countyPolygon
+    #countyPolygonFiltered = [] as Area[]
     #divPortSummary!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #gCounty!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gIcon!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
@@ -176,7 +171,6 @@ export default class DisplayPorts {
     #minNetIncome!: number
     #minPortPoints!: number
     #minTaxIncome!: number
-    #nationIcons!: NationListAlternative<string>
     #portDataFiltered!: PortWithTrades[]
     #portRadius!: ScaleLinear<number, number>
     #portSummaryNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
@@ -185,9 +179,10 @@ export default class DisplayPorts {
     #portSummaryTextNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #portSummaryTextNumPorts!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #portSummaryTextTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #regionPolygon!: Area[]
-    #regionPolygonFiltered!: Area[]
+    #regionPolygon = regionPolygon
+    #regionPolygonFiltered = [] as Area[]
     #scale = 0
+    #tooltip: BSTooltip | undefined = undefined
     #upperBound = {} as Point
     readonly #baseId = "show-radius"
     readonly #circleSize = defaultCircleSize
@@ -208,12 +203,6 @@ export default class DisplayPorts {
         this.#minScale = this.map.minMapScale
         this.#scale = this.#minScale
         this.#f11 = this.map.f11
-
-        this.showCurrentGood = false
-        this.showTradePortPartners = false
-
-        // Shroud Cay
-        this.currentPort = { id: 366, coord: { x: 4396, y: 2494 } }
 
         /**
          * Possible values for show radius (first is default value)
@@ -236,30 +225,25 @@ export default class DisplayPorts {
         this.showRadius = this._getShowRadiusSetting()
     }
 
-    static _hideDetails(this: JQuery.PlainObject): void {
-        $(this).tooltip("dispose")
-    }
-
     async init(): Promise<void> {
         await this._loadAndSetupData()
     }
 
     _setupData(data: ReadData): void {
         // Combine port data with port battle data
-        this.portDataDefault = data.ports.map((port: PortBasic) => {
+        this.#portDataDefault = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
             const pbData = data.pb.find((d: PortBattlePerServer) => d.id === port.id) ?? ({} as PortBattlePerServer)
             const combinedData = { ...port, ...serverData, ...pbData } as PortWithTrades
 
             return combinedData
         })
-        this.portData = this.portDataDefault
+        this.#portData = this.#portDataDefault
 
         this._setupScales()
         this._setupListener()
         this._setupSvg()
         this._setupCounties()
-        this._setupRegions()
         this._setupPatrolZones()
         this._setupSummary()
         this._setupFlags()
@@ -281,7 +265,7 @@ export default class DisplayPorts {
         this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
 
         const readData = {} as ReadData
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<PortJsonData>(dataSources, readData)
 
@@ -360,117 +344,27 @@ export default class DisplayPorts {
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
-        this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("class", "region")
-        this.#gCounty = this.#gPort.append<SVGGElement>("g").attr("class", "county")
+        this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "region").attr("class", "title")
+        this.#gCounty = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "county")
+            .attr("class", "sub-title")
         this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
-        this.#gIcon = this.#gPort.append<SVGGElement>("g").attr("class", "port")
-        this.#gText = this.#gPort.append<SVGGElement>("g").attr("class", "port-names")
-        this.#gPZ = this.#gPort.append<SVGGElement>("g").attr("class", "pz")
+        this.#gIcon = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "port-icons")
+            .attr("class", "click-circle")
+        this.#gText = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "port-names")
+            .attr("class", "fill-white")
+        this.#gPZ = this.#gPort
+            .append<SVGGElement>("g")
+            .attr("data-ui-component", "patrol-zone")
+            .attr("class", "fill-yellow-dark")
     }
 
     _setupCounties(): void {
-        /*
-        // Automatic calculation of text position
-        // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const counties = this._portDataDefault
-            .filter(port => port.county !== "")
-            .reduce(
-                (r, a) =>
-                    Object.assign(r, {
-                        [a.county]: (r[a.county] || []).concat([a.coordinates])
-                    }),
-                {}
-            );
-        this._countyPolygon = [];
-        Object.entries(counties).forEach(([key, value]) => {
-            this._countyPolygon.push({
-                name: key,
-                polygon: d3PolygonHull(value),
-                centroid: d3PolygonCentroid(d3PolygonHull(value)),
-                angle: 0
-            });
-        });
-         */
-
-        // noinspection SpellCheckingInspection
-        this.#countyPolygon = [
-            { name: "Abaco", centroid: [4500, 1953], angle: 0 },
-            { name: "Andros", centroid: [3870, 2350], angle: 0 },
-            { name: "Apalache", centroid: [2800, 1330], angle: 0 },
-            { name: "Bacalar", centroid: [2050, 3646], angle: 0 },
-            { name: "Baracoa", centroid: [4750, 3320], angle: 25 },
-            { name: "Basse-Terre", centroid: [7540, 4450], angle: 0 },
-            { name: "Belize", centroid: [1900, 4300], angle: 0 },
-            { name: "Benedenwinds", centroid: [6187, 5340], angle: 0 },
-            { name: "Bermuda", centroid: [7550, 210], angle: 0 },
-            { name: "Bovenwinds", centroid: [7280, 4180], angle: 350 },
-            { name: "Campeche", centroid: [980, 3791], angle: 0 },
-            { name: "Cap-Français", centroid: [5270, 3480], angle: 0 },
-            { name: "Caracas", centroid: [6430, 5750], angle: 0 },
-            { name: "Cartagena", centroid: [4450, 6024], angle: 0 },
-            { name: "Caymans", centroid: [3116, 3811], angle: 0 },
-            { name: "Cayos del Golfo", centroid: [1240, 3120], angle: 0 },
-            { name: "Comayaqua", centroid: [1920, 4500], angle: 0 },
-            { name: "Cornwall", centroid: [4100, 3845], angle: 0 },
-            { name: "Costa de los Calos", centroid: [2850, 1928], angle: 0 },
-            { name: "Costa del Fuego", centroid: [3700, 1670], angle: 70 },
-            { name: "Costa Rica", centroid: [3140, 5920], angle: 0 },
-            { name: "Crooked", centroid: [4925, 2950], angle: 0 },
-            { name: "Ciudad de Cuba", centroid: [4500, 3495], angle: 0 },
-            { name: "Cumaná", centroid: [7280, 5770], angle: 0 },
-            { name: "Dominica", centroid: [7640, 4602], angle: 0 },
-            { name: "Exuma", centroid: [4700, 2560], angle: 0 },
-            { name: "Filipina", centroid: [2850, 3100], angle: 340 },
-            { name: "Florida Occidental", centroid: [2172, 1200], angle: 0 },
-            { name: "Georgia", centroid: [3670, 747], angle: 0 },
-            { name: "Golfo de Maracaibo", centroid: [5635, 5601], angle: 0 },
-            { name: "Grand Bahama", centroid: [3950, 1850], angle: 320 },
-            { name: "Grande-Terre", centroid: [8000, 4400], angle: 35 },
-            { name: "Gustavia", centroid: [7720, 3990], angle: 0 },
-            { name: "Inagua", centroid: [4970, 3220], angle: 0 },
-            { name: "Isla de Pinos", centroid: [3150, 3300], angle: 0 },
-            { name: "Kidd’s Island", centroid: [5950, 1120], angle: 0 },
-            { name: "La Habana", centroid: [2850, 2800], angle: 340 },
-            { name: "La Vega", centroid: [5830, 3530], angle: 20 },
-            { name: "Lago de Maracaibo", centroid: [5550, 6040], angle: 0 },
-            { name: "Leeward Islands", centroid: [7850, 4150], angle: 0 },
-            { name: "Les Cayes", centroid: [5145, 4050], angle: 0 },
-            { name: "Los Llanos", centroid: [3640, 2770], angle: 30 },
-            { name: "Los Martires", centroid: [3300, 2360], angle: 0 },
-            { name: "Louisiane", centroid: [1420, 1480], angle: 0 },
-            { name: "Margarita", centroid: [7150, 5584], angle: 0 },
-            { name: "Martinique", centroid: [7700, 4783], angle: 0 },
-            { name: "Mérida", centroid: [1858, 3140], angle: 0 },
-            { name: "New Providence", centroid: [4500, 2330], angle: 0 },
-            { name: "North Carolina", centroid: [4580, 150], angle: 0 },
-            { name: "North Mosquito", centroid: [2420, 4480], angle: 0 },
-            { name: "Nuevitas del Principe", centroid: [4350, 3050], angle: 35 },
-            { name: "Nuevo Santander", centroid: [450, 2594], angle: 0 },
-            { name: "Orinoco", centroid: [7620, 6000], angle: 0 },
-            { name: "Ponce", centroid: [6720, 4040], angle: 0 },
-            { name: "Port-au-Prince", centroid: [5000, 3800], angle: 0 },
-            { name: "Portobelo", centroid: [3825, 5990], angle: 0 },
-            { name: "Providencia", centroid: [3436, 5033], angle: 0 },
-            { name: "Quatro Villas", centroid: [3780, 3100], angle: 35 },
-            { name: "Royal Mosquito", centroid: [3130, 4840], angle: 0 },
-            { name: "Sainte-Lucie", centroid: [7720, 4959], angle: 0 },
-            { name: "San Juan", centroid: [6760, 3800], angle: 0 },
-            { name: "Santa Marta", centroid: [5150, 5500], angle: 340 },
-            { name: "Santo Domingo", centroid: [5880, 4000], angle: 350 },
-            { name: "South Carolina", centroid: [4200, 416], angle: 0 },
-            { name: "South Cays", centroid: [4170, 4361], angle: 0 },
-            { name: "South Mosquito", centroid: [3080, 5540], angle: 0 },
-            { name: "Surrey", centroid: [4350, 4100], angle: 0 },
-            { name: "Texas", centroid: [750, 1454], angle: 0 },
-            { name: "Timucua", centroid: [3620, 1220], angle: 0 },
-            { name: "Trinidad", centroid: [7880, 5660], angle: 350 },
-            { name: "Turks and Caicos", centroid: [5515, 3145], angle: 0 },
-            { name: "Vera Cruz", centroid: [520, 3779], angle: 0 },
-            { name: "Vestindiske Øer", centroid: [7090, 4030], angle: 350 },
-            { name: "Virgin Islands", centroid: [7220, 3840], angle: 350 },
-            { name: "Windward Isles", centroid: [7800, 5244], angle: 0 },
-        ] as Area[]
-
         // Sort by distance, origin is top left corner
         const origin = { x: this.map.coord.max / 2, y: this.map.coord.max / 2 }
         this.#countyPolygon = this.#countyPolygon.sort((a, b) => {
@@ -482,69 +376,18 @@ export default class DisplayPorts {
         this.#colourScaleCounty.domain(this.#countyPolygon.map((county) => county.name))
     }
 
-    _setupRegions(): void {
-        /*
-        ** Automatic calculation of text position
-        // https://stackoverflow.com/questions/40774697/how-to-group-an-array-of-objects-by-key
-        const regions = this._portDataDefault.filter(port => port.region !== "").reduce(
-            (r, a) =>
-                Object.assign(r, {
-                    [a.region]: (r[a.region] || []).concat([a.coordinates])
-                }),
-            {}
-        );
-        this._regionPolygon = [];
-        Object.entries(regions).forEach(([key, value]) => {
-            this._regionPolygon.push({
-                name: key,
-                // polygon: d3.polygonHull(value),
-                centroid: d3.polygonCentroid(d3.polygonHull(value))
-            });
-        });
-        */
-
-        this.#regionPolygon = [
-            { name: "Atlantic Coast", centroid: [4200, 970], angle: 0 },
-            { name: "Atlantic", centroid: [6401, 684], angle: 0 },
-            { name: "Bahamas", centroid: [5100, 2400], angle: 0 },
-            { name: "Central America", centroid: [3000, 5100], angle: 0 },
-            { name: "Central Antilles", centroid: [6900, 4500], angle: 0 },
-            { name: "East Cuba", centroid: [4454, 3400], angle: 20 },
-            { name: "Gulf", centroid: [1602, 2328], angle: 0 },
-            { name: "Hispaniola", centroid: [5477, 4200], angle: 0 },
-            { name: "Jamaica", centroid: [3500, 3985], angle: 0 },
-            { name: "Lower Antilles", centroid: [7100, 5173], angle: 0 },
-            { name: "Puerto Rico", centroid: [6900, 3750], angle: 0 },
-            { name: "South America", centroid: [6400, 6100], angle: 0 },
-            { name: "Upper Antilles", centroid: [6850, 4250], angle: 0 },
-            { name: "West Cuba", centroid: [3700, 3000], angle: 20 },
-            { name: "Yucatan", centroid: [1462, 3550], angle: 0 },
-        ] as Area[]
-    }
-
     _setupPatrolZones(): void {
-        const patrolZones = [
-            { name: "Hispaniola", coordinates: [4900, 3635], radius: 150, shallow: false },
-            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true },
-            { name: "Tumbado", coordinates: [2400, 3050], radius: 150, shallow: false },
-            { name: "Léogane", coordinates: [5130, 3770], radius: 90, shallow: false, shipClass: { min: 7, max: 4 } },
-            { name: "Tortuga", coordinates: [5435, 3420], radius: 100, shallow: false, shipClass: { min: 7, max: 5 } },
-            { name: "Antilles", coordinates: [7555, 4470], radius: 140, shallow: false },
-            { name: "Nassau", coordinates: [4360, 2350], radius: 108, shallow: true },
-            { name: "La Mona", coordinates: [6180, 4100], radius: 170, shallow: false, shipClass: { min: 7, max: 4 } },
-        ] as PatrolZone[]
-
-        const start = dayjs.utc("2021-01-17").hour(10)
+        const start = dayjs.utc("2021-01-17").hour(serverMaintenanceHour)
         const index = dayjs.utc().diff(start, "day") % patrolZones.length
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
         const { radius, name, shallow, shipClass } = patrolZones[index]
         const swordSize = radius * 1.6
         const [x, y] = patrolZones[index].coordinates
-        const dyFactor = 1.2
+        const dyFactor = 1.3
         const dy = Math.round(radius / dyFactor)
         const fontSize = Math.round((this.#fontSize * radius) / 100)
 
-        this.#gPZ.append("circle").attr("cx", x).attr("cy", y).attr("r", radius).attr("opacity", 0.7)
+        this.#gPZ.append("circle").attr("class", "background-yellow").attr("cx", x).attr("cy", y).attr("r", radius)
         this.#gPZ
             .append("image")
             .attr("height", swordSize)
@@ -556,13 +399,19 @@ export default class DisplayPorts {
             .attr("alt", "Patrol zone")
         this.#gPZ
             .append("text")
-            .text(name)
+            .attr("class", "svg-text-center")
             .attr("x", x)
             .attr("y", y)
             .attr("dy", dy)
             .attr("font-size", Math.round(fontSize * 1.6))
+            .text(name)
         this.#gPZ
             .append("text")
+            .attr("class", "svg-text-center")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("dy", dy - fontSize * 1.6)
+            .attr("font-size", fontSize)
             .html(
                 shallow
                     ? "Shallow water ships"
@@ -570,10 +419,6 @@ export default class DisplayPorts {
                           shipClass ? `${getOrdinalSVG(shipClass.min)} to ${getOrdinalSVG(shipClass.max)} rate` : "All"
                       } ships`
             )
-            .attr("x", x)
-            .attr("y", y)
-            .attr("dy", dy - fontSize * 1.6)
-            .attr("font-size", fontSize)
     }
 
     _setupSummary(): void {
@@ -581,27 +426,26 @@ export default class DisplayPorts {
         this.#divPortSummary = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
             .append<HTMLDivElement>("div")
             .attr("id", "port-summary")
-            .attr("class", "port-summary port-summary-no-wind")
+            .attr("class", "port-summary shadow port-summary-no-wind")
 
         // Number of selected ports
         this.#portSummaryNumPorts = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextNumPorts = this.#portSummaryNumPorts.append<HTMLDivElement>("div")
-        this.#portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "summary-des").html("selected<br>ports")
+        this.#portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "overlay-des").html("selected<br>ports")
 
         // Total tax income
         this.#portSummaryTaxIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextTaxIncome = this.#portSummaryTaxIncome.append<HTMLDivElement>("div")
-        this.#portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("tax<br>income")
+        this.#portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("tax<br>income")
 
         // Total net income
         this.#portSummaryNetIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextNetIncome = this.#portSummaryNetIncome.append<HTMLDivElement>("div")
-        this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "summary-des").html("net<br>income")
+        this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("net<br>income")
     }
 
     _setupFlags(): void {
-        this.#nationIcons = getIcons()
-
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getPattern = (id: string): SVGPatternElement => {
             const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern")
             pattern.id = id
@@ -612,24 +456,39 @@ export default class DisplayPorts {
             return pattern
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getImage = (nation: NationShortName): SVGImageElement => {
             const image = document.createElementNS("http://www.w3.org/2000/svg", "image")
             image.setAttribute("width", String(this.#iconSize))
             image.setAttribute("height", String(this.#iconSize))
-            image.setAttribute("href", this.#nationIcons[nation].replace('"', "").replace('"', ""))
+            image.setAttribute("href", nationFlags[nation].replace('"', "").replace('"', ""))
 
             return image
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getCircleCapital = (): SVGCircleElement => {
             const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
             circleCapital.setAttribute("cx", String(this.#iconSize / 2))
             circleCapital.setAttribute("cy", String(this.#iconSize / 2))
             circleCapital.setAttribute("r", "16")
+            circleCapital.setAttribute("class", "circle-highlight-yellow")
 
             return circleCapital
         }
 
+        // eslint-disable-next-line unicorn/consistent-function-scoping
+        const getCircleRegionCapital = (): SVGCircleElement => {
+            const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+            circleCapital.setAttribute("cx", String(this.#iconSize / 2))
+            circleCapital.setAttribute("cy", String(this.#iconSize / 2))
+            circleCapital.setAttribute("r", "16")
+            circleCapital.setAttribute("class", "circle-highlight")
+
+            return circleCapital
+        }
+
+        // eslint-disable-next-line unicorn/consistent-function-scoping
         const getRectAvail = (): SVGRectElement => {
             const rectAvail = document.createElementNS("http://www.w3.org/2000/svg", "rect")
             rectAvail.setAttribute("height", "480")
@@ -649,35 +508,70 @@ export default class DisplayPorts {
             const patternNode = svgDefNode.appendChild(patternElement)
 
             if (nation !== "FT") {
+                const patternRegionCapital = patternNode.cloneNode(true) as SVGPatternElement
+                patternRegionCapital.id = `${nation}r`
+                patternRegionCapital.append(getCircleRegionCapital())
+                svgDefNode.append(patternRegionCapital)
+            }
+
+            if (nation !== "NT" && nation !== "FT") {
                 const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
                 patternCapital.id = `${nation}c`
                 patternCapital.append(getCircleCapital())
                 svgDefNode.append(patternCapital)
-            }
 
-            if (nation !== "NT" && nation !== "FT") {
                 const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
                 patternAvail.id = `${nation}a`
                 patternAvail.append(getRectAvail())
                 svgDefNode.append(patternAvail)
 
-                const patternCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
-                patternCapitalAvail.id = `${nation}ca`
-                patternCapitalAvail.append(getCircleCapital())
-                svgDefNode.append(patternCapitalAvail)
+                const patternRegionCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
+                patternRegionCapitalAvail.id = `${nation}ra`
+                patternRegionCapitalAvail.append(getCircleRegionCapital())
+                svgDefNode.append(patternRegionCapitalAvail)
             }
         }
     }
 
     _getPortName(id: number): string {
-        return id ? this.portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
+        return id ? this.#portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
     }
+
+    _formatItems = (items: GoodList | undefined): string =>
+        items
+            ?.map((item) => this.tradeItem.get(item)?.name ?? "")
+            .sort(simpleStringSort)
+            .join(", ") ?? ""
+
+    _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
+
+    _sortByProfitPerTon = (a: TradeGoodProfit, b: TradeGoodProfit): number =>
+        b.profit.profitPerTon - a.profit.profitPerTon
+
+    _formatProfits = (profits: TradeGoodProfit[]): HtmlResult =>
+        html`${profits
+            ?.sort(this._sortByProfit)
+            ?.map(
+                (good, index) =>
+                    html`<span style="white-space: nowrap;">${good.name} (${formatSiIntHtml(good.profit.profit)})</span
+                        >${index === profits.length - 1 ? html`` : html`, `}`
+            )}`
+
+    _formatProfitsPerTon = (profits: TradeGoodProfit[]): HtmlResult =>
+        html`${profits
+            ?.sort(this._sortByProfitPerTon)
+            ?.map(
+                (good, index) =>
+                    html`<span style="white-space: nowrap;"
+                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)})</span
+                        >${index === profits.length - 1 ? html`` : html`, `}`
+            )}`
 
     // eslint-disable-next-line complexity
     _getText(portProperties: PortWithTrades): PortForDisplay {
         /*
         const getCoord = (portId: number): Coordinate => {
-            const port = this.portDataDefault.find((port) => port.id === portId)!
+            const port = this.#portDataDefault.find((port) => port.id === portId)!
             return { x: port.coordinates[0], y: port.coordinates[1] }
         }
 
@@ -688,9 +582,8 @@ export default class DisplayPorts {
         }
         */
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const formatFromToTime = (from: number, to: number): HtmlString =>
-            `${String(from)}\u2009\u2012\u2009${String(to)}`
+        const formatFromToTime = (from: number, to: number): HtmlResult =>
+            html`<span style="white-space: nowrap;">${String(from)} ‒ ${String(to)}</span>`
 
         const formatTime = (from: number, to: number): HtmlResult => {
             const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
@@ -698,8 +591,6 @@ export default class DisplayPorts {
             return html`${formatFromToTime(from, to)} (${formatFromToTime(fromLocal, toLocal)})`
         }
 
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
         const portBattleST = dayjs.utc(portProperties.portBattle)
         const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
@@ -712,10 +603,14 @@ export default class DisplayPorts {
             : formatTime(11, 8)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
         const attackHostility = portProperties.portBattle
-            ? html`${displayClanLitHtml(portProperties.attackerClan)} (${portProperties.attackerNation})
-              attack${portProperties.portBattle
-                  ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-                  : html`s: ${formatPercent(portProperties.attackHostility ?? 0)} hostility`}`
+            ? html`<span
+                      class="flag-icon-${portProperties.attackerNation} flag-icon-small me-1"
+                      role="img"
+                      title="${findNationByNationShortName(portProperties?.attackerNation ?? "")?.sortName ?? ""}"
+                  ></span
+                  >${displayClanLitHtml(portProperties.attackerClan)} attack${portProperties.portBattle
+                      ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
+                      : html`s: ${formatPercentHtml(portProperties.attackHostility ?? 0)} hostility`}`
             : html``
 
         const port = {
@@ -732,50 +627,28 @@ export default class DisplayPorts {
                 ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
                 : "",
             attack: portProperties.attackHostility ? attackHostility : html``,
-            isNPCAttacker: portProperties.attackerNation === "Neutral",
+            isNPCAttacker: portProperties.attackerNation === "NT",
             pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
             brLimit: formatInt(portProperties.brLimit),
             portPoints: portProperties.capturable ? formatInt(portProperties.portPoints) : "",
             taxIncome: formatSiIntHtml(portProperties.taxIncome),
-            portTax: formatPercent(portProperties.portTax),
+            portTax: formatPercentHtml(portProperties.portTax),
             netIncome: formatSiIntHtml(portProperties.netIncome),
             tradingCompany: portProperties.tradingCompany,
             laborHoursDiscount: portProperties.laborHoursDiscount,
-            dropsTrading:
-                portProperties.dropsTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
-            consumesTrading:
-                portProperties.consumesTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
-            producesNonTrading:
-                portProperties.producesNonTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
-            dropsNonTrading:
-                portProperties.dropsNonTrading
-                    ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-                    .sort(simpleStringSort)
-                    .join(", ") ?? "",
+            dropsTrading: this._formatItems(portProperties.dropsTrading),
+            consumesTrading: this._formatItems(portProperties.consumesTrading),
+            producesNonTrading: this._formatItems(portProperties.producesNonTrading),
+            dropsNonTrading: this._formatItems(portProperties.dropsNonTrading),
             tradePort: this._getPortName(this.tradePortId),
-            goodsToSellInTradePort: html`${portProperties.goodsToSellInTradePort
-                ?.sort(sortByProfit)
-                ?.map(
-                    (good, index) =>
-                        html`<span style="white-space: nowrap;">${good.name} (${formatSiInt(good.profit.profit)})</span
-                            >${index === portProperties.goodsToSellInTradePort.length - 1 ? html`` : html`, `}`
-                )}`,
-            goodsToBuyInTradePort: html`${portProperties.goodsToBuyInTradePort
-                ?.sort(sortByProfit)
-                ?.map(
-                    (good, index) =>
-                        html`<span style="white-space: nowrap;">${good.name} (${formatSiInt(good.profit.profit)})</span
-                            >${index === portProperties.goodsToBuyInTradePort.length - 1 ? html`` : html`, `}`
-                )}`,
+            goodsToSellInTradePort: {
+                profit: this._formatProfits(portProperties.goodsToSellInTradePort),
+                profitPerTon: this._formatProfitsPerTon(portProperties.goodsToSellInTradePort),
+            },
+            goodsToBuyInTradePort: {
+                profit: this._formatProfits(portProperties.goodsToBuyInTradePort),
+                profitPerTon: this._formatProfitsPerTon(portProperties.goodsToBuyInTradePort),
+            },
         } as PortForDisplay
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
@@ -795,15 +668,28 @@ export default class DisplayPorts {
         return port
     }
 
+    _showProfits = (goods: Profit, tradePort: string, tradeDirection: string): HtmlResult => {
+        const colour = tradeDirection === "buy" ? "alert-success" : "alert-danger"
+        const instruction =
+            tradeDirection === "buy" ? `Buy here and sell in ${tradePort}` : `Buy in ${tradePort} and sell here`
+
+        return goods.profit?.[0] === undefined
+            ? html``
+            : html`<div class="alert ${colour} mt-2 mb-2 text-start" role="alert">
+                  <div class="alert-heading"><span class="caps">${instruction}</span> (net value in reales)</div>
+                  <p class="my-1"><em>By profit per item</em>: ${goods.profit}</p>
+                  <p class="my-1"><em>By profit per ton</em>: ${goods.profitPerTon}</p>
+              </div>`
+    }
+
     // eslint-disable-next-line complexity
-    _tooltipData(port: PortForDisplay): HtmlResult {
+    _tooltipData(port: PortForDisplay): VNode {
         const getPortBonus = (): HtmlResult => {
             return html`${portBonusType.map((bonus) => {
                 return html`${port?.portBonus?.[bonus]
-                    ? html`<div>
-                          <i class="icon icon-light icon-${bonus} mr-1" aria-hidden="true"></i>
-                          <span class="sr-only">${bonus} bonus </span>
-                          <span class="x-large text-lighter align-top mr-1">${port.portBonus[bonus]}</span>
+                    ? html`<div class="me-1">
+                          <i class="icon icon-light icon-${bonus}" role="img" aria-label="${bonus} bonus"></i>
+                          <div class="x-large text-lighter text-center">${port.portBonus[bonus]}</div>
                       </div>`
                     : html``}`
             })}`
@@ -812,45 +698,48 @@ export default class DisplayPorts {
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center ">
-                    <img
-                        alt="${port.icon}"
-                        class="flag-icon mr-3 align-self-stretch ${iconBorder}"
-                        src="${this.#nationIcons[port.icon].replace('"', "").replace('"', "")}"
-                    />
+            <div class="d-flex justify-content-between mb-4">
+                <div class="d-flex">
+                    <i class="flag-icon-${port.icon} flag-icon-large ${iconBorder}" role="img" />
 
-                    <div class="text-left mr-1">
-                        <div class="large">${port.name}</div>
+                    <div class="text-start align-self-center compress mx-3">
+                        <div class="large mb-1">${port.name}</div>
                         <div class="caps">${port.county}</div>
                         <div class="caps">${port.region}</div>
                     </div>
                 </div>
 
-                ${port.portBonus ? html`<div class="d-flex mr-1">${getPortBonus()}</div>` : html``}
+                ${port.portBonus ? html`<div class="d-flex align-self-end me-1">${getPortBonus()}</div>` : html``}
 
-                <div class="d-flex flex-column justify-content-end">
-                    <div class="ml-auto">
+                <div class="d-flex flex-column justify-content-end align-self-center">
+                    <div class="ms-auto">
                         ${port.portPoints ? html`<span class="x-large text-lighter">${port.portPoints}</span>` : html``}
                     </div>
-                    <div class="ml-auto">
+                    <div class="ms-auto">
                         ${port.laborHoursDiscount
-                            ? html`<i class="icon icon-light icon-labour mr-1" aria-hidden="true"></i
-                                  ><span class="sr-only">Labour hour discount level ${port.laborHoursDiscount}</span>`
+                            ? html`<i
+                                  class="icon icon-light icon-labour me-1"
+                                  role="img"
+                                  aria-label="Labour hour discount level ${port.laborHoursDiscount}"
+                              ></i>`
                             : html``}
                         ${port.tradingCompany
-                            ? html`<i class="icon icon-light icon-trading mr-1" aria-hidden="true"></i
-                                  ><span class="sr-only">Trading company level ${port.tradingCompany}</span>`
+                            ? html`<i
+                                  class="icon icon-light icon-trading me-1"
+                                  role="img"
+                                  aria-label="Trading company level ${port.tradingCompany}"
+                              ></i>`
                             : html``}
                         ${port.availableForAll
-                            ? html`<i class="icon icon-light icon-open mr-1" aria-hidden="true"></i
-                                  ><span class="sr-only">Accessible to all</span>`
+                            ? html`<i
+                                  class="icon icon-light icon-open me-1"
+                                  role="img"
+                                  aria-label="Accessible to all"
+                              ></i>`
                             : html``}
                         ${port.shallow
-                            ? html`<i class="icon icon-light icon-shallow" aria-hidden="true"></i
-                                  ><span class="sr-only">Shallow</span>`
-                            : html`<i class="icon icon-light icon-deep" aria-hidden="true"></i
-                                  ><span class="sr-only">Deep</span>`}
+                            ? html`<i class="icon icon-light icon-shallow" role="img" aria-label="Shallow"></i>`
+                            : html`<i class="icon icon-light icon-deep" role="img" aria-label="Deep"></i>`}
                     </div>
                 </div>
             </div>
@@ -865,67 +754,66 @@ export default class DisplayPorts {
                       ${port.attack}
                   </div>`}
 
-            <div class="d-flex text-left mb-2">
+            <div class="d-flex text-start mb-2 compress">
                 ${port.capital || port.icon === "FT"
-                    ? html`<div>${port.portTax}<br /><span class="des">Tax rate</span></div>`
+                    ? html`<div>${port.portTax}<br /><span class="des top-0">Tax rate</span></div>`
                     : html`
-                          <div class="mr-3">
+                          <div class="me-3">
                               ${port.pbTimeRange}<br />
-                              <span class="des">Battle timer</span>
+                              <span class="des top-0">Battle timer</span>
                           </div>
-                          <div class="mr-3">
+                          <div class="me-3">
                               ${port.brLimit}<br />
-                              <span class="des">Rating</span>
+                              <span class="des top-0">Rating</span>
                           </div>
-                          <div class="mr-3">
-                              ${port.capturer}<br />
-                              <span class="des">Capturer</span>
-                          </div>
-                          <div class="mr-5">
-                              ${port.captureTime}<br />
-                              <span class="des">Capture</span>
-                          </div>
+                          ${port.capturer
+                              ? html` <div class="me-3">
+                                        ${port.capturer}<br />
+                                        <span class="des top-0">Capturer</span>
+                                    </div>
+                                    <div class="me-5">
+                                        ${port.captureTime}<br />
+                                        <span class="des top-0">Capture</span>
+                                    </div>`
+                              : html``}
 
-                          <div class="ml-auto mr-3">
+                          <div class="ms-auto me-3">
                               ${port.taxIncome} (${port.portTax})<br />
-                              <span class="des">Tax income</span>
+                              <span class="des top-0">Tax income</span>
                           </div>
                           <div>
                               ${port.netIncome}<br />
-                              <span class="des">Net income</span>
+                              <span class="des top-0">Net income</span>
                           </div>
                       `}
             </div>
 
-            ${port.producesNonTrading.length > 0
-                ? html`<p class="mb-2">
-                      <span class="caps">Produces—</span><span class="non-trading">${port.producesNonTrading}</span>
-                  </p>`
-                : html``}
-            ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
-                ? html`<p class="mb-2">
-                      <span class="caps">Drops—</span>
-                      ${port.dropsNonTrading ? html`<span class="non-trading">${port.dropsNonTrading}</span>` : html``}
-                      ${port.dropsTrading}
-                  </p> `
-                : html``}
-            ${port.consumesTrading.length > 0
-                ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
-                : html``}
             ${this.showRadius === "tradePorts"
-                ? html`${port.goodsToSellInTradePort?.[0] === undefined
-                      ? html``
-                      : html`<div class="alert alert-success mt-2 mb-2 text-left" role="alert">
-                            <span class="caps">Buy here and sell in ${port.tradePort}</span> (net profit)<br />${port.goodsToSellInTradePort}
-                        </div>`}
-                  ${port.goodsToBuyInTradePort?.[0] === undefined
-                      ? html``
-                      : html`<div class="alert alert-danger mt-2 mb-2 text-left" role="alert">
-                            <span class="caps">Buy in ${port.tradePort} and sell here</span> (net profit)<br />${port.goodsToBuyInTradePort}
-                        </div>`}`
-                : html``}
+                ? html`${this._showProfits(port.goodsToSellInTradePort, port.tradePort, "buy")}${this._showProfits(
+                      port.goodsToBuyInTradePort,
+                      port.tradePort,
+                      "sell"
+                  )}`
+                : html` ${port.producesNonTrading.length > 0
+                      ? html`<p class="mb-2">
+                            <span class="caps">Produces—</span
+                            ><span class="non-trading">${port.producesNonTrading}</span>
+                        </p>`
+                      : html``}
+                  ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
+                      ? html`<p class="mb-2">
+                            <span class="caps">Drops—</span>
+                            ${port.dropsNonTrading
+                                ? html`<span class="non-trading">${port.dropsNonTrading}</span>`
+                                : html``}
+                            ${port.dropsTrading}
+                        </p> `
+                      : html``}
+                  ${port.consumesTrading.length > 0
+                      ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
+                      : html``}`}
         `
-        return h
+        return h as VNode
     }
 
     _getInventory(port: PortWithTrades): HtmlString {
@@ -966,24 +854,25 @@ export default class DisplayPorts {
         return h
     }
 
+    _hideDetails(): void {
+        if (this.#tooltip !== undefined) {
+            this.#tooltip.dispose()
+            this.#tooltip = undefined
+        }
+    }
+
     _showDetails(event: Event, d: PortWithTrades): void {
-        const node$ = $(event.currentTarget as JQuery.PlainObject)
-            .tooltip("dispose")
-            .tooltip({
-                html: true,
-                placement: "auto",
-                trigger: "manual",
-                title: "Wait...",
-                sanitize: false,
-            })
-        // Inject tooltip text
-        node$.on("inserted.bs.tooltip", () => {
-            const tooltipInner = $(document.body).find(".tooltip").find(".tooltip-inner")[0]
-            tooltipInner.textContent = ""
-            render(this._tooltipData(this._getText(d)), tooltipInner)
-            node$.tooltip("update")
+        const element = event.currentTarget as Element
+
+        this._hideDetails()
+        this.#tooltip = new BSTooltip(element, {
+            html: true,
+            placement: "auto",
+            trigger: "manual",
+            title: render(this._tooltipData(this._getText(d))),
+            sanitize: false,
         })
-        node$.tooltip("show")
+        this.#tooltip.show()
 
         if (this.map.showTrades.show) {
             if (this.map.showTrades.listType !== "inventory") {
@@ -992,13 +881,6 @@ export default class DisplayPorts {
 
             this.map.showTrades.update(this._getInventory(d))
         }
-
-        /*
-        const body = document.querySelector("body")
-        const div = document.createElement("div")
-        body?.appendChild(div)
-        render(this._tooltipData(this._getText(d)), div)
-        */
     }
 
     _updateIcons(): void {
@@ -1013,9 +895,9 @@ export default class DisplayPorts {
                 enter
                     .append("circle")
                     .attr("fill", (d) => {
-                        const appendix = `${d.countyCapital && d.capturable ? "c" : ""}${
-                            d.availableForAll && d.nation !== "NT" ? "a" : ""
-                        }`
+                        const appendix = `${d.nation === "FT" || d.nation === "NT" || d.capturable ? "" : "c"}${
+                            d.countyCapital && d.capturable ? "r" : ""
+                        }${d.availableForAll && d.nation !== "NT" ? "a" : ""}`
                         return `url(#${d.nation}${appendix})`
                     })
                     .attr("cx", (d) => d.coordinates[0])
@@ -1023,7 +905,9 @@ export default class DisplayPorts {
                     .on("click", (event: Event, d: PortWithTrades) => {
                         this._showDetails(event, d)
                     })
-                    .on("mouseleave", DisplayPorts._hideDetails)
+                    .on("mouseleave", () => {
+                        this._hideDetails()
+                    })
             )
             .attr("r", circleSize)
     }
@@ -1047,7 +931,7 @@ export default class DisplayPorts {
         let marker = ""
         if (port.cooldownTime) {
             marker = "cooldown"
-        } else if (port.attackerNation === "Neutral") {
+        } else if (port.attackerNation === "NT") {
             marker = "raider"
         }
 
@@ -1071,7 +955,7 @@ export default class DisplayPorts {
         const rMin = roundToThousands(scaledCircleSize * this.#minRadiusFactor)
         const rMax = roundToThousands(scaledCircleSize * this.#maxRadiusFactor)
 
-        const incomeThreshold = 100000
+        const incomeThreshold = 100_000
         const portPointThreshold = 30
         let data = this.#portDataFiltered
         // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -1082,55 +966,96 @@ export default class DisplayPorts {
         let fill: PortCircleStringF = () => ""
 
         // noinspection IfStatementWithTooManyBranchesJS
-        if (this.showRadius === "tax") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
-            this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
-            cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
-            r = (d): number => this.#portRadius(d.taxIncome) ?? 0
-        } else if (this.showRadius === "net") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
-            this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
-            cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
-            r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
-        } else if (this.showRadius === "points") {
-            data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints>portPointThreshold)
-            this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
-            cssClass = (): string => "bubble"
-            fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
-            r = (d): number => this.#portRadius(d.portPoints) ?? 0
-        } else if (this.showRadius === "position") {
-            cssClass = (): string => "bubble here"
-            r = (d): number => d.distance
-        } else if (this.showRadius === "attack") {
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
-            this.#attackRadius.range([rMin, rMax / 1.5])
-            cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
-            fill = (d): string =>
-                d.attackerNation === "Neutral" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
-            r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
-        } else if (this.circleType === "currentGood") {
-            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
-            r = (): number => rMax / 2
-        } else if (this.showRadius === "county") {
-            cssClass = (d): string =>
-                d.capturable ? (d.countyCapital ? "bubble capital" : "bubble non-capital") : "bubble not-capturable"
-            fill = (d): string => (d.capturable ? this.#colourScaleCounty(d.county) : "")
-            r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
-        } else if (this.showRadius === "tradePorts") {
-            cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
-            r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
-        } else if (this.showRadius === "frontline") {
-            cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
-            r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
-            data = data.filter((d) => d.enemyPort ?? d.ownPort)
-        } else if (this.showRadius === "currentGood") {
-            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
-            r = (): number => rMax / 2
-        } else if (this.showRadius === "off") {
-            data = []
+        switch (this.showRadius) {
+            case "tax":
+                data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
+                this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
+                cssClass = (): string => "bubble"
+                fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
+                r = (d): number => this.#portRadius(d.taxIncome) ?? 0
+
+                break
+
+            case "net":
+                data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
+                this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
+                cssClass = (): string => "bubble"
+                fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
+                r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
+
+                break
+
+            case "points":
+                data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints > portPointThreshold)
+                this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
+                cssClass = (): string => "bubble"
+                fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
+                r = (d): number => this.#portRadius(d.portPoints) ?? 0
+
+                break
+
+            case "position":
+                cssClass = (): string => "bubble here"
+                r = (d): number => d.distance ?? 0
+
+                break
+
+            case "attack":
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
+                this.#attackRadius.range([rMin, rMax / 1.5])
+                cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
+                fill = (d): string =>
+                    d.attackerNation === "NT" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
+                r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
+
+                break
+
+            default:
+                if (this.circleType === "currentGood") {
+                    cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
+                    r = (): number => rMax / 2
+                } else {
+                    switch (this.showRadius) {
+                        case "county":
+                            cssClass = (d): string =>
+                                d.capturable
+                                    ? d.countyCapital
+                                        ? "bubble capital"
+                                        : "bubble non-capital"
+                                    : "bubble not-capturable"
+                            fill = (d): string => (d.capturable ? this.#colourScaleCounty(d.county) : "")
+                            r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
+
+                            break
+
+                        case "tradePorts":
+                            cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
+                            r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
+
+                            break
+
+                        case "frontline":
+                            cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
+                            r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
+                            data = data.filter((d) => d.enemyPort ?? d.ownPort)
+
+                            break
+
+                        case "currentGood":
+                            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
+                            r = (): number => rMax / 2
+
+                            break
+
+                        case "off":
+                            data = []
+
+                            break
+
+                        // No default
+                    }
+                }
         }
 
         this.#gPortCircle
@@ -1150,7 +1075,7 @@ export default class DisplayPorts {
     _updateTextsX(d: PortWithTrades, circleSize: number): number {
         return this.zoomLevel === "pbZone" &&
             (this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id))
-            ? d.coordinates[0] + Math.round(circleSize * 1.2 * Math.cos(degreesToRadians(d.angle)))
+            ? d.coordinates[0] + Math.round(circleSize * 1.3 * Math.cos(degreesToRadians(d.angle)))
             : d.coordinates[0]
     }
 
@@ -1163,7 +1088,7 @@ export default class DisplayPorts {
 
         const dy = d.angle > 90 && d.angle < 270 ? fontSize : 0
         return this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id)
-            ? d.coordinates[1] + Math.round(circleSize * 1.2 * Math.sin(degreesToRadians(d.angle))) + dy
+            ? d.coordinates[1] + Math.round(circleSize * 1.3 * Math.sin(degreesToRadians(d.angle))) + dy
             : d.coordinates[1] + deltaY
     }
 
@@ -1192,20 +1117,21 @@ export default class DisplayPorts {
                 .join((enter) => enter.append("text").text((d) => d.name))
                 .attr("x", (d) => this._updateTextsX(d, circleSize))
                 .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
-                .attr("text-anchor", (d) => this._updateTextsAnchor(d))
+                .style("text-anchor", (d) => this._updateTextsAnchor(d))
+                .style("dominant-baseline", "auto")
 
             this.#gText.attr("font-size", `${fontSize}px`).classed("d-none", false)
         }
     }
 
     _updateSummary(): void {
-        const numberPorts = Object.keys(this.portData).length
+        const numberPorts = Object.keys(this.#portData).length
         let taxTotal = 0
         let netTotal = 0
 
         if (numberPorts) {
-            taxTotal = d3Sum(this.portData, (d) => d.taxIncome)
-            netTotal = d3Sum(this.portData, (d) => d.netIncome)
+            taxTotal = d3Sum(this.#portData, (d) => d.taxIncome)
+            netTotal = d3Sum(this.#portData, (d) => d.netIncome)
         }
 
         this.#portSummaryTextNumPorts.text(`${numberPorts}`)
@@ -1224,6 +1150,7 @@ export default class DisplayPorts {
                     (enter) =>
                         enter
                             .append("text")
+                            .attr("class", "svg-text-center")
                             .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                             .text((d) => d.name),
                     (update) =>
@@ -1262,6 +1189,7 @@ export default class DisplayPorts {
                 .join((enter) =>
                     enter
                         .append("text")
+                        .attr("class", "svg-text-center")
                         .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
                         .text((d) => d.name)
                 )
@@ -1309,9 +1237,9 @@ export default class DisplayPorts {
 
     _filterVisible(): void {
         if (this.showRadius === "position") {
-            this.#portDataFiltered = this.portData
+            this.#portDataFiltered = this.#portData
         } else {
-            this.#portDataFiltered = this.portData.filter(
+            this.#portDataFiltered = this.#portData.filter(
                 (port) =>
                     port.coordinates[0] >= this.#lowerBound[0] &&
                     port.coordinates[0] <= this.#upperBound[0] &&
@@ -1358,9 +1286,77 @@ export default class DisplayPorts {
 
     clearMap(scale?: number): void {
         this._showSummary()
-        this.portData = this.portDataDefault
+        this.#portData = this.#portDataDefault
         this.circleType = ""
         this.setShowRadiusSetting()
         this.update(scale)
+    }
+
+    get circleType(): string {
+        return this.#circleType
+    }
+
+    set circleType(newCircleType: string) {
+        this.#circleType = newCircleType
+    }
+
+    get currentPort(): CurrentPort {
+        return this.#currentPort
+    }
+
+    set currentPort(newCurrentPort: CurrentPort) {
+        this.#currentPort = newCurrentPort
+    }
+
+    get portData(): PortWithTrades[] {
+        return this.#portData
+    }
+
+    set portData(newPortData: PortWithTrades[]) {
+        this.#portData = newPortData
+    }
+
+    get portDataDefault(): PortWithTrades[] {
+        return this.#portDataDefault
+    }
+
+    get showRadius(): string {
+        return this.#showRadius
+    }
+
+    set showRadius(newShowRadius: string) {
+        this.#showRadius = newShowRadius
+    }
+
+    get tradeItem(): Map<number, TradeItem> {
+        return this.#tradeItem
+    }
+
+    set tradeItem(newTradeItem: Map<number, TradeItem>) {
+        this.#tradeItem = newTradeItem
+    }
+
+    get showTradePortPartners(): boolean {
+        return this.#showCurrentGood
+    }
+
+    set showTradePortPartners(newShowTradePortPartners: boolean) {
+        this.#showTradePortPartners = newShowTradePortPartners
+    }
+
+    get tradePortId(): number {
+        return this.#tradePortId
+    }
+
+    set tradePortId(newTradePortId: number) {
+        this.#tradePortId = newTradePortId
+    }
+
+    get zoomLevel(): ZoomLevel {
+        return this.#zoomLevel
+    }
+
+    set zoomLevel(newZoomLevel: ZoomLevel) {
+        this.#zoomLevel = newZoomLevel
     }
 }

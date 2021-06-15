@@ -14,10 +14,9 @@ import css, { Declaration, Rule } from "css"
 import Excel from "exceljs"
 import sass from "sass"
 
-import { range } from "../common/common"
-import { commonPaths, serverStartDate } from "../common/common-dir"
+import { currentServerStartDate, range, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { executeCommand, readJson } from "../common/common-file"
-import { sortBy } from "../common/common-node"
 
 import { PortBasic, ShipData } from "../common/gen-json"
 
@@ -28,6 +27,8 @@ interface PortBR {
     name: string
     br: number
 }
+
+const commonPaths = getCommonPaths()
 
 const shallowWaterFrigates = new Set(["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"])
 const minDeepWaterBR = 80
@@ -86,9 +87,11 @@ const setColours = (): ColourMap => {
         .css.toString()
     const parsedCss = css.parse(compiledCss)
     return new Map(
-        (parsedCss.stylesheet?.rules.filter((rule: Rule) =>
-            rule.selectors?.[0].startsWith(".colour-palette ")
-        ) as Rule[])
+        (
+            parsedCss.stylesheet?.rules.filter((rule: Rule) =>
+                rule.selectors?.[0].startsWith(".colour-palette ")
+            ) as Rule[]
+        )
             .filter((rule: Rule) =>
                 rule?.declarations?.find((declaration: Declaration) => declaration.property === "background-color")
             )
@@ -146,9 +149,10 @@ const defaultFont: Partial<Excel.Font> = {
  */
 // @ts-expect-error
 import StylesXform from "exceljs/lib/xlsx/xform/style/styles-xform"
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const origStylesXformInit = StylesXform.prototype.init
 StylesXform.prototype.init = function () {
-    // eslint-disable-next-line prefer-rest-params
+    // eslint-disable-next-line prefer-rest-params,@typescript-eslint/no-unsafe-argument
     Reflect.apply(origStylesXformInit, this, arguments)
     this._addFont(defaultFont)
 }
@@ -339,7 +343,7 @@ function fillSheet(sheet: Excel.Worksheet, ships: ShipData[], ports: PortBR[]): 
     row.font = fontColourBold(colourContrastNearWhite)
 
     sheet.getCell(currentRowNumber, 1).value = "Rate"
-    sheet.getCell(currentRowNumber, 2).value = "Ship"
+    sheet.getCell(currentRowNumber, 2).value = "Column"
     sheet.getCell(currentRowNumber, 3).value = "BR"
     sheet.getCell(currentRowNumber, 4).value = "# Players"
     sheet.getCell(currentRowNumber, 5).value = "BR total"
@@ -489,7 +493,7 @@ function fillSheet(sheet: Excel.Worksheet, ships: ShipData[], ports: PortBR[]): 
  * Create excel spreadsheet
  */
 const createPortBattleSheets = async (): Promise<void> => {
-    const date = new Date(serverStartDate)
+    const date = new Date(currentServerStartDate)
 
     workbook = new Excel.Workbook()
 

@@ -23,8 +23,7 @@
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
                 "plugin:unicorn/recommended",
-                "xo/browser",
-                "xo/esnext",
+                "xo",
                 "xo-typescript",
                 "plugin:prettier/recommended"
             ],
@@ -47,9 +46,10 @@
                 "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
                 "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
                 "semi": ["error", "never"],
-                "unicorn/prevent-abbreviations": "off",
                 "unicorn/no-nested-ternary": "off",
                 "unicorn/no-useless-undefined": "off",
+                "unicorn/prevent-abbreviations": "off",
+                "unicorn/prefer-node-protocol": "off",
                 "tsdoc/syntax": "warn",
                 "@typescript-eslint/ban-ts-comment": "off",
                 "@typescript-eslint/class-literal-property-style": "off",
@@ -83,7 +83,6 @@
         },
         {
             "files": ["*.js", "*.[cm]js", "*.jsx"],
-            "parser": "babel-eslint",
             "env": {
                 "es2020": true,
                 "node": true
@@ -91,8 +90,7 @@
             "extends": [
                 "eslint:recommended",
                 "plugin:unicorn/recommended",
-                "xo/esnext",
-                "xo/browser",
+                "xo",
                 "plugin:prettier/recommended"
             ],
             "rules": {

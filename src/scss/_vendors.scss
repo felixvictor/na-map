@@ -2,10 +2,10 @@
 /// This file is part of na-map.
 /// Vendors.
 ///
-/// copyright 2019
-/// license   http://www.gnu.org/licenses/gpl.html
-/// @group    main
+/// @group    scss
 /// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
 ////
 
 .bootstrap-select > .dropdown-toggle.bs-placeholder {
@@ -14,39 +14,6 @@
 
 .dropdown-header {
     font-size: smaller;
-}
-
-.tablesort {
-    th [role="columnheader"]:not(.no-sort) {
-        cursor: pointer;
-    }
-
-    th [role="columnheader"]:not(.no-sort)::after {
-        float: right;
-        margin-top: 7px;
-        visibility: hidden;
-        content: "";
-        user-select: none;
-        border-color: $primary-600 transparent;
-        border-style: solid;
-        border-width: 0 4px 4px;
-        opacity: 0;
-    }
-
-    th [aria-sort="ascending"]:not(.no-sort)::after {
-        border-width: 4px 4px 0;
-        border-bottom: none;
-    }
-
-    th [aria-sort]:not(.no-sort)::after {
-        visibility: visible;
-        opacity: 0.4;
-    }
-
-    th [role="columnheader"]:not(.no-sort):hover::after {
-        visibility: visible;
-        opacity: 1;
-    }
 }
 
 .timelines-chart {

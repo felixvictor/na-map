@@ -13,9 +13,10 @@ import { default as fs, promises as pfs } from "fs"
 import path from "path"
 import { promisify } from "util"
 
+import { currentServerStartDate } from "./common"
 import { apiBaseFiles } from "./common-var"
-import { baseAPIFilename, serverStartDate } from "./common-dir"
 import { serverIds } from "./servers"
+import { baseAPIFilename } from "./common-node"
 
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/globals.d.ts
 interface ErrnoException extends Error {
@@ -94,7 +95,10 @@ const loopApiFiles = (command: string): void => {
 
     for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
-            const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverStartDate}.${ext}`)
+            const fileName = path.resolve(
+                baseAPIFilename,
+                `${serverName}-${apiBaseFile}-${currentServerStartDate}.${ext}`
+            )
             xz(command, fileName)
         }
     }

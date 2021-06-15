@@ -46,10 +46,10 @@ export const isImported = (name: string): boolean => name.includes(importedFlag)
 export const stripShipName = (name: string): string => name.replace(importedFlag, "")
 
 export const beautifyShipName = (name: string): HtmlString =>
-    stripShipName(name) + (isImported(name) ? ' <span class="caps small">imported</span>' : "")
+    stripShipName(name) + (isImported(name) ? ' <span class="caps small condensed">imported</span>' : "")
 
 export const beautifyShipNameHTML = (name: string): HtmlResult =>
-    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small">imported</span>` : html``}`
+    html`${stripShipName(name)} ${isImported(name) ? html`<span class="caps small condensed">imported</span>` : html``}`
 
 /**
  * Format float for htm
@@ -104,11 +104,17 @@ export const getBaseModalHTML = ({ id, title, size = "modal-xl", body, footer }:
 export const getCurrencyAmount = (amount: number | string): string =>
     `${formatInt(Number(amount))}\u00A0real${Number(amount) > 1 ? "es" : ""}`
 
-export const getContrastColour = (colour: string): string => {
+export const getYiq = (colour: string): number => {
     const { r, g, b } = d3Rgb(colour)
     const yiq = (r * 299 + g * 587 + b * 114) / 1000
 
-    return yiq >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
+    return yiq
 }
+
+export const getContrastColour = (colour: string): string =>
+    getYiq(colour) >= 128 ? d3Color(colourWhite)?.darker(5).toString() ?? "#111" : colourWhite
+
+export const getContrastContrastColour = (colour: string): string =>
+    getYiq(colour) >= 128 ? colourWhite : d3Color(colourWhite)?.darker(5).toString() ?? "#111"
 
 export const displayClanLitHtml = (clan: string | undefined): HtmlResult => html`<span class="caps">${clan}</span>`

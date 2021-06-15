@@ -530,7 +530,7 @@ export interface APITimeBasedConvertibleItem {
     ItemType: "TimeBasedConvertibleItem"
     MongoID: string
     GeneralChest: boolean
-    LifetimeSeconds: 10800
+    LifetimeSeconds: 10_800
     ExtendedLootTable: number[]
     CanBeConverted: "Port"
     ConvertsTo: unknown[]
@@ -671,7 +671,7 @@ export interface APIShip {
     CanBeSoldToShop: boolean
     ResetStockOnServerStart: boolean
     SellPriceCoefficient: number
-    ItemType: "Ship"
+    ItemType: "Column"
     MongoID: string
     BaseDurability: number
     QualityPrices: number[]

@@ -16,17 +16,15 @@ import { ValuesType } from "utility-types"
 import { Group } from "timelines-chart"
 
 import {
+    AttackerNationShortName,
     CannonFamily,
     CannonType,
-    NationFullName,
     NationShortName,
     NationShortNameAlternative,
     PeneDistance,
-    WoodFamily,
-    WoodType,
 } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
-import { FrontlinesType, LootType, PortBonus } from "./types"
+import { FrontlinesType, LootType, PortBonus, WoodFamily, WoodType } from "./types"
 
 /****************************
  * buildings.json
@@ -122,8 +120,10 @@ export interface CannonValue {
 export interface TradeItem {
     id: number
     name: string
-    price: number
+    buyPrice: number
+    sellPrice?: number
     distanceFactor?: number
+    weight?: number
 }
 
 /****************************
@@ -285,7 +285,7 @@ export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
 
 export interface TradeProfit {
     profit: number
-    profitPerDistance: number
+    profitPerTon: number
 }
 
 export interface TradeGoodProfit {
@@ -299,7 +299,7 @@ export interface PortWithTrades extends Port {
     buyInTradePort: boolean
     goodsToSellInTradePort: TradeGoodProfit[]
     sellInTradePort: boolean
-    distance: number
+    distance?: number
     isSource: boolean
     ownPort: boolean
     enemyPort: boolean
@@ -343,14 +343,13 @@ export interface InventoryEntity {
  * <servername>-pb.json
  */
 
-type AttackerNationName = NationFullName | "n/a" | ""
 export interface PortBattlePerServer {
     id: number
     name: string
     nation: NationShortName
     capturer?: string
     captured?: string
-    attackerNation?: AttackerNationName
+    attackerNation?: AttackerNationShortName
     attackerClan?: string
     attackHostility?: number
     portBattle?: string
@@ -616,7 +615,7 @@ interface ShipMast {
 /****************************
  * woods.json
  */
-export type WoodData = {
+export type WoodJsonData = {
     [K in WoodType]: WoodTrimOrFrame[]
 }
 interface WoodTrimOrFrame {

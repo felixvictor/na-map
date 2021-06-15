@@ -10,10 +10,11 @@
 import * as fs from "fs";
 import path from "path";
 import convert from "xml-js";
-import { commonPaths } from "../common/common-dir";
+import { getCommonPaths } from "../common/common-dir";
 import { readTextFile, saveJsonAsync } from "../common/common-file";
 import { round } from "../common/common-math";
 import { cannonEntityType, cannonType, peneDistance } from "../common/common";
+const commonPaths = getCommonPaths();
 const countDecimals = (value) => {
     if (value === undefined) {
         return 0;
@@ -103,11 +104,8 @@ const addData = (fileData) => {
                 0),
         };
     }
-    const penetrations = new Map(fileData.Attributes.Pair.find((pair) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")?.Value
-        .Value.map((penetration) => [
-        Number(penetration.Time._text) * 1000,
-        Number(penetration.Value._text),
-    ]));
+    const penetrations = new Map(fileData.Attributes.Pair.find((pair) => pair.Key._text === "CANNON_PENETRATION_DEGRADATION")
+        ?.Value.Value.map((penetration) => [Number(penetration.Time._text) * 1000, Number(penetration.Value._text)]));
     penetrations.set(50, ((penetrations.get(0) ?? 0) + (penetrations.get(100) ?? 0)) / 2);
     penetrations.set(750, (penetrations.get(800) ?? 0) + ((penetrations.get(600) ?? 0) - (penetrations.get(800) ?? 0)) * 0.25);
     penetrations.set(1250, ((penetrations.get(1200) ?? 0) + (penetrations.get(1300) ?? 0)) / 2);
@@ -123,7 +121,9 @@ const addData = (fileData) => {
     };
     cannon.name = getName();
     cannon.family = getFamily(cannon.name);
-    if (cannon.family !== "unicorn") {
+    if (cannon.family !== "unicorn" &&
+        !(cannon.family === "defense" && cannon.name === "24 (Fort)") &&
+        !(cannon.family === "defense" && cannon.name === "24 (Tower)")) {
         cannons[getType()].push(cannon);
     }
 };

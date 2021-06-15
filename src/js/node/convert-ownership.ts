@@ -11,16 +11,15 @@
 import * as fs from "fs"
 import path from "path"
 
-import d3Array from "d3-array"
-const { group: d3Group } = d3Array
+import { group as d3Group } from "d3-array"
 
 import { default as lzma } from "lzma-native"
 import { default as readDirRecursive } from "recursive-readdir"
 
-import { capitalToCounty, nations, NationShortName } from "../common/common"
-import { commonPaths } from "../common/common-dir"
+import { capitalToCounty, nations, NationShortName, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { saveJsonAsync } from "../common/common-file"
-import { cleanName, sortBy } from "../common/common-node"
+import { cleanName } from "../common/common-node"
 import { ServerId, serverIds } from "../common/servers"
 
 import { APIPort } from "./api-port"
@@ -28,6 +27,7 @@ import { NationList, Ownership, OwnershipNation } from "../common/gen-json"
 import { PowerMapList } from "../common/interface"
 import { Group, Line, Segment } from "timelines-chart"
 
+const commonPaths = getCommonPaths()
 const fileExtension = ".json.xz"
 
 type ServerIdList<T> = {
@@ -236,11 +236,11 @@ const processFiles = async (serverId: ServerId, fileNames: string[]): Promise<un
                 .then((decompressedContent) => {
                     if (decompressedContent) {
                         const currentDate = (fileBaseNameRegex[serverId].exec(path.basename(fileName)) ?? [])[1]
-                        parseData(serverId, JSON.parse(decompressedContent.toString()), currentDate)
+                        parseData(serverId, JSON.parse(decompressedContent.toString()) as APIPort[], currentDate)
                     }
                 })
-                .catch((error) => {
-                    throw new Error(error)
+                .catch((error: unknown) => {
+                    throw new Error(error as string)
                 }),
         Promise.resolve()
     )
@@ -251,12 +251,11 @@ const processFiles = async (serverId: ServerId, fileNames: string[]): Promise<un
  * @param serverId - Server id
  */
 const writeResult = async (serverId: ServerId): Promise<void> => {
-    const groups = (d3Group<Port, string>(
+    const groups = d3Group<Port, string, string>(
         [...ports[serverId].values()],
         (d) => d.region,
-        // @ts-expect-error
         (d) => d.county
-    ) as unknown) as RegionGroup
+    ) as RegionGroup
 
     // Convert to data structure needed for timelines-chart
     // region

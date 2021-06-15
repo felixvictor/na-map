@@ -8,10 +8,11 @@
  */
 
 import { initAnalytics, registerPage } from "./analytics"
-import { serverIds } from "common/servers"
+import { ServerId, serverIds } from "common/servers"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
+import { ShipCompareSearchParamsRead } from "./game-tools/compare-ships/search-params-read"
 
 import "scss/main.scss"
 
@@ -26,7 +27,7 @@ declare global {
 }
 SVGAnimatedString.prototype.indexOf = function (this: SVGAnimatedString): number {
     // @ts-expect-error
-    return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params
+    return this.baseVal.indexOf.apply(this.baseVal, arguments) // eslint-disable-line prefer-spread,prefer-rest-params,unicorn/prefer-prototype-methods
 }
 
 /**
@@ -53,7 +54,7 @@ const radios = new RadioButton(baseId, radioButtonValues)
  * Get server name from cookie or use default value
  * @returns Server name
  */
-const getServerName = (): string => {
+const getServerName = (): ServerId => {
     const r = cookie.get()
 
     radios.set(r)
@@ -61,13 +62,14 @@ const getServerName = (): string => {
     return r
 }
 
-const getSearchParams = (): URLSearchParams => new URL(document.location.href).searchParams
+const getSearchParams = (): URLSearchParams => new URLSearchParams(new URL(document.location.href).search)
 
 /**
  * Change server name
  */
 const serverNameSelected = (): void => {
     const serverId = radios.get()
+
     cookie.set(serverId)
     document.location.reload()
 }
@@ -81,7 +83,7 @@ const setupListener = (): void => {
     })
 
     // {@link https://jsfiddle.net/bootstrapious/j6zkyog8/}
-    $(".dropdown-menu [data-toggle='dropdown']").on("click", (event) => {
+    $(".dropdown-menu [data-bs-toggle='dropdown']").on("click", (event) => {
         event.preventDefault()
         event.stopPropagation()
 
@@ -104,7 +106,7 @@ const setupListener = (): void => {
  * @param serverId - Server id
  * @param searchParams - Query arguments
  */
-const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
+const loadMap = async (serverId: ServerId, searchParams: URLSearchParams): Promise<void> => {
     const Map = await import(/* webpackChunkName: "map" */ "./map/na-map")
     const map = new Map.NAMap(serverId, searchParams)
     await map.MapInit()
@@ -112,12 +114,10 @@ const loadMap = async (serverId: string, searchParams: URLSearchParams): Promise
 
 /**
  * Load game tools
- * @param serverId - Server id
- * @param searchParams - Query arguments
  */
-const loadGameTools = async (serverId: string, searchParams: URLSearchParams): Promise<void> => {
+const loadGameTools = async (serverId: ServerId, readParams?: ShipCompareSearchParamsRead): Promise<void> => {
     const gameTools = await import(/* webpackChunkName: "game-tools" */ "./game-tools")
-    gameTools.init(serverId, searchParams)
+    gameTools.init(serverId, readParams)
 }
 
 /**
@@ -131,6 +131,7 @@ const loadMapTools = async (): Promise<void> => {
 const load = async (): Promise<void> => {
     const serverId = getServerName()
     const searchParams = getSearchParams()
+    const readParams = new ShipCompareSearchParamsRead(searchParams)
 
     // Remove search string from URL
     // {@link https://stackoverflow.com/a/5298684}
@@ -138,15 +139,21 @@ const load = async (): Promise<void> => {
 
     await loadMap(serverId, searchParams)
 
-    if (searchParams.get("v")) {
-        void loadGameTools(serverId, searchParams)
+    if (readParams.isCurrentVersion()) {
+        void loadGameTools(serverId, readParams)
     } else {
-        document
-            .querySelector("#game-tools-dropdown")
-            ?.addEventListener("click", async () => loadGameTools(serverId, searchParams), { once: true })
+        ;(document.querySelector("#game-tools-dropdown") as HTMLElement).addEventListener(
+            "show.bs.dropdown",
+            async () => loadGameTools(serverId, undefined),
+            { once: true }
+        )
     }
 
-    document.querySelector("#map-tools-dropdown")?.addEventListener("click", async () => loadMapTools(), { once: true })
+    ;(document.querySelector("#map-tools-dropdown") as HTMLElement).addEventListener(
+        "show.bs.dropdown",
+        async () => loadMapTools(),
+        { once: true }
+    )
 }
 
 /**
@@ -157,8 +164,7 @@ const main = (): void => {
     registerPage("Homepage")
 
     setupListener()
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    load()
+    void load()
 }
 
 main()

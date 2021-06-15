@@ -2,30 +2,38 @@
  * webpack.config
  */
 
-const path = require("path")
-const webpack = require("webpack")
+import path from "node:path"
+
+import webpack from "webpack"
 
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-const CopyPlugin = require("copy-webpack-plugin")
-const FaviconsPlugin = require("favicons-webpack-plugin")
-const HtmlPlugin = require("html-webpack-plugin")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
-const parseCss = require("css")
-const PreloadWebpackPlugin = require("preload-webpack-plugin")
-const sass = require("sass")
-const SitemapPlugin = require("sitemap-webpack-plugin").default
-const { SubresourceIntegrityPlugin } = require("webpack-subresource-integrity")
-const TerserPlugin = require("terser-webpack-plugin")
+import CopyPlugin from "copy-webpack-plugin"
+import FaviconsPlugin from "favicons-webpack-plugin"
 
-const dirOutput = path.resolve(__dirname, "public")
-const dirSrc = path.resolve(__dirname, "src")
-const dirLib = path.resolve(dirSrc, "lib")
+import HtmlPlugin from "html-webpack-plugin"
+import MiniCssExtractPlugin from "mini-css-extract-plugin"
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin"
+import parseCss from "css"
+import PreloadWebpackPlugin from "preload-webpack-plugin"
+import sass from "sass"
+import { SubresourceIntegrityPlugin } from "webpack-subresource-integrity"
+import SitemapPlugin from "sitemap-webpack-plugin"
 
+import TerserPlugin from "terser-webpack-plugin"
+import svgToMiniDataURI from "mini-svg-data-uri";
+
+import { extendDefaultPlugins, optimize } from "svgo"
+import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
+
+import { getCommonPaths } from "./dist/js/common/common-dir.cjs"
+const commonPaths = getCommonPaths(__dirname)
+const { dirLib, dirOutput, dirSrc } = commonPaths
+
+const dirEjs = path.resolve(dirSrc, "ejs")
 const dirFlags = path.resolve(dirSrc, "images", "flags")
 const dirFonts = path.resolve(dirSrc, "fonts")
 const dirIcons = path.resolve(dirSrc, "icons")
-const dirJsSrc = path.resolve(dirSrc, "js")
+const dirJs = path.resolve(dirSrc, "js")
 const dirMap = path.resolve(dirSrc, "images", "map")
 const dirPrefixIcons = path.join("images", "icons")
 
@@ -35,10 +43,11 @@ const filePostcssDevConfig = path.resolve(dirSrc, "postcss.dev.config.js")
 const fileScssPreCompile = path.resolve(dirSrc, "scss", "pre-compile.scss")
 
 // Variables
-const PACKAGE = require("./package.json")
-const TSCONFIG = require("./tsconfig.json")
-const repairs = require(`${dirLib}/gen-generic/repairs.json`)
-const { isProduction } = require("webpack-mode")
+import PACKAGE from "./package.json"
+import TSCONFIG from "./tsconfig.json";
+
+import repairs from `${dirLib}/gen-generic/repairs.json`
+import { isProduction } from "webpack-mode"
 const servers = [
     { id: "eu1", name: "War", type: "PVP" },
     { id: "eu2", name: "Peace", type: "PVE" },
@@ -99,15 +108,6 @@ const colourRedDark = colours.get("red-dark")
 const colourWhite = colours.get("white")
 const colourLight = colours.get("light")
 
-const aliasPaths = {}
-for (const [key, value] of Object.entries(TSCONFIG.compilerOptions.paths)) {
-    aliasPaths[key.replace("/*", "")] = path.resolve(
-        __dirname,
-        TSCONFIG.compilerOptions.baseUrl,
-        value.map((path) => path.replace("/*", ""))[0]
-    )
-}
-
 const babelOpt = {
     cacheDirectory: true,
     plugins: ["@babel/plugin-proposal-class-properties"],
@@ -165,52 +165,17 @@ const sassLoaderOpt = {
 }
 
 const svgoOpt = {
-    plugins: [
-        { cleanupAttrs: true },
-        { removeDoctype: true },
-        { removeXMLProcInst: true },
-        { removeComments: true },
-        { removeMetadata: true },
-        { removeTitle: true },
-        { removeDesc: true },
-        { removeUselessDefs: true },
-        { removeXMLNS: false },
-        { removeEditorsNSData: true },
-        { removeEmptyAttrs: true },
-        { removeHiddenElems: true },
-        { removeEmptyText: true },
-        { removeEmptyContainers: true },
-        { removeViewBox: false },
-        { cleanupEnableBackground: true },
-        { minifyStyles: true },
-        { convertStyleToAttrs: true },
-        { convertColors: true },
-        { convertPathData: true },
-        { convertTransform: true },
-        { removeUnknownsAndDefaults: true },
-        { removeNonInheritableGroupAttrs: true },
-        { removeUselessStrokeAndFill: true },
-        { removeUnusedNS: true },
-        { cleanupIDs: true },
-        { cleanupNumericValues: true },
-        { cleanupListOfValues: false },
-        { moveElemsAttrsToGroup: true },
-        { moveGroupAttrsToElems: true },
-        { collapseGroups: true },
-        { removeRasterImages: false },
-        { mergePaths: true },
-        { convertShapeToPath: true },
-        { sortAttrs: false },
-        { transformsWithOnePath: false },
-        { removeDimensions: false },
-        { removeAttrs: false },
-        { removeElementsByAttr: true },
-        { removeStyleElement: true },
-        { addClassesToSVGElement: false },
-        { addAttributesToSVGElement: false },
-        { removeStyleElement: false },
-        { removeScriptElement: false },
-    ],
+    multipass: true,
+    plugins: extendDefaultPlugins([
+        {
+            name: "removeScriptElement",
+            active: true,
+        },
+        {
+            name: "removeViewBox",
+            active: false,
+        },
+    ]),
 }
 
 // noinspection JSIncompatibleTypesComparison
@@ -227,7 +192,7 @@ const htmlOpt = {
     minify: htmlMinifyOpt,
     scriptLoading: "defer",
     servers,
-    template: path.resolve(__dirname, dirSrc, "index.template.ejs"),
+    template: path.resolve(__dirname, dirEjs, "index.ejs"),
     title: PACKAGE.description,
 }
 
@@ -266,13 +231,6 @@ const MiniCssExtractPluginOpt = {
     esModule: true,
 }
 
-const getSvgLoaderOpt = (path) => ({
-    esModule: false,
-    limit: 1000,
-    name: "[name].[ext]",
-    outputPath: path,
-})
-
 const config = {
     devServer: {
         host: "localhost",
@@ -282,7 +240,7 @@ const config = {
 
     devtool: false,
 
-    entry: [path.resolve(dirJsSrc, "browser/main.ts")],
+    entry: [path.resolve(dirJs, "browser/main.ts")],
 
     externals: {
         jquery: "jQuery",
@@ -334,7 +292,7 @@ const config = {
             $: "jquery",
             jQuery: "jquery",
             "window.jQuery": "jquery",
-            Popper: ["popper.js", "default"],
+            "bootstrap.Dropdown": "bootstrap/js/dist/dropdown",
         }),
         new CopyPlugin({
             patterns: [
@@ -369,7 +327,11 @@ const config = {
 
     resolve: {
         extensions: [".ts", ".js", ".json"],
-        alias: aliasPaths,
+        plugins: [
+            new TsconfigPathsPlugin({
+                /* options: see below */
+            }),
+        ],
     },
 
     target: isProduction ? "browserslist" : "web",
@@ -394,7 +356,7 @@ const config = {
         rules: [
             {
                 test: /\.(ts|js)$/,
-                include: dirJsSrc,
+                include: dirJs,
                 use: [{ loader: "babel-loader", options: babelOpt }],
             },
             {
@@ -403,13 +365,6 @@ const config = {
                     {
                         loader: MiniCssExtractPlugin.loader,
                         options: MiniCssExtractPluginOpt,
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: "url(ata:image",
-                            replace: "url(data:image",
-                        },
                     },
                     {
                         loader: "css-loader",
@@ -445,73 +400,50 @@ const config = {
             {
                 test: regExpFont,
                 include: dirFonts,
-                use: {
-                    loader: "file-loader",
-                    options: {
-                        name: "[name].[ext]",
-                        outputPath: "fonts/",
-                    },
+                type: "asset/resource",
+                generator: {
+                    filename: "fonts/[name][ext]",
                 },
             },
             {
                 test: /\.svg$/,
                 include: dirFlags,
-                use: [
-                    {
-                        loader: "svg-url-loader",
-                        options: getSvgLoaderOpt("images/flags/"),
+                type: "asset/inline",
+                generator: {
+                    dataUrl: (content) => {
+                        let svg = content.toString()
+
+                        // Replace with custom colours
+                        svg = svg.replace('fill="#fff" fill-opacity="0"/>', `fill="${primary700}" fill-opacity="0.3"/>`)
+                        svg = svg.replace('fill="#fff" fill-opacity="1"/>', `fill="${primary200}" fill-opacity="1"/>`)
+
+                        // svgo
+                        svg = optimize(svg, svgoOpt).data
+
+                        // Compress
+                        return svgToMiniDataURI(svg)
                     },
-                    {
-                        loader: "image-webpack-loader",
-                        options: {
-                            svgo: svgoOpt,
-                        },
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="#fff" fill-opacity="0"/>',
-                            replace: `fill="${primary700}" fill-opacity="0.3"/>`,
-                        },
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="#fff" fill-opacity="1"/>',
-                            replace: `fill="${primary200}" fill-opacity="1"/>`,
-                        },
-                    },
-                ],
+                },
             },
             {
                 test: /\.svg$/,
                 include: dirIcons,
-                use: [
-                    {
-                        loader: "svg-url-loader",
-                        options: getSvgLoaderOpt("icons/"),
+                type: "asset/inline",
+                generator: {
+                    dataUrl: (content) => {
+                        let svg = content.toString()
+
+                        // Replace with custom colours
+                        svg = svg.replace('fill="$themeColour"', `fill="${themeColour}"`)
+                        svg = svg.replace('fill="$darkYellow"', `fill="${colourYellowDark}"`)
+
+                        // svgo
+                        svg = optimize(svg, svgoOpt).data
+
+                        // Compress
+                        return svgToMiniDataURI(svg)
                     },
-                    {
-                        loader: "image-webpack-loader",
-                        options: {
-                            svgo: svgoOpt,
-                        },
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="$themeColour"',
-                            replace: `fill="${themeColour}"`,
-                        },
-                    },
-                    {
-                        loader: "string-replace-loader",
-                        options: {
-                            search: 'fill="$darkYellow"',
-                            replace: `fill="${colourYellowDark}"`,
-                        },
-                    },
-                ],
+                },
             },
         ],
     },
@@ -540,21 +472,8 @@ if (isProduction) {
     config.optimization.minimize = true
     config.optimization.minimizer = [
         new CssMinimizerPlugin({
-            sourceMap: false,
-            minify: async (data) => {
-                const csso = require("csso")
-
-                const [[filename, input]] = Object.entries(data)
-                const minifiedCss = csso.minify(input, {
-                    comments: false,
-                    filename,
-                    sourceMap: false,
-                })
-
-                return {
-                    css: minifiedCss.css,
-                }
-            },
+            minimizerOptions: [{ comments: false, sourceMap: false }],
+            minify: [CssMinimizerPlugin.cssoMinify],
         }),
         new TerserPlugin({
             parallel: true,

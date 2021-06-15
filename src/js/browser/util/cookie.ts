@@ -10,6 +10,7 @@
 
 import Cookies from "js-cookie"
 import { appName } from "common/common-browser"
+import dayjs from "dayjs"
 
 const yearInDays = 365
 
@@ -28,19 +29,11 @@ export default class Cookie {
     // Default cookie value
     readonly #default: string
 
-    constructor({
-        id: baseId,
-        values = [],
-        expire = yearInDays,
-    }: {
-        id: string
-        values?: readonly string[]
-        expire?: number | Date
-    }) {
+    constructor({ id: baseId, values = [], expire }: { id: string; values?: readonly string[]; expire?: dayjs.Dayjs }) {
         this.#baseId = baseId
-        this.#expire = expire
-
+        this.#expire = expire ? dayjs(expire).toDate() : yearInDays
         this.#name = `${appName}--${this.#baseId}`
+
         this.#values = values
         this.#default = values?.[0]
     }
@@ -65,17 +58,12 @@ export default class Cookie {
      * Get cookie
      */
     get(): string {
-        let cookieValue = Cookies.get(this.#name) ?? undefined
+        let cookieValue = Cookies.get(this.#name) ?? this.#default
 
-        if (cookieValue) {
-            if (this.#values.length > 0 && !this.#values.includes(cookieValue)) {
-                // Use default value if cookie has invalid data and remove cookie
-                cookieValue = this.#default
-                this.remove()
-            }
-        } else {
-            // Use default value if cookie is not stored
+        if (this.#default && cookieValue && !this.#values.includes(cookieValue)) {
+            // Use default value if cookie has invalid data and remove cookie
             cookieValue = this.#default
+            this.remove()
         }
 
         return cookieValue

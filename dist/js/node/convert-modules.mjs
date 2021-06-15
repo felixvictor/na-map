@@ -1,8 +1,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Convert modules.
- * @module    src/node/convert-modules
+ * @file      Convert setModules.
+ * @module    src/node/convert-setModules
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -10,12 +10,14 @@
 import path from "path";
 import d3Array from "d3-array";
 const { group: d3Group } = d3Array;
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
-import { capitalizeFirstLetter, woodType } from "../common/common";
-import { cleanName, sortBy } from "../common/common-node";
+import { capitalizeFirstLetter, currentServerStartDate as serverDate, sortBy } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
+import { baseAPIFilename, cleanName } from "../common/common-node";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { serverIds } from "../common/servers";
+import { woodType } from "../common/types";
 let apiItems;
+const commonPaths = getCommonPaths();
 const notUsedExceptionalWoodIds = new Set([
     2358,
     2363,
@@ -81,7 +83,6 @@ export const convertModulesAndWoodData = async () => {
         ["NONE CREW_DAMAGE_RECEIVED_DECREASE_PERCENT", "Splinter resistance"],
         ["NONE GROG_MORALE_BONUS", "Morale"],
         ["NONE RUDDER_HALFTURN_TIME", "Rudder speed"],
-        ["NONE SHIP_MATERIAL", "Ship material"],
         ["NONE SHIP_MAX_SPEED", "Max speed"],
         ["NONE SHIP_PHYSICS_ACC_COEF", "Acceleration"],
         ["NONE SHIP_TURNING_ACCELERATION_TIME", "Turn acceleration"],
@@ -220,9 +221,14 @@ export const convertModulesAndWoodData = async () => {
     const setWood = (module) => {
         const wood = {};
         wood.id = module.id;
-        wood.properties = module.APImodifiers.map((modifier) => {
+        wood.properties = module.APImodifiers
+            .filter((modifier) => {
             const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
-            const modifierName = modifiers.get(apiModifierName) ?? "";
+            return modifiers.get(apiModifierName);
+        })
+            .map((modifier) => {
+            const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
+            const modifierName = modifiers.get(apiModifierName);
             let amount = modifier.Percentage;
             let isPercentage = true;
             if (modifier.Absolute) {
@@ -240,7 +246,7 @@ export const convertModulesAndWoodData = async () => {
                 isPercentage = true;
             }
             return {
-                modifier: modifierName ?? "",
+                modifier: modifierName,
                 amount,
                 isPercentage,
             };
@@ -273,7 +279,8 @@ export const convertModulesAndWoodData = async () => {
                 return true;
             }
             return modifiers.get(apiModifierName) !== "";
-        }).flatMap((modifier) => {
+        })
+            .flatMap((modifier) => {
             const apiModifierName = `${modifier.Slot} ${modifier.MappingIds.join()}`;
             const modifierName = modifiers.get(apiModifierName) ?? "";
             let amount = modifier.Percentage;
@@ -286,14 +293,14 @@ export const convertModulesAndWoodData = async () => {
                     isPercentage = false;
                 }
                 else {
-                    amount = Math.round(modifier.Absolute * 10000) / 100;
+                    amount = Math.round(modifier.Absolute * 10_000) / 100;
                 }
             }
             if (flipAmountForModule.has(modifierName)) {
                 amount *= -1;
             }
             else if (modifierName === "Splinter resistance") {
-                amount = Math.round(modifier.Absolute * 10000) / 100;
+                amount = Math.round(modifier.Absolute * 10_000) / 100;
                 isPercentage = true;
             }
             if (notPercentage.has(modifierName)) {
@@ -318,15 +325,16 @@ export const convertModulesAndWoodData = async () => {
                 amount,
                 isPercentage,
             };
-        });
+        })
+            .sort(sortBy(["modifier"]));
     };
     const getModuleType = (module) => {
         let type;
-        let { moduleLevel, moduleType, permanentType, sortingGroup, usageType } = module;
+        let { moduleLevel, moduleType, name, permanentType, sortingGroup, usageType } = module;
         if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim";
         }
-        else if (moduleType === "Permanent" && !module.name.endsWith(" Bonus")) {
+        else if (moduleType === "Permanent" && !name.endsWith(" Bonus")) {
             type = "Permanent";
         }
         else if (usageType === "All" && !sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
@@ -338,11 +346,11 @@ export const convertModulesAndWoodData = async () => {
         else {
             type = "Not used";
         }
-        if (module.name.endsWith("French Rig Refit") || module.name === "Bridgetown Frame Refit") {
+        if (name.endsWith("French Rig Refit") || name === "Bridgetown Frame Refit") {
             sortingGroup = "survival";
         }
         if (type === "Ship trim") {
-            const result = bonusRegex.exec(module.name);
+            const result = bonusRegex.exec(name);
             sortingGroup = result ? `\u202F\u2013\u202F${result[1]}` : "";
         }
         else {

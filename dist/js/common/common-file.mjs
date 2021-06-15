@@ -11,9 +11,10 @@ import { exec, execSync } from "child_process";
 import { default as fs, promises as pfs } from "fs";
 import path from "path";
 import { promisify } from "util";
+import { currentServerStartDate } from "./common";
 import { apiBaseFiles } from "./common-var";
-import { baseAPIFilename, serverStartDate } from "./common-dir";
 import { serverIds } from "./servers";
+import { baseAPIFilename } from "./common-node";
 const execP = promisify(exec);
 export const fileExists = (fileName) => fs.existsSync(fileName);
 export const makeDirAsync = async (dir) => {
@@ -60,7 +61,7 @@ const loopApiFiles = (command) => {
     const ext = command === "xz" ? "json" : "json.xz";
     for (const serverName of serverIds) {
         for (const apiBaseFile of apiBaseFiles) {
-            const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverStartDate}.${ext}`);
+            const fileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${currentServerStartDate}.${ext}`);
             xz(command, fileName);
         }
     }

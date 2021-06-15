@@ -1,0 +1,426 @@
+<% String.prototype.replaceAll = function(str1, str2, ignore) { %>
+<%     return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2); %>
+<% } %>
+
+<% function getBaseId(title) { %>
+<%    return title.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", ""); %>
+<% } %>
+
+<% function makeRadioGroup(data) { %>
+    <h6 class="dropdown-header"><%= data.title %></h6>
+    <div class="ms-3 mb-3" id="<%= data.name %>">
+        <% data.radios.forEach(function(radio) { %>
+            <input type="radio" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>"
+                   autocomplete="off" value="<%= radio.id %>">
+            <label class="btn btn-toggle text-body" for="<%= data.name %>-<%= radio.id %>"><%= radio.title %></label>
+        <% }) %>
+    </div>
+<% } %>
+
+<% function makeRadioToggleButtons(data) { %>
+    <h6 class="dropdown-header"><%= data.title %></h6>
+    <div class="ms-3 mb-3" id="<%= data.name %>">
+        <% data.radios.forEach(function(radio) { %>
+            <input type="radio" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= radio.id %>"
+                   autocomplete="off" value="<%= radio.id %>">
+            <label class="btn btn-toggle" for="<%= data.name %>-<%= radio.id %>" title="<%= radio.title %>">
+                <i class="icon icon-<%= radio.icon %> icon-navbar" role="img" aria-label="<%= radio.title %>"></i>
+            </label>
+        <% }) %>
+    </div>
+<% } %>
+
+<% function makeCheckboxGroup(data) { %>
+    <h6 class="dropdown-header"><%= data.title %></h6>
+    <div class="ms-3 mb-3" id="<%= data.name %>">
+        <input type="checkbox" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= data.name %>"
+               autocomplete="off">
+        <label class="btn btn-toggle" for="<%= data.name %>-<%= data.name %>" title="<%= data.title %>">
+            <i class="icon icon-<%= data.name %> icon-navbar" role="img" aria-label="<%= data.title %>"></i>
+        </label>
+    </div>
+<% } %>
+
+<% function makeSimpleList(data) { %>
+    <% data.forEach(function(item) { %>
+        <% const id = getBaseId(item.name) %>
+        <li><a class="dropdown-item d-flex align-items-center" id="menu-<%= id %>"><span
+                        class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
+                            class="icon icon-menu icon-<%= item.icon %>" role="img"
+                            aria-label="<%= item.name %>"></i></span>
+                <div class="menu-item-text">
+                    <% if(item.name==="Go to F11") { %>
+                        Go to <span class="caps">F11</span>
+                        <span
+                                class="small text-end badge badge-pill bg-primary">shift+<span
+                                class="caps">F11</span></span>
+                    <% } else { %>
+                        <%= item.name %>
+                    <% } %>
+                </div>
+            </a></li>
+    <% }) %>
+<% } %>
+
+<% function makeList(type, data) { %>
+    <div class="row row-cols-md-2 row-cols-1 g-0">
+        <% data.forEach(function(item) { %>
+            <% const id = getBaseId(item.name.replace(" compare", "")) %>
+            <li><a class="dropdown-item d-flex align-items-center" id="menu-<%= type %>-<%= id %>"><span
+                            class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
+                                class="icon icon-menu icon-<%= item.icon %>" role="img"
+                                aria-label="<%= item.name %>"></i></span>
+                    <div class="menu-item-text"><%= item.name %></div>
+                </a></li>
+        <% }) %>
+    </div>
+<% } %>
+
+<% function makeSelects(data) { %>
+    <% data.forEach(function(select) { %>
+        <% const id = getBaseId(select.title) %>
+        <li class="nav-item pe-2">
+            <label><select name="port-select-<%= id %>-select" id="port-select-<%= id %>-select" class="selectpicker"
+                           data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true"
+                           data-live-search-placeholder="Search ..." data-virtual-scroll="true"
+                           title="<%= select.title %>"></select></label>
+        </li>
+    <% }) %>
+<% } %>
+
+
+<!doctype html>
+<html lang="<%= htmlWebpackPlugin.options.lang %>" itemscope itemtype="http://schema.org/Map">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="description" content="<%= htmlWebpackPlugin.options.description %>">
+    <% if(htmlWebpackPlugin.options.canonicalUrl){ %>
+        <link rel="canonical" href="<%= htmlWebpackPlugin.options.canonicalUrl %>">
+    <% } else{ %>
+        <meta name="robots" content="noindex">
+    <% } %>
+    <meta itemprop="name" property="og:title" content="<%= htmlWebpackPlugin.options.title %>">
+    <meta itemprop="description" property="og:description" content="<%= htmlWebpackPlugin.options.description %>">
+    <meta itemprop="image" property="og:image" content="<%= htmlWebpackPlugin.options.iconLarge %>">
+    <meta itemprop="url" property="og:url" content="<%= htmlWebpackPlugin.options.canonicalUrl %>">
+
+    <meta property="og:locale" content="<%= htmlWebpackPlugin.options.lang.toLowerCase().replace("-", "_") %>">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
+</head>
+
+<body class="data-bs-no-jquery">
+
+<% /*          %>
+<% const colours = ["primary", "secondary", "gray", "blue", "yellow"] %>
+<% let steps = ["050", "100", "200", "300", "400", "500", "600", "700", "800", "900"] %>
+<div class="row">
+    <% colours.forEach(colour => { %>
+    <div class="col-sm-3 colour-palette">
+        <div class="colour-slab colour-slab-base <%= colour %>-500">500 <%= colour %></div>
+        <% steps.forEach(step => { %>
+            <div class="colour-slab <%= colour %>-<%= step %>"><%= step %></div>
+        <% }) %>
+    </div>
+    <% }) %>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base success">success</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base info">info</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base warning">warning</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base danger">danger</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base white">white</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base light">light</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base gray">gray</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base dark">dark</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base gray-dark">gray-dark</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base black">black</div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base red-light">red-light</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base red-dark">red-dark</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base green-light">green-light</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base green-dark">green-dark</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base black">black</div>
+    </div>
+    <div class="col-sm-2 colour-palette">
+        <div class="colour-slab colour-slab-base yellow-dark">yellow-dark</div>
+    </div>
+</div>
+<%          */ %>
+
+<nav class="navbar navbar-expand-xl navbar-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="<%= htmlWebpackPlugin.options.iconSmall %>" width="32" height="32" alt="Brand">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div id="navbar-left" class="navbar-nav me-auto d-none">
+
+                <div id="selectPortNavbar">
+                    <div class="nav-item dropdown pe-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="propertyDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Select ports on
+                        </a>
+                        <ul class="dropdown-menu" id="propertyMenu" aria-labelledby="propertyDropdown">
+                            <li><h6 class="dropdown-header">Port owner</h6></li>
+                            <li><label class="dropend">
+                                    <select title="Select nation" name="port-select-nation-select"
+                                            id="port-select-nation-select"></select>
+                                </label></li>
+                            <li><label class="dropend">
+                                    <select title="Select clan" name="port-select-clan-select"
+                                            id="port-select-clan-select"></select>
+                                </label></li>
+
+                            <li><h6 class="dropdown-header mt-3">Port property</h6></li>
+                            <li><a class="dropdown-item" id="menu-prop-deep">Deep water</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-shallow">Shallow water</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-all">Available to all</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a></li>
+
+                            <li><h6 class="dropdown-header mt-3">Port capture time</h6></li>
+                            <li><a class="dropdown-item" id="menu-prop-today">Today</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-this-week">This week</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-last-week">Last week</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <% let dataSelects = [
+                        {title: "Show trade relations"},
+                        {title: "Show goods’ relations"}
+                ]%>
+                <% makeSelects(dataSelects) %>
+
+                <div class="nav-item pe-2">
+                    <label><select name="port-select-show-good-availability-select" id="port-select-show-good-availability-select" class="d-none"></select></label>
+                </div>
+            </div>
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="map-tools-dropdown"
+                       role="button" title="Map tools" aria-label="Map tools"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="icon icon-map-tools icon-navbar" role="img" aria-label="Map tools"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-md dropdown-menu-end" id="map-tools-menu"
+                         aria-labelledby="map-tools-dropdown">
+
+                        <% let dataList = [
+                            { name: "Predict wind", icon: "wind" },
+                            { name: "In-game wind", icon: "ingame-wind" },
+                            { name: "Go to F11", icon: "geo" },
+                            { name: "Get position", icon: "position" },
+                            { name: "Make journey", icon: "journey" }
+                        ] %>
+                        <% makeSimpleList(dataList) %>
+
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="game-tools-dropdown"
+                       role="button" title="Game tools" aria-label="Game tools"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="icon icon-bar-chart icon-navbar" role="img" aria-label="Game tools"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-xl dropdown-menu-end" id="game-tools-menu"
+                         aria-labelledby="game-tools-dropdown">
+
+                        <% dataList = [
+                            { name: "Ship compare", icon: "sailing" },
+                            { name: "Wood compare", icon: "wood" }
+                        ] %>
+                        <% makeList("compare", dataList) %>
+
+                        <li><div class="dropdown-divider my-3"></div></li>
+                        <% dataList = [
+                            { name: "Admiralty items and recipes", icon: "admiralty" },
+                            { name: "Buildings", icon: "building" },
+                            { name: "Cannons", icon: "cannon" },
+                            { name: "Conquest flags", icon: "flag" },
+                            { name: "Loot and chests", icon: "loot" },
+                            { name: "Modules", icon: "modules" },
+                            { name: "Port battles", icon: "war" },
+                            { name: "Port bonuses", icon: "bonus" },
+                            { name: "Recipe ingredients", icon: "ingredient" },
+                            { name: "Ships", icon: "sailing" },
+                            { name: "Ship blueprints", icon: "labour" },
+                            { name: "Woods", icon: "wood" }
+                        ] %>
+                        <% makeList("list", dataList) %>
+
+                        <li><div class="dropdown-divider my-3"></div></li>
+                        <% dataList = [
+                            { name: "Net income", icon: "income" },
+                            { name: "Ownership overview", icon: "overview" },
+                            { name: "Power map", icon: "map" }
+                        ] %>
+                        <% makeList("show", dataList) %>
+
+                        <li><div class="dropdown-divider my-3"></div></li>
+                        <!--suppress HtmlUnknownTarget -->
+                        <li><a class="dropdown-item d-flex align-items-center" id="menu-download-pb-calc"
+                               href="data/port-battle.xlsx" download="port-battle-calculator.xlsx"><span
+                                        class="icon-menu-label d-flex align-items-center justify-content-center me-2 p-2"><i
+                                            class="icon icon-menu icon-spreadsheet" role="img"
+                                            aria-label="Port battle calculator"></i></span>Port battle calculator</a>
+                        </li>
+                    </ul>
+
+                </li>
+
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" title="Settings"
+                       aria-label="Settings">
+                        <i class="icon icon-options icon-navbar" role="img" aria-label="Settings"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg" id="settingsMenu"
+                         aria-labelledby="settingsDropdown">
+                    <form>
+                        <% let dataRadio = {
+                            title: "Game server",
+                            name: "server-name",
+                            radios: []
+                        }%>
+                        <% for (const server of htmlWebpackPlugin.options.servers) {
+                            dataRadio.radios.push({ id: server.id, title: server.name, icon: server.icon })
+                        } %>
+                        <% makeRadioToggleButtons(dataRadio) %>
+
+                        <% dataRadio = {
+                            title: "Show per port",
+                            name: "show-radius",
+                            radios: [
+                                {id: "attack", title: "Attack"},
+                                {id: "county", title: "County"},
+                                {id: "position", title: "Position"},
+                                {id: "points", title: "Points"},
+                                {id: "tax", title: "Tax income"},
+                                {id: "net", title: "Net income"},
+                                {id: "off", title: "Off"}
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
+
+                        <% dataRadio = {
+                            title: "Zones",
+                            name: "show-zones",
+                            radios: [
+                                { id: "pb-all", title: "All ports" },
+                                { id: "pb-single", title: "Single port" },
+                                { id: "raid-all", title: "All raid" },
+                                { id: "raid-single", title: "Single raid" },
+                                { id: "off", title: "Off" }
+                            ]
+                        }%>
+                        <% makeRadioGroup(dataRadio) %>
+
+                        <% dataRadio = {
+                            title: "Show Trades",
+                            name: "show-trades"
+                        }%>
+                        <% makeCheckboxGroup(dataRadio) %>
+
+                        <% dataRadio = {
+                            title: "Show grid",
+                            name: "show-grid"
+                        }%>
+                        <% makeCheckboxGroup(dataRadio) %>
+
+                        <% dataRadio = {
+                            title: "Double click to",
+                            name: "double-click-action",
+                            radios: [
+                                {id: "compass", title: "Plot a course", icon: "show-course"},
+                                {id: "f11", title: "Show F11 coordinates", icon: "show-f11"}
+                            ]
+                        }%>
+                        <% makeRadioToggleButtons(dataRadio) %>
+                    </form>
+                    </ul>
+                </li>
+
+                <form>
+                    <div class="btn-group" role="group">
+                        <button type="button" id="reset" class="btn px-2" title="Clear" aria-label="Clear">
+                            <i class="icon icon-clear icon-navbar" role="img" aria-label="Clear"></i>
+                        </button>
+                        <a role="button" class="btn px-2" target="_blank" rel=”noopener” title="Donate" aria-label="Donate"
+                           href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url">
+                            <i class="icon icon-gift icon-navbar" role="img" aria-label="Donate"></i>
+                        </a>
+                        <button type="button" id="about" class="btn px-2" title="About" aria-label="About">
+                            <i class="icon icon-info icon-navbar" role="img" aria-label="About"></i>
+                        </button>
+                    </div>
+                </form>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main role="main" class="container-fluid">
+    <div id="na-map" class="central"></div>
+    <div class="overlay overlay-no-grid">
+        <div id="wind" class="wind-predict-column">
+            <svg class="svg-background-light svg-text-center shadow d-none"></svg>
+        </div>
+        <div id="toast-column" aria-live="polite" aria-atomic="true" class="toast-column align-items-start"></div>
+        <div id="summary-column" class="summary-column"></div>
+    </div>
+    <div id="modal-section"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</body>
+</html>

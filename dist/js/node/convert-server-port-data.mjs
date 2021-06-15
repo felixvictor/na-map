@@ -11,17 +11,18 @@ import path from "path";
 import dayjs from "dayjs";
 import d3Array from "d3-array";
 const { group: d3Group } = d3Array;
-import { findNationById, nations, nationShortName } from "../common/common";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate, findNationById, nations, nationShortName, sortBy, } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { cleanName, simpleNumberSort, sortBy } from "../common/common-node";
+import { baseAPIFilename, cleanItemName, cleanName, simpleNumberSort } from "../common/common-node";
 import { serverTwitterNames } from "../common/common-var";
 import { serverIds } from "../common/servers";
-const minProfit = 30000;
+const minProfit = 30_000;
 const frontlinePorts = 2;
 let apiItems;
 let apiPorts;
 let apiShops;
+const commonPaths = getCommonPaths();
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`);
 const distancesOrig = readJson(distancesFile);
 let distances;
@@ -34,6 +35,7 @@ const getDistance = (fromPortId, toPortId) => fromPortId < toPortId
     ? distances.get(fromPortId * numberPorts + toPortId) ?? 0
     : distances.get(toPortId * numberPorts + fromPortId) ?? 0;
 const getPriceTierQuantity = (id) => apiItems.find((item) => item.Id === id)?.PriceTierQuantity ?? 0;
+const isTradeItem = (item) => item.SortingGroup === "Resource.Trading" || item.Name === "American Cotton" || item.Name === "Tobacco";
 const setPortFeaturePerServer = (apiPort) => {
     const portShop = apiShops.find((shop) => shop.Id === apiPort.Id);
     if (portShop) {
@@ -135,19 +137,22 @@ const setAndSaveDroppedItems = async (serverName) => {
         .map((item) => {
         const tradeItem = {
             id: item.Id,
-            name: cleanName(item.Name),
+            name: isTradeItem(item) ? cleanItemName(item.Name) : cleanName(item.Name),
             price: item.BasePrice,
         };
         if (item.PortPrices.RangePct) {
             tradeItem.distanceFactor = item.PortPrices.RangePct;
         }
+        if (item.ItemWeight) {
+            tradeItem.weight = item.ItemWeight;
+        }
         return tradeItem;
     });
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items);
 };
-const baseTimeInTicks = 621355968000000000;
+const baseTimeInTicks = 621_355_968_000_000_000;
 const getTimeFromTicks = (timeInTicks) => {
-    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10000).format("YYYY-MM-DD HH:mm");
+    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10_000).format("YYYY-MM-DD HH:mm");
 };
 const setAndSavePortBattleData = async (serverName) => {
     const pb = apiPorts
@@ -266,9 +271,7 @@ export const convertServerPortData = () => {
                 weight: item.ItemWeight,
                 itemType: item.ItemType,
                 buyPrice: item.BasePrice,
-                trading: item.SortingGroup === "Resource.Trading" ||
-                    item.Name === "American Cotton" ||
-                    item.Name === "Tobacco",
+                trading: isTradeItem(item),
             },
         ]));
         itemWeights = new Map(apiItems

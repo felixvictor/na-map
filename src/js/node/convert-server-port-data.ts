@@ -11,14 +11,20 @@
 import path from "path"
 import dayjs from "dayjs"
 
-import d3Array from "d3-array"
-const { group: d3Group } = d3Array
+import { group as d3Group } from "d3-array"
 
-import { findNationById, nations, nationShortName, NationShortName } from "../common/common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import {
+    currentServerStartDate as serverDate,
+    findNationById,
+    nations,
+    nationShortName,
+    NationShortName,
+    sortBy,
+} from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
 import { Distance } from "../common/common-math"
-import { cleanName, simpleNumberSort, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanItemName, cleanName, simpleNumberSort } from "../common/common-node"
 import { serverTwitterNames } from "../common/common-var"
 import { serverIds } from "../common/servers"
 
@@ -36,13 +42,14 @@ interface Item {
     buyPrice: number
 }
 
-const minProfit = 30000
+const minProfit = 30_000
 const frontlinePorts = 2
 
 let apiItems: APIItemGeneric[]
 let apiPorts: APIPort[]
 let apiShops: APIShop[]
 
+const commonPaths = getCommonPaths()
 const distancesFile = path.resolve(commonPaths.dirGenGeneric, `distances.json`)
 const distancesOrig: Distance[] = readJson(distancesFile)
 let distances: Map<number, number>
@@ -59,6 +66,9 @@ const getDistance = (fromPortId: number, toPortId: number): number =>
         : distances.get(toPortId * numberPorts + fromPortId) ?? 0
 
 const getPriceTierQuantity = (id: number): number => apiItems.find((item) => item.Id === id)?.PriceTierQuantity ?? 0
+
+const isTradeItem = (item: APIItemGeneric): boolean =>
+    item.SortingGroup === "Resource.Trading" || item.Name === "American Cotton" || item.Name === "Tobacco"
 
 /**
  *
@@ -198,12 +208,20 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
         .map((item) => {
             const tradeItem = {
                 id: item.Id,
-                name: cleanName(item.Name),
-                price: item.BasePrice,
+                name: isTradeItem(item) ? cleanItemName(item.Name) : cleanName(item.Name),
+                buyPrice: item.BasePrice,
             } as TradeItem
+
+            if (item.PortPrices.Consumed.SellPrice.Min > 0) {
+                tradeItem.sellPrice = item.PortPrices.Consumed.SellPrice.Min
+            }
 
             if (item.PortPrices.RangePct) {
                 tradeItem.distanceFactor = item.PortPrices.RangePct
+            }
+
+            if (item.ItemWeight) {
+                tradeItem.weight = item.ItemWeight
             }
 
             return tradeItem
@@ -212,9 +230,9 @@ const setAndSaveDroppedItems = async (serverName: string): Promise<void> => {
     await saveJsonAsync(path.resolve(commonPaths.dirGenServer, `${serverName}-items.json`), items)
 }
 
-const baseTimeInTicks = 621355968000000000
+const baseTimeInTicks = 621_355_968_000_000_000
 const getTimeFromTicks = (timeInTicks: number): string => {
-    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10000).format("YYYY-MM-DD HH:mm")
+    return dayjs.utc((timeInTicks - baseTimeInTicks) / 10_000).format("YYYY-MM-DD HH:mm")
 }
 
 const setAndSavePortBattleData = async (serverName: string): Promise<void> => {
@@ -400,10 +418,7 @@ export const convertServerPortData = (): void => {
                         weight: item.ItemWeight,
                         itemType: item.ItemType,
                         buyPrice: item.BasePrice,
-                        trading:
-                            item.SortingGroup === "Resource.Trading" ||
-                            item.Name === "American Cotton" ||
-                            item.Name === "Tobacco",
+                        trading: isTradeItem(item),
                     },
                 ])
         )

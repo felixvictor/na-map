@@ -10,15 +10,17 @@
 import path from "path";
 import d3Array from "d3-array";
 const { group: d3Group } = d3Array;
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate, simpleStringSort, sortBy } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync } from "../common/common-file";
-import { cleanName, simpleStringSort, sortBy } from "../common/common-node";
+import { baseAPIFilename, cleanName } from "../common/common-node";
 import { serverIds } from "../common/servers";
 let apiItems;
+const commonPaths = getCommonPaths();
 const craftGroups = new Map([
     ["AdmiralityShips", "Admirality permits"],
     ["AdmiraltyBooks", "Admirality books"],
-    ["AdmiraltyModules", "Admirality modules"],
+    ["AdmiraltyModules", "Admirality setModules"],
     ["AdmiraltyRecipes", "Admirality blueprints"],
     ["AdmiraltyResourcesAndMaterials", "Admirality resources"],
     ["AdmiraltyRewards", "PVP rewards"],

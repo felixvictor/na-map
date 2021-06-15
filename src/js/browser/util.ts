@@ -20,9 +20,7 @@ import {
     radiansToDegrees,
 } from "common/common-math"
 
-import JQuery from "jquery"
 import { Selection } from "d3-selection"
-import { Segment } from "./map/make-journey"
 
 /**
  * Display formatted compass
@@ -70,7 +68,7 @@ export const displayCompassAndDegrees = (wind: number | string, svg = false): st
  * @returns Wind in correctionValueDegrees
  */
 export const getUserWind = (sliderId: string): number => {
-    const currentUserWind = degreesToCompass($(`#${sliderId}`).roundSlider("getValue"))
+    const currentUserWind = degreesToCompass(Number($(`#${sliderId}`).roundSlider("getValue")))
     let windDegrees: number
 
     // eslint-disable-next-line unicorn/prefer-ternary
@@ -155,7 +153,9 @@ export const printCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<SVGGElement, Segment, HTMLElement, unknown>
+    element:
+        | Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+        | Selection<SVGGElement, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
@@ -175,6 +175,7 @@ export const printCompassRose = ({
 
     // Cardinal and intercardinal winds
     const label = element
+        .append("g")
         .selectAll("g")
         .data(data)
         .join((enter) =>
@@ -235,7 +236,9 @@ export const printSmallCompassRose = ({
     element,
     radius,
 }: {
-    element: Selection<SVGGElement, unknown, HTMLElement, unknown>
+    element:
+        | Selection<SVGSVGElement, unknown, HTMLElement, unknown>
+        | Selection<SVGGElement, unknown, HTMLElement, unknown>
     radius: number
 }): void => {
     const steps = numberSegments
@@ -256,6 +259,7 @@ export const printSmallCompassRose = ({
     const x2InterCard = 4
     const x2Card = 6
     element
+        .append("g")
         .selectAll("line")
         .data(data)
         .join((enter) =>
@@ -285,10 +289,10 @@ export const displayClan = (clan: string): string => `<span class="caps">${clan}
 /**
  * Copy to clipboard (fallback solution)
  * @param   text - String
- * @param modal$ - Modal
+ * @param modalSel - Modal
  * @returns Success
  */
-const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
+const copyToClipboardFallback = (text: string, modalSel: HTMLDivElement): boolean => {
     // console.log("copyToClipboardFallback");
     if (document.queryCommandSupported?.("copy")) {
         const input = document.createElement("input")
@@ -298,7 +302,7 @@ const copyToClipboardFallback = (text: string, modal$: JQuery): boolean => {
         input.style.position = "absolute"
         input.style.left = "-1000px"
         input.style.top = "-1000px"
-        modal$.append(input)
+        modalSel.append(input)
         input.select()
 
         try {
@@ -336,11 +340,11 @@ const writeClipboard = async (text: string): Promise<boolean> => {
 /**
  * Copy to clipboard (clipboard API)
  * @param text - String
- * @param modal$ - Modal
+ * @param modalSel - Modal
  */
-export const copyToClipboard = (text: string, modal$: JQuery): void => {
+export const copyToClipboard = (text: string, modalSel: HTMLDivElement): void => {
     if (!navigator.clipboard) {
-        copyToClipboardFallback(text, modal$)
+        copyToClipboardFallback(text, modalSel)
     }
 
     void writeClipboard(text)
@@ -350,16 +354,16 @@ export const copyToClipboard = (text: string, modal$: JQuery): void => {
  * Copy F11 coordinates to clipboard
  * @param x - X Coordinate
  * @param z - Z Coordinate
- * @param modal$ - Modal
+ * @param modalSel - Modal
  */
-export const copyF11ToClipboard = (x: number, z: number, modal$: JQuery): void => {
+export const copyF11ToClipboard = (x: number, z: number, modalSel: HTMLDivElement): void => {
     if (Number.isFinite(x) && Number.isFinite(z)) {
         const F11Url = new URL(window.location.href)
 
         F11Url.searchParams.set("x", String(x))
         F11Url.searchParams.set("z", String(z))
 
-        copyToClipboard(F11Url.href, modal$)
+        copyToClipboard(F11Url.href, modalSel)
     }
 }
 

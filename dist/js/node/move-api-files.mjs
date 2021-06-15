@@ -9,10 +9,11 @@
  */
 import * as fs from "fs";
 import path from "path";
-import { commonPaths } from "../common/common-dir";
+import { getCommonPaths } from "../common/common-dir";
 import { makeDirAsync } from "../common/common-file";
-const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/;
+const commonPaths = getCommonPaths();
 const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/;
+const yearRegex = /^api-.+-(\d{4})-\d{2}-\d{2}\.json(\.xz)?$/;
 const moveFileAsync = async (oldFileName, newFileName) => {
     fs.rename(oldFileName, newFileName, (err) => {
         if (err) {

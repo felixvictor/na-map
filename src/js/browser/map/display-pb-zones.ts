@@ -10,7 +10,7 @@
 
 import { select as d3Select, Selection } from "d3-selection"
 
-import { servers } from "common/servers"
+import { getServerType, ServerId, ServerType } from "common/servers"
 import { drawSvgCircle, drawSvgRect } from "../util"
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
@@ -21,15 +21,15 @@ import { PbZone, PbZoneBasic, PbZoneDefence, PbZoneRaid } from "common/gen-json"
 import { Extent, Point } from "common/common-math"
 
 export default class DisplayPbZones {
-    readonly #fortRangeRadius = 15
-    readonly #towerRangeRadius = 12
+    readonly #fortRangeRadius = 12
+    readonly #towerRangeRadius = 10
     showPB: string
-    #serverType: string
+    #serverType: ServerType
     #lowerBound = {} as Point
     #upperBound = {} as Point
     private readonly _ports!: DisplayPorts
     private readonly _showId: string
-    private readonly _showValues: Array<{ id: string; label: string }>
+    private readonly _showValues: string[]
     private readonly _showCookie: Cookie
     private readonly _showRadios: RadioButton
     private _isDataLoaded: boolean
@@ -39,37 +39,26 @@ export default class DisplayPbZones {
     private _raidZonesFiltered!: PbZoneRaid[]
     private _g!: Selection<SVGGElement, unknown, HTMLElement, unknown>
 
-    constructor(ports: DisplayPorts, serverId: string) {
+    constructor(ports: DisplayPorts, serverId: ServerId) {
         this._ports = ports
-        this.#serverType = servers.find((server) => server.id === serverId)!.type
+        this.#serverType = getServerType(serverId)
 
         this._showId = "show-zones"
 
         /**
          * Possible values for show port battle zones radio buttons (first is default value)
          */
-        this._showValues = [
-            { id: "pb-all", label: "All ports" },
-            { id: "pb-single", label: "Single port" },
-            { id: "raid-all", label: "All raid" },
-            { id: "raid-single", label: "Single raid" },
-            { id: "off", label: "Off" },
-        ]
-
-        this._setupRadios()
+        this._showValues = ["pb-all", "pb-single", "raid-all", "raid-single", "off"]
 
         /**
          * Show port battle zones cookie
          */
-        this._showCookie = new Cookie({ id: this._showId, values: this._showValues.map((item) => item.id) })
+        this._showCookie = new Cookie({ id: this._showId, values: this._showValues })
 
         /**
          * Show port battle zones radio buttons
          */
-        this._showRadios = new RadioButton(
-            this._showId,
-            this._showValues.map((item) => item.id)
-        )
+        this._showRadios = new RadioButton(this._showId, this._showValues)
 
         /**
          * Get showLayer setting from cookie or use default value
@@ -86,34 +75,15 @@ export default class DisplayPbZones {
         this._g = d3Select<SVGSVGElement, unknown>("#map").insert<SVGGElement>("g", "#ports").attr("class", "pb")
     }
 
-    _setupRadios(): void {
-        const divMain = d3Select("#show-zones")
-        for (const radioItem of this._showValues) {
-            const div = divMain.append("div").attr("class", "custom-control custom-radio custom-control-inline")
-            div.append("input")
-                .attr("type", "radio")
-                .attr("class", "custom-control-input")
-                .attr("name", "show-zones")
-                .attr("id", `show-zones-${radioItem.id}`)
-                .attr("value", radioItem.id)
-            div.append("label")
-                .attr("type", "radio")
-                .attr("class", "custom-control-label")
-                .attr("for", `show-zones-${radioItem.id}`)
-                .text(radioItem.label)
-        }
-    }
-
     async _loadData(): Promise<void> {
         this._pbZonesDefault = (
-            await import(/* webpackChunkName: "data-pb-zones" */ "../../../lib/gen-generic/pb-zones.json")
+            await import(/* webpackChunkName: "data-pb-zones" */ "../../../../lib/gen-generic/pb-zones.json")
         ).default as PbZone[]
     }
 
     _setupListener(): void {
-        document.querySelector(`#${this._showId}`)?.addEventListener("change", (event) => {
+        document.querySelector(`#${this._showId}`)?.addEventListener("change", () => {
             this._showPBZonesSelected()
-            event.preventDefault()
         })
     }
 
@@ -130,7 +100,7 @@ export default class DisplayPbZones {
     }
 
     _refreshPBZones(): void {
-        this.refresh()
+        void this.refresh()
         this._ports.updateTexts()
     }
 
@@ -145,143 +115,133 @@ export default class DisplayPbZones {
         this._g
             .selectAll<SVGGElement, PbZoneBasic>("g.pb-zones")
             .data(this._pbZonesFiltered, (d) => String(d.id))
-            .join(
-                (enter): Selection<SVGGElement, PbZoneBasic, SVGGElement, unknown> => {
-                    const g = enter.append("g").attr("class", "pb-zones")
+            .join((enter): Selection<SVGGElement, PbZoneBasic, SVGGElement, unknown> => {
+                const g = enter.append("g").attr("class", "pb-zones text-tiny")
 
-                    // Port battle join circles
-                    g.append("path")
-                        .attr("class", "pb-join-circle")
-                        .attr(
-                            "d",
-                            (d) =>
-                                drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 28) +
-                                drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 14)
-                        )
+                // Port battle join circles
+                g.append("path")
+                    .attr("class", "stroke-primary-light")
+                    .attr(
+                        "d",
+                        (d) =>
+                            drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 28) +
+                            drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 14)
+                    )
 
-                    // Port battle circles
+                // Port battle circles
+                g.append("path")
+                    .attr("class", "fill-primary-dark")
+                    .attr("d", (d) =>
+                        d.pbCircles.map((pbCircle) => drawSvgCircle(pbCircle[0], pbCircle[1], 3.5)).join("")
+                    )
+                g.append("text")
+                    .attr("class", "svg-text-center fill-white")
+                    .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
+                    .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
+                    .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
+
+                // Spawn points
+                if (this.#serverType === "PVP") {
                     g.append("path")
-                        .attr("class", "pb-circle")
+                        .attr("class", "fill-primary-light")
                         .attr("d", (d) =>
-                            d.pbCircles.map((pbCircle) => drawSvgCircle(pbCircle[0], pbCircle[1], 3.5)).join("")
+                            d.spawnPoints.map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5)).join("")
                         )
                     g.append("text")
-                        .attr("class", "pb-text pb-circle-text")
-                        .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
-                        .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
-                        .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
-
-                    // Spawn points
-                    if (this.#serverType === "PVP") {
-                        g.append("path")
-                            .attr("class", "raid-point")
-                            .attr("d", (d) =>
-                                d.spawnPoints
-                                    .map((spawnPoint) => drawSvgCircle(spawnPoint[0], spawnPoint[1], 3.5))
-                                    .join("")
-                            )
-                        g.append("text")
-                            .attr("class", "pb-text raid-point-text")
-                            .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
-                            .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
-                            .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
-                    }
-
-                    return g
+                        .attr("class", "svg-text-center fill-text")
+                        .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
+                        .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
+                        .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
                 }
-            )
+
+                return g
+            })
 
         const fortSize = 3
         const towerSize = 1.5
         this._g
             .selectAll<SVGGElement, PbZoneDefence>("g.defence")
             .data(this._defencesFiltered, (d) => String(d.id))
-            .join(
-                (enter): Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
-                    const g = enter.append("g").attr("class", "defence")
+            .join((enter): Selection<SVGGElement, PbZoneDefence, SVGGElement, unknown> => {
+                const g = enter.append("g").attr("class", "defence svg-text-center fill-white text-tiny")
 
-                    // Shooting ranges
-                    g.selectAll<SVGPathElement, Point[]>("path.tower-range")
-                        .data((d) => d.towers)
-                        .join((enter) =>
-                            enter
-                                .append("path")
-                                .attr("class", "tower-range")
-                                .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#towerRangeRadius))
-                        )
-                    g.selectAll<SVGPathElement, Point[]>("path.fort-range")
-                        .data((d) => d.forts)
-                        .join((enter) =>
-                            enter
-                                .append("path")
-                                .attr("class", "fort-range")
-                                .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#fortRangeRadius))
-                        )
+                // Shooting ranges
+                g.selectAll<SVGPathElement, Point[]>("path.tower-range")
+                    .data((d) => d.towers)
+                    .join((enter) =>
+                        enter
+                            .append("path")
+                            .attr("class", "tower-range background-primary-light")
+                            .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#towerRangeRadius))
+                    )
+                g.selectAll<SVGPathElement, Point[]>("path.fort-range")
+                    .data((d) => d.forts)
+                    .join((enter) =>
+                        enter
+                            .append("path")
+                            .attr("class", "fort-range background-red")
+                            .attr("d", (d) => drawSvgCircle(d[0], d[1], this.#fortRangeRadius))
+                    )
 
-                    // Forts
-                    g.append("path")
-                        .attr("class", "fort")
-                        .attr("d", (d) => d.forts.map((fort) => drawSvgRect(fort[0], fort[1], fortSize)).join(""))
-                    g.append("text")
-                        .attr("class", "pb-text pb-fort-text")
-                        .attr("x", (d) => d.forts.map((fort) => fort[0]).join(","))
-                        .attr("y", (d) => d.forts.map((fort) => fort[1]).join(","))
-                        .text((d) => d.forts.map((fort, i) => `${i + 1}`).join(""))
+                // Forts
+                g.append("path")
+                    .attr("class", "fort fill-red")
+                    .attr("d", (d) => d.forts.map((fort) => drawSvgRect(fort[0], fort[1], fortSize)).join(""))
+                g.append("text")
+                    .attr("class", "svg-text-center fill-white")
+                    .attr("x", (d) => d.forts.map((fort) => fort[0]).join(","))
+                    .attr("y", (d) => d.forts.map((fort) => fort[1]).join(","))
+                    .text((d) => d.forts.map((fort, i) => `${i + 1}`).join(""))
 
-                    // Towers
-                    g.append("path")
-                        .attr("class", "tower")
-                        .attr("d", (d) =>
-                            d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], towerSize)).join("")
-                        )
-                    g.append("text")
-                        .attr("class", "pb-text pb-tower-text")
-                        .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
-                        .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
-                        .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""))
+                // Towers
+                g.append("path")
+                    .attr("class", "tower fill-dark")
+                    .attr("d", (d) => d.towers.map((tower) => drawSvgCircle(tower[0], tower[1], towerSize)).join(""))
+                g.append("text")
+                    .attr("class", "svg-text-center fill-white")
+                    .attr("x", (d) => d.towers.map((tower) => tower[0]).join(","))
+                    .attr("y", (d) => d.towers.map((tower) => tower[1]).join(","))
+                    .text((d) => d.towers.map((tower, i) => `${i + 1}`).join(""))
 
-                    return g
-                }
-            )
+                return g
+            })
 
         this._g
             .selectAll<SVGGElement, PbZoneRaid>("g.raid-zones")
             .data(this._raidZonesFiltered, (d) => String(d.id))
-            .join(
-                (enter): Selection<SVGGElement, PbZoneRaid, SVGGElement, unknown> => {
-                    const g = enter.append("g").attr("class", "raid-zones")
+            .join((enter): Selection<SVGGElement, PbZoneRaid, SVGGElement, unknown> => {
+                const g = enter.append("g").attr("class", "raid-zones text-tiny")
 
-                    // Raid join circles
-                    g.append("path")
-                        .attr("class", "raid-join-circle")
-                        .attr("d", (d) => drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 35))
+                // Raid join circles
+                g.append("path")
+                    .attr("class", "stroke-primary-light")
+                    .attr("d", (d) => drawSvgCircle(d.joinCircle[0], d.joinCircle[1], 35))
 
-                    // Raid circles
-                    g.append("path")
-                        .attr("class", "raid-circle")
-                        .attr("d", (d) =>
-                            d.raidCircles.map((raidCircle) => drawSvgCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
-                        )
-                    g.append("text")
-                        .attr("class", "pb-text raid-circle-text")
-                        .attr("x", (d) => d.raidCircles.map((raidCircle) => raidCircle[0]).join(","))
-                        .attr("y", (d) => d.raidCircles.map((raidCircle) => raidCircle[1]).join(","))
-                        .text((d) => d.raidCircles.map((raidCircle, i) => String.fromCharCode(65 + i)).join(""))
+                // Raid circles
+                g.append("path")
+                    .attr("class", "fill-primary-dark")
+                    .attr("d", (d) =>
+                        d.raidCircles.map((raidCircle) => drawSvgCircle(raidCircle[0], raidCircle[1], 4.5)).join("")
+                    )
+                g.append("text")
+                    .attr("class", "svg-text-center fill-white")
+                    .attr("x", (d) => d.raidCircles.map((raidCircle) => raidCircle[0]).join(","))
+                    .attr("y", (d) => d.raidCircles.map((raidCircle) => raidCircle[1]).join(","))
+                    .text((d) => d.raidCircles.map((raidCircle, i) => String.fromCharCode(65 + i)).join(""))
 
-                    // Raid points
-                    g.append("path")
-                        .attr("class", "raid-point")
-                        .attr("d", (d) =>
-                            d.raidPoints.map((raidPoint) => drawSvgCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
-                        )
-                    g.append("text")
-                        .attr("class", "pb-text raid-point-text")
-                        .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
-                        .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
-                        .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""))
-                    return g
-                }
-            )
+                // Raid points
+                g.append("path")
+                    .attr("class", "fill-primary-light")
+                    .attr("d", (d) =>
+                        d.raidPoints.map((raidPoint) => drawSvgCircle(raidPoint[0], raidPoint[1], 1.5)).join("")
+                    )
+                g.append("text")
+                    .attr("class", "svg-text-center fill-text")
+                    .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
+                    .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
+                    .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""))
+                return g
+            })
     }
 
     _isPortIn(d: PbZone): boolean {
@@ -293,16 +253,14 @@ export default class DisplayPbZones {
         )
     }
 
-    _setData(): void {
+    async _setData(): Promise<void> {
         if (this._ports.zoomLevel === "pbZone" && this.showPB !== "off") {
-            if (this._isDataLoaded) {
-                this._filterVisible()
-            } else {
-                void this._loadData().then(() => {
-                    this._isDataLoaded = true
-                    this._filterVisible()
-                })
+            if (!this._isDataLoaded) {
+                await this._loadData()
+                this._isDataLoaded = true
             }
+
+            this._filterVisible()
         } else {
             this._defencesFiltered = []
             this._pbZonesFiltered = []
@@ -351,8 +309,8 @@ export default class DisplayPbZones {
         this.#upperBound = viewport[1]
     }
 
-    refresh(): void {
-        this._setData()
+    async refresh(): Promise<void> {
+        await this._setData()
         this._update()
     }
 }

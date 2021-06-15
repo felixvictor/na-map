@@ -11,17 +11,20 @@ import * as fs from "fs";
 import path from "path";
 import Deque from "collections/deque";
 import { default as PNG } from "pngjs";
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir";
+import { currentServerStartDate as serverDate } from "../common/common";
+import { getCommonPaths } from "../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { convertCoordX, convertCoordY } from "../common/common-math";
-import { simpleNumberSort } from "../common/common-node";
+import { baseAPIFilename, simpleNumberSort } from "../common/common-node";
 import { distanceMapSize, mapSize } from "../common/common-var";
 import { serverIds } from "../common/servers";
+const commonPaths = getCommonPaths();
 class Port {
+    apiPorts = [];
+    #fileName;
+    numPorts = 0;
+    portIds = [];
     constructor() {
-        this.apiPorts = [];
-        this.numPorts = 0;
-        this.portIds = [];
         this.#fileName = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`);
         xz("unxz", `${this.#fileName}.xz`);
         this.apiPorts = readJson(this.#fileName);
@@ -29,23 +32,26 @@ class Port {
         this.portIds = this.apiPorts.map((port) => Number(port.Id));
         this.numPorts = this.portIds.length;
     }
-    #fileName;
     getCoordinates(y, x, mapScale) {
         return [Math.trunc(convertCoordY(x, y) * mapScale), Math.trunc(convertCoordX(x, y) * mapScale)];
     }
 }
 class Map {
+    #mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
+    #pngData;
+    #distances = [];
+    #distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json");
+    #map = [];
+    #mapHeight;
+    #mapScale;
+    #mapWidth;
+    #port = {};
+    #completedPorts = new Set();
+    #LAND = 0;
+    #WATER = 0;
+    #VISITED = 0;
+    #FLAGS = 0;
     constructor() {
-        this.#mapFileName = path.resolve(commonPaths.dirSrc, "images", `frontline-map-${distanceMapSize}.png`);
-        this.#distances = [];
-        this.#distancesFile = path.resolve(commonPaths.dirGenGeneric, "distances.json");
-        this.#map = [];
-        this.#port = {};
-        this.#completedPorts = new Set();
-        this.#LAND = 0;
-        this.#WATER = 0;
-        this.#VISITED = 0;
-        this.#FLAGS = 0;
         this.#port = new Port();
         this.setBitFlags();
         this.readMap();
@@ -54,20 +60,6 @@ class Map {
         this.setBorders();
         void this.getAndSaveDistances();
     }
-    #mapFileName;
-    #pngData;
-    #distances;
-    #distancesFile;
-    #map;
-    #mapHeight;
-    #mapScale;
-    #mapWidth;
-    #port;
-    #completedPorts;
-    #LAND;
-    #WATER;
-    #VISITED;
-    #FLAGS;
     setBitFlags() {
         const bitsAvailable = 16;
         const bitsForPortIds = Number(this.#port.numPorts).toString(2).length + 1;

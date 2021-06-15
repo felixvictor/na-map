@@ -1,0 +1,343 @@
+////
+/// This file is part of na-map.
+/// svg.
+///
+/// @group    scss
+/// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
+////
+
+@mixin text-center {
+    dominant-baseline: central;
+    text-anchor: middle;
+}
+
+svg {
+    stroke-width: 0.05rem;
+    overflow: auto;
+    text {
+        pointer-events: none;
+        user-select: none;
+        stroke: none;
+        text-anchor: start;
+        dominant-baseline: mathematical;
+    }
+}
+
+.text-shadow {
+    text-shadow: 0.15rem 0.15rem 0.3rem $body-color;
+}
+
+.svg-shadow {
+    filter: drop-shadow(0 1rem 1rem $paper-800);
+}
+
+.text-end {
+    text-anchor: end;
+}
+
+.svg-text-center {
+    @include text-center();
+}
+
+.opacity-low {
+    opacity: 0.2;
+}
+
+.text-tiny {
+    font-size: 15%;
+}
+
+.click-circle {
+    cursor: pointer;
+}
+
+.fill-empty {
+    fill: none;
+}
+
+.fill-white {
+    fill: $white;
+}
+
+.stroke-empty {
+    stroke: none;
+}
+
+.stroke-thick {
+    stroke-width: 0.3rem;
+}
+
+.fill-yellow-dark {
+    fill: $yellow-900;
+}
+
+.fill-contrast-light {
+    fill: $dark-overlay-text-colour-contrast;
+}
+
+.fill-contrast-text {
+    fill: $overlay-text-colour-contrast;
+}
+
+.fill-text {
+    fill: $body-color;
+}
+
+.background-yellow {
+    opacity: 0.7;
+    fill: $yellow-300;
+}
+
+.background-primary-light {
+    fill-opacity: 0.3;
+    fill: $primary-300;
+}
+
+.background-red {
+    fill-opacity: 0.3;
+    fill: $red-600;
+}
+
+.stroke-contrast-text {
+    stroke: $overlay-text-colour-contrast;
+}
+
+.stroke-dark {
+    stroke: $primary-600;
+}
+
+.stroke-primary-light {
+    stroke: $primary-300;
+}
+
+.fill-background-light {
+    fill: $overlay-background-colour;
+}
+
+.fill-primary-light {
+    fill: $primary-300;
+}
+
+.fill-primary-dark {
+    fill: $primary-700;
+}
+
+.fill-red {
+    fill: $red-600;
+}
+
+.fill-dark {
+    fill: $primary-900;
+}
+
+.svg-background-light {
+    path {
+        stroke: $overlay-text-colour-contrast;
+    }
+
+    rect {
+        fill: $overlay-background;
+    }
+
+    text {
+        fill: $overlay-text-colour;
+        @include text-center();
+        .des {
+            fill: $overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        fill: $overlay-background-contrast;
+        stroke: $overlay-text-colour;
+    }
+
+    .text-light-separation {
+        font-size: smaller;
+        fill: $overlay-text-colour-contrast !important;
+    }
+}
+
+.svg-background-dark {
+    path {
+        stroke: $dark-overlay-text-colour-contrast;
+    }
+
+    rect {
+        fill: $dark-overlay-background;
+    }
+
+    text {
+        fill: $dark-overlay-text-colour;
+        .des {
+            fill: $dark-overlay-background-colour !important;
+        }
+    }
+
+    circle,
+    line {
+        stroke: $dark-overlay-text-colour;
+    }
+}
+
+$ship-outline-colour: $secondary-500;
+.ship-outline {
+    fill: $ship-outline-colour;
+    stroke: $ship-outline-colour;
+    stroke-width: 0.7rem;
+
+    circle {
+        cursor: pointer;
+    }
+
+    text {
+        fill: color-contrast($ship-outline-colour);
+        @include text-center();
+    }
+}
+
+$wind-profile-colour: $paper-700;
+.wind-profile-arrow-head {
+    fill: $wind-profile-colour;
+}
+
+.wind-profile-arrow {
+    opacity: 0.5;
+    fill: $wind-profile-colour;
+    stroke: $wind-profile-colour;
+    stroke-width: 0.7rem;
+}
+
+.wind-profile {
+    text {
+        fill: color-contrast($wind-profile-colour);
+    }
+}
+
+.ship-outline,
+.wind-profile {
+    text {
+        font-size: small;
+        pointer-events: none;
+        stroke: none;
+        text-anchor: middle;
+        dominant-baseline: mathematical;
+    }
+}
+
+.drag-circle {
+    fill: $dark-overlay-text-colour-contrast;
+    stroke: $dark-overlay-text-colour-contrast !important;
+}
+
+.drag-hidden {
+    fill: $dark-overlay-text-colour-contrast;
+    fill-opacity: 0;
+    stroke: none !important;
+}
+
+.drag-active {
+    filter: none;
+    stroke: $orange !important;
+    stroke-width: 4rem;
+    stroke-opacity: 0.4;
+}
+
+.trade-link {
+    fill: none;
+    stroke: $dark-overlay-text-colour;
+}
+
+.highlight {
+    stroke: $green-light;
+}
+
+.trade-label {
+    fill: $overlay-text-colour;
+    text-anchor: middle;
+}
+
+.trade-head {
+    fill: $overlay-text-colour;
+}
+
+.trades {
+    path,
+    .link {
+        fill: none;
+    }
+}
+
+.axis {
+    pointer-events: none;
+    .domain {
+        display: none;
+    }
+
+    line {
+        stroke: $primary-400;
+    }
+
+    text {
+        font-style: italic;
+        fill: $primary-100;
+        text-anchor: end;
+    }
+}
+
+.voronoi {
+    .cell {
+        stroke: $white;
+        stroke-width: 1px;
+    }
+
+    .label text {
+        text-anchor: middle !important;
+        fill: $white;
+    }
+
+    .label > .name {
+        dominant-baseline: text-after-edge;
+    }
+
+    .label > .value {
+        dominant-baseline: text-before-edge;
+    }
+
+    .hoverer {
+        fill: transparent;
+        stroke: $white;
+        stroke-width: 0;
+    }
+
+    .hoverer:hover {
+        stroke-width: 3px;
+    }
+}
+
+.compass-arc,
+.speed-circle {
+    stroke: $paper-400;
+}
+
+.speed-text text {
+    fill: $paper-500;
+    dominant-baseline: auto;
+}
+
+.base-profile,
+.comp-profile {
+    opacity: 0.5;
+}
+
+.base-profile {
+    fill: $paper-500;
+}
+
+.comp-profile {
+    stroke-width: 3px;
+    stroke: $secondary-800;
+}

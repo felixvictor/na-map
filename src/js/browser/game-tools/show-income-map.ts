@@ -8,30 +8,27 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util"
-import "bootstrap/js/dist/modal"
-import "bootstrap/js/dist/tooltip"
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import { max as d3Max, min as d3Min } from "d3-array"
 import { hierarchy as d3Hierarchy, HierarchyNode, stratify as d3Stratify } from "d3-hierarchy"
 import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
-import { select as d3Select, Selection } from "d3-selection"
+import { Selection } from "d3-selection"
 import { Point, voronoiTreemap as d3VoronoiTreemap } from "d3-voronoi-treemap"
 import seedrandom from "seedrandom"
 
 import { registerEvent } from "../analytics"
-import { findNationByNationShortName, nations } from "common/common"
-import { colourList, insertBaseModal, loadJsonFiles, showCursorDefault, showCursorWait } from "common/common-browser"
+import { nations } from "common/common"
+import { getIdFromBaseName, loadJsonFiles, showCursorDefault, showCursorWait } from "common/common-browser"
 import { formatPercentSig, formatSiCurrency, formatSiInt } from "common/common-format"
 import { getContrastColour } from "common/common-game-tools"
 
-import { BaseModal } from "./base-modal"
-
 import { Vertex } from "d3-weighted-voronoi"
-import JQuery from "jquery"
+import Modal from "util/modal"
 import { PortBasic, PortBattlePerServer, PortPerServer } from "common/gen-json"
 import { DataSource, HtmlString, PortIncome, PortJsonData } from "common/interface"
 import { ϕ } from "common/common-math"
+import { ServerId } from "common/servers"
 
 interface TreeMapPolygon extends Array<Point> {
     0: Point
@@ -54,28 +51,34 @@ interface PortHierarchy {
 /**
  *
  */
-export default class ShowIncomeMap extends BaseModal {
+export default class ShowIncomeMap {
+    #fontScale = {} as ScaleLinear<number, number>
     #height = 0
-    #width = 0
-    #nestedData = {} as HierarchyNode<PortHierarchy>
-    #tree = {} as TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>
     #mainDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #mainG = {} as Selection<SVGGElement, unknown, HTMLElement, unknown>
+    #modal: Modal | undefined = undefined
+    #nestedData = {} as HierarchyNode<PortHierarchy>
+    #serverId: ServerId
     #svg = {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>
-
+    #tooltip: BSTooltip | undefined = undefined
+    #tree = {} as TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>
+    #width = 0
+    readonly #baseId: HtmlString
+    readonly #baseName = "Net income"
     readonly #colourScale: ScaleOrdinal<string, string>
-    #fontScale = {} as ScaleLinear<number, number>
+    readonly #menuId: HtmlString
 
-    constructor(serverId: string) {
-        super(serverId, "Show port net income")
+    constructor(serverId: ServerId) {
+        this.#serverId = serverId
 
-        this.#colourScale = d3ScaleOrdinal<string>().range(colourList)
+        this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
+        this.#menuId = `menu-${this.#baseId}`
+
+        this.#colourScale = d3ScaleOrdinal<string, string>()
+            .domain(nations.map((nation) => nation.short))
+            .range(nations.map((nation) => nation.colours[0]))
 
         this._setupListener()
-    }
-
-    static _hideDetails(this: JQuery.PlainObject): void {
-        $(this).tooltip("dispose")
     }
 
     /**
@@ -122,14 +125,14 @@ export default class ShowIncomeMap extends BaseModal {
                     return {
                         id: port.name,
                         value: port.netIncome,
-                        parentId: findNationByNationShortName(port.nation)?.sortName,
+                        parentId: port.nation,
                     }
                 }),
             // Nation nodes
             ...nations
                 .filter((nation) => nationWithIncome.has(nation.short))
                 .map((nation) => ({
-                    id: nation.sortName,
+                    id: nation.short,
                     value: 0,
                     parentId: "World",
                 })),
@@ -146,17 +149,17 @@ export default class ShowIncomeMap extends BaseModal {
     async _loadData(): Promise<PortJsonData> {
         const dataSources: DataSource[] = [
             {
-                fileName: `${this.serverId}-ports.json`,
+                fileName: `${this.#serverId}-ports.json`,
                 name: "server",
             },
             {
-                fileName: `${this.serverId}-pb.json`,
+                fileName: `${this.#serverId}-pb.json`,
                 name: "pb",
             },
         ]
         const readData = {} as PortJsonData
 
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<PortJsonData>(dataSources, readData)
 
@@ -170,26 +173,29 @@ export default class ShowIncomeMap extends BaseModal {
         showCursorDefault()
     }
 
-    /**
-     * Setup listener
-     */
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            await this._loadAndSetupData()
+            this.#modal = new Modal(this.#baseName, "xl")
+            this.#mainDiv = this.#modal.outputSel
+            this._initTreemap()
+            this._drawTreemap()
+        }
+    }
+
     _setupListener(): void {
-        let firstClick = true
-
-        document.querySelector(`#${this.buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this.baseName)
-
-            this._menuItemSelected()
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
     _drawLegend(): void {
         const rowHeight = Math.floor(20 * ϕ)
+        const iconHeight = rowHeight * 0.8
         const rowPadding = Math.floor(2 * ϕ)
         const columnPadding = Math.floor(5 * ϕ)
         const nations = (this.#tree.children ?? []).sort((a, b) => b.value! - a.value!)
@@ -211,7 +217,6 @@ export default class ShowIncomeMap extends BaseModal {
 
                 const svg = div
                     .append("svg")
-                    .attr("class", "svg-text")
                     .attr("width", columnWidth)
                     .attr("height", rowHeight * 2 + rowPadding)
 
@@ -220,14 +225,22 @@ export default class ShowIncomeMap extends BaseModal {
                     .attr("height", rowHeight)
                     .style("fill", (d) => this.#colourScale(d.data.id!))
 
-                svg.append("text")
+                svg.append("rect")
                     .attr("x", columnPadding)
+                    .attr("y", "5%")
+                    .attr("width", (iconHeight * 4) / 3)
+                    .attr("height", iconHeight)
+                    .attr("fill", (d) => `url(#${d.data.id!})`)
+
+                svg.append("text")
+                    .attr("x", columnWidth - columnPadding)
                     .attr("y", "25%")
                     .text((d) => d.data.id!)
+                    .attr("class", "text-end")
                     .style("fill", (d) => getContrastColour(this.#colourScale(d.data.id!)))
 
                 svg.append("rect")
-                    .attr("class", "rect-background")
+                    .attr("class", "opacity-low")
                     .attr("y", rowHeight + rowPadding)
                     .attr("width", columnWidth)
                     .attr("height", rowHeight)
@@ -252,19 +265,21 @@ export default class ShowIncomeMap extends BaseModal {
     _getTooltipText(d: TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>): HtmlString {
         return `
             <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex flex-column text-left mt-1 mr-3 p-0">
-                <div><span class="x-large">${d.data.id ?? ""}</span><br />${d.parent?.data?.id ?? ""}</div>
+            <div class="d-flex flex-column text-start mt-1 me-3 p-0">
+                <div><i class="flag-icon-${
+                    d.parent?.data?.id as string
+                } flag-icon-small me-2" role="img"></i><span class="x-large">${d.data.id ?? ""}</span></div>
             </div>
-            <div class="d-flex flex-column text-left mt-1 p-0">
-                <div class="mr-3">
+            <div class="d-flex flex-column text-start mt-1 p-0">
+                <div class="me-3">
                     ${formatSiInt(d.data.data.value)}<br />
                     <span class="des">Port</span>
                 </div>
-                <div class="mr-3">
+                <div class="me-3">
                     ${formatPercentSig(d.data.data.value / (d.parent?.value ?? 1))}<br />
                     <span class="des">Nation</span>
                 </div>
-                <div class="mr-3">
+                <div class="me-3">
                     ${formatPercentSig(d.data.data.value / (d.parent?.parent?.value ?? 1))}<br />
                     <span class="des">World</span>
                 </div>
@@ -272,19 +287,28 @@ export default class ShowIncomeMap extends BaseModal {
             </div>`
     }
 
+    _hideDetails(): void {
+        if (this.#tooltip !== undefined) {
+            this.#tooltip.dispose()
+            this.#tooltip = undefined
+        }
+    }
+
     _showDetails(event: Event, d: TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>): void {
-        $(event.currentTarget as JQuery.PlainObject)
-            .tooltip("dispose")
-            .tooltip({
-                html: true,
-                template:
-                    '<div class="tooltip" role="tooltip">' +
-                    '<div class="tooltip-block tooltip-inner tooltip-inner-smaller">' +
-                    "</div></div>",
-                title: this._getTooltipText(d),
-                sanitize: false,
-            })
-            .tooltip("show")
+        const element = event.currentTarget as Element
+
+        this._hideDetails()
+        this.#tooltip = new BSTooltip(element, {
+            html: true,
+            template:
+                '<div class="tooltip  bs-tooltip-top" role="tooltip">' +
+                '<div class="tooltip-block tooltip-inner tooltip-inner-smaller">' +
+                "</div></div>",
+            title: this._getTooltipText(d),
+            trigger: "manual",
+            sanitize: false,
+        })
+        this.#tooltip.show()
     }
 
     _drawCells(leaves: Array<TreeMapHierarchyNode<HierarchyNode<PortHierarchy>>>): void {
@@ -341,7 +365,9 @@ export default class ShowIncomeMap extends BaseModal {
                     .on("mouseover", (event: Event, d) => {
                         this._showDetails(event, d)
                     })
-                    .on("mouseleave", ShowIncomeMap._hideDetails)
+                    .on("mouseleave", () => {
+                        this._hideDetails()
+                    })
             )
     }
 
@@ -374,51 +400,6 @@ export default class ShowIncomeMap extends BaseModal {
                 [this.#width, 0],
             ])
             .minWeightRatio(1e-10)
-            .prng(seedrandom(this.baseId))(this.#tree)
-    }
-
-    /**
-     * Inject modal
-     */
-    _injectModal(): void {
-        insertBaseModal({ id: this.modalId, title: this.baseName })
-
-        const body = d3Select(`#${this.modalId} .modal-body`)
-        this.#mainDiv = body.append("div").attr("id", `${this.baseId}`)
-    }
-
-    /**
-     * Init modal
-     */
-    _initModal(): void {
-        this._injectModal()
-    }
-
-    /**
-     * Action when menu item is clicked
-     */
-    _menuItemSelected(): void {
-        let emptyModal = false
-
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${this.modalId}`)) {
-            emptyModal = true
-            this._initModal()
-        }
-
-        showCursorWait()
-        // Show modal
-        $(`#${this.modalId}`)
-            .on("shown.bs.modal", () => {
-                // Inject chart after modal is shown to calculate modal width
-                if (emptyModal) {
-                    emptyModal = false
-                    this._initTreemap()
-                    this._drawTreemap()
-                }
-
-                showCursorDefault()
-            })
-            .modal("show")
+            .prng(seedrandom(this.#baseId))(this.#tree)
     }
 }

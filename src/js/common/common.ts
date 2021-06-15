@@ -8,22 +8,14 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { ArrayIndex } from "./interface"
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import utc from "dayjs/plugin/utc"
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
 
-export const woodFamily = ["regular", "seasoned", "exceptional"]!
-export type WoodFamily = typeof woodFamily[number]
-
-export const woodType = ["frame", "trim"]!
-export type WoodType = typeof woodType[number]
-export type WoodTypeList<T> = {
-    [K in WoodType]: T
-}
-export type WoodTypeArray<T> = {
-    [K in WoodType]: T[]
-}
-export type WoodTypeNestedArray<T> = {
-    [K1 in WoodType]: ArrayIndex<T>
-}
+import { serverMaintenanceHour } from "./common-var"
+import { HtmlString } from "./interface"
 
 export const cannonType = ["medium", "long", "carronade"]!
 export type CannonType = typeof cannonType[number]
@@ -46,10 +38,17 @@ export interface Nation {
     short: NationShortName // Short name
     name: NationFullName // Name
     sortName: string // Name for sorting
+    colours: string[]
 }
 
 export const nationShortName = ["CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"]!
 export type NationShortName = typeof nationShortName[number]
+export type NationShortNameList<T> = {
+    [K in NationShortName]: T
+}
+const attackerNationShortName = [...nationShortName, "n/a", ""]
+export type AttackerNationShortName = typeof attackerNationShortName[number]
+
 export const nationShortNameAlternative = [
     "CNa",
     "DEa",
@@ -86,21 +85,41 @@ export const nationFullName = [
 ]!
 export type NationFullName = typeof nationFullName[number]
 export const nations: Nation[] = [
-    { id: 0, short: "NT", name: "Neutral", sortName: "Neutral" },
-    { id: 1, short: "PR", name: "Pirates", sortName: "Pirates" },
-    { id: 2, short: "ES", name: "España", sortName: "España" },
-    { id: 3, short: "FR", name: "France", sortName: "France" },
-    { id: 4, short: "GB", name: "Great Britain", sortName: "Great Britain" },
-    { id: 5, short: "VP", name: "Verenigde Provinciën", sortName: "Verenigde Provinciën" },
-    { id: 6, short: "DK", name: "Danmark-Norge", sortName: "Danmark-Norge" },
-    { id: 7, short: "SE", name: "Sverige", sortName: "Sverige" },
-    { id: 8, short: "US", name: "United States", sortName: "United States" },
-    { id: 9, short: "FT", name: "Free Town", sortName: "Free Town" },
-    { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire" },
-    { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia" },
-    { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland" },
-    { id: 13, short: "CN", name: "China", sortName: "China" },
+    { id: 0, short: "NT", name: "Neutral", sortName: "Neutral", colours: ["#cec1c1"] },
+    { id: 1, short: "PR", name: "Pirates", sortName: "Pirates", colours: ["#352828", "#cec1c1"] },
+    { id: 2, short: "ES", name: "España", sortName: "España", colours: ["#9b3438", "#c5a528"] },
+    { id: 3, short: "FR", name: "France", sortName: "France", colours: ["#284e98", "#b5423a", "#cec1c1"] },
+    {
+        id: 4,
+        short: "GB",
+        name: "Great Britain",
+        sortName: "Great Britain",
+        colours: ["#284180", "#cec1c1", "#b13443"],
+    },
+    {
+        id: 5,
+        short: "VP",
+        name: "Verenigde Provinciën",
+        sortName: "Verenigde Provinciën",
+        colours: ["#9d3841", "#3b5688", "#cec1c1"],
+    },
+    { id: 6, short: "DK", name: "Danmark-Norge", sortName: "Danmark-Norge", colours: ["#9c294b", "#cec1c1"] },
+    { id: 7, short: "SE", name: "Sverige", sortName: "Sverige", colours: ["#287099", "#cdad28"] },
+    {
+        id: 8,
+        short: "US",
+        name: "United States",
+        sortName: "United States",
+        colours: ["#282873", "#cec1c1", "#a72e47"],
+    },
+    { id: 9, short: "FT", name: "Free Town", sortName: "Free Town", colours: ["#cec1c1"] },
+    { id: 10, short: "RU", name: "Russian Empire", sortName: "Russian Empire", colours: ["#284e98", "#cec1c1"] },
+    { id: 11, short: "DE", name: "Kingdom of Prussia", sortName: "Prussia", colours: ["#352828", "#cec1c1"] },
+    { id: 12, short: "PL", name: "Commonwealth of Poland", sortName: "Poland", colours: ["#c22839", "#cec1c1"] },
+    { id: 13, short: "CN", name: "China", sortName: "China", colours: ["#cdad3b", "#ce2828"] },
 ]
+
+export const nationColourList = []
 const nationMap = new Map<number, Nation>(nations.map((nation) => [nation.id, nation]))
 
 // noinspection SpellCheckingInspection
@@ -193,9 +212,8 @@ export const validNationShortName = (nationShortName: string): boolean =>
  * @param   object - Object
  * @returns True if object is empty
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const isEmpty = (object: object): boolean =>
-    Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object
+export const isEmpty = (object: Record<string, unknown> | unknown | undefined): boolean =>
+    object !== undefined && Object.getOwnPropertyNames(object).length === 0
 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
@@ -271,7 +289,7 @@ export class TupleKeyMap<K, V> extends Map {
 
     forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: unknown): void {
         for (const [key, value] of this.map.entries()) {
-            callbackfn.call(thisArg, value, JSON.parse(key), this)
+            callbackfn.call(thisArg, value, JSON.parse(key) as K, this)
         }
     }
 }
@@ -280,3 +298,71 @@ export const sleep = async (ms: number): Promise<NodeJS.Timeout> => {
     // eslint-disable-next-line no-promise-executor-return
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
+
+const getServerStartDateTime = (day: number): dayjs.Dayjs => {
+    let serverStart = dayjs().utc().hour(serverMaintenanceHour).minute(0).second(0)
+    const now = dayjs().utc()
+
+    // adjust reference server time if needed
+    if ((day < 0 && now.isBefore(serverStart)) || (day > 0 && now.isAfter(serverStart))) {
+        serverStart = dayjs.utc(serverStart).add(day, "day")
+    }
+
+    return serverStart
+}
+
+/**
+ * Get current server start (date and time)
+ */
+export const getCurrentServerStart = (): dayjs.Dayjs => getServerStartDateTime(-1)
+
+/**
+ * Get next server start (date and time)
+ */
+export const getNextServerStart = (): dayjs.Dayjs => getServerStartDateTime(1)
+
+export const currentServerStartDateTime = getCurrentServerStart().format("YYYY-MM-DD HH:mm")
+export const currentServerStartDate = getCurrentServerStart().format("YYYY-MM-DD")
+export const currentServerDateYear = String(dayjs(currentServerStartDate).year())
+export const currentServerDateMonth = String(dayjs(currentServerStartDate).month() + 1).padStart(2, "0")
+
+export const getBaseId = (title: string): HtmlString =>
+    title.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", "")
+
+/**
+ * Sort by a list of properties (in left-to-right order)
+ */
+export const sortBy =
+    <T, K extends keyof T>(propertyNames: K[]) =>
+    (a: T, b: T): number => {
+        let r = 0
+        propertyNames.some((propertyName: K) => {
+            let sign = 1
+
+            // property starts with '-' when sort is descending
+            if (String(propertyName).startsWith("-")) {
+                sign = -1
+                propertyName = String(propertyName).slice(1) as K
+            }
+
+            // eslint-disable-next-line unicorn/prefer-ternary
+            if (Number.isNaN(Number(a[propertyName])) && Number.isNaN(Number(b[propertyName]))) {
+                r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign
+            } else {
+                r = (Number(a[propertyName]) - Number(b[propertyName])) * sign
+            }
+
+            return r !== 0
+        })
+
+        return r
+    }
+
+/**
+ * Simple sort of strings a and b
+ * @param   a - String a
+ * @param   b - String b
+ * @returns Sort result
+ */
+export const simpleStringSort = (a: string | undefined, b: string | undefined): number =>
+    a && b ? a.localeCompare(b) : 0

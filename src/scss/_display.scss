@@ -2,77 +2,37 @@
 /// This file is part of na-map.
 /// Display.
 ///
-/// copyright 2017, 2018, 2019
-/// license   http://www.gnu.org/licenses/gpl.html
-/// @group    main
+/// @group    scss
 /// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
 ////
 
-$background-colour: $primary-600;
+@import "~bootstrap/scss/mixins";
+@import "mixins";
 
-$dark-overlay-background-colour: $primary-800;
-$dark-overlay-background-colour-contrast: $primary-700;
+$dark-overlay-background-colour: $paper-800;
+$dark-overlay-background-colour-contrast: $paper-700;
 $dark-overlay-background: rgba($dark-overlay-background-colour, 0.8);
 $dark-overlay-background-contrast: rgba($dark-overlay-background-colour-contrast, 0.8);
-$dark-overlay-text-colour-contrast: $primary-200;
-$dark-overlay-text-colour: color-yiq($dark-overlay-background);
+$dark-overlay-text-colour-contrast: $paper-200;
+$dark-overlay-text-colour: color-contrast($dark-overlay-background);
 
-$overlay-background-colour: $primary-200;
-$overlay-background-colour-contrast: $primary-050;
+$overlay-background-colour: $paper-200;
+$overlay-background-colour-contrast: $paper-050;
 $overlay-background: rgba($overlay-background-colour, 0.8);
 $overlay-background-contrast: rgba($overlay-background-colour-contrast, 0.8);
-$overlay-text-colour-contrast: $primary-700;
-$overlay-text-colour: color-yiq($overlay-background);
+$overlay-text-colour-contrast: $paper-700;
+$overlay-text-colour: color-contrast($overlay-background);
 
-// opentype
-
-body {
-    font-variant-alternates: styleset(ss18); // (needs also calt)
-    font-kerning: normal;
-    font-variant-caps: normal;
-    font-variant-ligatures: common-ligatures contextual; // liga calt
-    font-variant-numeric: oldstyle-nums; // onum
+.bg-map {
+    background-color: $primary;
 }
 
 text,
 .map-tiles {
     cursor: default;
     user-select: none;
-}
-
-p {
-    text-align: left;
-}
-
-.input-group > label,
-.nav-item > label {
-    margin-bottom: unset;
-}
-
-table,
-.page-link {
-    font-variant-numeric: normal; // onum off
-}
-
-.fraction {
-    font-variant-numeric: diagonal-fractions;
-}
-
-.super {
-    font-variant-position: super;
-    font-feature-settings: "sups";
-}
-
-@mixin caps {
-    font-variant-caps: all-small-caps;
-    font-variant-numeric: oldstyle-nums;
-    letter-spacing: 0.08em;
-}
-
-@mixin des {
-    position: relative;
-    top: -0.4rem;
-    font-size: small;
 }
 
 .des {
@@ -84,17 +44,320 @@ table,
     @include caps();
 }
 
-.extralarge-width {
-    min-width: 25em;
+.condensed {
+    font-stretch: condensed;
 }
 
-.large-width {
-    min-width: 18em;
+.overlay-des {
+    @include caps();
+    @include des();
+    top: 0;
+    color: $overlay-text-colour-contrast;
 }
 
-#na-svg {
-    background-color: $background-colour;
+.text-lighter {
+    color: $secondary-600;
 }
+
+.x-large {
+    font-size: x-large;
+}
+
+.large {
+    font-size: larger;
+}
+
+.x-small {
+    font-size: x-small;
+}
+
+.tooltip-block {
+    //max-width: 30rem;
+    text-align: left;
+}
+
+// Region capital ports
+.circle-highlight {
+    fill: none;
+    stroke: $white;
+    stroke-opacity: 0.8;
+    stroke-width: 0.4rem;
+}
+
+// Capital ports
+.circle-highlight-yellow {
+    fill: none;
+    stroke: $yellow;
+    stroke-opacity: 0.8;
+    stroke-width: 0.4rem;
+}
+
+.non-trading {
+    font-style: italic;
+}
+
+.bubble {
+    fill-opacity: 0.7;
+}
+
+.both {
+    opacity: 0.4;
+    fill: $blue;
+}
+
+.here {
+    opacity: 0.4;
+    fill: $white;
+}
+
+.neg {
+    opacity: 0.4;
+    fill: $red;
+}
+
+.pos {
+    opacity: 0.4;
+    fill: $green;
+}
+
+.cooldown {
+    fill: $green-800;
+}
+
+.raider {
+    fill: $orange-600;
+}
+
+.not-capturable {
+    opacity: 0.6;
+    fill: $gray-200;
+}
+
+.capital {
+    opacity: 0.9;
+}
+
+.non-capital {
+    opacity: 0.4;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.sub-title,
+.title {
+    font-weight: 300;
+    font-stretch: condensed;
+    font-feature-settings: "c2sc", "smcp";
+    text-anchor: middle;
+    text {
+        fill: $primary-900;
+    }
+}
+
+.title {
+    font-size: 160px;
+    letter-spacing: 0.5rem;
+}
+
+.sub-title {
+    font-size: 60px;
+    letter-spacing: 0.3rem;
+}
+
+.column-base .row-light {
+    background-color: $paper-200;
+}
+
+.column-comp .row-light {
+    background-color: $paper-300;
+}
+
+/////////////////////////////////////
+// modal
+
+.modal-content {
+    border-top: $paper-400 solid 1rem;
+}
+
+.modal-footer {
+    background-color: $paper-200;
+}
+
+/////////////////////////////////////
+// tooltip
+
+.tooltip {
+    box-shadow: 0 14px 28px rgba($paper-900, 0.25), 0 10px 10px rgba($paper-900, 0.22);
+
+    table {
+        margin-bottom: 0;
+    }
+}
+
+.tooltip-inner {
+    min-width: 30rem;
+    text-align: left;
+}
+
+.tooltip-inner-small {
+    min-width: 20rem !important;
+}
+
+.tooltip-inner-smaller {
+    min-width: 10rem !important;
+    p {
+        margin: 0;
+    }
+}
+
+/////////////////////////////////////
+// table
+
+.table-sort {
+    tr:not(.thead-group) th {
+        cursor: s-resize;
+    }
+}
+
+th {
+    font-style: italic;
+    font-weight: 400;
+}
+
+table thead {
+    border-bottom: 0.3rem solid $paper-600;
+}
+
+.table-sm thead {
+    border-bottom: 0.2rem solid $paper-600;
+}
+
+.table > thead {
+    vertical-align: top;
+}
+
+table {
+    text-align: end;
+}
+
+.text-table {
+    text-align: start;
+}
+
+/////////////////////////////////////
+// dropdown
+
+.bootstrap-select {
+    .dropdown-menu li a.opt {
+        padding-left: 1rem;
+    }
+}
+
+.dropdown-divider {
+    border: none;
+}
+
+.dropdown-menu-md {
+    min-width: 14rem;
+}
+
+.dropdown-menu-lg {
+    min-width: 20rem;
+}
+
+.dropdown-menu-xl {
+    min-width: 26rem;
+}
+
+.menu-item-text {
+    line-height: 1;
+    white-space: normal;
+}
+
+/////////////////////////////////////
+// bar
+
+.rate {
+    display: flex;
+
+    .bar {
+        position: relative;
+        top: 0;
+        float: left;
+        height: $spacer;
+    }
+
+    .basis {
+        @include colour($primary-600);
+    }
+
+    .pos {
+        @include colour($green-dark);
+    }
+
+    .neg {
+        @include colour($red-dark);
+    }
+
+    .diff {
+        opacity: 0.5;
+    }
+}
+
+/////////////////////////////////////7
+// ship compare
+
+.column-comp:not(:first-child) {
+    border-left: $paper-100 solid medium;
+}
+
+$padding-small: $padding-third / 1.618;
+$padding-large: $padding-third;
+
+.compress {
+    line-height: 1;
+    .row {
+        --bs-gutter-x: 1rem;
+    }
+}
+
+.badge {
+    font-stretch: condensed;
+}
+
+.badge-highlight {
+    color: $text-muted;
+    background-color: $white;
+    box-shadow: $box-shadow-sm;
+}
+
+/////////////////////////////////////7
+// toggle button
+
+.btn-toggle {
+    @include button-outline-variant($paper-400);
+}
+
+/*
+
+
+
+
+
+p {
+    text-align: left;
+}
+
+.input-group > label,
+.nav-item > label {
+    margin-bottom: unset;
+}
+
+
+
+
 
 .position {
     path {
@@ -153,38 +416,7 @@ table,
     text-anchor: start;
 }
 
-.flag-icon {
-    width: 6rem;
-    margin-right: 0.4rem;
-}
 
-.flag-icon-border-light {
-    background-clip: padding-box;
-    border: 0.3rem solid transparentize($white, 0.2);
-}
-
-.flag-icon-border-middle {
-    background-clip: padding-box;
-    border: 0.3rem solid transparentize($yellow, 0.1);
-}
-
-.icon-light {
-    background-color: $secondary-400;
-}
-
-.text-lighter {
-    color: $secondary-600;
-    font-variant-numeric: normal;
-}
-
-.x-large {
-    font-size: x-large;
-}
-
-.large {
-    font-size: larger;
-    font-variant-numeric: normal;
-}
 
 .dropdown-submenu {
     position: relative;
@@ -205,304 +437,6 @@ table,
         stroke-opacity: 0.4;
         stroke: $white !important;
         stroke-width: 2px;
-    }
-}
-
-.central {
-    width: 0;
-    height: 0;
-}
-
-.overlay {
-    display: grid;
-    pointer-events: none;
-}
-
-.overlay-grid {
-    grid-template-rows: 3rem 1fr;
-    grid-template-columns: 4rem 1fr 4fr 1fr;
-    grid-template-areas:
-        "x-axis x-axis x-axis x-axis"
-        "y-axis wind-predict toasts summary";
-}
-
-.overlay-no-grid {
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr 4fr 1fr;
-    grid-template-areas: "wind-predict toasts summary";
-}
-
-.overlay-grid::before // acts as axis-rect-x
-{
-    content: "";
-    grid-area: x-axis;
-    grid-column: 1 / 5;
-    grid-row: 1;
-    background: rgba($primary-200, 0.4);
-}
-
-.overlay-grid::after // acts as axis-rect-y
-{
-    content: "";
-    grid-area: y-axis;
-    grid-column: 1 / 1;
-    grid-row: 1 / 3;
-    background: rgba($primary-200, 0.4);
-}
-
-.wind-predict-column {
-    grid-area: wind-predict;
-    margin-right: auto;
-}
-
-.toast-column {
-    grid-area: toasts;
-    display: grid;
-    grid-template-columns: repeat(2, 2fr);
-}
-
-.summary-column {
-    grid-area: summary;
-    display: grid;
-    grid-template-rows: 6rem 1fr;
-}
-
-.block {
-    padding: $padding-third;
-    justify-self: center;
-}
-
-.port-summary {
-    //grid-template-columns: 1fr 1fr 1fr;
-}
-
-.journey-summary {
-    //grid-template-columns: auto auto auto;
-}
-
-.port-summary,
-.journey-summary {
-    display: grid;
-    align-items: center;
-    padding: $padding-third;
-    line-height: 1;
-    color: $overlay-text-colour;
-    pointer-events: all;
-    background-color: $overlay-background;
-    button {
-        margin-bottom: map-get($spacers, 2);
-    }
-}
-
-.port-summary-no-wind,
-.journey-summary {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.port-summary-wind {
-    grid-template-columns: repeat(4, 1fr);
-}
-
-.inventory,
-.trade-details {
-    flex: 1 1 auto;
-    flex-direction: column;
-    overflow-y: scroll;
-    color: $overlay-text-colour;
-    pointer-events: all;
-    background: $overlay-background;
-
-    .bootstrap-select {
-        padding: $padding-third;
-    }
-
-    .card {
-        background: $overlay-background;
-    }
-}
-
-.trade-list {
-    display: flex;
-    flex-wrap: wrap;
-    padding-top: $spacer;
-
-    .block:nth-of-type(odd) {
-        background: $overlay-background-contrast;
-    }
-
-    .des {
-        color: $overlay-text-colour-contrast;
-    }
-}
-
-.trade-list .block,
-.tooltip-block {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    justify-content: flex-start;
-    white-space: nowrap;
-
-    & > div {
-        padding: 0 $padding-third;
-    }
-}
-
-.trade-link {
-    fill: none;
-    stroke: $dark-overlay-text-colour;
-}
-
-.highlight {
-    stroke: $green-light;
-}
-
-.trade-label {
-    fill: $overlay-text-colour;
-    text-anchor: middle;
-}
-
-.trade-head {
-    fill: $overlay-text-colour;
-}
-
-.trades {
-    path,
-    .link {
-        fill: none;
-    }
-}
-
-.tooltip-block {
-    max-width: 30rem;
-    text-align: left;
-}
-
-.block-block {
-    display: flex;
-    flex-direction: column;
-
-    span {
-        padding-bottom: $padding-third;
-        font-style: italic;
-    }
-}
-
-svg {
-    .axis {
-        pointer-events: none;
-    }
-}
-
-.axis {
-    .domain {
-        display: none;
-    }
-
-    line {
-        stroke: $primary-500;
-    }
-
-    text {
-        font-style: italic;
-        fill: $primary-100;
-    }
-}
-
-////
-//// Display ports
-////
-
-.non-trading {
-    font-style: italic;
-}
-
-.summary-des {
-    @include caps();
-    @include des();
-    top: 0;
-    color: $overlay-text-colour-contrast;
-}
-
-.bubble {
-    fill-opacity: 0.7;
-}
-
-.both {
-    opacity: 0.4;
-    fill: $blue;
-}
-
-.here {
-    opacity: 0.4;
-    fill: $white;
-}
-
-.neg {
-    opacity: 0.4;
-    fill: $red;
-}
-
-.pos {
-    opacity: 0.4;
-    fill: $green;
-}
-
-.cooldown {
-    fill: $green-800;
-}
-
-.raider {
-    fill: $orange-600;
-}
-
-.not-capturable {
-    opacity: 0.6;
-    fill: $gray-200;
-}
-
-.capital {
-    opacity: 0.9;
-}
-
-.non-capital {
-    opacity: 0.4;
-}
-
-.hidden {
-    visibility: hidden;
-}
-
-.county,
-.region {
-    font-feature-settings: "c2sc", "smcp";
-    fill: $secondary-900;
-    text-anchor: middle;
-}
-
-.region {
-    font-size: 160px;
-    letter-spacing: 1rem;
-}
-
-.county {
-    font-size: 60px;
-    letter-spacing: 0.6rem;
-}
-
-.port-names {
-    fill: $white;
-}
-
-.port {
-    cursor: pointer;
-}
-
-.pz {
-    fill: $yellow-300;
-    text {
-        fill: $yellow-900;
-        text-anchor: middle;
     }
 }
 
@@ -579,109 +513,6 @@ svg {
     @extend .raid-join-circle;
 }
 
-// capital ports
-pattern > circle {
-    fill: none;
-    stroke: $white;
-    stroke-opacity: 0.8;
-    stroke-width: 0.4rem;
-}
-
-///
-// svg classes
-///
-
-.f11,
-.ingame-wind,
-.journey,
-.wind-predict {
-    svg {
-        overflow: auto;
-    }
-
-    circle {
-        fill-opacity: 0.2;
-    }
-
-    path {
-        fill: none;
-        stroke-width: 0.3rem;
-    }
-
-    text {
-        text-anchor: middle;
-        dominant-baseline: central;
-    }
-
-    line {
-        stroke-width: 0.1rem;
-    }
-}
-
-.ingame-wind,
-.wind-predict {
-    circle {
-        fill: color-yiq($overlay-background);
-    }
-
-    path {
-        stroke: color-yiq($overlay-background);
-    }
-
-    rect {
-        fill: $overlay-background;
-    }
-
-    text {
-        fill: $overlay-text-colour;
-
-        .des {
-            fill: $overlay-background-colour !important;
-        }
-    }
-
-    circle,
-    line {
-        stroke: $overlay-text-colour;
-    }
-
-    .text-light-separation {
-        font-size: smaller;
-        fill: $overlay-text-colour-contrast !important;
-    }
-}
-
-.f11,
-.journey {
-    circle {
-        fill: color-yiq($dark-overlay-background);
-    }
-
-    path {
-        stroke: color-yiq($dark-overlay-background);
-    }
-
-    rect {
-        fill: $dark-overlay-background;
-    }
-
-    text {
-        fill: $dark-overlay-text-colour;
-
-        .des {
-            fill: $dark-overlay-background-colour !important;
-        }
-    }
-
-    circle,
-    line {
-        stroke: $dark-overlay-text-colour;
-    }
-
-    .text-light-separation {
-        fill: $dark-overlay-text-colour-contrast !important;
-    }
-}
 
 .f11-coord {
     text-anchor: end !important;
@@ -711,14 +542,6 @@ pattern > circle {
             text-anchor: start;
         }
 
-        .drag-hidden {
-            fill-opacity: 0;
-            stroke: none;
-        }
-
-        .drag-hidden.drag-active {
-            stroke-width: 0;
-        }
     }
 }
 
@@ -797,39 +620,6 @@ $wind-profile-colour: $overlay-text-colour;
     stroke-width: 0.5rem;
 }
 
-.tooltip {
-    font-size: smaller;
-    text-align: left;
-    box-shadow: 0 14px 28px rgba($primary-900, 0.25), 0 10px 10px rgba($primary-900, 0.22);
 
-    table {
-        margin-bottom: 0;
-    }
-}
 
-.tooltip-inner {
-    min-width: 30rem;
-}
-
-.tooltip-inner-small {
-    min-width: 20rem !important;
-}
-
-.tooltip-inner-smaller {
-    min-width: 10rem !important;
-    p {
-        margin: 0;
-    }
-}
-
-.svg-text {
-    text {
-        pointer-events: none;
-        stroke: none;
-        text-anchor: start;
-        dominant-baseline: mathematical;
-    }
-    .rect-background {
-        opacity: 0.2;
-    }
-}
+*/

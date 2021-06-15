@@ -15,6 +15,11 @@ import { HtmlResult, HtmlString, SVGString } from "./interface"
 
 const html = htm.bind(h)
 
+const mSpan = '<span class="caps">m</span>'
+const mTSpan = '<tspan class="caps">m</tspan>'
+const pSpan = '<span class="caps">%</span>'
+const pTSpan = '<tspan class="caps">%</tspan>'
+
 /**
  * Default format
  */
@@ -24,7 +29,7 @@ export const formatLocale = d3FormatLocale({
     grouping: [3],
     currency: ["", "\u00A0reales"],
     percent: "\u202F%",
-    minus: "\u2212\u2009",
+    minus: "\u2212\u202F",
 } as FormatLocaleDefinition)
 
 // noinspection MagicNumberJS
@@ -72,9 +77,10 @@ export const formatF11 = (x: number): string => formatPrefix(x * -1).replace("k"
 /**
  * Format integer
  * @param   x - Integer
+ * @param   f - Digits following decimal point
  * @returns Formatted Integer
  */
-export const formatInt = (x: number): string => formatLocale.format(",d")(x)
+export const formatInt = (x: number, f = 2): string => formatLocale.format(`,.${f}d`)(x)
 
 // noinspection MagicNumberJS
 /**
@@ -89,7 +95,7 @@ export const formatIntTrunc = (x: number): string => formatLocale.format(",d")(x
  * @param   x - Integer
  * @returns Formatted Integer
  */
-export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x).replace("+", "\u002B\u200A")
+export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x)
 
 /**
  * Format percentage point
@@ -98,9 +104,6 @@ export const formatSignInt = (x: number): string => formatLocale.format("+,d")(x
  * @returns Formatted percentage point
  */
 export const formatPP = (x: number, f = 0): string => formatLocale.format(`,.${f}%`)(x).replace("%", "pp")
-
-const mSpan = '<span class="caps">m</span>'
-const mTSpan = '<tspan class="caps">m</tspan>'
 
 /**
  * Format integer with SI suffix
@@ -153,6 +156,35 @@ export const formatSiCurrency = (x: number, svg = false): HtmlString | SVGString
 export const formatPercent = (x: number, f = 1): string => formatLocale.format(`.${f}%`)(x).replace(".0", "")
 
 /**
+ * Format percent value (% sign in small caps)
+ * @param   x - Integer
+ * @param   f - digits following decimal point
+ * @param svg - True when tspan for SVG needed
+ * @returns Formatted percent value
+ */
+export const formatPercentOldstyle = (x: number, f = 1, svg = false): HtmlString | SVGString =>
+    formatLocale
+        .format(`.${f}%`)(x)
+        .replace(".0", "")
+        .replace("%", `${svg ? pTSpan : pSpan}`)
+
+/**
+ * Format percent value (% sign in small caps)
+ * @param   x - Integer
+ * @param   f - digits following decimal point
+ * @returns htm percent value
+ */
+export const formatPercentHtml = (x: number, f = 1): HtmlResult => {
+    const string = formatPercentOldstyle(x, f)
+
+    if (string.endsWith(pSpan)) {
+        return html`${string.replace(pSpan, "")}<span class="caps">%</span>`
+    }
+
+    return html`${string}`
+}
+
+/**
  * Format percent value with SI suffix
  * @param   x - Percent
  * @param   s - Significant digits
@@ -165,5 +197,16 @@ export const formatPercentSig = (x: number, s = 1): string => formatLocale.forma
  * @param   x - Percent
  * @returns Formatted percent value
  */
-export const formatSignPercent = (x: number): string =>
-    formatLocale.format("+.1%")(x).replace(".0", "").replace("+", "\uFF0B\u200A")
+export const formatSignPercent = (x: number): string => formatLocale.format("+.1%")(x).replace(".0", "")
+
+/**
+ * Format percent value with +/- sign
+ * @param   x - Percent
+ * @param svg - True when tspan for SVG needed
+ * @returns Formatted percent value
+ */
+export const formatSignPercentOldstyle = (x: number, svg = false): HtmlString | SVGString =>
+    formatLocale
+        .format("+.1%")(x)
+        .replace(".0", "")
+        .replace("%", `${svg ? pTSpan : pSpan}`)

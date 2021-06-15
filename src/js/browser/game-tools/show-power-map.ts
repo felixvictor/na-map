@@ -13,35 +13,35 @@ import { Delaunay, Delaunay as d3Delaunay, Voronoi } from "d3-delaunay"
 import { ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import { timer as d3Timer } from "d3-timer"
+import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
+
 import loadImage from "image-promise"
+import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+dayjs.extend(customParseFormat)
 
 import { registerEvent } from "../analytics"
-import { findNationById, nations, range, sleep } from "common/common"
+import { findNationById, nations, sleep } from "common/common"
 import {
-    nationColourList,
     getCanvasRenderingContext2D,
     loadJsonFiles,
     showCursorDefault,
     showCursorWait,
-    getIcons,
     colourWhite,
     getElementHeight,
     getElementWidth,
+    getIdFromBaseName,
+    nationFlags,
 } from "common/common-browser"
-import dayjs from "dayjs"
-
-import customParseFormat from "dayjs/plugin/customParseFormat"
-import { BaseModal } from "./base-modal"
-import { PortBasic } from "common/gen-json"
-import { DataSource, MinMaxCoord, PowerMapList } from "common/interface"
 import { getContrastColour } from "common/common-game-tools"
 import { formatSiInt } from "common/common-format"
 import { ϕ } from "common/common-math"
-import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
 
+import { PortBasic } from "common/gen-json"
+import { DataSource, HtmlString, MinMaxCoord, PowerMapList } from "common/interface"
+
+import { ServerId } from "common/servers"
 import { NAMap } from "js/browser/map/na-map"
-
-dayjs.extend(customParseFormat)
 
 interface JsonData {
     power: PowerMapList
@@ -61,7 +61,12 @@ interface DivDimension {
 /**
  *
  */
-export default class PowerMap extends BaseModal {
+export default class PowerMap {
+    #serverId: ServerId
+    readonly #baseId: HtmlString
+    readonly #baseName = "Power map"
+    readonly #menuId: HtmlString
+
     #columnsPerRow = 0
     #ctx = {} as CanvasRenderingContext2D
     #dateElem = {} as Selection<HTMLLabelElement, unknown, HTMLElement, unknown>
@@ -89,7 +94,6 @@ export default class PowerMap extends BaseModal {
     #stopCommand = false
     #voronoi = {} as Voronoi<Delaunay.Point>
     readonly #NAMap: NAMap
-    readonly #baseId = "power-map"
     readonly #colourScale: ScaleOrdinal<number, string>
     readonly #coord
     readonly #delayDefault = 200
@@ -97,16 +101,19 @@ export default class PowerMap extends BaseModal {
 
     readonly #speedFactor = 2
 
-    constructor(readonly map: NAMap, readonly serverId: string, readonly coord: MinMaxCoord) {
-        super(serverId, "Ownership map")
+    constructor(readonly map: NAMap, readonly serverId: ServerId, readonly coord: MinMaxCoord) {
+        this.#serverId = serverId
         this.#NAMap = map
+
+        this.#baseId = `show-${getIdFromBaseName(this.#baseName)}`
+        this.#menuId = `menu-${this.#baseId}`
 
         this.#coord = coord
         this.#colourScale = d3ScaleOrdinal<number, string>()
-            .domain(range(0, nations.length - 1))
-            .range(nationColourList)
+            .domain(nations.map((nation) => nation.id))
+            .range(nations.map((nation) => nation.colours[0]))
 
-        void this._setupListener()
+        this._setupListener()
     }
 
     _setupData(data: JsonData): void {
@@ -125,7 +132,7 @@ export default class PowerMap extends BaseModal {
         ]
         const readData = {} as JsonData
 
-        this.#portData = (await import(/* webpackChunkName: "data-ports" */ "../../../lib/gen-generic/ports.json"))
+        this.#portData = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
             .default as PortBasic[]
         await loadJsonFiles<JsonData>(dataSources, readData)
 
@@ -137,24 +144,21 @@ export default class PowerMap extends BaseModal {
         this._setupData(readData)
     }
 
-    /**
-     * Setup listener
-     */
-    async _setupListener(): Promise<void> {
-        let firstClick = true
+    async _menuClicked(): Promise<void> {
+        registerEvent("Tools", this.#baseName)
 
         await this._loadAndSetupData()
-        ;(document.querySelector(`#${this.buttonId}`) as HTMLButtonElement).addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            } else {
-                this.#index = 0
-            }
+        showCursorWait()
+        this._mapElementsOff()
+        this._initialMapZoom()
+        this._initVoronoi()
+        void this._initCanvas()
+        this._drawPowerMap()
+    }
 
-            registerEvent("Tools", this.baseName)
-
-            this._menuItemSelected()
+    _setupListener(): void {
+        document.querySelector(`#${this.#menuId}`)?.addEventListener("click", () => {
+            void this._menuClicked()
         })
     }
 
@@ -179,7 +183,7 @@ export default class PowerMap extends BaseModal {
     }
 
     async _setPattern(): Promise<void> {
-        const icons = Object.values(getIcons())
+        const icons = Object.values(nationFlags)
 
         try {
             const images = await loadImage(icons)
@@ -326,13 +330,13 @@ export default class PowerMap extends BaseModal {
         const totalPorts = ports.length
 
         this.#legendNationItemContainer
-            .selectAll<HTMLDivElement, [number, number]>("svg.svg-text")
+            .selectAll<HTMLDivElement, [number, number]>("svg.legend")
             .data(nations, (d, index) => String(index).padStart(2, "0") + String(d[0]).padStart(2, "0"))
             .join(
                 (enter) => {
                     const svg = enter
                         .append("svg")
-                        .attr("class", "svg-text")
+                        .attr("class", "legend")
                         .attr("width", this.#legendColumnWidth)
                         .attr("height", this.#legendRowHeight + this.#legendRowPadding)
                         .style("position", "absolute")
@@ -359,7 +363,7 @@ export default class PowerMap extends BaseModal {
                         .style("fill", (d) => getContrastColour(this.#colourScale(d[0])))
 
                     svg.append("rect")
-                        .attr("class", "rect-background")
+                        .attr("class", "opacity-low")
                         .attr("y", Math.floor(this.#legendRowHeight / 2 + this.#legendRowPadding))
                         .attr("width", "100%")
                         .attr("height", Math.floor(this.#legendRowHeight / 2))
@@ -460,14 +464,14 @@ export default class PowerMap extends BaseModal {
     _initRange(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
         const inputId = `range-${this.#baseId}`
 
-        const formGroup = formRow.append("div").attr("class", "form-group col-md-7 form-row mb-0")
+        const formGroup = formRow.append("div").attr("class", "row col-md-7 mb-0")
         this.#rangeInput = formGroup
             .append("div")
             .attr("class", "col-md-5")
             .append("input")
             .attr("id", inputId)
             .attr("type", "range")
-            .attr("class", "form-control-range custom-range px-md-2")
+            .attr("class", "form-range px-md-2")
             .attr("style", "height:100%")
             .attr("min", "0")
             .attr("max", String(this.#lastIndex))
@@ -531,7 +535,7 @@ export default class PowerMap extends BaseModal {
     }
 
     _initButtons(formRow: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void {
-        const buttonBaseId = `button-${this.#baseId}`
+        const buttonBaseId = `menu-${this.#baseId}`
 
         // eslint-disable-next-line unicorn/consistent-function-scoping
         const playButtonClicked = () => {
@@ -624,7 +628,7 @@ export default class PowerMap extends BaseModal {
         buttonGroup = buttonToolbar.append("div").attr("class", "btn-group").attr("role", "group")
         this.#playButton = addButton("pause", "Pause")
 
-        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group mr-3").attr("role", "group")
+        buttonGroup = buttonToolbar.append("div").attr("class", "btn-group me-3").attr("role", "group")
         const forwardButton = addButton("forward", "Year forward")
         const endButton = addButton("end", "End")
 
@@ -649,7 +653,7 @@ export default class PowerMap extends BaseModal {
 
     _adjustControllerHeight(): void {
         this.#legendControllerHeight = getElementHeight(this.#legendControllerElement)
-        this.#legendContainer.selectAll("svg.svg-text").style("top", (d, index) => this._getTopPosition(index))
+        this.#legendContainer.selectAll("svg.legend").style("top", (d, index) => this._getTopPosition(index))
         this.#legendContainer.selectAll("svg.index").style("top", (d, index) => this._getTopPosition(index))
     }
 
@@ -660,7 +664,10 @@ export default class PowerMap extends BaseModal {
             .attr("class", "p-2")
         this.#legendControllerElement = legendController.node() as HTMLDivElement
 
-        const formRow = legendController.append("form").append("div").attr("class", "form-row align-items-center")
+        const formRow = legendController
+            .append("form")
+            .append("div")
+            .attr("class", "row input-group align-items-center")
 
         const ro = new ResizeObserver(() => {
             this._adjustControllerHeight()
@@ -726,17 +733,5 @@ export default class PowerMap extends BaseModal {
         }
         this._initLegend(dim)
         await this._setPattern()
-    }
-
-    /**
-     * Action when menu item is clicked
-     */
-    _menuItemSelected(): void {
-        showCursorWait()
-        this._mapElementsOff()
-        this._initialMapZoom()
-        this._initVoronoi()
-        void this._initCanvas()
-        this._drawPowerMap()
     }
 }

@@ -8,71 +8,90 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import path from "path"
+// https://stackoverflow.com/a/46427607
+const buildPath = (...args: string[]) => {
+    return args
+        .map((part, i) => {
+            if (i === 0) {
+                return part.trim().replace(/\/*$/g, "")
+            }
 
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc.js"
-dayjs.extend(utc)
-
-import { serverMaintenanceHour } from "./common-var"
+            return part.trim().replace(/(^\/*|\/*$)/g, "")
+        })
+        .filter((x) => x.length)
+        .join("/")
+}
 
 // https://stackoverflow.com/a/50052194
-const appRoot = process.env.PWD ?? ""
-const dirOut = path.resolve(appRoot, "public", "data")
-const dirBuild = path.resolve(appRoot, "build")
-const dirAPI = path.resolve(dirBuild, "API")
-const dirModules = path.resolve(dirBuild, "Modules")
-const dirSrc = path.resolve(appRoot, "src")
-const dirLib = path.resolve(dirSrc, "lib")
-const dirGenServer = path.resolve(dirLib, "gen-server")
-const dirGenGeneric = path.resolve(dirLib, "gen-generic")
+
+interface DirList {
+    dirOutput: string
+    dirDataOut: string
+    dirBuild: string
+    dirAPI: string
+    dirModules: string
+    dirSrc: string
+    dirLib: string
+    dirGenServer: string
+    dirGenGeneric: string
+    fileBuilding: string
+    fileCannon: string
+    fileLoot: string
+    fileModules: string
+    filePbSheet: string
+    filePbZone: string
+    filePort: string
+    filePortBonus: string
+    filePortBonusCSV: string
+    filePrices: string
+    fileRecipe: string
+    fileRepair: string
+    fileShip: string
+    fileShipBlueprint: string
+    fileTwitterRefreshId: string
+    fileWood: string
+}
+
 /**
  * Build common paths and file names
  */
-export const commonPaths = {
-    dirAPI,
-    dirBuild,
-    dirGenGeneric,
-    dirGenServer,
-    dirModules,
-    dirOut,
-    dirSrc,
+export function getCommonPaths(appRoot = process.env.PWD ?? ""): DirList {
+    const dirOutput = buildPath(appRoot, "public")
+    const dirBuild = buildPath(appRoot, "build")
+    const dirAPI = buildPath(dirBuild, "API")
+    const dirLib = buildPath(appRoot, "lib")
+    const dirGenServer = buildPath(dirLib, "gen-server")
+    const dirGenGeneric = buildPath(dirLib, "gen-generic")
+    const dirSrc = buildPath(appRoot, "src")
 
-    fileTwitterRefreshId: path.resolve(dirAPI, "response-id.txt"),
+    return {
+        dirOutput,
+        dirDataOut: buildPath(dirOutput, "data"),
+        dirBuild,
+        dirAPI,
+        dirModules: buildPath(dirBuild, "Modules"),
+        dirSrc,
+        dirLib,
+        dirGenServer,
+        dirGenGeneric,
 
-    filePbSheet: path.resolve(dirGenGeneric, "port-battle.xlsx"),
-    filePortBonusCSV: path.resolve(dirGenServer, "eu1-port-bonus.csv"),
-    filePortBonus: path.resolve(dirGenServer, "eu1-port-bonus.json"),
+        fileTwitterRefreshId: buildPath(dirAPI, "response-id.txt"),
 
-    fileBuilding: path.resolve(dirGenGeneric, "buildings.json"),
-    fileCannon: path.resolve(dirGenGeneric, "cannons.json"),
-    fileLoot: path.resolve(dirGenGeneric, "loot.json"),
-    fileModules: path.resolve(dirGenGeneric, "modules.json"),
-    filePbZone: path.resolve(dirGenGeneric, "pb-zones.json"),
-    filePort: path.resolve(dirGenGeneric, "ports.json"),
-    filePrices: path.resolve(dirGenGeneric, "prices.json"),
-    fileRecipe: path.resolve(dirGenGeneric, "recipes.json"),
-    fileRepair: path.resolve(dirGenGeneric, "repairs.json"),
-    fileShip: path.resolve(dirGenGeneric, "ships.json"),
-    fileShipBlueprint: path.resolve(dirGenGeneric, "ship-blueprints.json"),
-    fileWood: path.resolve(dirGenGeneric, "woods.json"),
-}
-/**
- * Get server start (date and time)
- */
-const getServerStartDateTime = (): dayjs.Dayjs => {
-    let serverStart = dayjs().utc().hour(serverMaintenanceHour).minute(0).second(0)
+        filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
+        filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),
 
-    // adjust reference server time if needed
-    if (dayjs.utc().isBefore(serverStart)) {
-        serverStart = dayjs.utc(serverStart).subtract(1, "day")
+        fileBuilding: buildPath(dirGenGeneric, "buildings.json"),
+        fileCannon: buildPath(dirGenGeneric, "cannons.json"),
+        fileLoot: buildPath(dirGenGeneric, "loot.json"),
+        fileModules: buildPath(dirGenGeneric, "modules.json"),
+        filePbSheet: buildPath(dirGenGeneric, "port-battle.xlsx"),
+        filePbZone: buildPath(dirGenGeneric, "pb-zones.json"),
+        filePort: buildPath(dirGenGeneric, "ports.json"),
+        filePrices: buildPath(dirGenGeneric, "prices.json"),
+        fileRecipe: buildPath(dirGenGeneric, "recipes.json"),
+        fileRepair: buildPath(dirGenGeneric, "repairs.json"),
+        fileShip: buildPath(dirGenGeneric, "ships.json"),
+        fileShipBlueprint: buildPath(dirGenGeneric, "ship-blueprints.json"),
+        fileWood: buildPath(dirGenGeneric, "woods.json"),
     }
-
-    return serverStart
 }
-
-export const serverStartDateTime = getServerStartDateTime().format("YYYY-MM-DD HH:mm")
-export const serverStartDate = getServerStartDateTime().format("YYYY-MM-DD")
-const serverDateYear = String(dayjs(serverStartDate).year())
-const serverDateMonth = String(dayjs(serverStartDate).month() + 1).padStart(2, "0")
-export const baseAPIFilename = path.resolve(commonPaths.dirAPI, serverDateYear, serverDateMonth)

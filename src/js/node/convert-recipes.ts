@@ -10,12 +10,12 @@
 
 import path from "path"
 
-import d3Array from "d3-array"
-const { group: d3Group } = d3Array
+import { group as d3Group } from "d3-array"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { currentServerStartDate as serverDate, simpleStringSort, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { cleanName, simpleStringSort, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIRecipeModuleResource, APIRecipeResource, APIShipUpgradeBookItem } from "./api-item"
@@ -28,12 +28,13 @@ interface Ingredient {
 }
 
 let apiItems: APIItemGeneric[]
+const commonPaths = getCommonPaths()
 
 // noinspection SpellCheckingInspection
 const craftGroups = new Map([
     ["AdmiralityShips", "Admirality permits"],
     ["AdmiraltyBooks", "Admirality books"],
-    ["AdmiraltyModules", "Admirality modules"],
+    ["AdmiraltyModules", "Admirality setModules"],
     ["AdmiraltyRecipes", "Admirality blueprints"],
     ["AdmiraltyResourcesAndMaterials", "Admirality resources"],
     ["AdmiraltyRewards", "PVP rewards"],
@@ -66,9 +67,9 @@ const convertRecipes = async (): Promise<void> => {
     const itemNames = new Map(apiItems.filter((item) => !item.NotUsed).map((item) => [item.Id, cleanName(item.Name)]))
 
     const moduleNames = new Map(
-        ((apiItems.filter(
-            (item) => item.ItemType === "ShipUpgradeBookItem"
-        ) as unknown) as APIShipUpgradeBookItem[]).map((item) => [item.Id, itemNames.get(item.Upgrade) ?? ""])
+        (apiItems.filter((item) => item.ItemType === "ShipUpgradeBookItem") as unknown as APIShipUpgradeBookItem[]).map(
+            (item) => [item.Id, itemNames.get(item.Upgrade) ?? ""]
+        )
     )
 
     const ingredientIds = new Map(
@@ -151,7 +152,6 @@ const convertRecipes = async (): Promise<void> => {
             return {
                 group,
                 recipes: recipes.map((recipe) => {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     const { craftGroup, ...recipeCleaned } = recipe
                     return recipeCleaned
                 }),

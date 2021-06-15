@@ -14,5 +14,5 @@ export const serverMaintenanceHour = 10;
 export const mapSize = 8192;
 export const distanceMapSize = 8192;
 export const portBattleCooldown = 48;
-export const flagValidity = 144;
+export const flagValidity = 7;
 //# sourceMappingURL=common-var.js.map

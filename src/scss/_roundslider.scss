@@ -1,0 +1,60 @@
+////
+/// This file is part of na-map.
+/// Roundslider overrides.
+///
+/// @group    scss
+/// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
+////
+
+@import "~round-slider/src/roundslider.css";
+
+.rs-tooltip-text {
+    font-family: inherit;
+    font-size: 1.8em;
+    line-height: 1.1;
+    color: $primary-700;
+}
+
+.rs-handle {
+    position: relative;
+    width: 32px !important;
+    background: $primary-900;
+    border-radius: 0;
+
+    &::after,
+    &::before {
+        position: absolute;
+        top: 50%;
+        left: 98%;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+        content: " ";
+        border: solid transparent;
+    }
+
+    &::after {
+        margin-top: -24px;
+        border-width: 24px;
+        border-left-color: $primary-900;
+    }
+
+    &::before {
+        margin-top: -24px;
+        border-width: 24px;
+    }
+}
+
+.rs-control .rs-path-color {
+    background-color: $primary-300;
+}
+
+.rs-control .rs-handle {
+    background-color: $primary-900;
+}
+
+.rs-border {
+    border: 0;
+}

@@ -1,0 +1,47 @@
+////
+/// This file is part of na-map.
+/// flag icon definitions.
+///
+/// @group    scss
+/// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
+////
+
+$icon-dir: "../images/flags";
+
+.flag-icon-large {
+    width: 4rem * 1.2;
+    height: 3rem * 1.2;
+}
+
+.flag-icon-button {
+    width: 2rem;
+    height: 1.5rem;
+    vertical-align: middle !important;
+}
+
+.flag-icon-small {
+    width: 1.3333rem;
+    height: 1rem;
+}
+
+.flag-icon-border-light {
+    box-shadow: 0 0 0 0.4rem $white;
+}
+
+.flag-icon-border-middle {
+    box-shadow: 0 0 0 0.3rem $yellow;
+}
+
+$nations: "CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP";
+
+@each $nation in $nations {
+    .flag-icon-#{$nation} {
+        display: inline-block;
+        vertical-align: baseline;
+        background-image: url("#{$icon-dir}/#{$nation}.svg");
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
+}

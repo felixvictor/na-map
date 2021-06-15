@@ -12,10 +12,10 @@ import * as fs from "fs"
 import path from "path"
 import { default as nodeFetch } from "node-fetch"
 
-import { baseAPIFilename, serverStartDate as serverDate } from "../common/common-dir"
+import { currentServerStartDate as serverDate, sortBy } from "../common/common"
 import { apiBaseFiles } from "../common/common-var"
 import { saveJsonAsync, xzAsync } from "../common/common-file"
-import { sortBy } from "../common/common-node"
+import { baseAPIFilename } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIItemGeneric } from "./api-item"

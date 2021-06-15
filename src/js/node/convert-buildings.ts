@@ -10,9 +10,10 @@
 
 import path from "path"
 
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { currentServerStartDate as serverDate, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { cleanName, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIBuilding, LevelsEntity, TemplateEntity, APIItemGeneric, APIRecipeResource } from "./api-item"
@@ -87,9 +88,9 @@ const getBuildings = (): Building[] => {
         ])
     )
 
-    const apiRecipeResources = (apiItems.filter(
+    const apiRecipeResources = apiItems.filter(
         (item) => item.ItemType === "RecipeResource"
-    ) as unknown) as APIRecipeResource[]
+    ) as unknown as APIRecipeResource[]
 
     const resourceRecipes = new Map<number, BuildingBatch>(
         apiRecipeResources.map((recipe) => [
@@ -166,31 +167,29 @@ const getBuildings = (): Building[] => {
 }
 
 const getAPISeasonedItem = (name: string): APIRecipeResource =>
-    (apiItems.find(
+    apiItems.find(
         (item) =>
             item.ItemType === "Recipe" &&
             item.Name.replace(" Log", "") === name.replace(/\s/g, " ").replace("White Oak", "White oak")
-    ) as unknown) as APIRecipeResource
+    ) as unknown as APIRecipeResource
 
 const getPrices = (buildings: Building[]): Price => {
     const prices: Price = { standard: [], seasoned: [] }
     const getStandardPrices = (name: string): number | undefined =>
         prices.standard.find((standardItem) => standardItem.name === name.replace(" (S)", ""))?.reales
 
-    const standardPrices = (buildings.filter(
-        (building: Building) => building.result?.[0].price
-    ) as BuildingWithResult[])
-        .map(
-            (building: BuildingWithResult): PriceStandardWood => {
-                const result = building.result[0]
-                return {
-                    id: result.id,
-                    name: result.name.replace(" Log", ""),
-                    reales: result.price,
-                    labour: building?.batch?.labour ?? 0,
-                }
+    const standardPrices = (
+        buildings.filter((building: Building) => building.result?.[0].price) as BuildingWithResult[]
+    )
+        .map((building: BuildingWithResult): PriceStandardWood => {
+            const result = building.result[0]
+            return {
+                id: result.id,
+                name: result.name.replace(" Log", ""),
+                reales: result.price,
+                labour: building?.batch?.labour ?? 0,
             }
-        )
+        })
         .sort((a, b) => a.id - b.id)
 
     const superWoods = new Set([
@@ -205,46 +204,43 @@ const getPrices = (buildings: Building[]): Price => {
         1901, // Italian Larch
     ])
     const superPrices = [...superWoods]
-        .map(
-            (superWoodId): PriceStandardWood => {
-                const superWood = apiItems.find((item) => item.Id === superWoodId)
+        .map((superWoodId): PriceStandardWood => {
+            const superWood = apiItems.find((item) => item.Id === superWoodId)
 
-                return {
-                    id: superWoodId,
-                    name: superWood?.Name ?? "",
-                    reales: superWood?.BasePrice ?? 0,
-                }
+            return {
+                id: superWoodId,
+                name: superWood?.Name ?? "",
+                reales: superWood?.BasePrice ?? 0,
             }
-        )
+        })
         .sort((a, b) => a.id - b.id)
 
     prices.standard = [...standardPrices, ...superPrices]
     prices.seasoned = getItemsCraftedBySeasoningShed()
-        .map(
-            (seasonedItem: BuildingResult): PriceSeasonedWood => {
-                const name = seasonedItem.name.replace(" Log", "")
-                const apiSeasonedItem = getAPISeasonedItem(name)
+        .map((seasonedItem: BuildingResult): PriceSeasonedWood => {
+            const name = seasonedItem.name.replace(" Log", "")
+            const apiSeasonedItem = getAPISeasonedItem(name)
 
-                return {
-                    id: apiSeasonedItem.Id,
-                    name,
-                    reales: getStandardPrices(name) ?? 0,
-                    labour: apiSeasonedItem.LaborPrice,
-                    doubloon:
-                        apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
-                            ?.Amount ?? 0,
-                    tool:
-                        apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)
-                            ?.Amount ?? 0,
-                }
+            return {
+                id: apiSeasonedItem.Id,
+                name,
+                reales: getStandardPrices(name) ?? 0,
+                labour: apiSeasonedItem.LaborPrice,
+                doubloon:
+                    apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idDoubloons)
+                        ?.Amount ?? 0,
+                tool:
+                    apiSeasonedItem.FullRequirements.find((requirement) => requirement.Template === idTools)?.Amount ??
+                    0,
             }
-        )
+        })
         .sort((a, b) => a.id - b.id)
 
     return prices
 }
 
 const convertBuildings = async (): Promise<void> => {
+    const commonPaths = getCommonPaths()
     let buildings = getBuildings()
 
     const prices = getPrices(buildings)

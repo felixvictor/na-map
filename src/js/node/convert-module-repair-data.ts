@@ -1,7 +1,7 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Convert repair data from modules.
+ * @file      Convert repair data from setModules.
  * @module    src/node/convert-module-repair
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
@@ -11,11 +11,13 @@
 import path from "path"
 import convert, { ElementCompact } from "xml-js"
 
-import { commonPaths } from "../common/common-dir"
+import { getCommonPaths } from "../common/common-dir"
 import { readTextFile, saveJsonAsync } from "../common/common-file"
 
 import { Repair, RepairAmount } from "../common/gen-json"
 import { TextEntity, XmlRepair } from "./xml"
+
+const commonPaths = getCommonPaths()
 
 /**
  * Change string from snake case to camelCase

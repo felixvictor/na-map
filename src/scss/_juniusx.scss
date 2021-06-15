@@ -1,0 +1,51 @@
+////
+/// This file is part of na-map.
+/// Junicode font definitions.
+///
+/// @group    scss
+/// @author   iB aka Felix Victor
+/// copyright Felix Victor 2017 to 2021
+/// license   http://www.gnu.org/licenses/gpl.html
+////
+
+@use "sass:map";
+@import "font-weight";
+
+$font-name: "JuniusX";
+$font-family: $font-name;
+$font-path: "../fonts/#{$font-name}/";
+
+$font-list: (300 normal light condensed), (400 normal regular normal), (400 normal regular condensed);
+
+@each $font-weight, $font-style, $font-weight-name, $font-stretch in $font-list {
+    @font-face {
+        font-family: "#{$font-family}";
+        font-style: $font-style;
+        //noinspection Stylelint
+        font-weight: map.get($font-weights, $font-weight-name);
+        font-stretch: $font-stretch;
+        src: url("#{$font-path}#{$font-name}-#{$font-style}-#{$font-weight-name}-#{$font-stretch}.woff2")
+            format("woff2");
+        font-display: swap;
+    }
+}
+
+//
+// Add Junicode italics as long as JuniusX does not have its own
+
+$font-name: "Junicode";
+$font-family: "JuniusX";
+$font-path: "../fonts/#{$font-name}/";
+
+$font-weight: 400;
+$font-style: italic;
+$font-weight-name: regular;
+$font-stretch: normal;
+
+@font-face {
+    font-family: "#{$font-family}";
+    font-style: $font-style;
+    font-weight: $font-weight;
+    src: url("#{$font-path}#{$font-name}-#{$font-style}-#{$font-weight-name}-#{$font-stretch}.woff2") format("woff2");
+    font-display: swap;
+}

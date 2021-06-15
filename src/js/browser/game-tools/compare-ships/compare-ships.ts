@@ -8,178 +8,89 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-/// <reference types="bootstrap" />
-import "bootstrap/js/dist/util"
-import "bootstrap/js/dist/modal"
+import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
-import "bootstrap-select"
 import { group as d3Group, max as d3Max, min as d3Min } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
-import { select as d3Select, Selection } from "d3-selection"
-import dayjs from "dayjs"
-import customParseFormat from "dayjs/plugin/customParseFormat.js"
-import utc from "dayjs/plugin/utc.js"
 
 import { registerEvent } from "../../analytics"
-import { appVersion, colourGreenDark, colourRedDark, colourWhite, insertBaseModal } from "common/common-browser"
-import { isEmpty, WoodType, woodType } from "common/common"
-import { formatPP, formatSignFloat, formatSignPercent } from "common/common-format"
-import {
-    hashids,
-    hullRepairsPercent,
-    isImported,
-    repairTime,
-    rigRepairsPercent,
-    stripShipName,
-} from "common/common-game-tools"
+import { sortBy } from "common/common"
+import { colourGreenDark, colourRedDark, colourWhite, getElementWidth } from "common/common-browser"
+import { formatPP, formatSignFloat, formatSignPercentOldstyle } from "common/common-format"
+import { hullRepairsPercent, isImported, repairTime, rigRepairsPercent, stripShipName } from "common/common-game-tools"
 import { getOrdinal } from "common/common-math"
-import { sortBy } from "common/common-node"
-import { copyToClipboard } from "../../util"
+import { moduleAndWoodCaps, moduleAndWoodChanges } from "./module-modifier"
 
-import JQuery from "jquery"
 import { Module, ModuleEntity, ModulePropertiesEntity, ShipData, ShipRepairTime } from "common/gen-json"
-import { ArrayIndex, HtmlString, Index, ModifierName, NestedIndex } from "common/interface"
+import { HtmlString } from "common/interface"
+import { WoodType, woodType } from "common/types"
+import { ShipColumnTypeList, ModuleType, SelectedData, SelectedId, ShipSelectData } from "compare-ships"
+import { ShipColumnType } from "./index"
+import { WoodColumnType } from "../compare-woods"
 
-import CompareWoods from "../compare-woods"
-import { ShipBase } from "./ship-base"
-import { ShipComparison } from "./ship-comparison"
+import CompareShipsModal from "./modal"
+import SaveImage from "./save-image"
+import { copyDataClicked } from "./copy-to-clipboard"
+import { WoodData } from "../compare-woods/data"
+import { CompareShipsSelect } from "./select"
+import { ColumnBase } from "./column-base"
+import { ColumnCompare } from "./column-compare"
+import ModulesAndWoodData from "./module-wood-data"
 
-dayjs.extend(customParseFormat)
-dayjs.extend(utc)
-
-interface SelectedData {
-    moduleData: Map<string, string>
-    ship: string
-    wood: string[]
-}
-
-interface ShipSelectMap {
-    key: number
-    values: ShipSelectData[]
-}
-
-interface ShipSelectData {
-    id: number
-    name: string
-    class: number
-    battleRating: number
-    guns: number
-}
-
-interface Property {
-    properties: string[]
-    isBaseValueAbsolute: boolean
-}
-
-interface Amount {
-    amount: number
-    isPercentage: boolean
-}
-
-interface AbsoluteAndPercentageAmount {
-    absolute: number
-    percentage: number
-}
-
-interface PropertyWithCap {
-    properties: string[]
-    cap: Amount
-}
-
-type ModuleType = string
-type ModuleId = number
-
-const shipColumnType = ["Base", "C1", "C2"]!
-type ShipColumnType = typeof shipColumnType[number]
-type ColumnArray<T> = {
-    [K in ShipColumnType]: T[]
-}
-type ColumnNestedArray<T> = {
-    [K in ShipColumnType]: ArrayIndex<T>
-}
+type CompareShipsBaseId = "compare-ship" | "ship-journey"
+type ModuleOptionType = [number, ModuleEntity]
 
 export class CompareShips {
-    colorScale!: ScaleLinear<string, string>
+    #maxSpeed = 0
+    #minSpeed = 0
+    #modal: CompareShipsModal | undefined = undefined
+    #moduleDataDefault = {} as Module[]
+    #modulesAndWoodData = {} as ModulesAndWoodData
+
+    #shipData = {} as ShipData[]
+    readonly #baseId: CompareShipsBaseId
+    readonly #baseName: string
+    readonly #columnIds: ShipColumnType[]
+    readonly #menuId: HtmlString
+    readonly #moduleAndWoodCaps = moduleAndWoodCaps
+    readonly #moduleAndWoodChanges = moduleAndWoodChanges
+    #moduleTypes!: Set<ModuleType>
+    #moduleProperties = new Map<number, ModuleEntity>()
+    #tooltips = new Map<number, BSTooltip | undefined>()
+
+    activeColumns = {} as ShipColumnTypeList<ColumnBase | ColumnCompare | undefined>
+    colorScale = {} as ScaleLinear<string, string>
+    innerRadius = 0
+    outerRadius = 0
+    radiusSpeedScale = {} as ScaleLinear<number, number>
+    shipMassScale = {} as ScaleLinear<number, number>
+    singleShipData = {} as ShipData
+    svgHeight = 0
+    svgWidth = 0
+    windProfileRotate = 0
     readonly colourScaleSpeedDiff: ScaleLinear<string, string>
     readonly columnsCompare: ShipColumnType[]
-    innerRadius!: number
-    outerRadius!: number
-    radiusSpeedScale!: ScaleLinear<number, number>
-    selectedShips!: Index<ShipBase | ShipComparison>
-    singleShipData!: ShipData
-    shipMassScale!: ScaleLinear<number, number>
-    svgHeight!: number
-    svgWidth!: number
-    windProfileRotate = 0
-    woodCompare!: CompareWoods
-    #doNotRound!: Set<string>
-    #buttonMakeImage!: Selection<HTMLButtonElement, unknown, HTMLElement, unknown>
-    private _maxSpeed!: number
-    private _minSpeed!: number
-    private _modal$: JQuery = {} as JQuery
-    private _modifierAmount: Map<ModifierName, AbsoluteAndPercentageAmount> = new Map()
-    private _moduleAndWoodCaps!: Map<ModifierName, PropertyWithCap>
-    private _moduleAndWoodChanges!: Map<ModifierName, Property>
-    private _moduleDataDefault!: Module[]
-    private _moduleProperties!: Map<ModuleId, ModuleEntity>
-    private _moduleTypes!: Set<ModuleType>
-    private _selectedUpgradeIdsList: ColumnArray<number> = {} as ColumnArray<number>
-    private _selectedUpgradeIdsPerType: ColumnNestedArray<number> = {} as ColumnNestedArray<number>
-    private _selectModule$: NestedIndex<JQuery<HTMLSelectElement>> = {}
-    private _selectShip$: Index<JQuery<HTMLSelectElement>> = {}
-    private _selectWood$: NestedIndex<JQuery<HTMLSelectElement>> = {}
-    private _shipData!: ShipData[]
-    private _shipIds: Index<number> = {}
-    private _shipSelectData!: ShipSelectMap[]
-    private readonly _baseId: string
-    private readonly _baseName: string
-    private readonly _buttonId: HtmlString
-    private readonly _columns: ShipColumnType[]
-    private readonly _copyButtonId: HtmlString
-    private readonly _cloneLeftButtonId: HtmlString
-    private readonly _cloneRightButtonId: HtmlString
-    private readonly _imageButtonId: HtmlString
-    private readonly _modalId: HtmlString
-    private readonly _moduleId: HtmlString
-    private readonly _woodId: HtmlString
 
-    /**
-     *
-     * @param id - Base id (default "ship-compare")
-     */
-    constructor(id = "ship-compare") {
-        this._baseId = id
+    #woodData = {} as WoodData
+    #selects = {} as CompareShipsSelect
 
-        this._baseName = "Compare ships"
-        this._buttonId = `button-${this._baseId}`
-        this._modalId = `modal-${this._baseId}`
-        this._moduleId = `${this._baseId}-module`
-        this._copyButtonId = `button-copy-${this._baseId}`
-        this._cloneLeftButtonId = `button-clone-left-${this._baseId}`
-        this._cloneRightButtonId = `button-clone-right-${this._baseId}`
-        this._imageButtonId = `button-image-${this._baseId}`
+    constructor(id: CompareShipsBaseId = "compare-ship") {
+        this.#baseId = id
+
+        this.#baseName = this.#baseId === "compare-ship" ? "Compare ships" : this.#baseId
+        this.#menuId = `menu-${this.#baseId}`
 
         this.colourScaleSpeedDiff = d3ScaleLinear<string, string>()
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
-        if (this._baseId === "ship-compare") {
-            this.columnsCompare = ["C1", "C2"]
-        } else {
-            this.columnsCompare = []
-        }
+        this.columnsCompare = this.#baseId === "compare-ship" ? ["c1", "c2"] : []
+        this.#columnIds = [...this.columnsCompare]
+        this.#columnIds.unshift("base")
 
-        this._columns = this.columnsCompare.slice()
-        this._columns.unshift("Base")
-
-        this.selectedShips = { Base: {} as ShipBase, C1: {} as ShipComparison, C2: {} as ShipComparison }
-
-        this._woodId = "wood-ship"
-
-        this._setupArrow()
-        if (this._baseId !== "ship-journey") {
-            this._setupListener()
+        for (const columnId of this.#columnIds) {
+            this.activeColumns[columnId] = undefined
         }
     }
 
@@ -187,24 +98,12 @@ export class CompareShips {
         return rate <= 3 ? "L" : rate <= 5 ? "M" : "S"
     }
 
-    static _adjustAbsolute(currentValue: number, additionalValue: number): number {
-        return currentValue ? currentValue + additionalValue : additionalValue
-    }
-
-    static _adjustPercentage(currentValue: number, additionalValue: number, isBaseValueAbsolute: boolean): number {
-        if (isBaseValueAbsolute) {
-            return currentValue ? currentValue * (1 + additionalValue) : additionalValue
-        }
-
-        return currentValue ? currentValue + additionalValue : additionalValue
-    }
-
-    static _getModifierFromModule(properties: ModulePropertiesEntity[]): string {
+    static _getModifierFromModule(properties: ModulePropertiesEntity[]): HtmlString {
         return `<p class="mb-0">${properties
             .map((property) => {
                 let amount
                 if (property.isPercentage) {
-                    amount = formatSignPercent(property.amount / 100)
+                    amount = formatSignPercentOldstyle(property.amount / 100)
                 } else {
                     amount =
                         property.amount < 1 && property.amount > 0
@@ -217,588 +116,326 @@ export class CompareShips {
             .join("<br>")}</p>`
     }
 
-    static _setSelect(select$: JQuery, ids: number | number[]): void {
-        let value: string | string[]
-        // eslint-disable-next-line unicorn/prefer-ternary
-        if (Array.isArray(ids)) {
-            value = ids.map<string>((id: number | string) => String(id))
-        } else {
-            value = String(ids)
-        }
-
-        if (value) {
-            select$.val(value)
-        }
-
-        select$.selectpicker("render")
+    get columnIds(): ShipColumnType[] {
+        return this.#columnIds
     }
 
-    static _saveCanvasAsImage(uri: string): void {
-        const date = dayjs.utc().format("YYYY-MM-DD HH-mm-ss")
-        const fileName = `na-map ship compare ${date}.png`
-        const link = document.createElement("a")
-
-        link.href = uri
-        link.download = fileName
-
-        // Firefox requires the link to be in the body
-        document.body.append(link)
-
-        // simulate click
-        link.click()
-
-        // remove the link when done
-        link.remove()
+    get menuId(): HtmlString {
+        return this.#menuId
     }
 
-    _getShipId(columnId: ShipColumnType): number {
-        return this._shipIds[columnId]
+    get modulesAndWoodData(): ModulesAndWoodData {
+        return this.#modulesAndWoodData
     }
 
-    _setShip(columnId: ShipColumnType, shipId: number): void {
-        this._shipIds[columnId] = shipId
-        CompareShips._setSelect(this._selectShip$[columnId], shipId)
-        if (columnId === "Base" && this._baseId !== "ship-journey") {
-            this._enableCompareSelects()
-        }
+    get moduleTypes(): Set<ModuleType> {
+        return this.#moduleTypes
+    }
+
+    get selects(): CompareShipsSelect {
+        return this.#selects
+    }
+
+    hasShipId(id: number): boolean {
+        return this.#shipData.some((ship) => ship.id === id)
     }
 
     _cloneShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
-        const shipId = this._getShipId(currentColumnId)
-        if (shipId) {
-            this._setShip(newColumnId, shipId)
+        const shipId = this.#selects.getSelectedShipId(currentColumnId)
+
+        if (shipId !== 0) {
+            this.#selects.setShip(newColumnId, shipId)
+            return true
         }
 
-        return shipId !== undefined
+        return false
     }
 
-    _getWoodId(columnId: ShipColumnType, type: WoodType): number {
-        return Number(this._selectWood$[columnId][type].val())
+    _addTooltip(element: HTMLLIElement, module: ModuleEntity): void {
+        // Add tooltip with module properties
+        element.dataset.bsOriginalTitle = CompareShips._getModifierFromModule(module.properties)
+        const tooltip = new BSTooltip(element, { html: true })
+        element.addEventListener("show.bs.tooltip", () => {
+            // Remember shown tooltip
+            this.#tooltips.set(module.id, tooltip)
+        })
+        element.addEventListener("hide.bs.tooltip", () => {
+            this.#tooltips.set(module.id, undefined)
+        })
     }
 
-    _setWood(columnId: ShipColumnType, type: WoodType, woodId: number): void {
-        CompareShips._setSelect(this._selectWood$[columnId][type], woodId)
-        this.woodCompare._woodSelected(columnId, type, this._selectWood$[columnId][type])
+    _getModuleFromName(moduleName: string | null): ModuleEntity | undefined {
+        let module: ModuleEntity | undefined
+
+        this.#moduleDataDefault.some((type) => {
+            module = type[1].find((module) => module.name === moduleName)
+            return Boolean(module)
+        })
+
+        return module
+    }
+
+    _initTooltip(select$: JQuery<HTMLSelectElement>): void {
+        for (const element of select$.data("selectpicker").selectpicker.current.elements as HTMLLIElement[]) {
+            if (!(element.classList.contains("dropdown-divider") || element.classList.contains("dropdown-header"))) {
+                const module = this._getModuleFromName(element.textContent)
+                if (module) {
+                    this._addTooltip(element, module)
+                }
+            }
+        }
+    }
+
+    _initModuleSelects(columnId: ShipColumnType): void {
+        const shipClass = this._getShipClass(columnId)
+        for (const moduleType of this.#moduleTypes) {
+            this.#selects.initModuleSelects(columnId, moduleType, this._getModuleOption(moduleType, shipClass))
+
+            // console.log(moduleType, this.#selects.getModule$(columnId, moduleType))
+            this.#selects
+                .getModule$(columnId, moduleType)
+                .on("show.bs.select", (event: Event) => {
+                    const select$ = $(event.currentTarget as HTMLSelectElement)
+
+                    // Remove 'select all' button
+                    select$.parent().find("button.bs-select-all").remove()
+                    this._initTooltip(select$)
+                })
+                .on("hide.bs.select", () => {
+                    // Hide remaining tooltips
+                    for (const [, tooltip] of this.#tooltips) {
+                        if (tooltip) {
+                            tooltip.hide()
+                        }
+                    }
+
+                    this.#tooltips.clear()
+                })
+        }
     }
 
     _cloneWoodData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this.woodCompare.enableSelects(newColumnId)
+        this.#selects.enableWoodSelects(newColumnId)
 
-        if (this._selectWood$[currentColumnId].frame.val() !== "") {
+        if (this.#selects.getSelectedWoodId(currentColumnId, "frame")) {
             for (const type of woodType) {
-                const woodId = this._getWoodId(currentColumnId, type)
-                this._setWood(newColumnId, type, woodId)
+                const woodId = this.#selects.getSelectedWoodId(currentColumnId, type)
+                this.#selects.setWood(newColumnId, type, woodId)
             }
         }
-    }
-
-    _getModuleIds(columnId: ShipColumnType, type: ModuleType): number[] {
-        return this._selectedUpgradeIdsPerType[columnId][type]
-    }
-
-    _setModules(columnId: ShipColumnType, type: ModuleType, moduleIds: number[]): void {
-        if (!this._selectedUpgradeIdsPerType[columnId]) {
-            this._selectedUpgradeIdsPerType[columnId] = {} as ArrayIndex<number>
-        }
-
-        if (!this._selectedUpgradeIdsList[columnId]) {
-            this._selectedUpgradeIdsList[columnId] = []
-        }
-
-        // console.log("moduleIds", { columnId }, { type }, { moduleIds });
-
-        this._selectedUpgradeIdsPerType[columnId][type] = moduleIds.map((element) => Number(element))
-        CompareShips._setSelect(this._selectModule$[columnId][type], this._selectedUpgradeIdsPerType[columnId][type])
-        this._selectedUpgradeIdsList[columnId].push(...this._selectedUpgradeIdsPerType[columnId][type])
     }
 
     _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        this._setupModulesSelect(newColumnId)
-        if (this._selectedUpgradeIdsPerType[currentColumnId]) {
-            for (const type of [...this._moduleTypes]) {
-                const moduleIds = this._getModuleIds(currentColumnId, type)
-                this._setModules(newColumnId, type, moduleIds)
-            }
-        }
+        const moduleIds = this.#selects.getSelectedModuleIds(currentColumnId, this.#moduleTypes)
+
+        this._initModuleSelects(newColumnId)
+        this.#selects.setModules(newColumnId, moduleIds)
     }
 
-    _cloneShipToLeft(currentColumnId: ShipColumnType): void {
-        const newColumnIndex = this._columns.indexOf(currentColumnId)
-        const newColumnId = this._columns[newColumnIndex - 1]
-
+    _clone(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
         const hasData = this._cloneShipData(currentColumnId, newColumnId)
+
         if (hasData) {
             this._cloneWoodData(currentColumnId, newColumnId)
             this._cloneModuleData(currentColumnId, newColumnId)
 
-            this._refreshShips(newColumnId)
+            this._refreshColumn(newColumnId)
         }
     }
 
-    _cloneShipToRight(currentColumnId: ShipColumnType): void {
-        const newColumnIndex = this._columns.indexOf(currentColumnId)
-        const newColumnId = this._columns[newColumnIndex + 1]
+    _cloneToLeft(currentColumnId: ShipColumnType): void {
+        const newColumnIndex = this.#columnIds.indexOf(currentColumnId)
+        const newColumnId = this.#columnIds[newColumnIndex - 1]
 
-        const hasData = this._cloneShipData(currentColumnId, newColumnId)
-        if (hasData) {
-            this._cloneWoodData(currentColumnId, newColumnId)
-            this._cloneModuleData(currentColumnId, newColumnId)
+        this._clone(currentColumnId, newColumnId)
+    }
 
-            this._refreshShips(newColumnId)
+    _cloneToRight(currentColumnId: ShipColumnType): void {
+        const newColumnIndex = this.#columnIds.indexOf(currentColumnId)
+        const newColumnId = this.#columnIds[newColumnIndex + 1]
+
+        this._clone(currentColumnId, newColumnId)
+    }
+
+    _setupModuleSelectListener(columnId: ShipColumnType): void {
+        for (const type of this.#moduleTypes) {
+            const select$ = this.#selects.getModule$(columnId, type)
+            select$.on("changed.bs.select", () => {
+                this._refreshColumn(columnId)
+            })
         }
     }
 
-    async CompareShipsInit(): Promise<void> {
-        await this._loadAndSetupData()
-        this._initData()
-        this._initSelects()
+    _getShipClass = (columnId: ShipColumnType): number =>
+        this.#shipData.find((ship) => ship.id === this.#selects.getSelectedShipId(columnId))?.class ?? 0
+
+    _getModuleDataForShipClass(moduleType: string, shipClass: number): ModuleOptionType[] {
+        return [...this.#moduleProperties].filter(
+            (module) =>
+                module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
+                (module[1].moduleLevel === "U" || module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
+        )
     }
 
-    async initFromClipboard(urlParams: URLSearchParams): Promise<void> {
-        await this._loadAndSetupData()
-        const shipAndWoodsIds = hashids.decode(urlParams.get("cmp") ?? "") as number[]
-        if (shipAndWoodsIds.length > 0) {
-            this._shipCompareSelected()
-            this._setShipAndWoodsSelects(shipAndWoodsIds)
-            this._setModuleSelects(urlParams)
+    _getModulesGrouped(moduleType: string, shipClass: number): Array<{ key: string; values: ModuleOptionType[] }> {
+        const moduleData = this._getModuleDataForShipClass(moduleType, shipClass)
+        return [...d3Group(moduleData, (module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))]
+            .map(([key, value]) => ({
+                key,
+                values: value.sort((a, b) => a[1].name.localeCompare(b[1].name)),
+            }))
+            .sort(sortBy(["key"]))
+    }
+
+    _getMaxOptions(moduleTypeWithSingleOption: Set<string>, moduleType: string): number {
+        return moduleTypeWithSingleOption.has(moduleType.replace(/[\sA-Za-z]+\s–\s/, "")) ? 1 : 5
+    }
+
+    _getOption(values: ModuleOptionType[]): HtmlString {
+        return values.map((module) => `<option value="${module[0]}">${module[1].name}</option>`).join("")
+    }
+
+    _getModuleOption(moduleType: string, shipClass: number): HtmlString {
+        // Group module data by sub type (e.g. "Gunnery")
+        const modulesGrouped = this._getModulesGrouped(moduleType, shipClass)
+        let options: string
+        const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
+
+        // eslint-disable-next-line unicorn/prefer-ternary
+        if (modulesGrouped.length > 1) {
+            // Get options with sub types as optgroups
+            options = modulesGrouped
+                .map(
+                    (group) =>
+                        `<optgroup label="${group.key}" data-max-options="${this._getMaxOptions(
+                            moduleTypeWithSingleOption,
+                            moduleType
+                        )}">${this._getOption(group.values)}</optgroup>`
+                )
+                .join("")
+        } else {
+            // Get options without optgroups
+            options = modulesGrouped.map((group) => `${this._getOption(group.values)}`).join("")
+        }
+
+        return options
+    }
+
+    _setOtherWoodSelect(columnId: WoodColumnType, type: WoodType): void {
+        const otherType: WoodType = type === "frame" ? "trim" : "frame"
+        const otherTypeValue = this.#selects.getSelectedWoodId(columnId, otherType)
+
+        if (otherTypeValue === 0) {
+            this.#selects.resetWoodSelect(columnId, otherType, this.#woodData.defaultWoodId[otherType])
         }
     }
 
-    _setupArrow(): void {
-        // Get current arrow
-        const arrow = document.querySelector<SVGMarkerElement>("#journey-arrow")
-        if (arrow) {
-            // Clone arrow and change properties
-            const arrowNew = arrow.cloneNode(true) as SVGMarkerElement
-            arrowNew.id = "wind-profile-arrow-head"
-            if (arrowNew.hasChildNodes()) {
-                for (const child of arrowNew.childNodes) {
-                    ;(child as SVGPathElement).classList.replace("journey-arrow-head", "wind-profile-arrow-head")
-                }
+    _setupShipAndWoodSelectListener(columnId: ShipColumnType): void {
+        const shipSel$ = this.#selects.getShip$(columnId)
+
+        shipSel$.on("changed.bs.select", () => {
+            this._initModuleSelects(columnId)
+            this._setupModuleSelectListener(columnId)
+            this._refreshColumn(columnId)
+
+            if (columnId === "base") {
+                this.#selects.enableShipCompareSelects()
             }
 
-            // Insert new arrow
-            const defs = document.querySelector<SVGDefsElement>("#na-map svg defs")
-            if (defs) {
-                defs.append(arrowNew)
-            }
+            this.#selects.enableWoodSelects(columnId)
+        })
+
+        for (const type of woodType) {
+            const woodSel$ = this.#selects.getWood$(columnId, type)
+            woodSel$.on("changed.bs.select", () => {
+                this._setOtherWoodSelect(columnId, type)
+                this._refreshColumn(columnId)
+            })
         }
     }
 
-    _setupData(): void {
-        this._moduleAndWoodChanges = new Map<ModifierName, Property>([
-            [
-                "Cannon horizontal dispersion",
-                { properties: ["gunnery.dispersionHorizontal"], isBaseValueAbsolute: true },
-            ],
-            ["Cannon vertical dispersion", { properties: ["gunnery.dispersionVertical"], isBaseValueAbsolute: true }],
-            ["Cannon reload time", { properties: ["gunnery.reload"], isBaseValueAbsolute: true }],
-            ["Cannon ball penetration", { properties: ["gunnery.penetration"], isBaseValueAbsolute: true }],
-            ["Cannon side traverse", { properties: ["gunnery.traverseSide"], isBaseValueAbsolute: true }],
-            ["Cannon up/down traverse", { properties: ["gunnery.traverseUpDown"], isBaseValueAbsolute: true }],
+    async _setupWoodData(): Promise<void> {
+        this.#woodData = new WoodData(this.#baseId)
+        await this.#woodData.init()
+    }
 
-            ["Morale", { properties: ["boarding.morale"], isBaseValueAbsolute: true }],
-            ["Muskets accuracy", { properties: ["boarding.musketsAccuracy"], isBaseValueAbsolute: false }],
-            ["Preparation", { properties: ["boarding.prepPerRound"], isBaseValueAbsolute: true }],
-            ["Initial preparation", { properties: ["boarding.prepInitial"], isBaseValueAbsolute: true }],
-            ["Melee attack", { properties: ["boarding.attack"], isBaseValueAbsolute: false }],
-            ["Melee defense", { properties: ["boarding.defense"], isBaseValueAbsolute: false }],
-            ["Disengage time", { properties: ["boarding.disengageTime"], isBaseValueAbsolute: true }],
-            ["Crew with muskets", { properties: ["boarding.musketsCrew"], isBaseValueAbsolute: true }],
-            ["Boarding cannons accuracy", { properties: ["boarding.cannonsAccuracy"], isBaseValueAbsolute: false }],
+    async _setupData(): Promise<void> {
+        const theoreticalMinSpeed = (d3Min(this.#shipData, (ship) => ship.speed.min) ?? 0) * 1.2
+        const theoreticalMaxSpeed = this.#moduleAndWoodCaps.get("Max speed")?.cap.amount ?? Number.POSITIVE_INFINITY
 
-            ["Acceleration", { properties: ["ship.acceleration"], isBaseValueAbsolute: true }],
-            [
-                "Armor thickness",
-                { properties: ["sides.thickness", "bow.thickness", "stern.thickness"], isBaseValueAbsolute: true },
-            ],
-            [
-                "Armour hit points",
-                { properties: ["bow.armour", "sides.armour", "stern.armour"], isBaseValueAbsolute: true },
-            ],
-            ["Armour repair amount (perk)", { properties: ["repairAmount.armourPerk"], isBaseValueAbsolute: true }],
-            ["Back armour thickness", { properties: ["stern.thickness"], isBaseValueAbsolute: true }],
-            ["Cannon crew", { properties: ["crew.cannons"], isBaseValueAbsolute: true }],
-            ["Carronade crew", { properties: ["crew.carronades"], isBaseValueAbsolute: true }],
-            ["Crew", { properties: ["crew.max"], isBaseValueAbsolute: true }],
-            ["Deceleration", { properties: ["ship.deceleration"], isBaseValueAbsolute: true }],
-            ["Front armour thickness", { properties: ["bow.thickness"], isBaseValueAbsolute: true }],
-            ["Hold weight", { properties: ["maxWeight"], isBaseValueAbsolute: true }],
-            ["Hull hit points", { properties: ["structure.armour"], isBaseValueAbsolute: true }],
-            ["Sail hit points", { properties: ["sails.armour"], isBaseValueAbsolute: true }],
-            [
-                "Mast hit points",
-                {
-                    properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"],
-                    isBaseValueAbsolute: true,
-                },
-            ],
-            ["Leak resistance", { properties: ["resistance.leaks"], isBaseValueAbsolute: false }],
-            [
-                "Mast health",
-                { properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"], isBaseValueAbsolute: true },
-            ],
-            [
-                "Mast thickness",
-                {
-                    properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
-                    isBaseValueAbsolute: true,
-                },
-            ],
-            ["Max speed", { properties: ["speed.max"], isBaseValueAbsolute: true }],
-            ["Repair amount", { properties: ["repairAmount.armour"], isBaseValueAbsolute: true }],
-            ["Repair time", { properties: ["repairTime.sides"], isBaseValueAbsolute: true }],
-            ["Roll angle", { properties: ["ship.rollAngle"], isBaseValueAbsolute: true }],
-            ["Rudder health", { properties: ["rudder.armour"], isBaseValueAbsolute: true }],
-            ["Rudder speed", { properties: ["rudder.halfturnTime"], isBaseValueAbsolute: true }],
-            ["Sail repair amount (perk)", { properties: ["repairAmount.sailsPerk"], isBaseValueAbsolute: true }],
-            ["Sailing crew", { properties: ["crew.sailing"], isBaseValueAbsolute: true }],
-            ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
-            ["Turn acceleration", { properties: ["ship.turnAcceleration"], isBaseValueAbsolute: true }],
-            ["Turn speed", { properties: ["ship.turnSpeed"], isBaseValueAbsolute: true }],
-            ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
-        ])
-
-        // Integer values that should not be rounded when modifiers are applied
-        this.#doNotRound = new Set(["Turn acceleration"])
-
-        this._moduleAndWoodCaps = new Map<ModifierName, PropertyWithCap>([
-            [
-                "Armor thickness",
-                {
-                    properties: ["sides.thickness"],
-                    cap: { amount: 1, isPercentage: true },
-                },
-            ],
-            [
-                "Armour hit points",
-                {
-                    properties: ["bow.armour", "sides.armour", "stern.armour"],
-                    cap: { amount: 1, isPercentage: true },
-                },
-            ],
-            ["Structure hit points", { properties: ["structure.armour"], cap: { amount: 1, isPercentage: true } }],
-            [
-                "Mast health",
-                {
-                    properties: ["mast.bottomArmour", "mast.middleArmour", "mast.topArmour"],
-                    cap: { amount: 1, isPercentage: true },
-                },
-            ],
-            [
-                "Mast thickness",
-                {
-                    properties: ["mast.bottomThickness", "mast.middleThickness", "mast.topThickness"],
-                    cap: { amount: 1, isPercentage: true },
-                },
-            ],
-            ["Max speed", { properties: ["speed.max"], cap: { amount: 18, isPercentage: false } }],
-            ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
-        ])
-
-        const theoreticalMinSpeed = (d3Min(this._shipData, (ship) => ship.speed.min) ?? 0) * 1.2
-        const theoreticalMaxSpeed = this._moduleAndWoodCaps.get("Max speed")!.cap.amount
-
-        this._minSpeed = theoreticalMinSpeed
-        this._maxSpeed = theoreticalMaxSpeed
+        this.#minSpeed = theoreticalMinSpeed
+        this.#maxSpeed = theoreticalMaxSpeed
         this.colorScale = d3ScaleLinear<string, string>()
-            .domain([this._minSpeed, 0, this._maxSpeed])
+            .domain([this.#minSpeed, 0, this.#maxSpeed])
             .range([colourRedDark, colourWhite, colourGreenDark])
             .interpolate(d3InterpolateHcl)
 
-        const minShipMass = d3Min(this._shipData, (ship) => ship.shipMass) ?? 0
-        const maxShipMass = d3Max(this._shipData, (ship) => ship.shipMass) ?? 0
+        const minShipMass = d3Min(this.#shipData, (ship) => ship.shipMass) ?? 0
+        const maxShipMass = d3Max(this.#shipData, (ship) => ship.shipMass) ?? 0
         this.shipMassScale = d3ScaleLinear<number, number>().domain([minShipMass, maxShipMass]).range([100, 150])
+
+        this._setupModuleData()
+        await this._setupWoodData()
     }
 
-    async _loadAndSetupData(): Promise<void> {
-        this._moduleDataDefault = (
-            await import(/* webpackChunkName: "data-modules" */ "../../../../lib/gen-generic/modules.json")
+    async loadAndSetupData(): Promise<void> {
+        this.#moduleDataDefault = (
+            await import(/* webpackChunkName: "data-setModules" */ "../../../../../lib/gen-generic/modules.json")
         ).default as Module[]
-        this._shipData = (await import(/* webpackChunkName: "data-ships" */ "../../../../lib/gen-generic/ships.json"))
-            .default as ShipData[]
-        this._setupData()
-        if (this._baseId !== "ship-journey") {
-            this.woodCompare = new CompareWoods(this._woodId)
-            await this.woodCompare.woodInit()
-        }
-    }
-
-    /**
-     * Setup menu item listener
-     */
-    _setupListener(): void {
-        let firstClick = true
-
-        document.querySelector(`#${this._buttonId}`)?.addEventListener("click", async () => {
-            if (firstClick) {
-                firstClick = false
-                await this._loadAndSetupData()
-            }
-
-            registerEvent("Tools", this._baseName)
-
-            this._shipCompareSelected()
-        })
+        this.#shipData = (
+            await import(/* webpackChunkName: "data-ships" */ "../../../../../lib/gen-generic/ships.json")
+        ).default as ShipData[]
+        await this._setupData()
     }
 
     /**
      * Set graphics parameter
      */
     _setGraphicsParameters(): void {
-        this.svgWidth = $(`#${this._modalId} .column-base`).width() ?? 0
+        const column = this.#modal!.getModalNode().querySelector(".column-base") as HTMLElement
+
+        this.svgWidth = getElementWidth(column) ?? 0
         // noinspection JSSuspiciousNameCombination
         this.svgHeight = this.svgWidth
         this.outerRadius = Math.floor(Math.min(this.svgWidth, this.svgHeight) / 2)
         this.innerRadius = Math.floor(this.outerRadius * 0.3)
         this.radiusSpeedScale = d3ScaleLinear<number, number>()
-            .domain([this._minSpeed, 0, this._maxSpeed])
+            .domain([this.#minSpeed, 0, this.#maxSpeed])
             .range([10, this.innerRadius, this.outerRadius])
     }
 
-    _getShipName(id: number): string {
-        return this._shipData.find((ship) => ship.id === id)?.name ?? ""
-    }
-
-    _getSelectedData(columnId: ShipColumnType): SelectedData {
-        const selectedData = {
-            moduleData: new Map<string, string>(),
-            ship: "",
-            wood: [] as string[],
-        }
-        if (this._shipIds[columnId]) {
-            selectedData.ship = this._getShipName(this._shipIds[columnId])
-            for (const type of woodType) {
-                selectedData.wood.push(
-                    this.woodCompare.getWoodName(type, Number(this._selectWood$[columnId][type].val()))
-                )
+    _initCloneListeners(): void {
+        for (const columnId of this.#columnIds) {
+            // Clone left
+            if (columnId !== this.#columnIds[0]) {
+                // Add listener except for first column
+                ;(
+                    document.querySelector(`#${this.#modal!.getCloneLeftButtonId(columnId)}`) as HTMLButtonElement
+                ).addEventListener("click", () => {
+                    this._cloneToLeft(columnId)
+                })
             }
 
-            if (this._selectedUpgradeIdsPerType[columnId]) {
-                for (const type of [...this._moduleTypes]) {
-                    const text = [] as string[]
-                    for (const id of this._selectedUpgradeIdsPerType[columnId][type]) {
-                        text.push(this._moduleProperties.get(id)?.name.replace(" Bonus", "") ?? "")
-                    }
-
-                    selectedData.moduleData.set(type, text.join(", "))
-                }
-            }
-        }
-
-        return selectedData
-    }
-
-    _printSelectedData(clonedDocument: Document, selectedData: SelectedData, columnId: ShipColumnType): void {
-        const labels = clonedDocument.querySelectorAll<HTMLElement>(`#${this._baseId}-${columnId.toLowerCase()} label`)
-        const parent = labels[0].parentNode as HTMLElement
-        const labelHeight = labels[0].offsetHeight
-        for (const label of labels) {
-            label.remove()
-        }
-
-        const mainDiv = d3Select(parent)
-            .insert("div", ":first-child")
-            .style("height", `${labelHeight * 5}px`)
-
-        if (selectedData.ship) {
-            mainDiv.append("div").style("margin-bottom", "5px").style("line-height", "1.1").text(selectedData.ship)
-        }
-
-        if (selectedData.wood[0] !== "") {
-            mainDiv
-                .append("div")
-                .style("font-size", "smaller")
-                .style("margin-bottom", "5px")
-                .style("line-height", "1.1")
-                .text(selectedData.wood.join(" | "))
-        }
-
-        for (const [key, value] of selectedData.moduleData) {
-            if (value !== "") {
-                mainDiv
-                    .append("div")
-                    .style("font-size", "small")
-                    .style("margin-bottom", "5px")
-                    .style("line-height", "1.1")
-                    .html(`<em>${key}</em>: ${value}`)
+            // Clone right
+            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
+                // Add listener except for last right column
+                ;(
+                    document.querySelector(`#${this.#modal!.getCloneRightButtonId(columnId)}`) as HTMLButtonElement
+                ).addEventListener("click", () => {
+                    this._cloneToRight(columnId)
+                })
             }
         }
     }
 
-    _replaceSelectsWithText(clonedDocument: Document): void {
-        for (const columnId of this._columns) {
-            const selectedData = this._getSelectedData(columnId)
-            this._printSelectedData(clonedDocument, selectedData, columnId)
-        }
-    }
-
-    _setMakeImageSpinner(): void {
-        this.#buttonMakeImage.select("i").remove()
-        this.#buttonMakeImage.attr("class", "btn btn-primary").property("disabled", true)
-        this.#buttonMakeImage
-            .append("span")
-            .attr("class", "spinner-border spinner-border-sm")
-            .attr("role", "status")
-            .attr("aria-hidden", "true")
-        this.#buttonMakeImage.append("span").attr("class", "sr-only").text("Loading...")
-    }
-
-    _unsetMakeImageSpinner(): void {
-        this.#buttonMakeImage.selectAll("span").remove()
-        this.#buttonMakeImage.attr("class", "btn btn-outline-secondary icon-outline-button").property("disabled", false)
-        this.#buttonMakeImage.append("i").attr("class", "icon icon-image")
-    }
-
-    async _makeImage(event: Event): Promise<void> {
-        event.preventDefault()
-
-        this._setMakeImageSpinner()
-
-        const html2canvas = await import(/* webpackChunkName: "html2canvas" */ "html2canvas")
-        const element = document.querySelector<HTMLElement>(
-            `#${this._modalId} .modal-dialog .modal-content .modal-body`
-        )
-        if (element) {
-            const canvas = await html2canvas.default(element, {
-                allowTaint: true,
-                foreignObjectRendering: true,
-                ignoreElements: (element) =>
-                    element.classList.contains("central") ||
-                    element.classList.contains("overlay") ||
-                    element.classList.contains("navbar"),
-                logging: true,
-                onclone: (clonedDocument) => {
-                    this._replaceSelectsWithText(clonedDocument)
-                },
-                x: 0,
-                y: 0,
-            })
-
-            CompareShips._saveCanvasAsImage(canvas.toDataURL())
-        }
-
-        this._unsetMakeImageSpinner()
-    }
-
-    /**
-     * Action when selected
-     */
-    _shipCompareSelected(): void {
-        // If the modal has no content yet, insert it
-        if (isEmpty(this._modal$)) {
-            this._initModal()
-            this._modal$ = $(`#${this._modalId}`)
-
-            // Copy data to clipboard (ctrl-c key event)
-            document.querySelector(`#${this._modalId}`)?.addEventListener("keydown", (event: Event): void => {
-                if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
-                    this._copyDataClicked(event)
-                }
-            })
-            // Copy data to clipboard (click event)
-            document.querySelector(`#${this._copyButtonId}`)?.addEventListener("click", (event) => {
-                this._copyDataClicked(event)
-            })
-            // Make image
-            document.querySelector(`#${this._imageButtonId}`)?.addEventListener("click", async (event) => {
-                registerEvent("Menu", "Ship compare image")
-                await this._makeImage(event)
-            })
-        }
-
-        // Show modal
-        this._modal$.modal("show")
-        this._setGraphicsParameters()
-    }
-
-    _getShipAndWoodIds(): number[] {
-        const data: number[] = []
-
-        for (const columnId of this._columns) {
-            const shipId = this._getShipId(columnId)
-            if (shipId) {
-                data.push(shipId)
-                for (const type of woodType) {
-                    const woodId = this._getWoodId(columnId, type)
-                    data.push(woodId)
-                }
-            }
-        }
-
-        return data
-    }
-
-    _copyDataClicked(event: Event): void {
-        registerEvent("Menu", "Copy ship compare")
-        event.preventDefault()
-
-        const ShipAndWoodIds = this._getShipAndWoodIds()
-
-        if (ShipAndWoodIds.length > 0) {
-            const ShipCompareUrl = new URL(window.location.href)
-
-            // Add app version
-            ShipCompareUrl.searchParams.set("v", encodeURIComponent(appVersion))
-            // Add selected ships and woods, triple (shipId, frameId, trimId) per column, flat array
-            ShipCompareUrl.searchParams.set("cmp", hashids.encode(ShipAndWoodIds))
-
-            // Add selected modules, new searchParam per module
-            for (const columnId of this._columns) {
-                const columnIndex = this._columns.indexOf(columnId)
-                if (this._selectedUpgradeIdsPerType[columnId]) {
-                    for (const type of [...this._moduleTypes]) {
-                        const moduleIds = this._getModuleIds(columnId, type)
-                        const typeIndex = [...this._moduleTypes].indexOf(type)
-
-                        // eslint-disable-next-line max-depth
-                        if (moduleIds?.length) {
-                            const param = `${columnIndex}${typeIndex}`
-
-                            ShipCompareUrl.searchParams.set(param, hashids.encode(moduleIds))
-                        }
-                    }
-                }
-            }
-
-            copyToClipboard(ShipCompareUrl.href, this._modal$)
-        }
-    }
-
-    /**
-     * Setup ship data (group by class)
-     */
-    _setupShipData(): void {
-        this._shipSelectData = [...d3Group(this._shipData, (ship) => ship.class)]
-            .map(([key, value]) => ({
-                key,
-                values: value
-                    .map(
-                        (ship) =>
-                            ({
-                                id: ship.id,
-                                name: ship.name,
-                                class: ship.class,
-                                battleRating: ship.battleRating,
-                                guns: ship.guns.total,
-                            } as ShipSelectData)
-                    )
-                    .sort(sortBy(["name"])),
-            }))
-            .sort(sortBy(["key"]))
-    }
-
-    /**
-     * Setup module data
-     */
     _setupModuleData(): void {
-        // Get all modules where change modifier (moduleChanges) exists
-        this._moduleProperties = new Map(
-            this._moduleDataDefault.flatMap((type) =>
+        // Get all setModules where change modifier (moduleChanges) exists
+        this.#moduleProperties = new Map(
+            this.#moduleDataDefault.flatMap((type) =>
                 type[1]
                     .filter((module) =>
                         module.properties.some((property) => {
-                            return this._moduleAndWoodChanges.has(property.modifier)
+                            return this.#moduleAndWoodChanges.has(property.modifier)
                         })
                     )
                     .map((module) => [module.id, module])
@@ -806,365 +443,35 @@ export class CompareShips {
         )
 
         // Get types from moduleProperties list
-        this._moduleTypes = new Set<ModuleType>(
-            [...this._moduleProperties].map((module) => module[1].type.replace(/\s\u2013\s[\s/A-Za-z\u25CB]+/, ""))
-        )
-    }
-
-    /**
-     * Inject modal
-     */
-    _injectModal(): void {
-        insertBaseModal({ id: this._modalId, title: this._baseName })
-
-        const row = d3Select(`#${this._modalId} .modal-body`)
-            .append("div")
-            .attr("class", "container-fluid")
-            .append("div")
-            .attr("class", "row")
-
-        for (const columnId of this._columns) {
-            const div = row
-                .append("div")
-                .attr("id", `${this._baseId}-${columnId.toLowerCase()}`)
-                .attr("class", `col-md-4 ml-auto pt-2 ${columnId === "Base" ? "column-base" : "column-comp"}`)
-
-            const shipSelectId = this._getShipSelectId(columnId)
-
-            const divShip = div.append("div").attr("class", "input-group justify-content-between mb-1")
-
-            // Add clone icon except for first column
-            if (columnId !== this._columns[0]) {
-                divShip
-                    .append("div")
-                    .attr("class", "input-group-prepend")
-                    .append("button")
-                    .attr("class", "btn btn-default icon-outline-button")
-                    .attr("id", `${this._cloneLeftButtonId}-${columnId}`)
-                    .attr("title", "Clone ship to left")
-                    .attr("type", "button")
-                    .append("i")
-                    .attr("class", "icon icon-clone-left")
-            }
-
-            divShip
-                .append("label")
-                .append("select")
-                .attr("name", shipSelectId)
-                .attr("id", shipSelectId)
-                .attr("class", "selectpicker")
-
-            // Add clone icon except for last right column
-            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
-                divShip
-                    .append("div")
-                    .attr("class", "input-group-append")
-                    .append("button")
-                    .attr("class", "btn btn-default icon-outline-button")
-                    .attr("id", `${this._cloneRightButtonId}-${columnId}`)
-                    .attr("title", "Clone ship to right")
-                    .attr("type", "button")
-                    .append("i")
-                    .attr("class", "icon icon-clone-right")
-            }
-
-            const divWoods = div.append("div").attr("class", "input-group justify-content-between mb-1")
-            for (const type of woodType) {
-                const woodId = this._getWoodSelectId(type, columnId)
-                divWoods
-                    .append("label")
-                    .append("select")
-                    .attr("name", woodId)
-                    .attr("id", woodId)
-                    .attr("class", "selectpicker")
-            }
-
-            const divModules = div.append("div").attr("class", "input-group justify-content-between")
-            for (const type of this._moduleTypes) {
-                const moduleId = this._getModuleSelectId(type, columnId)
-                divModules
-                    .append("label")
-                    .attr("class", "mb-1")
-                    .append("select")
-                    .attr("name", moduleId)
-                    .attr("id", moduleId)
-                    .property("multiple", true)
-                    .attr("class", "selectpicker")
-            }
-
-            div.append("div")
-                .attr("id", `${this._baseId}-${columnId}`)
-                .attr("class", `${columnId === "Base" ? "ship-base" : "ship-compare"} compress`)
-        }
-
-        const footer = d3Select(`#${this._modalId} .modal-footer`)
-        footer
-            .insert("button", "button")
-            .attr("class", "btn btn-outline-secondary icon-outline-button")
-            .attr("id", this._copyButtonId)
-            .attr("title", "Copy to clipboard (ctrl-c)")
-            .attr("type", "button")
-            .append("i")
-            .attr("class", "icon icon-copy")
-        this.#buttonMakeImage = footer
-            .insert("button", "button")
-            .attr("class", "btn btn-outline-secondary icon-outline-button")
-            .attr("id", this._imageButtonId)
-            .attr("title", "Make image")
-            .attr("type", "button")
-        this.#buttonMakeImage.append("i").attr("class", "icon icon-image")
-    }
-
-    _initData(): void {
-        this._setupShipData()
-        this._setupModuleData()
-    }
-
-    _initSelectColumns(): void {
-        for (const columnId of this._columns) {
-            this._setupShipSelect(columnId)
-            if (this._baseId !== "ship-journey") {
-                this._selectWood$[columnId] = {}
-                for (const type of woodType) {
-                    this._selectWood$[columnId][type] = $(`#${this._getWoodSelectId(type, columnId)}`)
-                    this.woodCompare._setupWoodSelects(columnId, type, this._selectWood$[columnId][type])
-                }
-            }
-
-            this._setupSelectListener(columnId)
-        }
-    }
-
-    _initSelects(): void {
-        this._initSelectColumns()
-    }
-
-    _initCloneListeners(): void {
-        for (const columnId of this._columns) {
-            // Clone left
-            if (columnId !== this._columns[0]) {
-                // Add listener except for first column
-                document.querySelector(`#${this._cloneLeftButtonId}-${columnId}`)?.addEventListener("click", () => {
-                    this._cloneShipToLeft(columnId)
-                })
-            }
-
-            // Clone right
-            if (columnId !== this.columnsCompare[this.columnsCompare.length - 1]) {
-                // Add listener except for last right column
-                document.querySelector(`#${this._cloneRightButtonId}-${columnId}`)?.addEventListener("click", () => {
-                    this._cloneShipToRight(columnId)
-                })
-            }
-        }
-    }
-
-    /**
-     * Init modal
-     */
-    _initModal(): void {
-        this._initData()
-        this._injectModal()
-        this._initSelects()
-        this._initCloneListeners()
-    }
-
-    /**
-     * Get select options
-     */
-    _getShipOptions(): HtmlString {
-        return this._shipSelectData
-            .map(
-                (key) =>
-                    `<optgroup label="${getOrdinal(Number(key.key), false)} rate">${key.values
-                        .map(
-                            (ship) =>
-                                `<option data-subtext="${ship.battleRating} ${
-                                    isImported(ship.name) ? "Imported" : ""
-                                }" value="${ship.id}">${stripShipName(ship.name)} (${ship.guns})`
-                        )
-                        .join("</option>")}`
-            )
-            .join("</optgroup>")
-    }
-
-    /**
-     * Setup ship select
-     * @param columnId - Column id
-     */
-    _setupShipSelect(columnId: ShipColumnType): void {
-        this._selectShip$[columnId] = $(`#${this._getShipSelectId(columnId)}`)
-        const options = this._getShipOptions()
-        this._selectShip$[columnId].append(options)
-        if (columnId !== "Base") {
-            this._selectShip$[columnId].attr("disabled", "disabled")
-        }
-    }
-
-    /**
-     * Get select options
-     * @param moduleType - Module type
-     * @param shipClass - Ship class
-     * @returns HTML formatted option
-     */
-    _getUpgradesOptions(moduleType: string, shipClass: number): string {
-        const moduleDataForShipClass = [...this._moduleProperties].filter(
-            (module) =>
-                module[1].type.replace(/\s–\s[\s/A-Za-z\u25CB]+/, "") === moduleType &&
-                (module[1].moduleLevel === "U" || module[1].moduleLevel === CompareShips._getModuleLevel(shipClass))
+        this.#moduleTypes = new Set<ModuleType>(
+            [...this.#moduleProperties].map((module) => module[1].type.replace(/\s\u2013\s[\s/A-Za-z\u25CB]+/, ""))
         )
 
-        // Group module data by sub type (e.g. "Gunnery")
-        const modules = [...d3Group(moduleDataForShipClass, (module) => module[1].type.replace(/[\sA-Za-z]+\s–\s/, ""))]
-            .map(([key, value]) => ({
-                key,
-                values: value.sort((a, b) => a[1].name.localeCompare(b[1].name)),
-            }))
-            .sort(sortBy(["key"]))
-
-        let options: string
-        const moduleTypeWithSingleOption = new Set(["Permanent", "Ship trim"])
-        // eslint-disable-next-line unicorn/prefer-ternary
-        if (modules.length > 1) {
-            // Get options with sub types as optgroups
-            options = modules
-                .map(
-                    (group) =>
-                        `<optgroup label="${group.key}" data-max-options="${
-                            moduleTypeWithSingleOption.has(moduleType.replace(/[\sA-Za-z]+\s–\s/, "")) ? 1 : 5
-                        }">${group.values
-                            .map((module: [number, ModuleEntity]) => `<option value="${module[0]}">${module[1].name}`)
-                            .join("</option>")}`
-                )
-                .join("</optgroup>")
-        } else {
-            // Get options without optgroups
-            options = modules
-                .map(
-                    (group) =>
-                        `${group.values
-                            .map((module: [number, ModuleEntity]) => `<option value="${module[0]}">${module[1].name}`)
-                            .join("</option>")}`
-                )
-                .join("")
-        }
-
-        return options
+        this.#modulesAndWoodData = new ModulesAndWoodData(this.#baseId, this.#minSpeed, this.#maxSpeed)
     }
 
-    _fillModuleSelect(columnId: ShipColumnType, type: string): void {
-        const getShipClass = (): number => this._shipData.find((ship) => ship.id === this._shipIds[columnId])!.class
-
-        const options = this._getUpgradesOptions(type, getShipClass())
-
-        this._selectModule$[columnId][type].find("option").remove()
-        this._selectModule$[columnId][type].append(options)
+    _getShipDefaultData(columnId: ShipColumnType): ShipData {
+        return this.#shipData.find((ship) => ship.id === this.#selects.getSelectedShipId(columnId)) ?? ({} as ShipData)
     }
 
-    _resetModuleSelects(columnId: ShipColumnType): void {
-        for (const type of this._moduleTypes) {
-            this._fillModuleSelect(columnId, type)
-            this._selectModule$[columnId][type].selectpicker("refresh")
-        }
-    }
+    _getSelectedModuleData(columnId: ShipColumnType): ModuleEntity[] {
+        const selectedModuleIds = this.#selects.getSelectedModuleIds(columnId, this.#moduleTypes)
+        const moduleData = [] as ModuleEntity[]
 
-    _getModuleFromName(moduleName: string | null): ModuleEntity {
-        let module = {} as ModuleEntity | undefined
-
-        this._moduleDataDefault.some((type) => {
-            module = type[1].find((module) => module.name === moduleName)
-            return Boolean(module)
-        })
-
-        return module!
-    }
-
-    /**
-     * Setup upgrades select
-     * @param columnId - Column id
-     */
-    _setupModulesSelect(columnId: ShipColumnType): void {
-        if (!this._selectModule$[columnId]) {
-            this._selectModule$[columnId] = {}
-
-            for (const type of this._moduleTypes) {
-                const tooltips = new Map<number, JQuery<HTMLLIElement> | null>()
-                this._selectModule$[columnId][type] = $(`#${this._getModuleSelectId(type, columnId)}`)
-
-                this._selectModule$[columnId][type]
-                    .on("changed.bs.select", () => {
-                        this._modulesSelected(columnId)
-                        this._refreshShips(columnId)
-                    })
-                    .on("show.bs.select", (event: Event) => {
-                        const $el = $(event.currentTarget as HTMLSelectElement)
-
-                        // Remove 'select all' button
-                        $el.parent().find("button.bs-select-all").remove()
-
-                        // Add tooltip
-                        for (const element of $el.data("selectpicker").selectpicker.current
-                            .elements as HTMLLIElement[]) {
-                            if (
-                                !(
-                                    element.classList.contains("dropdown-divider") ||
-                                    element.classList.contains("dropdown-header")
-                                )
-                            ) {
-                                const module = this._getModuleFromName(element.textContent)
-
-                                // Add tooltip with module properties
-                                $(element)
-                                    .attr("data-original-title", CompareShips._getModifierFromModule(module.properties))
-                                    .tooltip({ boundary: "viewport", html: true })
-                                    .on("show.bs.tooltip", () => {
-                                        // Remember shown tooltip
-                                        tooltips.set(module.id, $(element))
-                                    })
-                                    .on("hide.bs.tooltip", () => {
-                                        // eslint-disable-next-line unicorn/no-null
-                                        tooltips.set(module.id, null)
-                                    })
-                            }
-                        }
-                    })
-                    .selectpicker({
-                        actionsBox: true,
-                        countSelectedText(amount: number) {
-                            return `${amount} ${type.toLowerCase()}s selected`
-                        },
-                        deselectAllText: "Clear",
-                        liveSearch: true,
-                        liveSearchNormalize: true,
-                        liveSearchPlaceholder: "Search ...",
-                        maxOptions: type.startsWith("Ship trim") ? 6 : 5,
-                        selectedTextFormat: "count > 1",
-                        title: `${type}`,
-                        width: "150px",
-                    })
-                    .on("hide.bs.select", () => {
-                        // Hide remaining tooltips
-                        for (const [, value] of tooltips) {
-                            if (value) {
-                                value.tooltip("hide")
-                            }
-                        }
-
-                        tooltips.clear()
-                    })
+        for (const [, moduleIds] of selectedModuleIds) {
+            for (const moduleId of moduleIds) {
+                moduleData.push(this.#moduleProperties.get(moduleId) ?? ({} as ModuleEntity))
             }
         }
 
-        this._resetModuleSelects(columnId)
+        return moduleData
     }
 
     /**
      * Get ship data for ship with id <id>
-     * @param columnId - Column id
-     * @returns Ship data
      */
     _getShipData(columnId: ShipColumnType): ShipData {
-        const shipDataDefault = this._shipData.find((ship) => ship.id === this._shipIds[columnId])!
+        const shipDataDefault = this._getShipDefaultData(columnId)
         shipDataDefault.boarding = {
             attack: 0,
             cannonsAccuracy: 0,
@@ -1197,219 +504,21 @@ export class CompareShips {
             traverseUpDown: 0,
             traverseSide: 0,
         }
-        shipDataUpdated = this._addModulesAndWoodData(shipDataDefault, shipDataUpdated, columnId)
+
+        shipDataUpdated = this.#modulesAndWoodData.addModulesAndWoodData(
+            shipDataDefault,
+            shipDataUpdated,
+            columnId,
+            this.#woodData.getSelectedWoodData(this.#selects.getSelectedWoodIds(columnId)),
+            this._getSelectedModuleData(columnId)
+        )
 
         return shipDataUpdated
     }
 
-    _roundPropertyValue(baseValue: number, value: number, doNotRound = false): number {
-        if (Number.isInteger(baseValue) && !doNotRound) {
-            return Math.round(value)
-        }
-
-        return Math.trunc(value * 100) / 100
-    }
-
-    _adjustValue(value: number, key: string, isBaseValueAbsolute: boolean): number {
-        let adjustedValue = value
-
-        if (this._modifierAmount.get(key)?.percentage !== 0) {
-            const percentage = this._modifierAmount.get(key)!.percentage / 100
-            adjustedValue = CompareShips._adjustPercentage(adjustedValue, percentage, isBaseValueAbsolute)
-        }
-
-        if (this._modifierAmount.get(key)?.absolute !== 0) {
-            const { absolute } = this._modifierAmount.get(key)!
-            adjustedValue = CompareShips._adjustAbsolute(adjustedValue, absolute)
-        }
-
-        const doNotRound = this.#doNotRound.has(key) || isBaseValueAbsolute || value === 0
-
-        return this._roundPropertyValue(value, adjustedValue, doNotRound)
-    }
-
-    _setModifier(property: ModulePropertiesEntity): void {
-        let absolute = property.isPercentage ? 0 : property.amount
-        let percentage = property.isPercentage ? property.amount : 0
-
-        // If modifier has been in the Map add the amount
-        if (this._modifierAmount.has(property.modifier)) {
-            absolute += this._modifierAmount.get(property.modifier)?.absolute ?? 0
-            percentage += this._modifierAmount.get(property.modifier)?.percentage ?? 0
-        }
-
-        this._modifierAmount.set(property.modifier, {
-            absolute,
-            percentage,
-        })
-    }
-
-    _showCappingAdvice(compareId: ShipColumnType, modifiers: Set<string>): void {
-        const id = `${this._baseId}-${compareId}-capping`
-        let div = document.querySelector<HTMLDivElement>(`#${id}`)
-
-        if (!div) {
-            div = document.createElement("p")
-            div.id = id
-            div.className = "alert alert-warning"
-            const element = document.querySelector<HTMLDivElement>(`#${this._baseId}-${compareId}`)
-            element?.firstChild?.after(div)
-        }
-
-        // noinspection InnerHTMLJS
-        div.innerHTML = `${[...modifiers].join(", ")} capped`
-    }
-
-    _removeCappingAdvice(compareId: ShipColumnType): void {
-        const id = `${this._baseId}-${compareId}-capping`
-        const div = document.querySelector<HTMLDivElement>(`#${id}`)
-
-        if (div) {
-            div.remove()
-        }
-    }
-
-    /**
-     * Add upgrade changes to ship data
-     * @param shipDataBase - Base ship data
-     * @param shipDataUpdated - Updated ship data
-     * @param compareId - Column id
-     * @returns Updated ship data
-     */
-    _addModulesAndWoodData(shipDataBase: ShipData, shipDataUpdated: ShipData, compareId: ShipColumnType): ShipData {
-        const data = JSON.parse(JSON.stringify(shipDataUpdated)) as ShipData
-
-        const setModifierAmounts = (): void => {
-            for (const id of this._selectedUpgradeIdsList[compareId]) {
-                const module = this._moduleProperties.get(id)!
-
-                for (const property of module.properties) {
-                    if (this._moduleAndWoodChanges.has(property.modifier)) {
-                        this._setModifier(property)
-                    }
-                }
-            }
-
-            if (this.woodCompare.instances[compareId]) {
-                let dataLink = "_woodData"
-                if (compareId !== "Base") {
-                    dataLink = "_compareData"
-                }
-
-                // Add modifier amount for both frame and trim
-                for (const type of woodType) {
-                    // @ts-expect-error
-                    for (const property of this.woodCompare.instances[compareId][dataLink][type].properties) {
-                        if (this._moduleAndWoodChanges.has(property.modifier)) {
-                            this._setModifier(property)
-                        }
-                    }
-                }
-            }
-        }
-
-        const adjustDataByModifiers = (): void => {
-            for (const [key] of this._modifierAmount.entries()) {
-                if (this._moduleAndWoodChanges.get(key)?.properties) {
-                    const { properties, isBaseValueAbsolute } = this._moduleAndWoodChanges.get(key)!
-                    for (const modifier of properties) {
-                        const index = modifier.split(".")
-                        if (index.length > 1) {
-                            /*
-                            console.log(
-                                key,
-                                data[index[0]][index[1]],
-                                this._modifierAmount.get(key),
-                                isBaseValueAbsolute,
-                                this._adjustValue(data[index[0]][index[1]], key, isBaseValueAbsolute)
-                            )
-                            */
-                            data[index[0]][index[1]] = this._adjustValue(
-                                data[index[0]][index[1]],
-                                key,
-                                isBaseValueAbsolute
-                            )
-                        } else {
-                            data[index[0]] = this._adjustValue(data[index[0]], key, isBaseValueAbsolute)
-                        }
-                    }
-                }
-            }
-        }
-
-        const adjustDataByCaps = (): void => {
-            const valueCapped = { isCapped: false, modifiers: new Set<ModifierName>() }
-
-            const adjustValue = (
-                modifier: ModifierName,
-                valueUncapped: number,
-                valueBase: number,
-                { amount: capAmount, isPercentage }: Amount
-            ): number => {
-                const valueRespectingCap = Math.min(
-                    valueUncapped,
-                    isPercentage ? this._roundPropertyValue(valueBase, valueBase * (1 + capAmount)) : capAmount
-                )
-                if (valueUncapped > valueRespectingCap) {
-                    valueCapped.isCapped = true
-                    valueCapped.modifiers.add(modifier)
-                }
-
-                return valueRespectingCap
-            }
-
-            for (const [modifier] of this._modifierAmount.entries()) {
-                if (this._moduleAndWoodCaps.has(modifier)) {
-                    const { cap } = this._moduleAndWoodCaps.get(modifier)!
-                    for (const property of this._moduleAndWoodCaps.get(modifier)!.properties) {
-                        const index = property.split(".")
-                        if (index.length > 1) {
-                            // eslint-disable-next-line max-depth
-                            if (data[index[0]][index[1]]) {
-                                data[index[0]][index[1]] = adjustValue(
-                                    modifier,
-                                    data[index[0]][index[1]],
-                                    shipDataBase[index[0]][index[1]],
-                                    cap
-                                )
-                            }
-                        } else if (data[index[0]]) {
-                            data[index[0]] = adjustValue(modifier, data[index[0]], shipDataBase[index[0]], cap)
-                        }
-                    }
-                }
-            }
-
-            if (valueCapped.isCapped) {
-                this._showCappingAdvice(compareId, valueCapped.modifiers)
-            } else {
-                this._removeCappingAdvice(compareId)
-            }
-        }
-
-        const setSpeedDegrees = (): void => {
-            data.speedDegrees = data.speedDegrees.map((speed: number) => {
-                const factor = 1 + this._modifierAmount.get("Max speed")!.percentage / 100
-                const newSpeed = speed > 0 ? speed * factor : speed / factor
-                // Correct speed by caps
-                return Math.max(Math.min(newSpeed, this._maxSpeed), this._minSpeed)
-            })
-        }
-
-        this._modifierAmount = new Map()
-        setModifierAmounts()
-        adjustDataByModifiers()
-        adjustDataByCaps()
-        if (this._modifierAmount.has("Max speed")) {
-            setSpeedDegrees()
-        }
-
-        return data
-    }
-
     _updateDifferenceProfileNeeded(id: ShipColumnType): void {
-        if (id !== "Base" && !isEmpty(this.selectedShips[id])) {
-            ;(this.selectedShips[id] as ShipComparison).updateDifferenceProfile()
+        if (id !== "base" && this.activeColumns[id]) {
+            ;(this.activeColumns[id] as ColumnCompare).updateDifferenceProfile()
         }
     }
 
@@ -1429,27 +538,180 @@ export class CompareShips {
         }
     }
 
-    /**
-     * Refresh ship data
-     * @param compareId - Column id
-     */
-    _refreshShips(compareId: ShipColumnType): void {
-        if (this._baseId === "ship-journey") {
-            this.singleShipData = this._shipData.find((ship) => ship.id === this._shipIds[compareId])!
+    _setSelectedShip(columnId: ShipColumnType, columnData: ColumnBase | ColumnCompare): void {
+        this.activeColumns[columnId] = columnData
+    }
+
+    getShipOptions(): HtmlString {
+        const selectData = [...d3Group(this.#shipData, (ship) => ship.class)]
+            .map(([key, value]) => ({
+                key,
+                values: value
+                    .map(
+                        (ship) =>
+                            ({
+                                id: ship.id,
+                                name: ship.name,
+                                class: ship.class,
+                                battleRating: ship.battleRating,
+                                guns: ship.guns.total,
+                            } as ShipSelectData)
+                    )
+                    .sort(sortBy(["name"])),
+            }))
+            .sort(sortBy(["key"]))
+
+        return selectData
+            .map(
+                (key) =>
+                    `<optgroup label="${getOrdinal(Number(key.key), false)} rate">${key.values
+                        .map(
+                            (ship) =>
+                                `<option data-subtext="${ship.battleRating}${
+                                    isImported(ship.name) ? " Imported" : ""
+                                }" value="${ship.id}">${stripShipName(ship.name)} (${ship.guns})</option>`
+                        )
+                        .join("")}</optgroup>`
+            )
+            .join("")
+    }
+
+    getShipNameAndSpeed = (): Map<number, { name: string; speedDegrees: number[] }> =>
+        new Map(this.#shipData.map((ship) => [ship.id, { name: ship.name, speedDegrees: ship.speedDegrees }]))
+
+    _initSelectListeners(): void {
+        for (const columnId of this.#columnIds) {
+            this._setupShipAndWoodSelectListener(columnId)
+        }
+    }
+
+    _getShipName(id: number | undefined): string {
+        return this.#shipData.find((ship) => ship.id === id)?.name ?? ""
+    }
+
+    _getSelectedModuleTexts(columnId: ShipColumnType): Map<string, string> {
+        const modules = new Map<string, string>()
+
+        for (const type of [...this.#moduleTypes]) {
+            const ids = this.#selects.getSelectedModuleIdsPerType(columnId, type)
+            const text = [] as string[]
+            for (const id of ids) {
+                const property = this.#moduleProperties.get(id)
+                text.push(property?.name.replace(" Bonus", "") ?? "")
+            }
+
+            modules.set(type, text.join(", "))
+        }
+
+        return modules
+    }
+
+    _getSelectedWoodText(columnId: ShipColumnType): string[] {
+        const woods = [] as string[]
+        for (const type of woodType) {
+            const woodId = this.#selects.getSelectedWoodId(columnId, type)
+            woods.push(this.#woodData.getWoodName(woodId))
+        }
+
+        return woods
+    }
+
+    _getSelectedData(): ShipColumnTypeList<SelectedData> {
+        const selectedData = {} as ShipColumnTypeList<SelectedData>
+
+        for (const columnId of this.#columnIds) {
+            const shipId = this.#selects.getSelectedShipId(columnId)
+
+            if (shipId) {
+                selectedData[columnId] = {
+                    ship: this._getShipName(shipId),
+                    moduleData: this._getSelectedModuleTexts(columnId),
+                    wood: this._getSelectedWoodText(columnId),
+                }
+            }
+        }
+
+        return selectedData
+    }
+
+    _getSelectedIds(): ShipColumnTypeList<SelectedId> {
+        const selectedIds = {} as ShipColumnTypeList<SelectedId>
+
+        for (const columnId of this.#columnIds) {
+            const shipId = this.#selects.getSelectedShipId(columnId)
+            if (shipId) {
+                selectedIds[columnId] = {
+                    ship: shipId,
+                    wood: this.#selects.getSelectedWoodIds(columnId),
+                    modules: this.#selects.getSelectedModuleIds(columnId, this.#moduleTypes),
+                }
+            }
+        }
+
+        return selectedIds
+    }
+
+    async menuClicked(): Promise<void> {
+        registerEvent("Menu", this.#baseName)
+
+        if (this.#modal) {
+            this.#modal.show()
         } else {
-            this._modulesSelected(compareId)
-            const singleShipData = this._getShipData(compareId)
-            if (compareId === "Base") {
-                this._setSelectedShip(compareId, new ShipBase(compareId, singleShipData, this))
+            await this.loadAndSetupData()
+            this.#modal = new CompareShipsModal(
+                this.#baseName,
+                this.#columnIds,
+                this.columnsCompare[this.columnsCompare.length - 1]
+            )
+
+            this.#selects = new CompareShipsSelect(this.#baseId, this.#columnIds, this.#modal)
+            this.#selects.initShipAndWoodSelects(this.getShipOptions(), this.#woodData)
+            this._initSelectListeners()
+            this._initCloneListeners()
+
+            // Copy data to clipboard (ctrl-c key event)
+            this.#modal.getModalNode().addEventListener("keydown", (event: Event): void => {
+                if ((event as KeyboardEvent).key === "KeyC" && (event as KeyboardEvent).ctrlKey) {
+                    event.preventDefault()
+                    copyDataClicked(this._getSelectedIds(), this.#moduleTypes, this.#modal!.getModalNode())
+                }
+            })
+            // Copy data to clipboard (click event)
+            document.querySelector(`#${this.#modal.copyButtonId}`)?.addEventListener("click", (event) => {
+                event.preventDefault()
+                copyDataClicked(this._getSelectedIds(), this.#moduleTypes, this.#modal!.getModalNode())
+            })
+            // Make image
+            document.querySelector(`#${this.#modal.imageButtonId}`)?.addEventListener("click", async (event) => {
+                registerEvent("Menu", "Ship compare image")
+                event.preventDefault()
+                const saveImage = new SaveImage(this.#baseId, this._getSelectedData(), this.#modal as CompareShipsModal)
+                await saveImage.init()
+            })
+        }
+
+        this._setGraphicsParameters()
+    }
+
+    _refreshColumn(columnId: ShipColumnType): void {
+        if (this.#baseId === "ship-journey") {
+            this.singleShipData = this._getShipDefaultData(columnId)
+        } else {
+            const singleShipData = this._getShipData(columnId)
+            if (columnId === "base") {
+                this._setSelectedShip(
+                    columnId,
+                    new ColumnBase(this.#modal!.getBaseIdOutput(columnId), singleShipData, this)
+                )
                 for (const otherCompareId of this.columnsCompare) {
-                    this._selectShip$[otherCompareId].removeAttr("disabled").selectpicker("refresh")
-                    if (!isEmpty(this.selectedShips[otherCompareId])) {
+                    this.#selects.enableShipSelect(otherCompareId)
+                    if (this.activeColumns[otherCompareId]) {
                         this._setSelectedShip(
                             otherCompareId,
-                            new ShipComparison(
-                                otherCompareId,
+                            new ColumnCompare(
+                                this.#modal!.getBaseIdOutput(otherCompareId),
                                 singleShipData,
-                                (this.selectedShips[otherCompareId] as ShipComparison).shipCompareData,
+                                (this.activeColumns[otherCompareId] as ColumnCompare).shipCompareData,
                                 this
                             )
                         )
@@ -1457,153 +719,17 @@ export class CompareShips {
                 }
             } else {
                 this._setSelectedShip(
-                    compareId,
-                    new ShipComparison(compareId, (this.selectedShips.Base as ShipBase).shipData, singleShipData, this)
+                    columnId,
+                    new ColumnCompare(
+                        this.#modal!.getBaseIdOutput(columnId),
+                        (this.activeColumns.base as ColumnBase).shipData,
+                        singleShipData,
+                        this
+                    )
                 )
             }
 
-            this._updateSailingProfile(compareId)
+            this._updateSailingProfile(columnId)
         }
-    }
-
-    /**
-     * Enable compare selects
-     */
-    _enableCompareSelects(): void {
-        for (const compareId of this.columnsCompare) {
-            this._selectShip$[compareId].removeAttr("disabled").selectpicker("refresh")
-        }
-    }
-
-    _modulesSelected(compareId: ShipColumnType): void {
-        this._selectedUpgradeIdsList[compareId] = []
-        this._selectedUpgradeIdsPerType[compareId] = {} as ArrayIndex<number>
-
-        for (const type of this._moduleTypes) {
-            // @ts-expect-error
-            this._selectedUpgradeIdsPerType[compareId][type] = this._selectModule$[compareId][type].val()
-            if (Array.isArray(this._selectedUpgradeIdsPerType[compareId][type])) {
-                // Multiple selects
-                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][
-                    type
-                ].map((element) => Number(element))
-            } else {
-                // Single select
-                this._selectedUpgradeIdsPerType[compareId][type] = this._selectedUpgradeIdsPerType[compareId][type]
-                    ? [Number(this._selectedUpgradeIdsPerType[compareId][type])]
-                    : []
-            }
-
-            if (this._selectedUpgradeIdsPerType[compareId][type].length > 0) {
-                this._selectedUpgradeIdsList[compareId] = [
-                    ...this._selectedUpgradeIdsList[compareId],
-                    ...this._selectedUpgradeIdsPerType[compareId][type],
-                ]
-            }
-            // console.log("_modulesSelected", compareId, type, this._selectedUpgradeIdsPerType[compareId][type]);
-        }
-    }
-
-    /**
-     * Listener for the select
-     * @param compareId - Column id
-     */
-    _setupSelectListener(compareId: ShipColumnType): void {
-        this._selectShip$[compareId]
-            .selectpicker({ title: "Ship" })
-            .val("default")
-            .selectpicker("refresh")
-            .on("changed.bs.select", () => {
-                this._shipIds[compareId] = Number(this._selectShip$[compareId].val())
-                if (this._baseId !== "ship-journey") {
-                    this._setupModulesSelect(compareId)
-                }
-
-                this._refreshShips(compareId)
-                if (compareId === "Base" && this._baseId !== "ship-journey") {
-                    this._enableCompareSelects()
-                }
-
-                if (this._baseId !== "ship-journey") {
-                    this.woodCompare.enableSelects(compareId)
-                }
-            })
-        if (this._baseId !== "ship-journey") {
-            for (const type of woodType) {
-                this._selectWood$[compareId][type]
-                    .on("changed.bs.select", () => {
-                        this.woodCompare._woodSelected(compareId, type, this._selectWood$[compareId][type])
-                        this._refreshShips(compareId)
-                    })
-                    .selectpicker({ title: `Wood ${type}`, width: "150px" })
-            }
-        }
-    }
-
-    _setShipAndWoodsSelects(ids: number[]): void {
-        let i = 0
-
-        this._columns.some((columnId) => {
-            // eslint-disable-next-line unicorn/prefer-array-some
-            if (!this._shipData.find((ship) => ship.id === ids[i])) {
-                return false
-            }
-
-            this._setShip(columnId, ids[i])
-            i += 1
-
-            this.woodCompare.enableSelects(columnId)
-            this._setupModulesSelect(columnId)
-
-            if (ids[i]) {
-                for (const type of woodType) {
-                    this._setWood(columnId, type, ids[i])
-                    i += 1
-                }
-            } else {
-                i += 2
-            }
-
-            this._refreshShips(columnId)
-            return i >= ids.length
-        })
-    }
-
-    /**
-     * Get selected modules, new searchParam per module
-     */
-    _setModuleSelects(urlParams: URLSearchParams): void {
-        for (const columnId of this._columns) {
-            const columnIndex = this._columns.indexOf(columnId)
-            let needRefresh = false
-            for (const type of [...this._moduleTypes]) {
-                const typeIndex = [...this._moduleTypes].indexOf(type)
-                if (urlParams.has(`${columnIndex}${typeIndex}`)) {
-                    const moduleIds = hashids.decode(urlParams.get(`${columnIndex}${typeIndex}`)!) as number[]
-                    this._setModules(columnId, type, moduleIds)
-                    needRefresh = true
-                }
-            }
-
-            if (needRefresh) {
-                this._refreshShips(columnId)
-            }
-        }
-    }
-
-    _getShipSelectId(columnId: ShipColumnType): HtmlString {
-        return `${this._baseId}-${columnId}-select`
-    }
-
-    _getWoodSelectId(type: string, columnId: ShipColumnType): HtmlString {
-        return `${this._woodId}-${type}-${columnId}-select`
-    }
-
-    _getModuleSelectId(type: string, columnId: ShipColumnType): HtmlString {
-        return `${this._moduleId}-${type.replace(/\s/, "")}-${columnId}-select`
-    }
-
-    _setSelectedShip(columnId: ShipColumnType, ship: ShipBase | ShipComparison): void {
-        this.selectedShips[columnId] = ship
     }
 }

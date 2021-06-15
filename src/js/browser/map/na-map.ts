@@ -8,32 +8,32 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/util"
-import "bootstrap/js/dist/modal"
-
-import "bootstrap-select"
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity, ZoomBehavior, ZoomTransform, D3ZoomEvent } from "d3-zoom"
 
 import { registerEvent } from "../analytics"
-import { appDescription, appTitle, appVersion, insertBaseModal } from "common/common-browser"
+import { appDescription, appTitle, appVersion } from "common/common-browser"
 import { defaultFontSize, Extent, nearestPow2 } from "common/common-math"
 import { mapSize } from "common/common-var"
 import { displayClan } from "../util"
 
 import { MinMaxCoord, ZoomLevel } from "common/interface"
+import { ServerId } from "common/servers"
 
 import Cookie from "util/cookie"
-import RadioButton from "util/radio-button"
+import Modal from "util/modal"
+
 import DisplayGrid from "./display-grid"
 import DisplayPbZones from "./display-pb-zones"
 import DisplayPorts from "./display-ports"
+import MakeJourney from "./make-journey"
+import PowerMap from "../game-tools/show-power-map"
+import RadioButton from "util/radio-button"
 import SelectPorts from "./select-ports"
 import ShowF11 from "./show-f11"
 import ShowTrades from "./show-trades"
-import MakeJourney from "./make-journey"
 import TrilateratePosition from "./get-position"
-import PowerMap from "../game-tools/show-power-map"
+import WindRose from "./wind-rose"
 
 export type Tile = [number, number, number]
 
@@ -71,9 +71,11 @@ class NAMap {
     #y1 = 0
     #gMap = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
+    #windRose!: WindRose
+    #modal: Modal | undefined = undefined
 
     readonly rem = defaultFontSize // Font size in px
-    serverName: string
+    serverName: ServerId
     showGrid: string
     showTrades!: ShowTrades
     width = 0
@@ -102,7 +104,7 @@ class NAMap {
      * @param serverName - Naval action server name
      * @param searchParams - Query arguments
      */
-    constructor(serverName: string, searchParams: URLSearchParams) {
+    constructor(serverName: ServerId, searchParams: URLSearchParams) {
         /**
          * Naval action server name
          */
@@ -175,21 +177,6 @@ class NAMap {
         this._setupListener()
     }
 
-    static _initModal(id: string): void {
-        insertBaseModal({
-            id,
-            title: `${appTitle} <span class="text-primary small">v${appVersion}</span>`,
-            size: "modal-lg",
-        })
-
-        const body = d3Select(`#${id} .modal-body`)
-        body.html(
-            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                    <p>Designed by iB aka Felix Victor, <em>Bastards</em> clan ${displayClan("(BSTD)")}</a>.</p>
-                    <div class="alert alert-secondary" role="alert"><h5 class="alert-heading">Did you know?</h5><p class="mb-0">My clan mate, Aquillas, wrote a most comprehensive <a href="https://drive.google.com/file/d/1K6xCXtCUd68PPzvNjBxD5ffgE_69VEoc/view">user guide</a>.</p></div>`
-        )
-    }
-
     static _stopProperty(event: Event): void {
         if (event.defaultPrevented) {
             event.stopPropagation()
@@ -231,19 +218,20 @@ class NAMap {
         // function();
         //        performance.mark(`${marks[marks.length - 1]}-end`);
 
-        this.f11 = new ShowF11(this, this.coord)
         this._ports = new DisplayPorts(this)
         await this._ports.init()
-
         this._pbZone = new DisplayPbZones(this._ports, this.serverName)
-        this._grid = new DisplayGrid(this)
 
-        this._portSelect = new SelectPorts(this._ports, this._pbZone, this)
-        this.showTrades = new ShowTrades(this.serverName, this._portSelect, this.minMapScale, this.#extent)
+        this._grid = new DisplayGrid(this)
+        this._portSelect = new SelectPorts(this._ports)
+
+        this.showTrades = new ShowTrades(this._ports, this)
         await this.showTrades.showOrHide()
+        this.f11 = new ShowF11(this, this.coord)
 
         this._init()
         this._journey = new MakeJourney(this.rem)
+        this.#windRose = new WindRose()
         void new TrilateratePosition(this._ports)
         void new PowerMap(this, this.serverName, this.coord)
 
@@ -276,7 +264,7 @@ class NAMap {
         document.querySelector("#settingsDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Settings")
         })
-        document.querySelector("#button-download-pb-calc")?.addEventListener("click", () => {
+        document.querySelector("#menu-download-pb-calc")?.addEventListener("click", () => {
             registerEvent("Tools", "Download pb calculator")
         })
         document.querySelector("#reset")?.addEventListener("click", () => {
@@ -305,6 +293,7 @@ class NAMap {
         this._svg = d3Select<SVGSVGElement, Event>("#na-map")
             .append<SVGSVGElement>("svg")
             .attr("id", "na-svg")
+            .attr("class", "fill-empty stroke-empty bg-map")
             .call(this.#zoom)
 
         this._svg.append<SVGDefsElement>("defs")
@@ -350,9 +339,9 @@ class NAMap {
         const x = transform.x - scale / 2
         const y = transform.y - scale / 2
         const xMin = Math.max(0, Math.floor((this.#x0 - x) / k))
-        const xMax = Math.min(1 << z0, Math.ceil((this.#x1 - x) / k))
+        const xMax = Math.min(Number(1 << z0), Math.ceil((this.#x1 - x) / k))
         const yMin = Math.max(0, Math.floor((this.#y0 - y) / k))
-        const yMax = Math.min(1 << z0, Math.ceil((this.#y1 - y) / k))
+        const yMax = Math.min(Number(1 << z0), Math.ceil((this.#y1 - y) / k))
         for (let y = yMin; y < yMax; ++y) {
             for (let x = xMin; x < xMax; ++x) {
                 tiles.tiles.push([x, y, z0])
@@ -409,19 +398,27 @@ class NAMap {
         this._ports.clearMap()
         this._portSelect.clearMap()
         this.showTrades.clearMap()
+        this.#windRose.clearMap()
         $(".selectpicker").val("default").selectpicker("refresh")
     }
 
+    _initModal(): void {
+        this.#modal = new Modal(`${appTitle} <span class="text-primary small">v${appVersion}</span>`, "lg")
+        const body = this.#modal.bodySel
+
+        body.html(
+            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
+                    <p>Designed by iB aka Felix Victor, <em>Bastards</em> clan ${displayClan("(BSTD)")}</a>.</p>
+                    <div class="alert alert-secondary" role="alert"><h5 class="alert-heading">Did you know?</h5><p class="mb-0">My clan mate, Aquillas, wrote a most comprehensive <a href="https://drive.google.com/file/d/1K6xCXtCUd68PPzvNjBxD5ffgE_69VEoc/view">user guide</a>.</p></div>`
+        )
+    }
+
     _showAbout(): void {
-        const modalId = "modal-about"
-
-        // If the modal has no content yet, insert it
-        if (!document.querySelector(`#${modalId}`)) {
-            NAMap._initModal(modalId)
+        if (this.#modal) {
+            this.#modal.show()
+        } else {
+            this._initModal()
         }
-
-        // Show modal
-        $(`#${modalId}`).modal("show")
     }
 
     _doDoubleClickAction(event: Event): void {
@@ -457,7 +454,7 @@ class NAMap {
             this._grid.update()
         }
 
-        this._pbZone.refresh()
+        void this._pbZone.refresh()
         this._ports.update(this.#currentMapScale)
     }
 
@@ -617,6 +614,7 @@ class NAMap {
                 Math.floor(-y + this.coord.max / 2 + this.height / 2) / mapScale
             )
 
+        // eslint-disable-next-line unicorn/prefer-prototype-methods
         this._svg.call(this.#zoom.transform, transform)
         return transform
     }
@@ -627,6 +625,10 @@ class NAMap {
         } else {
             this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y)
         }
+    }
+
+    get extent(): Extent {
+        return this.#extent
     }
 }
 

@@ -7,8 +7,12 @@
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
  */
-export const woodFamily = ["regular", "seasoned", "exceptional"];
-export const woodType = ["frame", "trim"];
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(customParseFormat);
+dayjs.extend(utc);
+import { serverMaintenanceHour } from "./common-var";
 export const cannonType = ["medium", "long", "carronade"];
 export const cannonFamilyList = {
     medium: ["regular", "congreve", "defense", "edinorog"],
@@ -147,7 +151,7 @@ export const capitalToCounty = new Map([
     ["Wilmington", "North Carolina"],
 ]);
 export const validNationShortName = (nationShortName) => nations.some((nation) => nation.short === nationShortName);
-export const isEmpty = (object) => Object.getOwnPropertyNames(object).length === 0 && object.constructor === Object;
+export const isEmpty = (object) => object !== undefined && Object.getOwnPropertyNames(object).length === 0;
 export const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 export const range = (start, end) => Array.from({ length: 1 + end - start }, (_, i) => start + i);
 export const findNationByName = (nationName) => nations.find((nation) => nationName === nation.name);
@@ -157,10 +161,7 @@ export const putImportError = (error) => {
     console.error("Import request failed -->", error);
 };
 export class TupleKeyMap extends Map {
-    constructor() {
-        super(...arguments);
-        this.map = new Map();
-    }
+    map = new Map();
     set(key, value) {
         this.map.set(JSON.stringify(key), value);
         return this;
@@ -189,4 +190,38 @@ export class TupleKeyMap extends Map {
 export const sleep = async (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
+const getServerStartDateTime = (day) => {
+    let serverStart = dayjs().utc().hour(serverMaintenanceHour).minute(0).second(0);
+    const now = dayjs().utc();
+    if ((day < 0 && now.isBefore(serverStart)) || (day > 0 && now.isAfter(serverStart))) {
+        serverStart = dayjs.utc(serverStart).add(day, "day");
+    }
+    return serverStart;
+};
+export const getCurrentServerStart = () => getServerStartDateTime(-1);
+export const getNextServerStart = () => getServerStartDateTime(1);
+export const currentServerStartDateTime = getCurrentServerStart().format("YYYY-MM-DD HH:mm");
+export const currentServerStartDate = getCurrentServerStart().format("YYYY-MM-DD");
+export const currentServerDateYear = String(dayjs(currentServerStartDate).year());
+export const currentServerDateMonth = String(dayjs(currentServerStartDate).month() + 1).padStart(2, "0");
+export const getBaseId = (title) => title.toLocaleLowerCase().replaceAll(" ", "-").replaceAll("’", "");
+export const sortBy = (propertyNames) => (a, b) => {
+    let r = 0;
+    propertyNames.some((propertyName) => {
+        let sign = 1;
+        if (String(propertyName).startsWith("-")) {
+            sign = -1;
+            propertyName = String(propertyName).slice(1);
+        }
+        if (Number.isNaN(Number(a[propertyName])) && Number.isNaN(Number(b[propertyName]))) {
+            r = String(a[propertyName]).localeCompare(String(b[propertyName])) * sign;
+        }
+        else {
+            r = (Number(a[propertyName]) - Number(b[propertyName])) * sign;
+        }
+        return r !== 0;
+    });
+    return r;
+};
+export const simpleStringSort = (a, b) => a && b ? a.localeCompare(b) : 0;
 //# sourceMappingURL=common.js.map

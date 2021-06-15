@@ -11,10 +11,10 @@
 import path from "path"
 import polylabel from "polylabel"
 
-import { capitalToCounty } from "../common/common"
-import { baseAPIFilename, commonPaths, serverStartDate as serverDate } from "../common/common-dir"
+import { capitalToCounty, currentServerStartDate as serverDate, sortBy } from "../common/common"
+import { getCommonPaths } from "../common/common-dir"
 import { readJson, saveJsonAsync } from "../common/common-file"
-import { cleanName, sortBy } from "../common/common-node"
+import { baseAPIFilename, cleanName } from "../common/common-node"
 import {
     convertCoordX,
     convertCoordY,
@@ -27,6 +27,8 @@ import { serverIds } from "../common/servers"
 
 import { APIPort, PortElementsSlotGroupsEntity, PortPosition, PortRaidSpawnPointsEntity } from "./api-port"
 import { FeaturesEntity, GeoJson, PbZone, PortBasic } from "../common/gen-json"
+
+const commonPaths = getCommonPaths()
 
 let apiPorts = [] as APIPort[]
 let apiPortPos: Map<number, Coordinate> = new Map()

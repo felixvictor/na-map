@@ -13,8 +13,8 @@ import { HtmlString, SVGString } from "./interface"
 export const ϕ = (1 + Math.sqrt(5)) / 2
 export const timeFactor = 2.63
 export const speedFactor = 390
-export const speedConstA = 0.074465523706782
-export const speedConstB = 0.00272175949231
+export const speedConstA = 0.074_465_523_706_782
+export const speedConstB = 0.002_721_759_492_31
 export const defaultFontSize = 16
 export const defaultCircleSize = 16
 export const degreesFullCircle = 360
@@ -23,18 +23,18 @@ export const degreesQuarterCircle = 90
 
 // noinspection MagicNumberJS
 const transformMatrix = {
-    A: -0.00499866779363828,
-    B: -0.00000021464254980645,
-    C: 4096.88635151897,
-    D: 4096.90282787469,
+    A: -0.004_998_667_793_638_28,
+    B: -0.000_000_214_642_549_806_45,
+    C: 4096.886_351_518_97,
+    D: 4096.902_827_874_69,
 }
 
 // noinspection MagicNumberJS
 const transformMatrixInv = {
-    A: -200.053302087577,
-    B: -0.00859027897636011,
-    C: 819630.836437126,
-    D: -819563.745651571,
+    A: -200.053_302_087_577,
+    B: -0.008_590_278_976_360_11,
+    C: 819_630.836_437_126,
+    D: -819_563.745_651_571,
 }
 
 // F11 coord to svg coord
@@ -162,10 +162,10 @@ export const getSailingDistanceInK = (pixelDistance: number): number => pixelDis
  * @returns Formatted Ordinal
  */
 export function getOrdinal(n: number, sup = true): HtmlString {
-    const s = ["th", "st", "nd", "rd"]
+    const s = sup ? ["th", "st", "nd", "rd"] : ["ᵗʰ", "ˢᵗ", "ⁿᵈ", "ʳᵈ"]
     const v = n % 100
     const text = s[(v - 20) % 10] || s[v] || s[0]
-    return String(n) + (sup ? `<span class="super">${text}</span>` : `${text}`)
+    return String(n) + text
 }
 
 /**
