@@ -92,6 +92,10 @@ interface CurrentPort {
     id: number
     coord: Coordinate
 }
+interface Profit {
+    profit: HtmlResult[]
+    profitPerTon: HtmlResult[]
+}
 
 interface PortForDisplay {
     name: string
@@ -121,8 +125,8 @@ interface PortForDisplay {
     dropsNonTrading: string
     tradePort: string
     tradePortId?: number
-    goodsToSellInTradePort: HtmlResult[]
-    goodsToBuyInTradePort: HtmlResult[]
+    goodsToSellInTradePort: Profit
+    goodsToBuyInTradePort: Profit
     portBonus?: PortBonus
 }
 
@@ -541,15 +545,25 @@ export default class DisplayPorts {
 
     _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
 
+    _sortByProfitPerTon = (a: TradeGoodProfit, b: TradeGoodProfit): number =>
+        b.profit.profitPerTon - a.profit.profitPerTon
+
     _formatProfits = (profits: TradeGoodProfit[]): HtmlResult =>
         html`${profits
             ?.sort(this._sortByProfit)
             ?.map(
                 (good, index) =>
+                    html`<span style="white-space: nowrap;">${good.name} (${formatSiIntHtml(good.profit.profit)})</span
+                        >${index === profits.length - 1 ? html`` : html`, `}`
+            )}`
+
+    _formatProfitsPerTon = (profits: TradeGoodProfit[]): HtmlResult =>
+        html`${profits
+            ?.sort(this._sortByProfitPerTon)
+            ?.map(
+                (good, index) =>
                     html`<span style="white-space: nowrap;"
-                            >${good.name} (${formatSiIntHtml(good.profit.profit)} / ${formatSiIntHtml(
-                                good.profit.profitPerTon
-                            )})</span
+                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)})</span
                         >${index === profits.length - 1 ? html`` : html`, `}`
             )}`
 
@@ -626,8 +640,14 @@ export default class DisplayPorts {
             producesNonTrading: this._formatItems(portProperties.producesNonTrading),
             dropsNonTrading: this._formatItems(portProperties.dropsNonTrading),
             tradePort: this._getPortName(this.tradePortId),
-            goodsToSellInTradePort: this._formatProfits(portProperties.goodsToSellInTradePort),
-            goodsToBuyInTradePort: this._formatProfits(portProperties.goodsToBuyInTradePort),
+            goodsToSellInTradePort: {
+                profit: this._formatProfits(portProperties.goodsToSellInTradePort),
+                profitPerTon: this._formatProfitsPerTon(portProperties.goodsToSellInTradePort),
+            },
+            goodsToBuyInTradePort: {
+                profit: this._formatProfits(portProperties.goodsToBuyInTradePort),
+                profitPerTon: this._formatProfitsPerTon(portProperties.goodsToBuyInTradePort),
+            },
         } as PortForDisplay
 
         if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
@@ -647,18 +667,17 @@ export default class DisplayPorts {
         return port
     }
 
-    _showProfits = (goods: HtmlResult[], tradePort: string, tradeDirection: string): HtmlResult => {
-        const colour = tradeDirection === "buy" ? "alert-danger" : "alert-success"
+    _showProfits = (goods: Profit, tradePort: string, tradeDirection: string): HtmlResult => {
+        const colour = tradeDirection === "buy" ? "alert-success" : "alert-danger"
         const instruction =
             tradeDirection === "buy" ? `Buy here and sell in ${tradePort}` : `Buy in ${tradePort} and sell here`
 
-        return goods?.[0] === undefined
+        return goods.profit?.[0] === undefined
             ? html``
-            : html` <div class="alert ${colour} mt-2 mb-2 text-start" role="alert">
-                  <div class="alert-heading">
-                      <span class="caps">${instruction}</span> (profit per item / profit per ton, net value in reales)
-                  </div>
-                  ${goods}
+            : html`<div class="alert ${colour} mt-2 mb-2 text-start" role="alert">
+                  <div class="alert-heading"><span class="caps">${instruction}</span> (net value in reales)</div>
+                  <p class="my-1"><em>By profit per item</em>: ${goods.profit}</p>
+                  <p class="my-1"><em>By profit per ton</em>: ${goods.profitPerTon}</p>
               </div>`
     }
 
@@ -682,7 +701,7 @@ export default class DisplayPorts {
                 <div class="d-flex">
                     <i class="flag-icon-${port.icon} flag-icon-large ${iconBorder}" role="img" />
 
-                    <div class="text-start  align-self-center compress mx-3">
+                    <div class="text-start align-self-center compress mx-3">
                         <div class="large mb-1">${port.name}</div>
                         <div class="caps">${port.county}</div>
                         <div class="caps">${port.region}</div>
