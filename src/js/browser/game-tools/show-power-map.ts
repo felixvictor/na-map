@@ -21,7 +21,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 dayjs.extend(customParseFormat)
 
 import { registerEvent } from "../analytics"
-import { findNationById, nations, range, sleep } from "common/common"
+import { findNationById, nations, sleep } from "common/common"
 import {
     getCanvasRenderingContext2D,
     loadJsonFiles,

@@ -14,7 +14,6 @@ import { select as d3Select, Selection } from "d3-selection"
 
 import { Point } from "common/common-math"
 import { Segment } from "./index"
-import { HtmlString } from "common/interface"
 
 export default class MakeJourneyLabel {
     #numberSegments = 0
@@ -38,7 +37,6 @@ export default class MakeJourneyLabel {
         this.#gJourneyPath = gJourneyPath
         this.#fontSize = fontSize
         this.#lineHeight = this.#fontSize * 1.4
-
     }
 
     /** Correct Text Box

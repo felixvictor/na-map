@@ -567,6 +567,7 @@ export default class DisplayPorts {
                         >${index === profits.length - 1 ? html`` : html`, `}`
             )}`
 
+    // eslint-disable-next-line complexity
     _getText(portProperties: PortWithTrades): PortForDisplay {
         /*
         const getCoord = (portId: number): Coordinate => {
