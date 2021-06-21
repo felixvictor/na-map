@@ -152,7 +152,7 @@ import StylesXform from "exceljs/lib/xlsx/xform/style/styles-xform"
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const origStylesXformInit = StylesXform.prototype.init
 StylesXform.prototype.init = function () {
-    // eslint-disable-next-line prefer-rest-params,@typescript-eslint/no-unsafe-argument
+    // eslint-disable-next-line prefer-rest-params
     Reflect.apply(origStylesXformInit, this, arguments)
     this._addFont(defaultFont)
 }
