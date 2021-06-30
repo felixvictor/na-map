@@ -70,7 +70,7 @@
     "dependencies": {
         "@d3fc/d3fc-label-layout": "^7.0.3",
         "@popperjs/core": "^2.9.2",
-        "bootstrap": "^5.0.1",
+        "bootstrap": "^5.0.2",
         "bootstrap-select": "https://github.com/snapappointments/bootstrap-select.git#v1.14-dev",
         "d3-area-label": "^1.5.0",
         "d3-array": "^3.0.1",
@@ -191,7 +191,7 @@
         "prettier": "^2.3.2",
         "prettier-plugin-packagejson": "^2.2.11",
         "recursive-readdir": "^2.2.2",
-        "sass": "1.32.13",
+        "sass": "^1.35.1",
         "sass-loader": "^12.1.0",
         "sassdoc": "^2.7.3",
         "shellcheck": "^1.0.0",

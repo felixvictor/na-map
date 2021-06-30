@@ -8,6 +8,8 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
+@use "sass:math";
+
 @import "~bootstrap/scss/mixins";
 @import "mixins";
 
@@ -313,7 +315,7 @@ table {
     border-left: $paper-100 solid medium;
 }
 
-$padding-small: $padding-third / 1.618;
+$padding-small: math.div($padding-third, 1.618);
 $padding-large: $padding-third;
 
 .compress {

@@ -122,6 +122,7 @@ const sassLoaderOpt = {
     sassOptions: {
         outputStyle: "expanded",
         precision: 6,
+        quietDeps: true,
         sourceMap: !isProduction,
         sourceMapContents: !isProduction,
     },
