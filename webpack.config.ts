@@ -34,9 +34,7 @@ import {
     colourRedLight,
     colourWhite,
     colourYellowDark,
-    primary200,
     primary300,
-    primary700,
     themeColour,
 } from "./src/js/webpack/colours"
 import { repairs } from "./src/js/webpack/repairs"
