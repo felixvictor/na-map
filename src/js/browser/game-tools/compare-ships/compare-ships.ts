@@ -198,7 +198,12 @@ export class CompareShips {
                     const select$ = $(event.currentTarget as HTMLSelectElement)
 
                     // Remove 'select all' button
-                    select$.parent().find("button.bs-select-all").remove()
+                    const parent = select$.parent()
+                    parent.find("button.bs-select-all").remove()
+                    // Change button colour
+                    parent.find("button.bs-deselect-all").removeClass("btn-light")
+                    parent.find("button.bs-deselect-all").addClass("btn-paper")
+
                     this._initTooltip(select$)
                 })
                 .on("hide.bs.select", () => {
