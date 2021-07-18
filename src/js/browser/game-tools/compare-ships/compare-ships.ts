@@ -233,7 +233,11 @@ export class CompareShips {
     _cloneModuleData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
         const moduleIds = this.#selects.getSelectedModuleIds(currentColumnId, this.#moduleTypes)
 
-        this._initModuleSelects(newColumnId)
+        if (!this.#selects.hasModuleSelects(newColumnId)) {
+            this._initModuleSelects(newColumnId)
+            this._setupModuleSelectListener(newColumnId)
+        }
+
         this.#selects.setModules(newColumnId, moduleIds)
     }
 
@@ -340,7 +344,6 @@ export class CompareShips {
 
         shipSel$.on("changed.bs.select", () => {
             this._initModuleSelects(columnId)
-            this._setupModuleSelectListener(columnId)
             this._refreshColumn(columnId)
 
             if (columnId === "base") {
@@ -462,7 +465,7 @@ export class CompareShips {
     _getSelectedModuleData(columnId: ShipColumnType): ModuleEntity[] {
         const selectedModuleIds = this.#selects.getSelectedModuleIds(columnId, this.#moduleTypes)
         const moduleData = [] as ModuleEntity[]
-
+        console.log("_getSelectedModuleData", selectedModuleIds)
         for (const [, moduleIds] of selectedModuleIds) {
             for (const moduleId of moduleIds) {
                 moduleData.push(this.#moduleProperties.get(moduleId) ?? ({} as ModuleEntity))

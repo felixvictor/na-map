@@ -1,3 +1,4 @@
+import { isEmpty } from "common/common"
 import { WoodType, woodType } from "common/types"
 import { HtmlString } from "common/interface"
 import { ShipColumnTypeList, ModuleType, ModuleTypeList } from "compare-ships"
@@ -35,6 +36,8 @@ export class CompareShipsSelect {
 
     getModule$ = (columnId: ShipColumnType, moduleType: ModuleType): JQuery<HTMLSelectElement> =>
         this.#selectModule[columnId][moduleType].select$
+
+    hasModuleSelects = (columnId: ShipColumnType): boolean => !isEmpty(this.#selectModule[columnId])
 
     setShip(columnId: ShipColumnType, shipId: number): void {
         this.#selectShip[columnId].setSelectValues(shipId)
