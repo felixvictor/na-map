@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.0.6](///compare/v13.0.5...v13.0.6) (2021-07-18)
+
+
+### Bug Fixes
+
+* **ship compare:** debug off 0916fcb
+
 ### [13.0.5](///compare/v13.0.4...v13.0.5) (2021-07-18)
 
 
