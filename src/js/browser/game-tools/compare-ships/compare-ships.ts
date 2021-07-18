@@ -465,7 +465,7 @@ export class CompareShips {
     _getSelectedModuleData(columnId: ShipColumnType): ModuleEntity[] {
         const selectedModuleIds = this.#selects.getSelectedModuleIds(columnId, this.#moduleTypes)
         const moduleData = [] as ModuleEntity[]
-        console.log("_getSelectedModuleData", selectedModuleIds)
+
         for (const [, moduleIds] of selectedModuleIds) {
             for (const moduleId of moduleIds) {
                 moduleData.push(this.#moduleProperties.get(moduleId) ?? ({} as ModuleEntity))
