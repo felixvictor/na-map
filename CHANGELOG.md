@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.0.5](///compare/v13.0.4...v13.0.5) (2021-07-18)
+
+
+### Bug Fixes
+
+* **select:** deselect all button appearance 5261565
+* **ship compare:** module changes after cloning bb6e131
+
 ### [13.0.4](///compare/v13.0.3...v13.0.4) (2021-06-30)
 
 ### [13.0.3](///compare/v13.0.2...v13.0.3) (2021-06-21)
