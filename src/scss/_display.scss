@@ -204,10 +204,12 @@ text,
 }
 
 .tooltip-inner-small {
+    /* stylelint-disable-next-line declaration-no-important */
     min-width: 20rem !important;
 }
 
 .tooltip-inner-smaller {
+    /* stylelint-disable-next-line declaration-no-important */
     min-width: 10rem !important;
     p {
         margin: 0;
@@ -253,6 +255,7 @@ table {
 
 .bootstrap-select {
     .dropdown-menu li a.opt {
+        /* stylelint-disable-line selector-no-qualifying-type */
         padding-left: 1rem;
     }
 }

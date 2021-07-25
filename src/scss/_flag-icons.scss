@@ -18,6 +18,7 @@ $icon-dir: "../images/flags";
 .flag-icon-button {
     width: 2rem;
     height: 1.5rem;
+    /* stylelint-disable-next-line declaration-no-important */
     vertical-align: middle !important;
 }
 

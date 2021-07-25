@@ -143,6 +143,7 @@
     justify-content: flex-start;
     white-space: nowrap;
 
+    /* stylelint-disable-next-line scss/selector-no-redundant-nesting-selector */
     & > div {
         padding: 0 $padding-third;
     }

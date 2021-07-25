@@ -26,6 +26,7 @@
         .x-grid,
         .y-axis,
         .grp-axis {
+            /* stylelint-disable-next-line declaration-no-important */
             font-family: $font-family-base !important;
         }
 
@@ -71,6 +72,7 @@
     }
 
     .legend {
+        /* stylelint-disable-next-line selector-class-pattern */
         .legendText {
             fill: $body-color;
         }
@@ -89,6 +91,7 @@
     }
 
     .axis {
+        /* stylelint-disable-next-line declaration-no-important */
         font-family: $font-family-base !important;
 
         path {

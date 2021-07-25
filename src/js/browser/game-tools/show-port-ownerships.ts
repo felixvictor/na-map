@@ -166,7 +166,6 @@ export default class ShowPortOwnerships {
             }
 
             // @ts-expect-error
-            // eslint-disable-next-line unicorn/prefer-prototype-methods
             this.#svg.call(this.#textures[nationShortName])
         }
     }

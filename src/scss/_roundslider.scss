@@ -19,6 +19,7 @@
 
 .rs-handle {
     position: relative;
+    /* stylelint-disable declaration-no-important */
     width: 32px !important;
     background: $primary-900;
     border-radius: 0;

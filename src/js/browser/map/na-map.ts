@@ -614,7 +614,6 @@ class NAMap {
                 Math.floor(-y + this.coord.max / 2 + this.height / 2) / mapScale
             )
 
-        // eslint-disable-next-line unicorn/prefer-prototype-methods
         this._svg.call(this.#zoom.transform, transform)
         return transform
     }
