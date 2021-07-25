@@ -140,17 +140,6 @@ export class CompareShips {
         return this.#shipData.some((ship) => ship.id === id)
     }
 
-    _cloneHasShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
-        const shipId = this.#selects.getSelectedShipId(currentColumnId)
-
-        if (shipId !== 0) {
-            this.#selects.setShip(newColumnId, shipId)
-            return true
-        }
-
-        return false
-    }
-
     _addTooltip(element: HTMLLIElement, module: ModuleEntity): void {
         // Add tooltip with module properties
         element.dataset.bsOriginalTitle = CompareShips._getModifierFromModule(module.properties)
@@ -186,6 +175,32 @@ export class CompareShips {
         }
     }
 
+    _showModuleTooltip(event: Event): void {
+        const select$ = $(event.currentTarget as HTMLSelectElement)
+
+        // Remove 'select all' button
+        const parent = select$.parent()
+        parent.find("button.bs-select-all").remove()
+        // Change button colour
+        parent.find("button.bs-deselect-all").removeClass("btn-light")
+        parent.find("button.bs-deselect-all").addClass("btn-paper")
+
+        this._initTooltip(select$)
+    }
+
+    /**
+     * Hide remaining tooltips
+     */
+    _hideModuleTooltips(): void {
+        for (const [, tooltip] of this.#tooltips) {
+            if (tooltip) {
+                tooltip.hide()
+            }
+        }
+
+        this.#tooltips.clear()
+    }
+
     _initModuleSelects(columnId: ShipColumnType): void {
         const shipClass = this._getShipClass(columnId)
         for (const moduleType of this.#moduleTypes) {
@@ -194,27 +209,14 @@ export class CompareShips {
             // console.log(moduleType, this.#selects.getModule$(columnId, moduleType))
             this.#selects
                 .getModule$(columnId, moduleType)
+                .on("changed.bs.select", () => {
+                    this._refreshColumn(columnId)
+                })
                 .on("show.bs.select", (event: Event) => {
-                    const select$ = $(event.currentTarget as HTMLSelectElement)
-
-                    // Remove 'select all' button
-                    const parent = select$.parent()
-                    parent.find("button.bs-select-all").remove()
-                    // Change button colour
-                    parent.find("button.bs-deselect-all").removeClass("btn-light")
-                    parent.find("button.bs-deselect-all").addClass("btn-paper")
-
-                    this._initTooltip(select$)
+                    this._showModuleTooltip(event)
                 })
                 .on("hide.bs.select", () => {
-                    // Hide remaining tooltips
-                    for (const [, tooltip] of this.#tooltips) {
-                        if (tooltip) {
-                            tooltip.hide()
-                        }
-                    }
-
-                    this.#tooltips.clear()
+                    this._hideModuleTooltips()
                 })
         }
     }
@@ -235,14 +237,17 @@ export class CompareShips {
 
         if (!this.#selects.hasModuleSelects(newColumnId)) {
             this._initModuleSelects(newColumnId)
-            this._setupModuleSelectListener(newColumnId)
         }
 
         this.#selects.setModules(newColumnId, moduleIds)
     }
 
     _clone(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        if (this._cloneHasShipData(currentColumnId, newColumnId)) {
+        const shipId = this.#selects.getSelectedShipId(currentColumnId)
+
+        if (shipId) {
+            this.#selects.setShip(newColumnId, shipId)
+
             this._cloneWoodData(currentColumnId, newColumnId)
             this._cloneModuleData(currentColumnId, newColumnId)
 
@@ -262,15 +267,6 @@ export class CompareShips {
         const newColumnId = this.#columnIds[newColumnIndex + 1]
 
         this._clone(currentColumnId, newColumnId)
-    }
-
-    _setupModuleSelectListener(columnId: ShipColumnType): void {
-        for (const type of this.#moduleTypes) {
-            const select$ = this.#selects.getModule$(columnId, type)
-            select$.on("changed.bs.select", () => {
-                this._refreshColumn(columnId)
-            })
-        }
     }
 
     _getShipClass = (columnId: ShipColumnType): number =>
@@ -543,8 +539,8 @@ export class CompareShips {
     _updateSailingProfile(compareId: ShipColumnType): void {
         // Update recent changes first
         this._updateDifferenceProfileNeeded(compareId)
-        // Then update the rest of columns
 
+        // Then update the rest of columns
         for (const otherCompareId of this.columnsCompare) {
             if (otherCompareId !== compareId) {
                 this._updateDifferenceProfileNeeded(otherCompareId)

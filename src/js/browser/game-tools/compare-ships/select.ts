@@ -67,7 +67,8 @@ export class CompareShipsSelect {
         }
     }
 
-    getSelectedShipId = (columnId: ShipColumnType): number => Number(this.#selectShip[columnId].getValues()) ?? 0
+    getSelectedShipId = (columnId: ShipColumnType): number | undefined =>
+        Number(this.#selectShip[columnId].getValues()) ?? undefined
 
     getSelectedWoodId = (columnId: ShipColumnType, woodType: WoodType): number =>
         Number(this.#selectWood[columnId][woodType].getValues()) ?? 0
@@ -120,7 +121,6 @@ export class CompareShipsSelect {
 
     initModuleSelects(columnId: string, moduleType: ModuleType, options: HtmlString): void {
         const divBaseId = this.#modal.getBaseId(columnId)
-
         const bsSelectOptions: BootstrapSelectOptions = {
             actionsBox: true,
             countSelectedText(amount: number) {
@@ -145,31 +145,35 @@ export class CompareShipsSelect {
         )
     }
 
+    _initShipSelect(columnId: string, divBaseId: string, shipOptions: HtmlString): void {
+        const divSelectsShipId = this.#modal.getBaseIdSelectsShip(columnId)
+
+        this.#selectShip[columnId] = new Select(`${divBaseId}-ship`, divSelectsShipId, { title: "Ship" }, shipOptions)
+        if (columnId !== "base") {
+            this.#selectShip[columnId].disable()
+        }
+    }
+
+    _initWoodSelects(columnId: string, divBaseId: string, woodData: WoodData): void {
+        const divSelectsWoodsId = this.#modal.getBaseIdSelects(columnId)
+        this.#selectWood[columnId] = {} as WoodColumnTypeList<Select>
+
+        for (const type of woodType) {
+            this.#selectWood[columnId][type] = new Select(
+                `${divBaseId}-${type}`,
+                divSelectsWoodsId,
+                { title: `Wood ${type}`, width: "170px" },
+                woodData.getOptions(type)
+            )
+            this.#selectWood[columnId][type].disable()
+        }
+    }
+
     initShipAndWoodSelects(shipOptions: HtmlString, woodData: WoodData): void {
         for (const columnId of this.#columnIds) {
             const divBaseId = this.#modal.getBaseId(columnId)
-            const divSelectsShipId = this.#modal.getBaseIdSelectsShip(columnId)
-            this.#selectShip[columnId] = new Select(
-                `${divBaseId}-ship`,
-                divSelectsShipId,
-                { title: "Ship" },
-                shipOptions
-            )
-            if (columnId !== "base") {
-                this.#selectShip[columnId].disable()
-            }
-
-            const divSelectsWoodsId = this.#modal.getBaseIdSelects(columnId)
-            this.#selectWood[columnId] = {} as WoodColumnTypeList<Select>
-            for (const type of woodType) {
-                this.#selectWood[columnId][type] = new Select(
-                    `${divBaseId}-${type}`,
-                    divSelectsWoodsId,
-                    { title: `Wood ${type}`, width: "170px" },
-                    woodData.getOptions(type)
-                )
-                this.#selectWood[columnId][type].disable()
-            }
+            this._initShipSelect(columnId, divBaseId, shipOptions)
+            this._initWoodSelects(columnId, divBaseId, woodData)
         }
     }
 }
