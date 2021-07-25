@@ -140,7 +140,7 @@ export class CompareShips {
         return this.#shipData.some((ship) => ship.id === id)
     }
 
-    _cloneShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
+    _cloneHasShipData(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): boolean {
         const shipId = this.#selects.getSelectedShipId(currentColumnId)
 
         if (shipId !== 0) {
@@ -242,9 +242,7 @@ export class CompareShips {
     }
 
     _clone(currentColumnId: ShipColumnType, newColumnId: ShipColumnType): void {
-        const hasData = this._cloneShipData(currentColumnId, newColumnId)
-
-        if (hasData) {
+        if (this._cloneHasShipData(currentColumnId, newColumnId)) {
             this._cloneWoodData(currentColumnId, newColumnId)
             this._cloneModuleData(currentColumnId, newColumnId)
 
@@ -436,9 +434,11 @@ export class CompareShips {
         }
     }
 
-    _setupModuleData(): void {
-        // Get all setModules where change modifier (moduleChanges) exists
-        this.#moduleProperties = new Map(
+    /**
+     * Get all setModules where change modifier (moduleChanges) exists
+     */
+    _getModuleProperties = (): Map<number, ModuleEntity> =>
+        new Map(
             this.#moduleDataDefault.flatMap((type) =>
                 type[1]
                     .filter((module) =>
@@ -450,11 +450,17 @@ export class CompareShips {
             )
         )
 
-        // Get types from moduleProperties list
-        this.#moduleTypes = new Set<ModuleType>(
+    /**
+     * Get types from moduleProperties list
+     */
+    _getModuleTypes = (): Set<ModuleType> =>
+        new Set<ModuleType>(
             [...this.#moduleProperties].map((module) => module[1].type.replace(/\s\u2013\s[\s/A-Za-z\u25CB]+/, ""))
         )
 
+    _setupModuleData(): void {
+        this.#moduleProperties = this._getModuleProperties()
+        this.#moduleTypes = this._getModuleTypes()
         this.#modulesAndWoodData = new ModulesAndWoodData(this.#baseId, this.#minSpeed, this.#maxSpeed)
     }
 
