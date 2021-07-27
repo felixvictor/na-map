@@ -368,6 +368,18 @@ const gainHostilityRegex = new RegExp(
 const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+) conquest flag\\(s\\)`, "u")
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u")
 
+const checkFlags = (tweet: string): boolean => {
+    let result
+    let matched = false
+
+    if ((result = acquireFlagRegex.exec(tweet)) !== null) {
+        matched = true
+        flagAcquired(result)
+    }
+
+    return matched
+}
+
 const checkRaid = (tweet: string): boolean => {
     let result
     let matched = false
@@ -419,18 +431,6 @@ const checkPB = (tweet: string): boolean => {
     return matched
 }
 
-const checkFlags = (tweet: string): boolean => {
-    let result
-    let matched = false
-
-    if ((result = acquireFlagRegex.exec(tweet)) !== null) {
-        matched = true
-        flagAcquired(result)
-    }
-
-    return matched
-}
-
 /**
  * Update port data from tweets
  */
@@ -448,16 +448,16 @@ const updatePorts = async (): Promise<void> => {
 
         matched = checkFlags(tweet)
 
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
             matched = matched || checkRaid(tweet)
         }
 
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
             matched = matched || checkPB(tweet)
-        }
 
-        if (!matched) {
-            console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
+            if (!matched) {
+                console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
+            }
         }
     }
 
