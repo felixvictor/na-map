@@ -213,6 +213,15 @@ const getSpeedDegrees = (specs) => {
     speedDegrees.pop();
     return { calcPortSpeed, speedDegrees };
 };
+const isNumber = (name) => !Number.isNaN(Number(name));
+const getGunData = (cannon) => [
+    Number(cannon.name),
+    {
+        damage: cannon.damage.basic.value,
+        weight: cannon.generic.weight.value,
+        crew: cannon.generic.crew.value,
+    },
+];
 const convertGenericShipData = () => {
     const cannonLb = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2];
     const carroLb = [0, 0, 68, 42, 32, 24, 0, 18, 12];
@@ -220,21 +229,13 @@ const convertGenericShipData = () => {
     const frontDeckIndex = sideDeckMaxIndex + 1;
     const backDeckIndex = frontDeckIndex + 1;
     const emptyDeck = { amount: 0, maxCannonLb: 0, maxCarroLb: 0 };
-    const cannonData = new Map(cannons.long
-        .filter((cannon) => !Number.isNaN(Number(cannon.name)))
-        .map((cannon) => {
-        return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }];
-    }));
-    const carroData = new Map(cannons.carronade
-        .filter((cannon) => !Number.isNaN(Number(cannon.name)))
-        .map((cannon) => {
-        return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }];
-    }));
+    const cannonData = new Map(cannons.long.filter((cannon) => isNumber(cannon.name)).map((cannon) => getGunData(cannon)));
+    const carroData = new Map(cannons.carronade.filter((cannon) => isNumber(cannon.name)).map((cannon) => getGunData(cannon)));
     return apiItems.filter((item) => item.ItemType === "Ship" && !item.NotUsed && !shipsNotUsed.has(item.Id)).map((apiShip) => {
         const guns = {
             total: 0,
             decks: apiShip.Decks,
-            broadside: { cannons: 0, carronades: 0 },
+            damage: { cannons: 0, carronades: 0 },
             gunsPerDeck: [],
             weight: { cannons: 0, carronades: 0 },
         };
@@ -272,12 +273,13 @@ const convertGenericShipData = () => {
         for (let deckIndex = 0; deckIndex <= sideDeckMaxIndex; deckIndex += 1) {
             addDeck(apiShip.DeckClassLimit[deckIndex], deckIndex);
             const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount;
-            const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2;
+            const cannonBroadsideDamage = ((cannonData.get(guns.gunsPerDeck[deckIndex].maxCannonLb)?.damage ?? 0) * gunsPerDeck) / 2;
             guns.total += gunsPerDeck;
-            guns.broadside.carronades += guns.gunsPerDeck[deckIndex].maxCarroLb
-                ? (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
-                : cannonBroadside;
-            guns.broadside.cannons += cannonBroadside;
+            guns.damage.carronades +=
+                cannonData.get(guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0
+                    ? (cannonData.get(gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0) / 2
+                    : cannonBroadsideDamage;
+            guns.damage.cannons += cannonBroadsideDamage;
         }
         addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex);
         addDeck(apiShip.BackDeckClassLimit[0], backDeckIndex);
