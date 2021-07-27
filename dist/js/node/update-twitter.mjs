@@ -214,6 +214,15 @@ const rumorRegex = new RegExp(`\\[(${timeR}) UTC\\] Rumour has it that a great s
 const gainHostilityRegex = new RegExp(`\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`, "u");
 const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+) conquest flag\\(s\\)`, "u");
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
+const checkFlags = (tweet) => {
+    let result;
+    let matched = false;
+    if ((result = acquireFlagRegex.exec(tweet)) !== null) {
+        matched = true;
+        flagAcquired(result);
+    }
+    return matched;
+};
 const checkRaid = (tweet) => {
     let result;
     let matched = false;
@@ -266,15 +275,6 @@ const checkPB = (tweet) => {
     }
     return matched;
 };
-const checkFlags = (tweet) => {
-    let result;
-    let matched = false;
-    if ((result = acquireFlagRegex.exec(tweet)) !== null) {
-        matched = true;
-        flagAcquired(result);
-    }
-    return matched;
-};
 const updatePorts = async () => {
     for (const tweet of tweets) {
         console.log("\ntweet", tweet);
@@ -285,14 +285,14 @@ const updatePorts = async () => {
         }
         const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
         matched = checkFlags(tweet);
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
             matched = matched || checkRaid(tweet);
         }
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
             matched = matched || checkPB(tweet);
-        }
-        if (!matched) {
-            console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
+            if (!matched) {
+                console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
+            }
         }
     }
     if (isPortDataChanged) {
