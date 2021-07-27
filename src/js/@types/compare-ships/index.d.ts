@@ -14,11 +14,11 @@ declare module "compare-ships" {
         backArmor: string
         battleRating: string
         bowRepair?: string
-        cannonBroadside: string
+        cannonBroadsideDamage: string
         cannonCrew: string
         cannonWeight: string
         cannonsPerDeck: [string, string]
-        carroBroadside: string
+        carroBroadsideDamage: string
         carroCrew: string
         carroWeight: string
         deceleration: string

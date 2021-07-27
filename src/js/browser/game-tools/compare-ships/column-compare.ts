@@ -443,14 +443,14 @@ export class ColumnCompare extends Column {
                 this.shipCompareData.battleRating,
                 this._shipBaseData.battleRating
             )}`,
-            cannonBroadside: `${this.shipCompareData.guns.broadside.cannons}\u00A0${getDiff(
-                this.shipCompareData.guns.broadside.cannons,
-                this._shipBaseData.guns.broadside.cannons
+            cannonBroadsideDamage: `${this.shipCompareData.guns.damage.cannons}\u00A0${getDiff(
+                this.shipCompareData.guns.damage.cannons,
+                this._shipBaseData.guns.damage.cannons
             )}`,
             cannonsPerDeck: Column.getCannonsPerDeck(this.shipCompareData.guns),
-            carroBroadside: `${this.shipCompareData.guns.broadside.carronades}\u00A0${getDiff(
-                this.shipCompareData.guns.broadside.carronades,
-                this._shipBaseData.guns.broadside.carronades
+            carroBroadsideDamage: `${this.shipCompareData.guns.damage.carronades}\u00A0${getDiff(
+                this.shipCompareData.guns.damage.carronades,
+                this._shipBaseData.guns.damage.carronades
             )}`,
             deceleration: `${formatFloat(this.shipCompareData.ship.deceleration)}\u00A0${getDiff(
                 this.shipCompareData.ship.deceleration,

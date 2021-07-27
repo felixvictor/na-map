@@ -55,7 +55,7 @@ export default class ShipList {
                 [ship.class, String(ship.class)],
                 [ship.name, beautifyShipName(ship.name)],
                 [ship.guns.total, String(ship.guns.total)],
-                [ship.guns.broadside.cannons, formatInt(ship.guns.broadside.cannons)],
+                [ship.guns.damage.cannons, formatInt(ship.guns.damage.cannons)],
                 [ship.battleRating, formatInt(ship.battleRating)],
                 [ship.crew.max, formatInt(ship.crew.max)],
                 [ship.ship.maxSpeed, formatFloatFixed(ship.ship.maxSpeed, 1)],
@@ -116,7 +116,7 @@ export default class ShipList {
         const header: HeaderMap = {
             group: new Map([
                 ["dummy1", 2],
-                ["Broadside", 2],
+                ["Guns", 2],
                 ["dummy2", 1],
                 ["Speed", 2],
                 ["dummy3", 1],
@@ -127,7 +127,7 @@ export default class ShipList {
                 "",
                 "Name",
                 "No.",
-                "Weight",
+                "Damage",
                 "<span class='caps'>br</span>",
                 "Crew",
                 "Max",

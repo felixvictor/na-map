@@ -529,7 +529,7 @@ interface ShipGunneryTraverse {
 interface ShipGuns {
     total: number
     decks: number
-    broadside: ShipBroadside
+    damage: ShipBroadsideDamage
     gunsPerDeck: ShipGunDeck[]
     weight: ShipGunWeight
 }
@@ -538,7 +538,7 @@ interface ShipGunDeck {
     maxCannonLb: number
     maxCarroLb: number
 }
-interface ShipBroadside {
+interface ShipBroadsideDamage {
     cannons: number
     carronades: number
 }

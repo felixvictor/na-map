@@ -21,7 +21,7 @@ import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
 import { APIItemGeneric, APIShip, APIShipBlueprint, Limit, Specs } from "./api-item"
-import { Cannon, ShipBlueprint, ShipData, ShipGunDeck, ShipGuns } from "../common/gen-json"
+import { Cannon, CannonEntity, ShipBlueprint, ShipData, ShipGunDeck, ShipGuns } from "../common/gen-json"
 import { TextEntity, XmlGeneric } from "./xml"
 
 const commonPaths = getCommonPaths()
@@ -31,6 +31,9 @@ interface SubFileStructure {
     ext: string // file name extension (base file name is a ship name)
     elements: ElementMap
 }
+
+type GunData = { damage: number; weight: number; crew: number }
+type GunDataMap = Map<number, GunData>
 
 /**
  * Ratio of bottom mast thickness
@@ -298,27 +301,30 @@ const getSpeedDegrees = (specs: Specs): { calcPortSpeed: number; speedDegrees: n
     return { calcPortSpeed, speedDegrees }
 }
 
+const isNumber = (name: string): boolean => !Number.isNaN(Number(name))
+const getGunData = (cannon: CannonEntity): [number, GunData] => [
+    Number(cannon.name),
+    {
+        damage: cannon.damage.basic.value,
+        weight: cannon.generic.weight.value,
+        crew: cannon.generic.crew.value,
+    },
+]
+
 const convertGenericShipData = (): ShipData[] => {
     const cannonLb = [0, 42, 32, 24, 18, 12, 9, 0, 6, 4, 3, 2]
     const carroLb = [0, 0, 68, 42, 32, 24, 0, 18, 12]
     const sideDeckMaxIndex = 3
     const frontDeckIndex = sideDeckMaxIndex + 1
     const backDeckIndex = frontDeckIndex + 1
+
     const emptyDeck = { amount: 0, maxCannonLb: 0, maxCarroLb: 0 } as ShipGunDeck
 
-    const cannonData = new Map<number, { weight: number; crew: number }>(
-        cannons.long
-            .filter((cannon) => !Number.isNaN(Number(cannon.name)))
-            .map((cannon) => {
-                return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }]
-            })
+    const cannonData: GunDataMap = new Map(
+        cannons.long.filter((cannon) => isNumber(cannon.name)).map((cannon) => getGunData(cannon))
     )
-    const carroData = new Map<number, { weight: number; crew: number }>(
-        cannons.carronade
-            .filter((cannon) => !Number.isNaN(Number(cannon.name)))
-            .map((cannon) => {
-                return [Number(cannon.name), { weight: cannon.generic.weight.value, crew: cannon.generic.crew.value }]
-            })
+    const carroData: GunDataMap = new Map(
+        cannons.carronade.filter((cannon) => isNumber(cannon.name)).map((cannon) => getGunData(cannon))
     )
 
     return (
@@ -329,7 +335,7 @@ const convertGenericShipData = (): ShipData[] => {
         const guns = {
             total: 0,
             decks: apiShip.Decks,
-            broadside: { cannons: 0, carronades: 0 },
+            damage: { cannons: 0, carronades: 0 },
             gunsPerDeck: [],
             weight: { cannons: 0, carronades: 0 },
         } as ShipGuns
@@ -375,14 +381,16 @@ const convertGenericShipData = (): ShipData[] => {
         for (let deckIndex = 0; deckIndex <= sideDeckMaxIndex; deckIndex += 1) {
             addDeck(apiShip.DeckClassLimit[deckIndex], deckIndex)
             const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount
-            const cannonBroadside = (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCannonLb) / 2
+            const cannonBroadsideDamage =
+                ((cannonData.get(guns.gunsPerDeck[deckIndex].maxCannonLb)?.damage ?? 0) * gunsPerDeck) / 2
 
             guns.total += gunsPerDeck
-            guns.broadside.carronades += guns.gunsPerDeck[deckIndex].maxCarroLb
-                ? (gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb) / 2
-                : cannonBroadside
+            guns.damage.carronades +=
+                cannonData.get(guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0
+                    ? (cannonData.get(gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0) / 2
+                    : cannonBroadsideDamage
 
-            guns.broadside.cannons += cannonBroadside
+            guns.damage.cannons += cannonBroadsideDamage
         }
 
         addDeck(apiShip.FrontDeckClassLimit[0], frontDeckIndex)

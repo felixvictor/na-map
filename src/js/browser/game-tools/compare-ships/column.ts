@@ -157,10 +157,10 @@ export class Column {
         text += displayColumn("firezoneHorizontalWidth", "Firezone horizontal width")
         text += "</div></div></div>"
 
-        text += displayFirstColumn("Broadside (lb)")
+        text += displayFirstColumn("Broadside damage")
         text += Column.displaySecondBlock()
-        text += displayColumn("cannonBroadside", "Cannons")
-        text += displayColumn("carroBroadside", "Carronades")
+        text += displayColumn("cannonBroadsideDamage", "Cannons")
+        text += displayColumn("carroBroadsideDamage", "Carronades")
         text += "</div></div></div>"
 
         text += displayFirstColumn("Chasers")
