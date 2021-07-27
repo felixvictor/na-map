@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.1.0](///compare/v13.0.7...v13.1.0) (2021-07-27)
+
+
+### Features
+
+* **gun data:** broadside weight -> broadside (basic) damage 13bb51e
+
+
+### Bug Fixes
+
+* **port investments:** June 2021 data 63a061f
+
 ### [13.0.7](///compare/v13.0.6...v13.0.7) (2021-07-25)
 
 
