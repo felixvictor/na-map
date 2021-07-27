@@ -380,7 +380,7 @@ const checkFlags = (tweet: string): boolean => {
     return matched
 }
 
-const checkRaid = (tweet: string): boolean => {
+const checkPBAndRaid = (tweet: string): boolean => {
     let result
     let matched = false
 
@@ -388,12 +388,16 @@ const checkRaid = (tweet: string): boolean => {
         matched = true
         isPortDataChanged = true
         npcPortBattleScheduled(result)
+    } else if ((result = portBattleRegex.exec(tweet)) !== null) {
+        matched = true
+        isPortDataChanged = true
+        portBattleScheduled(result)
     }
 
     return matched
 }
 
-const checkPB = (tweet: string): boolean => {
+const checkPort = (tweet: string): boolean => {
     let matched = true
     let result
 
@@ -449,11 +453,11 @@ const updatePorts = async (): Promise<void> => {
         matched = checkFlags(tweet)
 
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
-            matched = matched || checkRaid(tweet)
+            matched = matched || checkPBAndRaid(tweet)
         }
 
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
-            matched = matched || checkPB(tweet)
+            matched = matched || checkPort(tweet)
 
             if (!matched) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
