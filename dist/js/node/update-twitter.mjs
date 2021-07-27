@@ -223,7 +223,7 @@ const checkFlags = (tweet) => {
     }
     return matched;
 };
-const checkRaid = (tweet) => {
+const checkPBAndRaid = (tweet) => {
     let result;
     let matched = false;
     if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
@@ -231,9 +231,14 @@ const checkRaid = (tweet) => {
         isPortDataChanged = true;
         npcPortBattleScheduled(result);
     }
+    else if ((result = portBattleRegex.exec(tweet)) !== null) {
+        matched = true;
+        isPortDataChanged = true;
+        portBattleScheduled(result);
+    }
     return matched;
 };
-const checkPB = (tweet) => {
+const checkPort = (tweet) => {
     let matched = true;
     let result;
     if ((result = capturedRegex.exec(tweet)) !== null) {
@@ -286,10 +291,10 @@ const updatePorts = async () => {
         const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
         matched = checkFlags(tweet);
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
-            matched = matched || checkRaid(tweet);
+            matched = matched || checkPBAndRaid(tweet);
         }
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
-            matched = matched || checkPB(tweet);
+            matched = matched || checkPort(tweet);
             if (!matched) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
             }
