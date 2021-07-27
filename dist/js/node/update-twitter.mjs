@@ -13,7 +13,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
-import { findNationByName, sortBy } from "../common/common";
+import { currentServerStartDateTime, findNationByName, sortBy } from "../common/common";
 import { readJson, saveJsonAsync } from "../common/common-file";
 import { getCommonPaths } from "../common/common-dir";
 import { flagValidity, portBattleCooldown } from "../common/common-var";
@@ -214,57 +214,85 @@ const rumorRegex = new RegExp(`\\[(${timeR}) UTC\\] Rumour has it that a great s
 const gainHostilityRegex = new RegExp(`\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`, "u");
 const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+) conquest flag\\(s\\)`, "u");
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
-const updatePorts = async () => {
+const checkRaid = (tweet) => {
     let result;
+    let matched = false;
+    if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
+        matched = true;
+        isPortDataChanged = true;
+        npcPortBattleScheduled(result);
+    }
+    return matched;
+};
+const checkPB = (tweet) => {
+    let matched = true;
+    let result;
+    if ((result = capturedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        captured(result);
+    }
+    else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        npcCaptured(result);
+    }
+    else if ((result = defendedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        defended(result);
+    }
+    else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        defended(result);
+    }
+    else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        hostilityLevelUp(result);
+    }
+    else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        hostilityLevelDown(result);
+    }
+    else if ((result = portBattleRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        portBattleScheduled(result);
+    }
+    else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        cooledOff(result);
+    }
+    else if (rumorRegex.exec(tweet) !== null) {
+    }
+    else {
+        matched = false;
+    }
+    return matched;
+};
+const checkFlags = (tweet) => {
+    let result;
+    let matched = false;
+    if ((result = acquireFlagRegex.exec(tweet)) !== null) {
+        matched = true;
+        flagAcquired(result);
+    }
+    return matched;
+};
+const updatePorts = async () => {
     for (const tweet of tweets) {
         console.log("\ntweet", tweet);
-        result = checkDateRegex.exec(tweet);
+        const result = checkDateRegex.exec(tweet);
+        let matched = false;
         if (!result) {
             return;
         }
-        if ((result = capturedRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            captured(result);
+        const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
+        matched = checkFlags(tweet);
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
+            matched = matched || checkRaid(tweet);
         }
-        else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            npcCaptured(result);
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
+            matched = matched || checkPB(tweet);
         }
-        else if ((result = defendedRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            defended(result);
-        }
-        else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            defended(result);
-        }
-        else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            hostilityLevelUp(result);
-        }
-        else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            hostilityLevelDown(result);
-        }
-        else if ((result = portBattleRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            portBattleScheduled(result);
-        }
-        else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            npcPortBattleScheduled(result);
-        }
-        else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-            isPortDataChanged = true;
-            cooledOff(result);
-        }
-        else if ((result = acquireFlagRegex.exec(tweet)) !== null) {
-            flagAcquired(result);
-        }
-        else if ((result = rumorRegex.exec(tweet)) === null) {
+        if (!matched) {
             console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
-        }
-        else {
         }
     }
     if (isPortDataChanged) {
