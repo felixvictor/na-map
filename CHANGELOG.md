@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.1.1](///compare/v13.1.0...v13.1.1) (2021-07-27)
+
+
+### Bug Fixes
+
+* **get tweets:** port ownership changes only after last maintenance 02069ce
+
 ## [13.1.0](///compare/v13.0.7...v13.1.0) (2021-07-27)
 
 
