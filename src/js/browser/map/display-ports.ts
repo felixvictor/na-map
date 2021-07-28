@@ -378,8 +378,14 @@ export default class DisplayPorts {
 
     _setupPatrolZones(): void {
         const start = dayjs.utc("2021-01-17").hour(serverMaintenanceHour)
-        const index = dayjs.utc().diff(start, "day") % patrolZones.length
+        let index = dayjs.utc().diff(start, "day") % patrolZones.length
+
+        if (this.#serverName === "eu2") {
+            index += 4
+        }
+
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
+
         const { radius, name, shallow, shipClass } = patrolZones[index]
         const swordSize = radius * 1.6
         const [x, y] = patrolZones[index].coordinates
