@@ -228,7 +228,15 @@ const checkFlags = (tweet) => {
 const checkCooldown = (tweet) => {
     let result;
     let matched = true;
-    if ((result = defendedRegex.exec(tweet)) !== null) {
+    if ((result = capturedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        cooldownOn(result);
+    }
+    else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
+        cooldownOn(result);
+    }
+    else if ((result = defendedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true;
         cooldownOn(result);
     }
@@ -313,12 +321,10 @@ const updatePorts = async () => {
         }
         const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
         matched = checkFlags(tweet);
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day")) &&
-            tweetTime.isBefore(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
             matched = matched || checkCooldown(tweet);
         }
-        else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day")) &&
-            tweetTime.isBefore(dayjs.utc(currentServerStartDateTime))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
             matched = matched || checkPBAndRaid(tweet);
         }
         else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
