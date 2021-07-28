@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.1.5](///compare/v13.1.4...v13.1.5) (2021-07-28)
+
+
+### Bug Fixes
+
+* **get tweets:** port ownership changes only after last maintenance f8e8a7a
+* **patrol zone:** PvE server has a different cycle 377d32e
+
 ### [13.1.4](///compare/v13.1.3...v13.1.4) (2021-07-28)
 
 
