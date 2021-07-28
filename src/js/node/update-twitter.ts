@@ -358,7 +358,7 @@ const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u")
 
 const checkFlags = (tweet: string): boolean => {
     let result: RegExpExecArray | null
-    let matched = true
+    let matched: boolean
 
     // eslint-disable-next-line no-negated-condition
     if ((result = acquireFlagRegex.exec(tweet)) !== null) {
@@ -429,6 +429,9 @@ const checkPort = (tweet: string): boolean => {
     } else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
         hostilityLevelDown(result)
+    } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true
+        npcPortBattleScheduled(result)
     } else if ((result = portBattleRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
         portBattleScheduled(result)
@@ -452,7 +455,7 @@ const updatePorts = async (): Promise<void> => {
     for (const tweet of tweets) {
         console.log("\ntweet", tweet)
         const result = checkDateRegex.exec(tweet)
-        let matched = false
+        let matched: boolean
 
         if (!result) {
             return
@@ -462,9 +465,15 @@ const updatePorts = async (): Promise<void> => {
 
         matched = checkFlags(tweet)
 
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
+        if (
+            tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day")) &&
+            tweetTime.isBefore(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))
+        ) {
             matched = matched || checkCooldown(tweet)
-        } else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
+        } else if (
+            tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day")) &&
+            tweetTime.isBefore(dayjs.utc(currentServerStartDateTime))
+        ) {
             matched = matched || checkPBAndRaid(tweet)
         } else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
             matched = matched || checkPort(tweet)
