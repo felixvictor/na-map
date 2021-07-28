@@ -97,23 +97,13 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
     ports[portIndex] = { ...ports[portIndex], ...updatedPort }
 }
 
-/**
- * Port captured
- * @param result - Result from tweet regex
- * @param nation - Nation
- * @param capturer - Capturing clan
- */
-const portCaptured = (result: RegExpExecArray, nation: string, capturer: string): void => {
+const cooldownOn = (result: RegExpExecArray): void => {
     const portName = result[2]
-    const portBattleTime = getPortBattleTime(portName)
     const cooldownTime = getCooldownTime(result[1])
 
-    console.log("      --- captured", portName)
+    console.log("      --- cooldown on", portName)
 
     const updatedPort = {
-        nation,
-        capturer,
-        captured: portBattleTime,
         cooldownTime,
     } as PortBattlePerServer
 
@@ -123,6 +113,27 @@ const portCaptured = (result: RegExpExecArray, nation: string, capturer: string)
 /**
  * Port captured
  * @param result - Result from tweet regex
+ * @param nation - Nation
+ * @param capturer - Capturing clan
+ */
+const portCaptured = (result: RegExpExecArray, nation: string, capturer: string): void => {
+    const portName = result[2]
+    const portBattleTime = getPortBattleTime(portName)
+
+    console.log("      --- captured", portName)
+
+    const updatedPort = {
+        nation,
+        capturer,
+        captured: portBattleTime,
+    } as PortBattlePerServer
+
+    cooldownOn(result)
+    updatePort(portName, updatedPort)
+}
+
+/**
+ * Port captured
  */
 const captured = (result: RegExpExecArray): void => {
     const nation = findNationByName(result[4])?.short ?? ""
@@ -133,30 +144,12 @@ const captured = (result: RegExpExecArray): void => {
 
 /**
  * Port captured by NPC raiders
- * @param result - Result from tweet regex
  */
 const npcCaptured = (result: RegExpExecArray): void => {
     const nation = "NT"
     const capturer = "RAIDER"
 
     portCaptured(result, nation, capturer)
-}
-
-/**
- * Port defended
- * @param result - Result from tweet regex
- */
-const defended = (result: RegExpExecArray): void => {
-    const portName = result[2]
-    const cooldownTime = getCooldownTime(result[1])
-
-    console.log("      --- defended", portName)
-
-    const updatedPort = {
-        cooldownTime,
-    } as PortBattlePerServer
-
-    updatePort(portName, updatedPort)
 }
 
 /**
@@ -178,7 +171,6 @@ const hostilityLevelUp = (result: RegExpExecArray): void => {
 
 /**
  * Hostility decreased
- * @param result - Result from tweet regex
  */
 const hostilityLevelDown = (result: RegExpExecArray): void => {
     const portName = result[4]
@@ -195,7 +187,6 @@ const hostilityLevelDown = (result: RegExpExecArray): void => {
 
 /**
  * Port battle scheduled
- * @param result - Result from tweet regex
  */
 const portBattleScheduled = (result: RegExpExecArray): void => {
     const portName = result[2]
@@ -214,7 +205,6 @@ const portBattleScheduled = (result: RegExpExecArray): void => {
 
 /**
  * NPC port battle scheduled
- * @param result - Result from tweet regex
  */
 const npcPortBattleScheduled = (result: RegExpExecArray): void => {
     const portName = result[2]
@@ -232,7 +222,6 @@ const npcPortBattleScheduled = (result: RegExpExecArray): void => {
 
 /**
  * Port can be attacked again
- * @param result - Result from tweet regex
  */
 const cooledOff = (result: RegExpExecArray): void => {
     const portName = result[2]
@@ -245,7 +234,6 @@ const cooledOff = (result: RegExpExecArray): void => {
 
 /**
  * A nation acquired one or more conquest flags
- * @param result - Result from tweet regex
  */
 const flagAcquired = (result: RegExpExecArray): void => {
     const nationName = result[2]
@@ -369,37 +357,59 @@ const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u")
 
 const checkFlags = (tweet: string): boolean => {
-    let result
-    let matched = false
+    let result: RegExpExecArray | null
+    let matched = true
 
+    // eslint-disable-next-line no-negated-condition
     if ((result = acquireFlagRegex.exec(tweet)) !== null) {
         matched = true
         flagAcquired(result)
+    } else {
+        matched = false
+    }
+
+    return matched
+}
+
+const checkCooldown = (tweet: string): boolean => {
+    let result: RegExpExecArray | null
+    let matched = true
+
+    if ((result = defendedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true
+        cooldownOn(result)
+        // eslint-disable-next-line no-negated-condition
+    } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true
+        cooldownOn(result)
+    } else {
+        matched = false
     }
 
     return matched
 }
 
 const checkPBAndRaid = (tweet: string): boolean => {
-    let result
-    let matched = false
+    let result: RegExpExecArray | null
+    let matched = true
 
     if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        matched = true
         isPortDataChanged = true
         npcPortBattleScheduled(result)
+        // eslint-disable-next-line no-negated-condition
     } else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        matched = true
         isPortDataChanged = true
         portBattleScheduled(result)
+    } else {
+        matched = false
     }
 
     return matched
 }
 
 const checkPort = (tweet: string): boolean => {
+    let result: RegExpExecArray | null
     let matched = true
-    let result
 
     if ((result = capturedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
@@ -409,10 +419,10 @@ const checkPort = (tweet: string): boolean => {
         npcCaptured(result)
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
-        defended(result)
+        cooldownOn(result)
     } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
-        defended(result)
+        cooldownOn(result)
     } else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
         hostilityLevelUp(result)
@@ -452,11 +462,11 @@ const updatePorts = async (): Promise<void> => {
 
         matched = checkFlags(tweet)
 
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
+            matched = matched || checkCooldown(tweet)
+        } else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
             matched = matched || checkPBAndRaid(tweet)
-        }
-
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
+        } else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
             matched = matched || checkPort(tweet)
 
             if (!matched) {
