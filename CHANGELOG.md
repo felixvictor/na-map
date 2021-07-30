@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.1.7](///compare/v13.1.6...v13.1.7) (2021-07-30)
+
+
+### Bug Fixes
+
+* **get tweets:** full -> get default API port data first 54ca77e
+
 ### [13.1.6](///compare/v13.1.5...v13.1.6) (2021-07-28)
 
 
