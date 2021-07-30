@@ -8,8 +8,6 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
 import { currentServerStartDateTime } from "../common/common"
-import { getCommonPaths } from "../common/common-dir"
-import { fileExists, readTextFile, saveTextFile } from "../common/common-file"
 import { cleanName } from "../common/common-node"
 
 type NextToken = string | undefined
@@ -41,35 +39,10 @@ const maxResults = "100"
 const queryFrom = "from:zz569k"
 const endpointUrl = "https://api.twitter.com/2/tweets/search/recent"
 
-const commonPaths = getCommonPaths()
 const bearerToken = process.argv[2]
 export const runType = process.argv[3] ?? "full"
 
 const tweets: string[] = []
-const refreshDefault = "0"
-let refresh = refreshDefault
-
-/**
- * Get refresh id, either from file or set default value (0)
- * @returns Refresh id
- */
-const getRefreshId = (): string => {
-    if (fileExists(commonPaths.fileTwitterRefreshId)) {
-        const fileData = readTextFile(commonPaths.fileTwitterRefreshId)
-        if (fileData) {
-            return fileData
-        }
-    }
-
-    return refreshDefault
-}
-
-/**
- * Save refresh id to file
- */
-const saveRefreshId = (refresh: string): void => {
-    saveTextFile(commonPaths.fileTwitterRefreshId, refresh)
-}
 
 /**
  * Add sanitised data to tweets
@@ -115,14 +88,8 @@ const getTwitterData = async (
 ): Promise<NextToken> => {
     const parameters: TwitterQueryParameters = {
         max_results: maxResults,
+        start_time: startDateTime,
         query,
-    }
-
-    // If no start time is provided use refresh id
-    if (startDateTime === "") {
-        parameters.since_id = refresh
-    } else {
-        parameters.start_time = startDateTime
     }
 
     // Use next page token if given
@@ -138,16 +105,11 @@ const getTwitterData = async (
 
     const {
         data: twitterDataRaw,
-        meta: { newest_id, next_token },
+        meta: { next_token },
     } = result
 
     if (twitterDataRaw) {
         addTwitterData(twitterDataRaw)
-    }
-
-    // Test for new refresh id
-    if (BigInt(newest_id ?? 0) > BigInt(refresh)) {
-        refresh = newest_id!
     }
 
     return next_token
@@ -170,7 +132,6 @@ const getTweetsSince = async (sinceDateTime: dayjs.Dayjs): Promise<void> => {
  * Get all available tweets from the 7 last days
  */
 const getTweetsFull = async (): Promise<void> => {
-    refresh = refreshDefault
     await getTweetsSince(dayjs.utc().subtract(7, "day"))
 }
 
@@ -182,38 +143,22 @@ const getTweetsSinceMaintenance = async (): Promise<void> => {
 }
 
 /**
- * Get tweets since last refresh id
- */
-const getTweetsSinceRefresh = async (): Promise<void> => {
-    await getTwitterData(queryFrom)
-}
-
-/**
  * Get partial data since maintenance or later based on refresh id
  */
 const getTweetsPartial = async (): Promise<void> => {
-    // eslint-disable-next-line unicorn/prefer-ternary
-    if (refresh === refreshDefault) {
-        await getTweetsSinceMaintenance()
-    } else {
-        await getTweetsSinceRefresh()
-    }
+    await getTweetsSinceMaintenance()
 }
 
 /**
  * Get tweets
  */
 export const getTweets = async (): Promise<string[]> => {
-    refresh = getRefreshId()
-
     // eslint-disable-next-line unicorn/prefer-ternary
     if (runType.startsWith("full")) {
         await getTweetsFull()
     } else {
         await getTweetsPartial()
     }
-
-    saveRefreshId(refresh)
 
     return tweets.reverse()
 }
