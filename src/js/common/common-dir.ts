@@ -48,7 +48,6 @@ interface DirList {
     fileRepair: string
     fileShip: string
     fileShipBlueprint: string
-    fileTwitterRefreshId: string
     fileWood: string
 }
 
@@ -74,8 +73,6 @@ export function getCommonPaths(appRoot = process.env.PWD ?? ""): DirList {
         dirLib,
         dirGenServer,
         dirGenGeneric,
-
-        fileTwitterRefreshId: buildPath(dirAPI, "response-id.txt"),
 
         filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
         filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),

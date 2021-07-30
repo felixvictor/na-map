@@ -16,8 +16,15 @@ import utc from "dayjs/plugin/utc.js"
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 
-import { AttackerNationShortName, currentServerStartDateTime, findNationByName, sortBy } from "../common/common"
-import { readJson, saveJsonAsync } from "../common/common-file"
+import {
+    AttackerNationShortName,
+    currentServerStartDate as serverDate,
+    currentServerStartDateTime,
+    findNationById,
+    findNationByName,
+    sortBy,
+} from "../common/common"
+import { readJson, saveJsonAsync, xz } from "../common/common-file"
 import { getCommonPaths } from "../common/common-dir"
 import { flagValidity, portBattleCooldown } from "../common/common-var"
 import { serverIds } from "../common/servers"
@@ -26,9 +33,12 @@ import { PortBattlePerServer } from "../common/gen-json"
 import { FlagEntity, FlagsPerNation } from "../common/types"
 
 import { getTweets, runType } from "./get-tweets"
+import { baseAPIFilename, cleanName } from "../common/common-node"
+import { APIPort } from "api-port"
 
 const flagsMap = new Map<number, Set<FlagEntity>>()
 const commonPaths = getCommonPaths()
+const APIPortFilename = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`)
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`)
 const flagsFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-flags.json`)
 
@@ -472,13 +482,13 @@ const updatePorts = async (): Promise<void> => {
         matched = checkFlags(tweet)
 
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
-            matched = matched || checkCooldown(tweet)
+            matched = checkCooldown(tweet) || matched
         }
 
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
-            matched = matched || checkPBAndRaid(tweet)
+            matched = checkPBAndRaid(tweet) || matched
         } else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
-            matched = matched || checkPort(tweet)
+            matched = checkPort(tweet) || matched
 
             if (!matched) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
@@ -491,9 +501,47 @@ const updatePorts = async (): Promise<void> => {
     }
 }
 
-const updateTwitter = async (): Promise<void> => {
+const getAPIPortData = (): APIPort[] => {
+    xz("unxz", `${APIPortFilename}.xz`)
+    const apiPorts: APIPort[] = readJson(APIPortFilename)
+    xz("xz", APIPortFilename)
+
+    return apiPorts
+}
+
+const getPortMaintenanceDefaults = (): void => {
+    const apiPorts: APIPort[] = getAPIPortData()
+    const currentPorts: PortBattlePerServer[] = readJson(portFilename)
+
+    const getCaptureDate = (portId: number): string | undefined => {
+        const index = currentPorts.findIndex((port) => port.id === portId)
+
+        return currentPorts[index].captured
+    }
+
+    ports = apiPorts.map(
+        (apiPort): PortBattlePerServer => ({
+            id: Number(apiPort.Id),
+            name: cleanName(apiPort.Name),
+            nation: findNationById(apiPort.Nation).short,
+            capturer: apiPort.Capturer as string,
+            captured: getCaptureDate(Number(apiPort.Id)),
+        })
+    )
+}
+
+const getPortCurrent = (): void => {
     ports = readJson(portFilename)
+}
+
+const updateTwitter = async (): Promise<void> => {
     flagsPerNations = readJson(flagsFilename)
+
+    if (runType.startsWith("full")) {
+        getPortMaintenanceDefaults()
+    } else {
+        getPortCurrent()
+    }
 
     initFlags()
 
