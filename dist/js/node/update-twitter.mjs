@@ -13,14 +13,16 @@ import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import utc from "dayjs/plugin/utc.js";
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
-import { currentServerStartDateTime, findNationByName, sortBy } from "../common/common";
-import { readJson, saveJsonAsync } from "../common/common-file";
+import { currentServerStartDate as serverDate, currentServerStartDateTime, findNationById, findNationByName, sortBy, } from "../common/common";
+import { readJson, saveJsonAsync, xz } from "../common/common-file";
 import { getCommonPaths } from "../common/common-dir";
 import { flagValidity, portBattleCooldown } from "../common/common-var";
 import { serverIds } from "../common/servers";
 import { getTweets, runType } from "./get-tweets";
+import { baseAPIFilename, cleanName } from "../common/common-node";
 const flagsMap = new Map();
 const commonPaths = getCommonPaths();
+const APIPortFilename = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`);
 const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`);
 const flagsFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-flags.json`);
 let ports = [];
@@ -322,13 +324,13 @@ const updatePorts = async () => {
         const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
         matched = checkFlags(tweet);
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
-            matched = matched || checkCooldown(tweet);
+            matched = checkCooldown(tweet) || matched;
         }
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
-            matched = matched || checkPBAndRaid(tweet);
+            matched = checkPBAndRaid(tweet) || matched;
         }
         else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
-            matched = matched || checkPort(tweet);
+            matched = checkPort(tweet) || matched;
             if (!matched) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
             }
@@ -338,9 +340,38 @@ const updatePorts = async () => {
         await saveJsonAsync(portFilename, ports);
     }
 };
-const updateTwitter = async () => {
+const getAPIPortData = () => {
+    xz("unxz", `${APIPortFilename}.xz`);
+    const apiPorts = readJson(APIPortFilename);
+    xz("xz", APIPortFilename);
+    return apiPorts;
+};
+const getPortMaintenanceDefaults = () => {
+    const apiPorts = getAPIPortData();
+    const currentPorts = readJson(portFilename);
+    const getCaptureDate = (portId) => {
+        const index = currentPorts.findIndex((port) => port.id === portId);
+        return currentPorts[index].captured;
+    };
+    ports = apiPorts.map((apiPort) => ({
+        id: Number(apiPort.Id),
+        name: cleanName(apiPort.Name),
+        nation: findNationById(apiPort.Nation).short,
+        capturer: apiPort.Capturer,
+        captured: getCaptureDate(Number(apiPort.Id)),
+    }));
+};
+const getPortCurrent = () => {
     ports = readJson(portFilename);
+};
+const updateTwitter = async () => {
     flagsPerNations = readJson(flagsFilename);
+    if (runType.startsWith("full")) {
+        getPortMaintenanceDefaults();
+    }
+    else {
+        getPortCurrent();
+    }
     initFlags();
     tweets = await getTweets();
     await updatePorts();

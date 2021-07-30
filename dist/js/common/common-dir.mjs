@@ -36,7 +36,6 @@ export function getCommonPaths(appRoot = process.env.PWD ?? "") {
         dirLib,
         dirGenServer,
         dirGenGeneric,
-        fileTwitterRefreshId: buildPath(dirAPI, "response-id.txt"),
         filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
         filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),
         fileBuilding: buildPath(dirGenGeneric, "buildings.json"),
