@@ -1541,10 +1541,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@netlify/build@^17.1.1":
-  version "17.1.1"
-  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-17.1.1.tgz#0207c37c5469032042a7b87d9f0338407995ad00"
-  integrity sha512-ulYaC/nCveDar8QGyl64wVtdjpbcUYM58/jHssVDgBiK3jQrDt6oZ5vG1sAJLDOY8ReXAtW1MqiIKLDImsk/4g==
+"@netlify/build@^17.3.1":
+  version "17.3.1"
+  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-17.3.1.tgz#4272156edc3c576e82be03b43df2112cc30052ce"
+  integrity sha512-xHxhdefsugGOzeoj4vLabZ29mDN6MRTT+Q3IR/iQKbDk5vlMr3pcT8EhowLBLhSoC1NnfskRbaFBtftxn5VWPw==
   dependencies:
     "@bugsnag/js" "^7.0.0"
     "@netlify/cache-utils" "^2.0.0"
@@ -1552,7 +1552,7 @@
     "@netlify/functions-utils" "^2.0.0"
     "@netlify/git-utils" "^2.0.0"
     "@netlify/plugin-edge-handlers" "^1.11.22"
-    "@netlify/plugins-list" "^2.19.3"
+    "@netlify/plugins-list" "^2.21.0"
     "@netlify/run-utils" "^2.0.0"
     "@netlify/zip-it-and-ship-it" "^4.15.1"
     "@sindresorhus/slugify" "^1.1.0"
@@ -1617,10 +1617,10 @@
     path-exists "^4.0.0"
     readdirp "^3.4.0"
 
-"@netlify/config@^14.0.0":
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/@netlify/config/-/config-14.0.0.tgz#ce9f3ead76a4642bba8f2becef219c45b2b8a79d"
-  integrity sha512-Ke7rEmHAy9N5qxaY9uCGrnDjCllC2lqMg1kn8p6qse0y+qkptkdlKnD0pBSDaUIsNfmyX3omvw0/d5vr0qNofA==
+"@netlify/config@^14.0.0", "@netlify/config@^14.1.0":
+  version "14.1.0"
+  resolved "https://registry.yarnpkg.com/@netlify/config/-/config-14.1.0.tgz#3e8fae6129c8fcfe1e913637a69cab7824b2dd8f"
+  integrity sha512-XgBIaKA+itg5uOAYOTt3uZmfyIFtC4t0vKPgf/CoEzWQ323g83fpwxbdqtGkqhw0bYgt0iWPKsoibnLdyoG1vQ==
   dependencies:
     "@ungap/from-entries" "^0.2.1"
     array-flat-polyfill "^1.0.1"
@@ -1796,10 +1796,10 @@
     rollup-plugin-terser "^7.0.2"
     typescript "^4.1.5"
 
-"@netlify/plugins-list@^2.19.3":
-  version "2.19.3"
-  resolved "https://registry.yarnpkg.com/@netlify/plugins-list/-/plugins-list-2.19.3.tgz#63ee1138a3fc4a1d1f6a956d4c9c13f44490271e"
-  integrity sha512-Z2RNrNhO7fsNFmpUQ+eNawgtfHwbGH/4Hji2g+GCRYL7W60kgK5rsWxveky1Nrye45I2OQn/4ZGapKqB1IqTaw==
+"@netlify/plugins-list@^2.21.0":
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/@netlify/plugins-list/-/plugins-list-2.21.0.tgz#181410ff81f1425130aba83a886d8fdd87a672e2"
+  integrity sha512-uo1yeph8fJdldX+7qPIcflw7bEIXdU5repRVcxTfTgGgRrMJ75JDTVoXwujKYNlGNZN9hKj94uDSZ0B5FQq8Tw==
 
 "@netlify/routing-local-proxy-darwin-arm64@^0.31.0":
   version "0.31.0"
@@ -2612,10 +2612,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^16.4.5":
-  version "16.4.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.4.5.tgz#eac95d4e52775190c405f0b9061ddcfb0304f7fc"
-  integrity sha512-+0GPv/hIFNoy8r5MFf7vRpBjnqNYNrlHdetoy23E7TYc7JB2ctwyi3GMKpviozaHQ/Sy2kBNUTvG9ywN66zV1g==
+"@types/node@*", "@types/node@^16.4.7":
+  version "16.4.7"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.4.7.tgz#f7afa78769d4b477f5092d7c3468e2e8653d779c"
+  integrity sha512-aDDY54sst8sx47CWT6QQqIZp45yURq4dic0+HCYfYNcY5Ejlb/CLmFnRLfy3wQuYafOeh3lB/DAKaqRKBtcZmA==
 
 "@types/node@^14.0.1", "@types/node@^14.0.27", "@types/node@^14.14.28":
   version "14.17.5"
@@ -4910,10 +4910,10 @@ core-js@^2.4.0:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
   integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
-core-js@^3.15.2:
-  version "3.15.2"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.15.2.tgz#740660d2ff55ef34ce664d7e2455119c5bdd3d61"
-  integrity sha512-tKs41J7NJVuaya8DxIOCnl8QuPHx5/ZVbFo1oKgVl1qHFBBrDctzQGtuLjPpRdNTWmKPH6oEvgN/MUID+l485Q==
+core-js@^3.16.0:
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.16.0.tgz#1d46fb33720bc1fa7f90d20431f36a5540858986"
+  integrity sha512-5+5VxRFmSf97nM8Jr2wzOwLqRo6zphH2aX+7KsAUONObyzakDNq2G/bgbhinxB4PoV9L3aXQYhiDKyIKWd2c8g==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -10558,17 +10558,17 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-netlify-cli@^5.2.11:
-  version "5.2.11"
-  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-5.2.11.tgz#9becd666d0caea97ccc42a2cd02881dcfb75b7b3"
-  integrity sha512-bM2Mf9rCw1JZRLsn0ByDfnZizUq+reh2vUrzFsMfKemsaiWZBo0EY3S8+UGb898bzIhkuJsa41g56lygZUfrRg==
+netlify-cli@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-5.3.1.tgz#7a25dacceb1564988506122e01454a560c515946"
+  integrity sha512-694ZZdsFDzJNRRSZVNpour0DYhkPX613drfRyaepz9yjHRm/vlJ3jq5i64GZW9bOjhZY1HW+cve0fhYmkIyVNQ==
   dependencies:
-    "@netlify/build" "^17.1.1"
-    "@netlify/config" "^14.0.0"
+    "@netlify/build" "^17.3.1"
+    "@netlify/config" "^14.1.0"
     "@netlify/framework-info" "^5.7.2"
     "@netlify/local-functions-proxy" "^1.0.0"
     "@netlify/plugin-edge-handlers" "^1.11.22"
-    "@netlify/plugins-list" "^2.19.3"
+    "@netlify/plugins-list" "^2.21.0"
     "@netlify/routing-local-proxy" "^0.31.0"
     "@netlify/zip-it-and-ship-it" "4.15.1"
     "@oclif/command" "^1.6.1"
@@ -15341,10 +15341,10 @@ webpack-sources@^1.4.3:
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack-sources@^3.0.1:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.0.2.tgz#29942415daf201a06278f8e2b92e44e564a9288e"
-  integrity sha512-XQ6aGLmqoxZtmpbgwySGhYLNFav1W6+qgMWPGgn6qScxfGrQgMdigkUqZXQ7oB0ydUrvfs9RRyHaSfV153K8Xg==
+webpack-sources@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.1.1.tgz#586d15bc9a9723765f6a735f672357d6402f9c57"
+  integrity sha512-ztUmIWq0LWaw+1YyR3bXtUPjt8vQedtI9WxGn/q1V1ASHsombnaso7MN9S25lzKS/OuC9Q8lEg3GsZexjDbdlQ==
 
 webpack-subresource-integrity@^5.0.0-alpha.5:
   version "5.0.0-alpha.5"
@@ -15353,10 +15353,10 @@ webpack-subresource-integrity@^5.0.0-alpha.5:
   dependencies:
     typed-assert "^1.0.4"
 
-webpack@5.47.0, webpack@^5, webpack@^5.1.0, webpack@^5.37.0:
-  version "5.47.0"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.47.0.tgz#3c13862b5d7b428792bfe76c5f67a0f43ba685f8"
-  integrity sha512-soKLGwcUM1R3YEbJhJNiZzy7T43TnI7ENda/ywfDp9G1mDlDTpO+qfc8I5b0AzMr9xM3jyvQ0n7ctJyiXuXW6Q==
+webpack@5.47.1, webpack@^5, webpack@^5.1.0, webpack@^5.37.0:
+  version "5.47.1"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.47.1.tgz#20fb7d76f68912a2249a6dd7ff16faa178049ad2"
+  integrity sha512-cW+Mzy9SCDapFV4OrkHuP6EFV2mAsiQd+gOa3PKtHNoKg6qPqQXZzBlHH+CnQG1osplBCqwsJZ8CfGO6XWah0g==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.50"
@@ -15380,7 +15380,7 @@ webpack@5.47.0, webpack@^5, webpack@^5.1.0, webpack@^5.37.0:
     tapable "^2.1.1"
     terser-webpack-plugin "^5.1.3"
     watchpack "^2.2.0"
-    webpack-sources "^3.0.1"
+    webpack-sources "^3.1.1"
 
 websocket-driver@>=0.5.1, websocket-driver@^0.7.4:
   version "0.7.4"
