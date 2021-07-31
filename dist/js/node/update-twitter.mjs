@@ -217,98 +217,80 @@ const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+
 const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
 const checkFlags = (tweet) => {
     let result;
-    let matched;
     if ((result = acquireFlagRegex.exec(tweet)) !== null) {
-        matched = true;
         flagAcquired(result);
     }
-    else {
-        matched = false;
-    }
-    return matched;
 };
 const checkCooldown = (tweet) => {
     let result;
-    let matched = true;
+    isPortDataChanged = true;
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else {
-        matched = false;
+        isPortDataChanged = false;
     }
-    return matched;
 };
 const checkPBAndRaid = (tweet) => {
     let result;
-    let matched = true;
+    isPortDataChanged = true;
     if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         npcPortBattleScheduled(result);
     }
     else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         portBattleScheduled(result);
     }
-    else {
-        matched = false;
+    else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
+        cooledOff(result);
     }
-    return matched;
+    else {
+        isPortDataChanged = false;
+    }
 };
 const checkPort = (tweet) => {
     let result;
     let matched = true;
+    isPortDataChanged = true;
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         captured(result);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         npcCaptured(result);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         hostilityLevelUp(result);
     }
     else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         hostilityLevelDown(result);
     }
     else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         npcPortBattleScheduled(result);
     }
     else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         portBattleScheduled(result);
     }
     else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooledOff(result);
     }
     else if (rumorRegex.exec(tweet) !== null) {
     }
     else {
+        isPortDataChanged = false;
         matched = false;
     }
     return matched;
@@ -317,20 +299,21 @@ const updatePorts = async () => {
     for (const tweet of tweets) {
         console.log("\ntweet", tweet);
         const result = checkDateRegex.exec(tweet);
-        let matched;
         if (!result) {
             return;
         }
         const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
-        matched = checkFlags(tweet);
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(2, "day"))) {
-            matched = checkCooldown(tweet) || matched;
+        checkFlags(tweet);
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(3, "day")) &&
+            tweetTime.isBefore(dayjs.utc(currentServerStartDateTime))) {
+            checkCooldown(tweet);
         }
-        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day"))) {
-            matched = checkPBAndRaid(tweet) || matched;
+        if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day")) &&
+            tweetTime.isBefore(dayjs.utc(currentServerStartDateTime))) {
+            checkPBAndRaid(tweet);
         }
         else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
-            matched = checkPort(tweet) || matched;
+            const matched = checkPort(tweet);
             if (!matched) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
             }
