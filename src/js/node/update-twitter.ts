@@ -472,7 +472,7 @@ const updatePorts = async (): Promise<void> => {
             checkPBAndRaid(tweet)
         } else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
             const matched = checkPort(tweet)
-            if (!matched) {
+            if (!matched && acquireFlagRegex.exec(tweet) === null) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`)
             }
         }
