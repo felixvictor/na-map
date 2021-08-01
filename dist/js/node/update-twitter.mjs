@@ -314,7 +314,7 @@ const updatePorts = async () => {
         }
         else if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime))) {
             const matched = checkPort(tweet);
-            if (!matched) {
+            if (!matched && acquireFlagRegex.exec(tweet) === null) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
             }
         }
