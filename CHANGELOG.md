@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.2.0](///compare/v13.1.9...v13.2.0) (2021-08-03)
+
+
+### Features
+
+* **select ports:** port battle time window added 229a977
+
 ### [13.1.9](///compare/v13.1.8...v13.1.9) (2021-08-01)
 
 
