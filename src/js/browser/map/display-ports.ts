@@ -42,6 +42,7 @@ import {
     colourLight,
     colourList,
     colourRedDark,
+    getPortBattleTimeHtml,
     loadJsonFile,
     loadJsonFiles,
     nationFlags,
@@ -588,15 +589,6 @@ export default class DisplayPorts {
         }
         */
 
-        const formatFromToTime = (from: number, to: number): HtmlResult =>
-            html`<span style="white-space: nowrap;">${String(from)} ‒ ${String(to)}</span>`
-
-        const formatTime = (from: number, to: number): HtmlResult => {
-            const fromLocal = Number(dayjs.utc().hour(from).local().format("H"))
-            const toLocal = Number(dayjs.utc().hour(to).local().format("H"))
-            return html`${formatFromToTime(from, to)} (${formatFromToTime(fromLocal, toLocal)})`
-        }
-
         const portBattleST = dayjs.utc(portProperties.portBattle)
         const portBattleLT = dayjs.utc(portProperties.portBattle).local()
         const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
@@ -604,9 +596,7 @@ export default class DisplayPorts {
         const cooldownTimeST = dayjs.utc(portProperties.cooldownTime)
         const cooldownTimeLT = dayjs.utc(portProperties.cooldownTime).local()
         const cooldownTimeLocal = cooldownTimeST === cooldownTimeLT ? "" : ` (${cooldownTimeLT.format("H.mm")} local)`
-        const portBattleStartTime = portProperties.portBattleStartTime
-            ? formatTime((portProperties.portBattleStartTime + 10) % 24, (portProperties.portBattleStartTime + 13) % 24)
-            : formatTime(11, 8)
+        const portBattleStartTime = getPortBattleTimeHtml(portProperties.portBattleStartTime)
         const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
         const attackHostility = portProperties.portBattle
             ? html`<span

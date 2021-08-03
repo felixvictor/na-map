@@ -22,6 +22,7 @@ import { initMultiDropdownNavbar } from "common/common-browser"
 import { serverMaintenanceHour } from "common/common-var"
 
 import DisplayPorts from "../display-ports"
+import SelectPBTimeWindow from "./pb-time"
 import SelectPortsSelectGoods from "./goods"
 import SelectPortsSelectPorts from "./ports"
 import SelectPortsNationClan from "./nation-clan"
@@ -38,6 +39,7 @@ export default class SelectPorts {
         void new SelectPortsSelectPorts(ports)
         void new SelectPortsSelectGoods(ports)
         this.#nationClan = new SelectPortsNationClan(ports)
+        void new SelectPBTimeWindow(ports)
 
         this._setupListener()
     }
