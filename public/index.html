@@ -1,0 +1,512 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!doctype html>
+<html itemscope itemtype="http://schema.org/Map" lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <title>Naval Action map</title>
+    <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." name="description">
+    
+        <link href="https://na-map.netlify.app/" rel="canonical">
+    
+    <meta content="Naval Action map" property="og:title" itemprop="name">
+    <meta content="Yet another map with in-game map, resources, ship and wood comparisons. Port battle data is updated constantly from twitter and all data daily after maintenance." property="og:description" itemprop="description">
+    <meta content="images/icons/firefox_app_512x512.png" property="og:image" itemprop="image">
+    <meta content="https://na-map.netlify.app/" property="og:url" itemprop="url">
+
+    <meta content="en_gb" property="og:locale">
+    <meta content="website" property="og:type">
+
+    <meta content="summary_large_image" name="twitter:card">
+
+    <script src="https://www.google-analytics.com/analytics.js" async></script>
+<meta content="width=device-width,initial-scale=1,shrink-to-fit=no" name="viewport"><link href="/images/icons/favicon.ico" rel="shortcut icon" crossorigin="anonymous" integrity="sha384-BiTrnBcpEggQZqDIWEL+PiJ1xmmfWaA/3Rd8WudsgLh3fJVCrGBEeS2I2yQG20A7"><link href="/images/icons/favicon-16x16.png" rel="icon" crossorigin="anonymous" integrity="sha384-/7f6z/2Rtrz3kOgIGnCtv3C2hp98QHClDD2OYZWGjVgafNqdsT77aU0b2pYrcE0k" sizes="16x16" type="image/png"><link href="/images/icons/favicon-32x32.png" rel="icon" crossorigin="anonymous" integrity="sha384-nyoVH10fhEUIBxP8o5Zn3r6jZXkPvmW1/tL6eNlNARF2EsTto2b1riDb7t1CYHx3" sizes="32x32" type="image/png"><link href="/images/icons/favicon-48x48.png" rel="icon" crossorigin="anonymous" integrity="sha384-NZJPhlPV6cfsxVXviOVlpCZpiglxXH0JuG9rY4iumsDEQmOfKRXT7Ata34NH4IYM" sizes="48x48" type="image/png"><link href="/images/icons/manifest.json" rel="manifest" crossorigin="anonymous" integrity="sha384-osCkpk3sc9frn+BCWjVXH8ZbOYkGQ50cX3Jp+9HAmJfH4P2OGwIRVUzwSBBA9CQR"><meta content="yes" name="mobile-web-app-capable"><meta content="#666542" name="theme-color"><meta content="na-map" name="application-name"><meta content="#847563" name="msapplication-TileColor"><meta content="/images/icons/mstile-144x144.png" name="msapplication-TileImage"><meta content="/images/icons/browserconfig.xml" name="msapplication-config"><link href="/main.dae3f8457d512e785cb9.css" rel="stylesheet" crossorigin="anonymous" integrity="sha384-f1K6I+gswAd/hAz84pCbhJo/yXevUWXLdT7m4UNRudagLaV5mziuLyTYwPE8uKIq"></head>
+
+<body class="data-bs-no-jquery">
+
+
+
+<nav class="navbar navbar-expand-xl navbar-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img alt="Brand" height="32" src="images/icons/android-chrome-48x48.png" width="32">
+        </a>
+        <button aria-label="Toggle navigation" class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="d-none me-auto navbar-nav" id="navbar-left">
+
+                <div id="selectPortNavbar">
+                    <div class="nav-item pe-2 dropdown">
+                        <a class="dropdown-toggle nav-link" id="propertyDropdown" href="#" aria-expanded="false" data-bs-toggle="dropdown" role="button">
+                            Select ports on
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="propertyDropdown" id="propertyMenu">
+                            <li><h6 class="dropdown-header">Port owner</h6></li>
+                            <li><label class="dropend">
+                                    <select id="port-select-nation-select" name="port-select-nation-select" title="Select nation"></select>
+                                </label></li>
+                            <li><label class="dropend">
+                                    <select id="port-select-clan-select" name="port-select-clan-select" title="Select clan"></select>
+                                </label></li>
+
+                            <li><h6 class="dropdown-header mt-3">Port property</h6></li>
+                            <li><a class="dropdown-item" id="menu-prop-deep">Deep water</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-shallow">Shallow water</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-all">Available to all</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-non-capturable">Non-capturable</a></li>
+
+                            <li><h6 class="dropdown-header mt-3">Port capture time</h6></li>
+                            <li><a class="dropdown-item" id="menu-prop-today">Today</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-yesterday">Yesterday</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-this-week">This week</a></li>
+                            <li><a class="dropdown-item" id="menu-prop-last-week">Last week</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                
+                
+    
+        
+
+
+
+        <li class="nav-item pe-2">
+            <label><select id="port-select-show-trade-relations-select" name="port-select-show-trade-relations-select" title="Show trade relations" class="selectpicker" data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true" data-live-search-placeholder="Search ..." data-virtual-scroll="true"></select></label>
+        </li>
+    
+        
+
+
+
+        <li class="nav-item pe-2">
+            <label><select id="port-select-show-goods-relations-select" name="port-select-show-goods-relations-select" title="Show goods’ relations" class="selectpicker" data-dropup-auto="false" data-live-search="true" data-live-search-normalize="true" data-live-search-placeholder="Search ..." data-virtual-scroll="true"></select></label>
+        </li>
+    
+
+
+                <div class="nav-item pe-2">
+                    <label><select id="port-select-show-good-availability-select" name="port-select-show-good-availability-select" class="d-none"></select></label>
+                </div>
+            </div>
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item pe-2 dropdown">
+                    <a class="dropdown-toggle nav-link" id="map-tools-dropdown" href="#" aria-expanded="false" data-bs-toggle="dropdown" role="button" aria-label="Map tools" title="Map tools">
+                        <i aria-label="Map tools" class="icon icon-navbar icon-map-tools" role="img"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-md" aria-labelledby="map-tools-dropdown" id="map-tools-menu">
+
+                        
+                        
+    
+        
+
+
+
+        <li><a class="align-items-center d-flex dropdown-item" id="menu-predict-wind"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Predict wind" class="icon icon-menu icon-wind" role="img"></i></span>
+                <div class="menu-item-text">
+                    
+                        Predict wind
+                    
+                </div>
+            </a></li>
+    
+        
+
+
+
+        <li><a class="align-items-center d-flex dropdown-item" id="menu-in-game-wind"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="In-game wind" class="icon icon-menu icon-ingame-wind" role="img"></i></span>
+                <div class="menu-item-text">
+                    
+                        In-game wind
+                    
+                </div>
+            </a></li>
+    
+        
+
+
+
+        <li><a class="align-items-center d-flex dropdown-item" id="menu-go-to-f11"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Go to F11" class="icon icon-menu icon-geo" role="img"></i></span>
+                <div class="menu-item-text">
+                    
+                        Go to <span class="caps">F11</span>
+                        <span class="badge badge-pill bg-primary small text-end">shift+<span class="caps">F11</span></span>
+                    
+                </div>
+            </a></li>
+    
+        
+
+
+
+        <li><a class="align-items-center d-flex dropdown-item" id="menu-get-position"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Get position" class="icon icon-menu icon-position" role="img"></i></span>
+                <div class="menu-item-text">
+                    
+                        Get position
+                    
+                </div>
+            </a></li>
+    
+        
+
+
+
+        <li><a class="align-items-center d-flex dropdown-item" id="menu-make-journey"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Make journey" class="icon icon-menu icon-journey" role="img"></i></span>
+                <div class="menu-item-text">
+                    
+                        Make journey
+                    
+                </div>
+            </a></li>
+    
+
+
+                    </ul>
+                </li>
+
+                <li class="nav-item pe-2 dropdown">
+                    <a class="dropdown-toggle nav-link" id="game-tools-dropdown" href="#" aria-expanded="false" data-bs-toggle="dropdown" role="button" aria-label="Game tools" title="Game tools">
+                        <i aria-label="Game tools" class="icon icon-navbar icon-bar-chart" role="img"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-xl" aria-labelledby="game-tools-dropdown" id="game-tools-menu">
+
+                        
+                        
+    <div class="g-0 row row-cols-1 row-cols-md-2">
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-compare-ship"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Ship compare" class="icon icon-menu icon-sailing" role="img"></i></span>
+                    <div class="menu-item-text">Ship compare</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-compare-wood"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Wood compare" class="icon icon-menu icon-wood" role="img"></i></span>
+                    <div class="menu-item-text">Wood compare</div>
+                </a></li>
+        
+    </div>
+
+
+                        <li><div class="dropdown-divider my-3"></div></li>
+                        
+                        
+    <div class="g-0 row row-cols-1 row-cols-md-2">
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-admiralty-items-and-recipes"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Admiralty items and recipes" class="icon icon-menu icon-admiralty" role="img"></i></span>
+                    <div class="menu-item-text">Admiralty items and recipes</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-buildings"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Buildings" class="icon icon-menu icon-building" role="img"></i></span>
+                    <div class="menu-item-text">Buildings</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-cannons"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Cannons" class="icon icon-menu icon-cannon" role="img"></i></span>
+                    <div class="menu-item-text">Cannons</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-conquest-flags"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Conquest flags" class="icon icon-menu icon-flag" role="img"></i></span>
+                    <div class="menu-item-text">Conquest flags</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-loot-and-chests"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Loot and chests" class="icon icon-menu icon-loot" role="img"></i></span>
+                    <div class="menu-item-text">Loot and chests</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-modules"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Modules" class="icon icon-menu icon-modules" role="img"></i></span>
+                    <div class="menu-item-text">Modules</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-port-battles"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Port battles" class="icon icon-menu icon-war" role="img"></i></span>
+                    <div class="menu-item-text">Port battles</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-port-bonuses"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Port bonuses" class="icon icon-menu icon-bonus" role="img"></i></span>
+                    <div class="menu-item-text">Port bonuses</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-recipe-ingredients"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Recipe ingredients" class="icon icon-menu icon-ingredient" role="img"></i></span>
+                    <div class="menu-item-text">Recipe ingredients</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-ships"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Ships" class="icon icon-menu icon-sailing" role="img"></i></span>
+                    <div class="menu-item-text">Ships</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-ship-blueprints"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Ship blueprints" class="icon icon-menu icon-labour" role="img"></i></span>
+                    <div class="menu-item-text">Ship blueprints</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-list-woods"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Woods" class="icon icon-menu icon-wood" role="img"></i></span>
+                    <div class="menu-item-text">Woods</div>
+                </a></li>
+        
+    </div>
+
+
+                        <li><div class="dropdown-divider my-3"></div></li>
+                        
+                        
+    <div class="g-0 row row-cols-1 row-cols-md-2">
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-show-net-income"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Net income" class="icon icon-menu icon-income" role="img"></i></span>
+                    <div class="menu-item-text">Net income</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-show-ownership-overview"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Ownership overview" class="icon icon-menu icon-overview" role="img"></i></span>
+                    <div class="menu-item-text">Ownership overview</div>
+                </a></li>
+        
+            
+
+
+
+            <li><a class="align-items-center d-flex dropdown-item" id="menu-show-power-map"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Power map" class="icon icon-menu icon-map" role="img"></i></span>
+                    <div class="menu-item-text">Power map</div>
+                </a></li>
+        
+    </div>
+
+
+                        <li><div class="dropdown-divider my-3"></div></li>
+                        
+                        <li><a class="align-items-center d-flex dropdown-item" id="menu-download-pb-calc" href="data/port-battle.xlsx" download="port-battle-calculator.xlsx"><span class="align-items-center d-flex icon-menu-label justify-content-center me-2 p-2"><i aria-label="Port battle calculator" class="icon icon-menu icon-spreadsheet" role="img"></i></span>Port battle calculator</a>
+                        </li>
+                    </ul>
+
+                </li>
+
+                <li class="nav-item pe-2 dropdown">
+                    <a class="dropdown-toggle nav-link" id="settingsDropdown" href="#" aria-expanded="false" data-bs-toggle="dropdown" role="button" aria-label="Settings" title="Settings">
+                        <i aria-label="Settings" class="icon icon-navbar icon-options" role="img"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg" aria-labelledby="settingsDropdown" id="settingsMenu">
+                    <form>
+                        
+                        
+                        
+    <h6 class="dropdown-header">Game server</h6>
+    <div class="mb-3 ms-3" id="server-name">
+        
+            <input autocomplete="off" class="btn-check" id="server-name-eu1" name="server-name" type="radio" value="eu1">
+            <label class="btn btn-toggle" for="server-name-eu1" title="War">
+                <i aria-label="War" class="icon icon-navbar icon-war" role="img"></i>
+            </label>
+        
+            <input autocomplete="off" class="btn-check" id="server-name-eu2" name="server-name" type="radio" value="eu2">
+            <label class="btn btn-toggle" for="server-name-eu2" title="Peace">
+                <i aria-label="Peace" class="icon icon-navbar icon-peace" role="img"></i>
+            </label>
+        
+    </div>
+
+
+                        
+                        
+    <h6 class="dropdown-header">Show per port</h6>
+    <div class="mb-3 ms-3" id="show-radius">
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-attack" name="show-radius" type="radio" value="attack">
+            <label class="btn btn-toggle text-body" for="show-radius-attack">Attack</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-county" name="show-radius" type="radio" value="county">
+            <label class="btn btn-toggle text-body" for="show-radius-county">County</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-position" name="show-radius" type="radio" value="position">
+            <label class="btn btn-toggle text-body" for="show-radius-position">Position</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-points" name="show-radius" type="radio" value="points">
+            <label class="btn btn-toggle text-body" for="show-radius-points">Points</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-tax" name="show-radius" type="radio" value="tax">
+            <label class="btn btn-toggle text-body" for="show-radius-tax">Tax income</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-net" name="show-radius" type="radio" value="net">
+            <label class="btn btn-toggle text-body" for="show-radius-net">Net income</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-radius-off" name="show-radius" type="radio" value="off">
+            <label class="btn btn-toggle text-body" for="show-radius-off">Off</label>
+        
+    </div>
+
+
+                        
+                        
+    <h6 class="dropdown-header">Zones</h6>
+    <div class="mb-3 ms-3" id="show-zones">
+        
+            <input autocomplete="off" class="btn-check" id="show-zones-pb-all" name="show-zones" type="radio" value="pb-all">
+            <label class="btn btn-toggle text-body" for="show-zones-pb-all">All ports</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-zones-pb-single" name="show-zones" type="radio" value="pb-single">
+            <label class="btn btn-toggle text-body" for="show-zones-pb-single">Single port</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-zones-raid-all" name="show-zones" type="radio" value="raid-all">
+            <label class="btn btn-toggle text-body" for="show-zones-raid-all">All raid</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-zones-raid-single" name="show-zones" type="radio" value="raid-single">
+            <label class="btn btn-toggle text-body" for="show-zones-raid-single">Single raid</label>
+        
+            <input autocomplete="off" class="btn-check" id="show-zones-off" name="show-zones" type="radio" value="off">
+            <label class="btn btn-toggle text-body" for="show-zones-off">Off</label>
+        
+    </div>
+
+
+                        
+                        
+    <h6 class="dropdown-header">Show Trades</h6>
+    <div class="mb-3 ms-3" id="show-trades">
+        <input autocomplete="off" class="btn-check" id="show-trades-show-trades" name="show-trades" type="checkbox">
+        <label class="btn btn-toggle" for="show-trades-show-trades" title="Show Trades">
+            <i aria-label="Show Trades" class="icon icon-navbar icon-show-trades" role="img"></i>
+        </label>
+    </div>
+
+
+                        
+                        
+    <h6 class="dropdown-header">Show grid</h6>
+    <div class="mb-3 ms-3" id="show-grid">
+        <input autocomplete="off" class="btn-check" id="show-grid-show-grid" name="show-grid" type="checkbox">
+        <label class="btn btn-toggle" for="show-grid-show-grid" title="Show grid">
+            <i aria-label="Show grid" class="icon icon-navbar icon-show-grid" role="img"></i>
+        </label>
+    </div>
+
+
+                        
+                        
+    <h6 class="dropdown-header">Double click to</h6>
+    <div class="mb-3 ms-3" id="double-click-action">
+        
+            <input autocomplete="off" class="btn-check" id="double-click-action-compass" name="double-click-action" type="radio" value="compass">
+            <label class="btn btn-toggle" for="double-click-action-compass" title="Plot a course">
+                <i aria-label="Plot a course" class="icon icon-navbar icon-show-course" role="img"></i>
+            </label>
+        
+            <input autocomplete="off" class="btn-check" id="double-click-action-f11" name="double-click-action" type="radio" value="f11">
+            <label class="btn btn-toggle" for="double-click-action-f11" title="Show F11 coordinates">
+                <i aria-label="Show F11 coordinates" class="icon icon-navbar icon-show-f11" role="img"></i>
+            </label>
+        
+    </div>
+
+                    </form>
+                    </ul>
+                </li>
+
+                <form>
+                    <div class="btn-group" role="group">
+                        <button aria-label="Clear" class="btn px-2" type="button" id="reset" title="Clear">
+                            <i aria-label="Clear" class="icon icon-navbar icon-clear" role="img"></i>
+                        </button>
+                        <a class="btn px-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MHRQ7ZGR88XSG&source=url" role="button" aria-label="Donate" title="Donate" rel="”noopener”" target="_blank">
+                            <i aria-label="Donate" class="icon icon-navbar icon-gift" role="img"></i>
+                        </a>
+                        <button aria-label="About" class="btn px-2" type="button" id="about" title="About">
+                            <i aria-label="About" class="icon icon-navbar icon-info" role="img"></i>
+                        </button>
+                    </div>
+                </form>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid" role="main">
+    <div class="central" id="na-map"></div>
+    <div class="overlay overlay-no-grid">
+        <div class="wind-predict-column" id="wind">
+            <svg class="d-none shadow svg-background-light svg-text-center"></svg>
+        </div>
+        <div class="align-items-start toast-column" id="toast-column" aria-atomic="true" aria-live="polite"></div>
+        <div class="summary-column" id="summary-column"></div>
+    </div>
+    <div id="modal-section"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="></script>
+<script src="/runtime.88dbe2d688df87ff96da.mjs" crossorigin="anonymous" integrity="sha384-uKZ3NJEarff5w/VlS91jKXaNrDgiKh90hDLdgHylV8cZyccIeBa6HQUfh7Il4Q/o" defer></script><script src="/844.d12da390c21250062efd.mjs" crossorigin="anonymous" integrity="sha384-NI64Zqk5DBaKd0irGSEtIikJ+acUVf7RhKMOuIlcnloY9Tv5TLIXQJiYoZ9jCyT6" defer></script><script src="/main.2abcff4c4a8f30969bd1.mjs" crossorigin="anonymous" integrity="sha384-Qy7G1Q1r0+ZT1R4udE8QwO1Ixj73WnE6G5Frp9H3mUE1CHnVo1Cle3e2gr/rL4KS" defer></script></body>
+</html>
