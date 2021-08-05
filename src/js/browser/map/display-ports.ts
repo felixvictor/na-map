@@ -379,11 +379,13 @@ export default class DisplayPorts {
 
     _setupPatrolZones(): void {
         const start = dayjs.utc("2021-01-17").hour(serverMaintenanceHour)
-        let index = dayjs.utc().diff(start, "day") % patrolZones.length
 
+        let index = dayjs.utc().diff(start, "day")
         if (this.#serverName === "eu2") {
             index += 4
         }
+
+        index %= patrolZones.length
 
         // console.log(start.format("YYYY-MM-DD hh.mm"), index)
 
