@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.2.3](///compare/v13.2.2...v13.2.3) (2021-08-05)
+
+
+### Bug Fixes
+
+* **get tweets:** cooldown after recent capture 7373f9a
+
 ### [13.2.2](///compare/v13.2.1...v13.2.2) (2021-08-05)
 
 
