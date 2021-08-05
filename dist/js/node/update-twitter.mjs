@@ -39,12 +39,12 @@ const guessNationFromClanName = (clanName) => {
     return port ? port.nation : "n/a";
 };
 const getPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
-const getCooldownTime = (tweetTime) => getTimeEstimate(tweetTime, dateTimeFormatTwitter);
-const getCaptureTime = (tweetTime) => getTimeEstimate(tweetTime, dateTimeFormat);
+const getCooldownTime = (tweetTime) => getTimeEstimate(tweetTime, dateTimeFormatTwitter).add(portBattleCooldown, "hour").format(dateTimeFormat);
+const getCaptureTime = (tweetTime) => getTimeEstimate(tweetTime, dateTimeFormat).format(dateTimeFormat);
 const getTimeEstimate = (time, format) => {
     const timeDayjs = dayjs.utc(time, format);
     const timeEstimated = timeDayjs.subtract((5 * 60) / 2, "second");
-    return timeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat);
+    return timeEstimated;
 };
 const getActiveTime = (time) => time.add(flagValidity, "days");
 const updatePort = (portName, updatedPort) => {
