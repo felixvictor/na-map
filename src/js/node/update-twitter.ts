@@ -73,16 +73,18 @@ const guessNationFromClanName = (clanName: string): AttackerNationShortName => {
 
 const getPortIndex = (portName: string): number => ports.findIndex((port) => port.name === portName)
 
-const getCooldownTime = (tweetTime: string | undefined): string => getTimeEstimate(tweetTime, dateTimeFormatTwitter)
+const getCooldownTime = (tweetTime: string | undefined): string =>
+    getTimeEstimate(tweetTime, dateTimeFormatTwitter).add(portBattleCooldown, "hour").format(dateTimeFormat)
 
-const getCaptureTime = (tweetTime: string | undefined): string => getTimeEstimate(tweetTime, dateTimeFormat)
+const getCaptureTime = (tweetTime: string | undefined): string =>
+    getTimeEstimate(tweetTime, dateTimeFormat).format(dateTimeFormat)
 
-const getTimeEstimate = (time: string | undefined, format: string|undefined): string => {
+const getTimeEstimate = (time: string | undefined, format: string | undefined): dayjs.Dayjs => {
     const timeDayjs = dayjs.utc(time, format)
     // Tweets every 5 minutes, get the estimated time at 2.5 minutes
     const timeEstimated = timeDayjs.subtract((5 * 60) / 2, "second")
 
-    return timeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat)
+    return timeEstimated
 }
 
 const getActiveTime = (time: dayjs.Dayjs): dayjs.Dayjs => time.add(flagValidity, "days")
