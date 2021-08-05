@@ -95,8 +95,6 @@ export default class SelectPortsSelectInventory {
     _getPortList(goodIdSelected: number, buyGoods: goodMap, sellGoods: goodMap): HtmlString {
         let h: HtmlString = ""
 
-        console.log(goodIdSelected)
-
         h += `<h5>${this.#ports.tradeItem.get(goodIdSelected)?.name ?? ""}</h5>`
         if (buyGoods.size > 0) {
             h += "<h6>Buy</h6>"

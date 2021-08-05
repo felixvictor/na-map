@@ -50,6 +50,9 @@ let isPortDataChanged = false
 const dateTimeFormat = "YYYY-MM-DD HH:mm"
 const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm"
 
+const getTweetTime = (time: string): string => getTweetTimeDayjs(time).format(dateTimeFormat)
+const getTweetTimeDayjs = (time: string): dayjs.Dayjs => dayjs.utc(time, dateTimeFormatTwitter)
+
 /**
  * Find port by name of port owning clan
  * @param clanName - Clan name
@@ -70,19 +73,16 @@ const guessNationFromClanName = (clanName: string): AttackerNationShortName => {
 
 const getPortIndex = (portName: string): number => ports.findIndex((port) => port.name === portName)
 
-const getPortBattleTime = (portName: string): string | undefined => {
-    const portIndex = getPortIndex(portName)
-    const portBattleTime = ports[portIndex].portBattle
+const getCooldownTime = (tweetTime: string | undefined): string => getTimeEstimate(tweetTime, dateTimeFormatTwitter)
 
-    return portBattleTime
-}
+const getCaptureTime = (tweetTime: string | undefined): string => getTimeEstimate(tweetTime, dateTimeFormat)
 
-const getCooldownTime = (tweetTime: string | undefined): string => {
-    const tweetTimeDayjs = dayjs.utc(tweetTime, dateTimeFormatTwitter)
+const getTimeEstimate = (time: string | undefined, format: string|undefined): string => {
+    const timeDayjs = dayjs.utc(time, format)
     // Tweets every 5 minutes, get the estimated time at 2.5 minutes
-    const portBattleEndTimeEstimated = tweetTimeDayjs.subtract((5 * 60) / 2, "second")
+    const timeEstimated = timeDayjs.subtract((5 * 60) / 2, "second")
 
-    return portBattleEndTimeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat)
+    return timeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat)
 }
 
 const getActiveTime = (time: dayjs.Dayjs): dayjs.Dayjs => time.add(flagValidity, "days")
@@ -128,18 +128,19 @@ const cooldownOn = (result: RegExpExecArray): void => {
  */
 const portCaptured = (result: RegExpExecArray, nation: string, capturer: string): void => {
     const portName = result[2]
-    const portBattleTime = getPortBattleTime(portName)
+    const tweetTime = getTweetTime(result[1])
+    const captured = getCaptureTime(tweetTime)
 
     console.log("      --- captured", portName)
 
     const updatedPort = {
         nation,
         capturer,
-        captured: portBattleTime,
+        captured,
     } as PortBattlePerServer
 
-    cooldownOn(result)
     updatePort(portName, updatedPort)
+    cooldownOn(result)
 }
 
 /**
@@ -249,8 +250,8 @@ const flagAcquired = (result: RegExpExecArray): void => {
     const nationName = result[2]
     const nationId = findNationByName(nationName)?.id ?? 0
     const numberOfFlags = Number(result[3])
-    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter)
-    const active = getActiveTime(tweetTime).format(dateTimeFormat)
+    const tweetTimeDayjs = getTweetTimeDayjs(result[1])
+    const active = getActiveTime(tweetTimeDayjs).format(dateTimeFormat)
 
     console.log("      --- conquest flag", numberOfFlags, nationName, active)
 
@@ -454,7 +455,7 @@ const updatePorts = async (): Promise<void> => {
             return
         }
 
-        const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm")
+        const tweetTime = getTweetTimeDayjs(result[1])
 
         checkFlags(tweet)
 
