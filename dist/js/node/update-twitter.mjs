@@ -31,21 +31,20 @@ let tweets = [];
 let isPortDataChanged = false;
 const dateTimeFormat = "YYYY-MM-DD HH:mm";
 const dateTimeFormatTwitter = "DD-MM-YYYY HH:mm";
+const getTweetTime = (time) => getTweetTimeDayjs(time).format(dateTimeFormat);
+const getTweetTimeDayjs = (time) => dayjs.utc(time, dateTimeFormatTwitter);
 const findPortByClanName = (clanName) => ports.find((port) => port.capturer === clanName);
 const guessNationFromClanName = (clanName) => {
     const port = findPortByClanName(clanName);
     return port ? port.nation : "n/a";
 };
 const getPortIndex = (portName) => ports.findIndex((port) => port.name === portName);
-const getPortBattleTime = (portName) => {
-    const portIndex = getPortIndex(portName);
-    const portBattleTime = ports[portIndex].portBattle;
-    return portBattleTime;
-};
-const getCooldownTime = (tweetTime) => {
-    const tweetTimeDayjs = dayjs.utc(tweetTime, dateTimeFormatTwitter);
-    const portBattleEndTimeEstimated = tweetTimeDayjs.subtract((5 * 60) / 2, "second");
-    return portBattleEndTimeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat);
+const getCooldownTime = (tweetTime) => getTimeEstimate(tweetTime, dateTimeFormatTwitter);
+const getCaptureTime = (tweetTime) => getTimeEstimate(tweetTime, dateTimeFormat);
+const getTimeEstimate = (time, format) => {
+    const timeDayjs = dayjs.utc(time, format);
+    const timeEstimated = timeDayjs.subtract((5 * 60) / 2, "second");
+    return timeEstimated.add(portBattleCooldown, "hour").format(dateTimeFormat);
 };
 const getActiveTime = (time) => time.add(flagValidity, "days");
 const updatePort = (portName, updatedPort) => {
@@ -73,15 +72,16 @@ const cooldownOn = (result) => {
 };
 const portCaptured = (result, nation, capturer) => {
     const portName = result[2];
-    const portBattleTime = getPortBattleTime(portName);
+    const tweetTime = getTweetTime(result[1]);
+    const captured = getCaptureTime(tweetTime);
     console.log("      --- captured", portName);
     const updatedPort = {
         nation,
         capturer,
-        captured: portBattleTime,
+        captured,
     };
-    cooldownOn(result);
     updatePort(portName, updatedPort);
+    cooldownOn(result);
 };
 const captured = (result) => {
     const nation = findNationByName(result[4])?.short ?? "";
@@ -146,8 +146,8 @@ const flagAcquired = (result) => {
     const nationName = result[2];
     const nationId = findNationByName(nationName)?.id ?? 0;
     const numberOfFlags = Number(result[3]);
-    const tweetTime = dayjs.utc(result[1], dateTimeFormatTwitter);
-    const active = getActiveTime(tweetTime).format(dateTimeFormat);
+    const tweetTimeDayjs = getTweetTimeDayjs(result[1]);
+    const active = getActiveTime(tweetTimeDayjs).format(dateTimeFormat);
     console.log("      --- conquest flag", numberOfFlags, nationName, active);
     const flag = { expire: active, number: numberOfFlags };
     const flagsSet = flagsMap.get(nationId) ?? new Set();
@@ -302,7 +302,7 @@ const updatePorts = async () => {
         if (!result) {
             return;
         }
-        const tweetTime = dayjs.utc(result[1], "DD-MM-YYYY HH:mm");
+        const tweetTime = getTweetTimeDayjs(result[1]);
         checkFlags(tweet);
         if (tweetTime.isAfter(dayjs.utc(currentServerStartDateTime).subtract(3, "day")) &&
             tweetTime.isBefore(dayjs.utc(currentServerStartDateTime))) {
