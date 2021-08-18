@@ -140,6 +140,25 @@ const svgoOpt = {
     ]),
 }
 
+/* svgo v2.4.0
+const svgoOpt = {
+    multipass: true,
+    plugins: [
+        {
+            name: "preset-default",
+            params: {
+                overrides: {
+                    removeViewBox: false,
+                },
+            },
+        },
+        {
+            name: "removeScriptElement",
+        },
+    ],
+}
+*/
+
 // noinspection JSIncompatibleTypesComparison
 const htmlOpt: HtmlPlugin.Options = {
     iconSmall: `${dirPrefixIcons}/android-chrome-48x48.png`,
