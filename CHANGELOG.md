@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.2.9](///compare/v13.2.8...v13.2.9) (2021-09-04)
+
+
+### Bug Fixes
+
+* **get-twitter:** sort flags by nation id 423cf36
+
 ### [13.2.8](///compare/v13.2.7...v13.2.8) (2021-09-04)
 
 
