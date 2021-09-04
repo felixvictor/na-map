@@ -96,7 +96,7 @@ export default class ListRecipes {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: BootstrapSelectOptions = {
+        const bsSelectOptions: Partial<BootstrapSelectOptions> = {
             dropupAuto: false,
             liveSearch: true,
             liveSearchNormalize: true,

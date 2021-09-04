@@ -177,7 +177,7 @@ export default class ShowPortOwnerships {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select region" }
+        const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: "Select region" }
 
         this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
     }

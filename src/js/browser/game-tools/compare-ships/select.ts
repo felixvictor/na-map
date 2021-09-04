@@ -121,7 +121,7 @@ export class CompareShipsSelect {
 
     initModuleSelects(columnId: string, moduleType: ModuleType, options: HtmlString): void {
         const divBaseId = this.#modal.getBaseId(columnId)
-        const bsSelectOptions: BootstrapSelectOptions = {
+        const bsSelectOptions: Partial<BootstrapSelectOptions> = {
             actionsBox: true,
             countSelectedText(amount: number) {
                 return `${amount} ${moduleType.toLowerCase()}s selected`

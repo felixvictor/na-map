@@ -15,7 +15,7 @@ import { HtmlString } from "common/interface"
 
 export default class Select {
     #select$ = {} as JQuery<HTMLSelectElement>
-    readonly #bsSelectOptions: BootstrapSelectOptions
+    readonly #bsSelectOptions: Partial<BootstrapSelectOptions>
     readonly #id: HtmlString
     readonly #isMultiple: boolean
     readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown> | undefined
@@ -24,7 +24,7 @@ export default class Select {
     constructor(
         id: HtmlString,
         selectsDivId: HtmlString | undefined,
-        bsSelectOptions: BootstrapSelectOptions,
+        bsSelectOptions: Partial<BootstrapSelectOptions>,
         options: HtmlString,
         isMultiple = false
     ) {

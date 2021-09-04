@@ -159,7 +159,7 @@ export default class ListLoot {
 
         for (const type of this.#types) {
             const title = type === "loot" ? "ship loot" : type === "fish" ? "fishing region" : type
-            const selectpickerOptions: BootstrapSelectOptions = {
+            const selectpickerOptions: Partial<BootstrapSelectOptions> = {
                 dropupAuto: false,
                 liveSearch: true,
                 liveSearchNormalize: true,

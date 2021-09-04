@@ -70,7 +70,7 @@ export default class ListBuildings {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: BootstrapSelectOptions = { noneSelectedText: "Select building" }
+        const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: "Select building" }
 
         this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions(), false)
         this.#labelSel = this.#modal!.selectsSel.select("label")
