@@ -76,7 +76,7 @@ export class CompareShipsSelect {
     getSelectedWoodIds(columnId: ShipColumnType): Map<string, number> {
         const woodIds = new Map<string, number>()
 
-        for (const type of [...woodType]) {
+        for (const type of woodType) {
             const id = this.getSelectedWoodId(columnId, type)
             woodIds.set(type, id)
         }
@@ -87,7 +87,7 @@ export class CompareShipsSelect {
     getSelectedModuleIds(columnId: ShipColumnType, moduleTypes: Set<ModuleType>): Map<string, number[]> {
         const moduleIds = new Map<string, number[]>()
 
-        for (const type of [...moduleTypes]) {
+        for (const type of moduleTypes) {
             const ids = this.getSelectedModuleIdsPerType(columnId, type)
             moduleIds.set(type, ids)
         }

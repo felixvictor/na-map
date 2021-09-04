@@ -236,7 +236,7 @@ export const convertCannons = async (): Promise<void> => {
     getBaseFileNames(commonPaths.dirModules)
 
     // Get all files without a master
-    for (const baseFileName of [...fileNames]) {
+    for (const baseFileName of fileNames) {
         const fileData = getFileData(baseFileName)
         addData(fileData)
     }

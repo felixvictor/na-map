@@ -229,10 +229,9 @@ const fillPattern = (fgColour: string): Excel.FillPattern => ({
  */
 const fontColourBold = (colour: string): Partial<Excel.Font> => ({
     ...defaultFont,
-    ...{
-        bold: true,
-        color: { argb: colour },
-    },
+
+    bold: true,
+    color: { argb: colour },
 })
 
 const border: Partial<Excel.Borders> = {
@@ -247,7 +246,7 @@ const border: Partial<Excel.Borders> = {
 }
 
 const brTooHigh: Partial<Excel.Style> = {
-    font: { ...fontColourBold(colourRed), ...{ size: 14 } },
+    font: { ...fontColourBold(colourRed), size: 14 },
 }
 
 /**

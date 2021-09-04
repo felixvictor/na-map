@@ -602,7 +602,7 @@ export class CompareShips {
     _getSelectedModuleTexts(columnId: ShipColumnType): Map<string, string> {
         const modules = new Map<string, string>()
 
-        for (const type of [...this.#moduleTypes]) {
+        for (const type of this.#moduleTypes) {
             const ids = this.#selects.getSelectedModuleIdsPerType(columnId, type)
             const text = [] as string[]
             for (const id of ids) {

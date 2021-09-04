@@ -296,7 +296,7 @@ export class ColumnBase extends Column {
             .attr("transform", (d) => `rotate(${-d.initRotate},${d.compassTextX},${d.compassTextY})`)
             .text((d) => this._getHeadingInCompass(d.initRotate))
 
-        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase)!)
+        gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
 
         // Speed marker
         gWindProfile

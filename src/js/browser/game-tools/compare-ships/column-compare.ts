@@ -240,10 +240,10 @@ export class ColumnCompare extends Column {
             .attr("transform", `rotate(${this._windProfile.initRotate})`)
 
         // Base profile shape
-        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase)!)
+        this._gWindProfile.append("path").attr("class", "base-profile").attr("d", line(arcsBase))
 
         // Comp profile lines
-        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp)!)
+        this._gWindProfile.append("path").attr("class", "comp-profile").attr("d", line(this._arcsComp))
     }
 
     updateWindProfileRotation(): void {
