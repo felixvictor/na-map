@@ -300,7 +300,7 @@ const cleanFlags = (): FlagsPerNation[] => {
         }
     }
 
-    return cleanedFlagsPerNation
+    return cleanedFlagsPerNation.sort(sortBy(["nation"]))
 }
 
 const initFlags = (): void => {
