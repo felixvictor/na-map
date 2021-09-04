@@ -180,7 +180,7 @@ const cleanFlags = () => {
             });
         }
     }
-    return cleanedFlagsPerNation;
+    return cleanedFlagsPerNation.sort(sortBy(["nation"]));
 };
 const initFlags = () => {
     for (const flagsPerNation of flagsPerNations) {
