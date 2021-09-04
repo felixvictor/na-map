@@ -55,11 +55,6 @@
         "size:css": "find public/ -iname '*.css' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
         "start": "TS_NODE_PROJECT='tsconfig-for-webpack-config.json' webpack serve --config webpack.config.ts --mode=development --color --hot --open"
     },
-    "husky": {
-        "hooks": {
-            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-        }
-    },
     "browserslist": [
         "defaults and supports es6-module and last 1 version and not ios > 0 and not safari > 0"
     ],
@@ -173,7 +168,7 @@
         "favicons-webpack-plugin": "^5.0.2",
         "git": "^0.1.5",
         "html-webpack-plugin": "^5.3.2",
-        "husky": "4",
+        "husky": "^7.0.2",
         "lzma-native": "^8.0.1",
         "mini-css-extract-plugin": "^2.2.2",
         "mini-svg-data-uri": "^1.3.3",
