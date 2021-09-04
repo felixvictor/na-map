@@ -29,7 +29,7 @@
         "lint:css": "stylelint --config .stylelintrc --syntax scss \"src/scss/*.scss\"",
         "lint:ejs": "ejslint src/ejs",
         "lint:js": "eslint -c .eslintrc.json --ext .ts,.tsx src/js",
-        "main:between": "                     run-s                                     'build:data:twitter partial-server'         build:deploy-main-quiet",
+        "main:between": "yarn run build:data:twitter partial-server && (git diff-index --quiet HEAD || yarn run build:deploy-main-quiet)",
         "main:develop-test": "                run-s build:load build:js                 'build:data:* full-client'                  build:deploy-test",
         "main:develop-test2": "               run-s build:load build:js                 'build:data:* full-client'                  build:deploy-test2",
         "main:maintenance": "yarn --silent && run-s build:load                          'build:data:* full-server'                  build:deploy-main-quiet",
