@@ -55,7 +55,7 @@ const deleteAPIFiles = (fileName: string): void => {
  */
 const readNAJson = async (url: URL): Promise<Error | APIType[]> => {
     try {
-        const response = await nodeFetch(url)
+        const response = await nodeFetch(url.toString())
         if (response.ok) {
             const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "")
             return JSON.parse(text) as APIType[]

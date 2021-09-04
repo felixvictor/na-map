@@ -66,7 +66,7 @@ const readTwitterJson = async (parameters: TwitterQueryParameters): Promise<Erro
     }
 
     try {
-        const response = await nodeFetch(url, options)
+        const response = await nodeFetch(url.toString(), options)
 
         if (response.ok) {
             return (await response.json()) as TwitterSearchResult
