@@ -29,7 +29,7 @@ const readTwitterJson = async (parameters) => {
         url.searchParams.set(key, String(value));
     }
     try {
-        const response = await nodeFetch(url, options);
+        const response = await nodeFetch(url.toString(), options);
         if (response.ok) {
             return (await response.json());
         }

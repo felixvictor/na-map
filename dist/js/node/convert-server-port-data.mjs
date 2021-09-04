@@ -236,7 +236,7 @@ const setAndSaveFrontlines = async (serverName) => {
         }
     }
     const frontlineDefendingNation = {};
-    for (const [key, fromPorts] of [...frontlineDefendingNationMap]) {
+    for (const [key, fromPorts] of frontlineDefendingNationMap) {
         const nationShortName = key.slice(0, 2);
         const toPortId = Number(key.slice(2));
         if (!frontlineDefendingNation[nationShortName]) {

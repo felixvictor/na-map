@@ -151,10 +151,8 @@ const fillPattern = (fgColour) => ({
 });
 const fontColourBold = (colour) => ({
     ...defaultFont,
-    ...{
-        bold: true,
-        color: { argb: colour },
-    },
+    bold: true,
+    color: { argb: colour },
 });
 const border = {
     top: {
@@ -167,7 +165,7 @@ const border = {
     },
 };
 const brTooHigh = {
-    font: { ...fontColourBold(colourRed), ...{ size: 14 } },
+    font: { ...fontColourBold(colourRed), size: 14 },
 };
 const getExcelAlpha = (colNum) => {
     let remaining = colNum;

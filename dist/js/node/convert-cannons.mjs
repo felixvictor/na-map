@@ -129,7 +129,7 @@ const addData = (fileData) => {
 };
 export const convertCannons = async () => {
     getBaseFileNames(commonPaths.dirModules);
-    for (const baseFileName of [...fileNames]) {
+    for (const baseFileName of fileNames) {
         const fileData = getFileData(baseFileName);
         addData(fileData);
     }
