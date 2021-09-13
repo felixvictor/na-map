@@ -24,7 +24,6 @@
                 "plugin:@typescript-eslint/recommended",
                 "plugin:unicorn/recommended",
                 "xo",
-                "xo-typescript",
                 "plugin:prettier/recommended"
             ],
             "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
