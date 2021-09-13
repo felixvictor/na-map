@@ -138,6 +138,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Repair time"],
         ["ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness"],
         ["ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness"],
+        ["DECK_ALL CANNON_BASIC_DAMAGE", "Cannon damage"],
         ["DECK_ALL CANNON_BASIC_PENETRATION", "Cannon ball penetration"],
         ["DECK_ALL CANNON_CREW_REQUIRED", "Cannon crew"],
         ["DECK_ALL CANNON_DISPERSION_PER100M", "Cannon horizontal dispersion"],
