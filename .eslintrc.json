@@ -6,6 +6,7 @@
             "impliedStrict": true
         },
         "ecmaVersion": 2020,
+        "project": "tsconfig.json",
         "sourceType": "module"
     },
     "env": {
@@ -22,8 +23,8 @@
             "extends": [
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
+                "prettier",
                 "plugin:unicorn/recommended",
-                "xo",
                 "plugin:prettier/recommended"
             ],
             "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
@@ -59,10 +60,7 @@
                 "@typescript-eslint/no-unsafe-member-access": "off",
                 "@typescript-eslint/no-unsafe-return": "off",
                 "@typescript-eslint/non-nullable-type-assertion-style": "off",
-                "@typescript-eslint/restrict-template-expressions": [
-                    "error",
-                    { "allowNullable": true, "allowNumber": true }
-                ],
+                "@typescript-eslint/restrict-template-expressions": ["error", { "allowNullish": true }],
                 "@typescript-eslint/prefer-readonly-parameter-types": "off",
                 "@typescript-eslint/member-delimiter-style": [
                     "error",
@@ -86,12 +84,7 @@
                 "es2020": true,
                 "node": true
             },
-            "extends": [
-                "eslint:recommended",
-                "plugin:unicorn/recommended",
-                "xo",
-                "plugin:prettier/recommended"
-            ],
+            "extends": ["eslint:recommended", "plugin:unicorn/recommended", "plugin:prettier/recommended"],
             "rules": {
                 "capitalized-comments": "off",
                 "new-cap": "off",

@@ -410,7 +410,8 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleType = (module: ModuleConvertEntity): string => {
         let type: string
-        let { moduleLevel, moduleType, name, permanentType, sortingGroup, usageType } = module
+        let { permanentType, sortingGroup } = module
+        const { moduleLevel, moduleType, name, usageType } = module
 
         if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim"
@@ -544,6 +545,7 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
                 }
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
             modules.set(
                 cleanedModule.name + cleanedModule.moduleLevel,

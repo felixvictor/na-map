@@ -199,10 +199,9 @@ export type NationListOptional<T> = {
 export type NationArrayList<T> = {
     [K in NationShortName]: ArrayIndex<T>
 }
-export type NationList<T> = T &
-    {
-        [K in NationShortName]: T
-    }
+export type NationList<T> = T & {
+    [K in NationShortName]: T
+}
 export type NationListAlternative<T> = {
     [K in NationShortName | NationShortNameAlternative]: T
 }

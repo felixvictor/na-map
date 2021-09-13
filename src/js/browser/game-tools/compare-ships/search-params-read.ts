@@ -34,7 +34,7 @@ export class ShipCompareSearchParamsRead extends ShipCompareSearchParams {
 
     _getModules(): void {
         for (const [keys, codedValue] of super.searchParams.entries()) {
-            const [columnIndex, moduleTypeIndex] = keys.split("")
+            const [columnIndex, moduleTypeIndex] = [...keys]
             const value = ShipCompareSearchParams.getDecodedValue(codedValue)
             const columnId = this._getColumnId(Number(columnIndex))
             const moduleType = this._getModuleType(Number(moduleTypeIndex))

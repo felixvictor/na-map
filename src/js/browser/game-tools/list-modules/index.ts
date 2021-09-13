@@ -65,7 +65,10 @@ export default class ListModules {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: "Select module category", width: "fit" }
+        const bsSelectOptions: Partial<BootstrapSelectOptions> = {
+            noneSelectedText: "Select module category",
+            width: "fit",
+        }
 
         this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
     }

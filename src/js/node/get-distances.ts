@@ -204,6 +204,7 @@ class Map {
         const queue = new Deque([[startIndex, 0]])
 
         while (foundPortIds.size + this.#completedPorts.size < this.#port.numPorts && queue.length > 0) {
+            // eslint-disable-next-line prefer-const
             let [index, pixelDistance] = queue.shift() as [Index, PixelDistance]
             const spot = this.getPortId(this.getSpot(index))
 
