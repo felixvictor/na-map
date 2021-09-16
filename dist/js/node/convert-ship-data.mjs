@@ -273,11 +273,11 @@ const convertGenericShipData = () => {
         for (let deckIndex = 0; deckIndex <= sideDeckMaxIndex; deckIndex += 1) {
             addDeck(apiShip.DeckClassLimit[deckIndex], deckIndex);
             const gunsPerDeck = guns.gunsPerDeck[deckIndex].amount;
-            const cannonBroadsideDamage = ((cannonData.get(guns.gunsPerDeck[deckIndex].maxCannonLb)?.damage ?? 0) * gunsPerDeck) / 2;
+            const cannonBroadsideDamage = Math.round(((cannonData.get(guns.gunsPerDeck[deckIndex].maxCannonLb)?.damage ?? 0) * gunsPerDeck) / 2);
             guns.total += gunsPerDeck;
             guns.damage.carronades +=
                 cannonData.get(guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0
-                    ? (cannonData.get(gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0) / 2
+                    ? Math.round((cannonData.get(gunsPerDeck * guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0) / 2)
                     : cannonBroadsideDamage;
             guns.damage.cannons += cannonBroadsideDamage;
         }

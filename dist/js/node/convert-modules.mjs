@@ -94,6 +94,7 @@ export const convertModulesAndWoodData = async () => {
         ["ARMOR_ALL_SIDES REPAIR_MODULE_TIME", "Repair time"],
         ["ARMOR_BACK ARMOR_THICKNESS", "Back armour thickness"],
         ["ARMOR_FRONT ARMOR_THICKNESS", "Front armour thickness"],
+        ["DECK_ALL CANNON_BASIC_DAMAGE", "Cannon damage"],
         ["DECK_ALL CANNON_BASIC_PENETRATION", "Cannon ball penetration"],
         ["DECK_ALL CANNON_CREW_REQUIRED", "Cannon crew"],
         ["DECK_ALL CANNON_DISPERSION_PER100M", "Cannon horizontal dispersion"],
@@ -329,7 +330,8 @@ export const convertModulesAndWoodData = async () => {
     };
     const getModuleType = (module) => {
         let type;
-        let { moduleLevel, moduleType, name, permanentType, sortingGroup, usageType } = module;
+        let { permanentType, sortingGroup } = module;
+        const { moduleLevel, moduleType, name, usageType } = module;
         if (usageType === "All" && sortingGroup && moduleLevel === "U" && moduleType === "Hidden") {
             type = "Ship trim";
         }
