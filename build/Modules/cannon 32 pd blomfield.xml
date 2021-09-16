@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>154</Value>
+        <Value>126.8</Value>
       </Value>
     </Pair>
     <Pair>
@@ -70,13 +70,13 @@
     <Pair>
       <Key>CANNON_DISPERSION_PER100M</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4.4</Value>
+        <Value>4</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>CANNON_DISPERSION_VERTICAL_PER100M</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>13.2</Value>
+        <Value>4</Value>
       </Value>
     </Pair>
     <Pair>
@@ -88,7 +88,7 @@
     <Pair>
       <Key>CANNON_RELOAD_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>62.4</Value>
+        <Value>53</Value>
       </Value>
     </Pair>
     <Pair>
@@ -130,7 +130,7 @@
     <Pair>
       <Key>CANNON_BASIC_PENETRATION</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>206</Value>
+        <Value>212</Value>
       </Value>
     </Pair>
     <Pair>
@@ -378,21 +378,21 @@
         </Value>
         <Value>
           <Time>0.9</Time>
-          <Value>0.49</Value>
-          <TangentIn>-0.5000003</TangentIn>
-          <TangentOut>-0.5000003</TangentOut>
+          <Value>0.5</Value>
+          <TangentIn>-0.400000364</TangentIn>
+          <TangentOut>-0.400000364</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>0.45</Value>
-          <TangentIn>-0.400000125</TangentIn>
-          <TangentOut>-0.400000125</TangentOut>
+          <Value>0.46</Value>
+          <TangentIn>-0.399999827</TangentIn>
+          <TangentOut>-0.399999827</TangentOut>
         </Value>
         <Value>
           <Time>1.1</Time>
           <Value>0.42</Value>
-          <TangentIn>-0.299999952</TangentIn>
-          <TangentOut>-0.299999952</TangentOut>
+          <TangentIn>-0.400000125</TangentIn>
+          <TangentOut>-0.400000125</TangentOut>
         </Value>
         <Value>
           <Time>1.2</Time>
@@ -435,7 +435,7 @@
     <Pair>
       <Key>CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>7.61</Value>
       </Value>
     </Pair>
     <Pair>

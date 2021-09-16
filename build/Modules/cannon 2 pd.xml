@@ -34,13 +34,13 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>53</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>CANNON_FIREPOWER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>520</Value>
+        <Value>525</Value>
       </Value>
     </Pair>
     <Pair>
@@ -58,13 +58,13 @@
     <Pair>
       <Key>CANNON_DISPERSION_PER100M</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>5.5</Value>
+        <Value>7</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>CANNON_DISPERSION_VERTICAL_PER100M</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>14.2</Value>
+        <Value>7</Value>
       </Value>
     </Pair>
     <Pair>
@@ -76,7 +76,7 @@
     <Pair>
       <Key>CANNON_RELOAD_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>25</Value>
+        <Value>35</Value>
       </Value>
     </Pair>
     <Pair>
@@ -268,7 +268,7 @@
     <Pair>
       <Key>CANNON_FORWARD_FLY_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>0.3</Value>
+        <Value>0.4</Value>
       </Value>
     </Pair>
     <Pair>
