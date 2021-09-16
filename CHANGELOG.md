@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.3.0](///compare/v13.2.9...v13.3.0) (2021-09-16)
+
+
+### Features
+
+* **patch:** 16 September 2021 patch (cannons, ships, woods) 0140609
+
+
+### Bug Fixes
+
+* **modules:** 10 September patch e44dfe9
+* **modules:** round cannon damage d2483e5
+
 ### [13.2.9](///compare/v13.2.8...v13.2.9) (2021-09-04)
 
 
