@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.1](///compare/v13.3.0...v13.3.1) (2021-09-16)
+
+
+### Bug Fixes
+
+* **about:** clan BSTD -> BASTD e78e213
+
 ## [13.3.0](///compare/v13.2.9...v13.3.0) (2021-09-16)
 
 
