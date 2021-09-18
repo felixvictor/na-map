@@ -533,9 +533,6 @@ const updateTwitter = async (): Promise<void> => {
     tweets = await getTweets()
     await updatePorts()
     await updateFlags()
-    if (runType.startsWith("partial")) {
-        process.exitCode = Number(!isPortDataChanged)
-    }
 }
 
 void updateTwitter()
