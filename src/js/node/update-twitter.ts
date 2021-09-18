@@ -379,74 +379,66 @@ const checkFlags = (tweet: string): void => {
 
 const checkCooldown = (tweet: string): void => {
     let result: RegExpExecArray | null
+    isPortDataChanged = true
 
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooldownOn(result)
     } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooldownOn(result)
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooldownOn(result)
         // eslint-disable-next-line no-negated-condition
     } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooldownOn(result)
+    } else {
+        isPortDataChanged = false
     }
 }
 
 const checkPBAndRaid = (tweet: string): void => {
     let result: RegExpExecArray | null
+    isPortDataChanged = true
 
     if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         npcPortBattleScheduled(result)
     } else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         portBattleScheduled(result)
         // eslint-disable-next-line no-negated-condition
     } else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooledOff(result)
+    } else {
+        isPortDataChanged = false
     }
 }
 
 const checkPort = (tweet: string): boolean => {
     let result: RegExpExecArray | null
     let matched = true
+    isPortDataChanged = true
 
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         captured(result)
     } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         npcCaptured(result)
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooldownOn(result)
     } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooldownOn(result)
     } else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         hostilityLevelUp(result)
     } else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         hostilityLevelDown(result)
     } else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         npcPortBattleScheduled(result)
     } else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         portBattleScheduled(result)
     } else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true
         cooledOff(result)
         // eslint-disable-next-line no-negated-condition
     } else if (rumorRegex.exec(tweet) !== null) {
         // noop
     } else {
+        isPortDataChanged = false
         matched = false
     }
 
@@ -488,7 +480,7 @@ const updatePorts = async (): Promise<void> => {
             }
         }
     }
-console.log("isPortDataChanged", isPortDataChanged)
+
     if (isPortDataChanged) {
         await saveJsonAsync(portFilename, ports)
     }
