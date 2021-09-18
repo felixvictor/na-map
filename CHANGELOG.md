@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.2](///compare/v13.3.1...v13.3.2) (2021-09-18)
+
+
+### Bug Fixes
+
+* **update-twitter:** return code removed 5b51927
+
 ### [13.3.1](///compare/v13.3.0...v13.3.1) (2021-09-16)
 
 
