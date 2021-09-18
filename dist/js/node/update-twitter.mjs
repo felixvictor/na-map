@@ -223,80 +223,74 @@ const checkFlags = (tweet) => {
 };
 const checkCooldown = (tweet) => {
     let result;
+    isPortDataChanged = true;
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
+    }
+    else {
+        isPortDataChanged = false;
     }
 };
 const checkPBAndRaid = (tweet) => {
     let result;
+    isPortDataChanged = true;
     if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         npcPortBattleScheduled(result);
     }
     else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         portBattleScheduled(result);
     }
     else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooledOff(result);
+    }
+    else {
+        isPortDataChanged = false;
     }
 };
 const checkPort = (tweet) => {
     let result;
     let matched = true;
+    isPortDataChanged = true;
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         captured(result);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         npcCaptured(result);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooldownOn(result);
     }
     else if ((result = hostilityLevelUpRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         hostilityLevelUp(result);
     }
     else if ((result = hostilityLevelDownRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         hostilityLevelDown(result);
     }
     else if ((result = npcPortBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         npcPortBattleScheduled(result);
     }
     else if ((result = portBattleRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         portBattleScheduled(result);
     }
     else if ((result = gainHostilityRegex.exec(tweet)) !== null) {
-        isPortDataChanged = true;
         cooledOff(result);
     }
     else if (rumorRegex.exec(tweet) !== null) {
     }
     else {
+        isPortDataChanged = false;
         matched = false;
     }
     return matched;
@@ -325,7 +319,6 @@ const updatePorts = async () => {
             }
         }
     }
-    console.log("isPortDataChanged", isPortDataChanged);
     if (isPortDataChanged) {
         await saveJsonAsync(portFilename, ports);
     }
