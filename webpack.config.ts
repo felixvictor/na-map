@@ -18,7 +18,7 @@ import { SubresourceIntegrityPlugin } from "webpack-subresource-integrity"
 import SitemapPlugin from "sitemap-webpack-plugin"
 import TerserPlugin from "terser-webpack-plugin"
 import svgToMiniDataURI from "mini-svg-data-uri"
-import { extendDefaultPlugins, optimize } from "svgo"
+import { DefaultPlugin, DefaultPlugins, optimize } from "svgo"
 
 import PACKAGE from "./package.json"
 import { argv } from "yargs"
@@ -128,36 +128,18 @@ const sassLoaderOpt = {
 
 const svgoOpt = {
     multipass: true,
-    plugins: extendDefaultPlugins([
-        {
-            name: "removeScriptElement",
-            active: true,
-        },
-        {
-            name: "removeViewBox",
-            active: false,
-        },
-    ]),
-}
-
-/* svgo v2.4.0
-const svgoOpt = {
-    multipass: true,
     plugins: [
         {
             name: "preset-default",
             params: {
                 overrides: {
                     removeViewBox: false,
+                    removeScriptElement: true,
                 },
             },
-        },
-        {
-            name: "removeScriptElement",
-        },
+        } as DefaultPlugins,
     ],
 }
-*/
 
 // noinspection JSIncompatibleTypesComparison
 const htmlOpt: HtmlPlugin.Options = {
