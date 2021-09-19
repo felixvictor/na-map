@@ -16,7 +16,7 @@ import convert, { ElementCompact } from "xml-js"
 import { currentServerStartDate as serverDate, isEmpty, sortBy } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file"
-import { roundToThousands, speedConstM, speedConstB } from "../common/common-math"
+import { roundToThousands, speedConstM, speedConstB, round } from "../common/common-math"
 import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
@@ -286,7 +286,7 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
 const getSpeedDegrees = (specs: Specs): { maxSpeed: number; speedDegrees: number[] } => {
-    const maxSpeed = specs.MaxSpeed * speedConstM - speedConstB
+    const maxSpeed = round(specs.MaxSpeed * speedConstM - speedConstB, 2)
     const speedDegrees = specs.SpeedToWind.map((speed: number) => roundToThousands(speed * maxSpeed))
     const { length } = specs.SpeedToWind
 
