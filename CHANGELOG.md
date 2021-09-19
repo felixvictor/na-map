@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.7](///compare/v13.3.6...v13.3.7) (2021-09-19)
+
+
+### Bug Fixes
+
+* **list ships:** table header corrected 50ffb6b
+* **ship speeds:** max speed with 2 decimals 2d81e07
+* **ship speeds:** ship list with calculated ship speeds (not from game files anymore) c4820bc
+* **ship speeds:** speed cap removed 8cc9a33
+* **ship speeds:** updated calculation 6d2b7d5
+* **wood data:** frame and trim have properties removed ca5a486
+
 ### [13.3.6](///compare/v13.3.5...v13.3.6) (2021-09-18)
 
 
