@@ -363,7 +363,7 @@ export class CompareShips {
 
     async _setupData(): Promise<void> {
         const theoreticalMinSpeed = (d3Min(this.#shipData, (ship) => ship.speed.min) ?? 0) * 1.2
-        const theoreticalMaxSpeed = this.#moduleAndWoodCaps.get("Max speed")?.cap.amount ?? Number.POSITIVE_INFINITY
+        const theoreticalMaxSpeed = this.#moduleAndWoodCaps.get("Max speed")?.cap.amount ?? 20
 
         this.#minSpeed = theoreticalMinSpeed
         this.#maxSpeed = theoreticalMaxSpeed
