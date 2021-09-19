@@ -65,7 +65,7 @@
     "dependencies": {
         "@d3fc/d3fc-label-layout": "^7.0.3",
         "@popperjs/core": "^2.10.1",
-        "bootstrap": "^5.0.2",
+        "bootstrap": "^5.1.1",
         "bootstrap-select": "https://github.com/snapappointments/bootstrap-select.git#v1.14-dev",
         "d3-area-label": "^1.5.0",
         "d3-array": "^3.0.2",
