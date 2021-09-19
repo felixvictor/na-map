@@ -98,6 +98,6 @@ export const moduleAndWoodCaps = new Map<ModifierName, PropertyWithCap>([
             cap: { amount: 1, isPercentage: true },
         },
     ],
-    ["Max speed", { properties: ["speed.max"], cap: { amount: 18, isPercentage: false } }],
+    ["Max speed", { properties: ["speed.max"], cap: { amount: Number.POSITIVE_INFINITY, isPercentage: false } }],
     ["Turn rate", { properties: ["rudder.turnSpeed"], cap: { amount: 0.25, isPercentage: true } }],
 ])
