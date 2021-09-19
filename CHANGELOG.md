@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.8](///compare/v13.3.7...v13.3.8) (2021-09-19)
+
+
+### Bug Fixes
+
+* **ship speeds:** ship list with calculated ship speeds (not from game files anymore) f45024b
+* **ship speeds:** speed cap set to 20 knots 52fa7d6
+
 ### [13.3.7](///compare/v13.3.6...v13.3.7) (2021-09-19)
 
 
