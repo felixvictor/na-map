@@ -16,7 +16,7 @@ import convert, { ElementCompact } from "xml-js"
 import { currentServerStartDate as serverDate, isEmpty, sortBy } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file"
-import { roundToThousands, speedConstA, speedConstB } from "../common/common-math"
+import { roundToThousands, speedConstM, speedConstB } from "../common/common-math"
 import { baseAPIFilename, cleanName } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
@@ -285,9 +285,9 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
  */
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
-const getSpeedDegrees = (specs: Specs): { calcPortSpeed: number; speedDegrees: number[] } => {
-    const calcPortSpeed = specs.MaxSpeed * speedConstA - speedConstB
-    const speedDegrees = specs.SpeedToWind.map((speed: number) => roundToThousands(speed * calcPortSpeed))
+const getSpeedDegrees = (specs: Specs): { maxSpeed: number; speedDegrees: number[] } => {
+    const maxSpeed = specs.MaxSpeed * speedConstM - speedConstB
+    const speedDegrees = specs.SpeedToWind.map((speed: number) => roundToThousands(speed * maxSpeed))
     const { length } = specs.SpeedToWind
 
     // Mirror speed degrees
@@ -298,7 +298,7 @@ const getSpeedDegrees = (specs: Specs): { calcPortSpeed: number; speedDegrees: n
     // Delete last element
     speedDegrees.pop()
 
-    return { calcPortSpeed, speedDegrees }
+    return { maxSpeed, speedDegrees }
 }
 
 const isNumber = (name: string): boolean => !Number.isNaN(Number(name))
@@ -342,7 +342,7 @@ const convertGenericShipData = (): ShipData[] => {
         let totalCannonCrew = 0
         let totalCarroCrew = 0
 
-        const { calcPortSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs)
+        const { maxSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs)
 
         const addDeck = (deckLimit: Limit, index: number) => {
             if (deckLimit) {
@@ -418,7 +418,7 @@ const convertGenericShipData = (): ShipData[] => {
             speed: {
                 // eslint-disable-next-line unicorn/no-array-reduce
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                max: roundToThousands(calcPortSpeed),
+                max: roundToThousands(maxSpeed),
             },
             sides: { armour: apiShip.HealthInfo.LeftArmor },
             bow: { armour: apiShip.HealthInfo.FrontArmor },
