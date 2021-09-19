@@ -595,7 +595,6 @@ interface ShipShip {
     acceleration: number
     deceleration: number
     firezoneHorizontalWidth: number
-    maxSpeed: number
     rollAngle: number
     turnAcceleration: number
     turnSpeed: number
