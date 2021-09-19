@@ -117,11 +117,10 @@ export default class ShipList {
             group: new Map([
                 ["dummy1", 2],
                 ["Guns", 2],
-                ["dummy2", 1],
+                ["dummy2", 2],
                 ["Speed", 2],
-                ["dummy3", 1],
                 ["Chasers", 2],
-                ["dummy4", 1],
+                ["dummy3", 1],
             ]),
             element: new Set([
                 "",
