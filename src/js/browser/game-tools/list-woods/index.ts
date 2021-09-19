@@ -43,7 +43,7 @@ export default class ListWoods {
 
     private _woodData: WoodJsonData = {} as WoodJsonData
     private _woodDataDefault: WoodJsonData = {} as WoodJsonData
-    private readonly _modifiersNotUsed = new Set(["Ship material", "Boarding morale"])
+    private readonly _modifiersNotUsed = new Set(["Boarding morale", "Crew", "Morale", "Repair time", "Ship material"])
 
     constructor() {
         this.#baseId = getIdFromBaseName(this.#baseName)
