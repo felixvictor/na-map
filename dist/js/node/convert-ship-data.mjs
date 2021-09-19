@@ -13,7 +13,7 @@ import convert from "xml-js";
 import { currentServerStartDate as serverDate, isEmpty, sortBy } from "../common/common";
 import { getCommonPaths } from "../common/common-dir";
 import { fileExists, readJson, readTextFile, saveJsonAsync } from "../common/common-file";
-import { roundToThousands, speedConstA, speedConstB } from "../common/common-math";
+import { roundToThousands, speedConstM, speedConstB, round } from "../common/common-math";
 import { baseAPIFilename, cleanName } from "../common/common-node";
 import { serverIds } from "../common/servers";
 const commonPaths = getCommonPaths();
@@ -188,7 +188,6 @@ const subFileStructure = [
             ["REPAIR_MODULE_TIME", { group: "repairTime", element: "sails" }],
             ["SAIL_RISING_SPEED", { group: "sails", element: "risingSpeed" }],
             ["SAILING_CREW_REQUIRED", { group: "crew", element: "sailing" }],
-            ["SHIP_MAX_SPEED", { group: "ship", element: "maxSpeed" }],
         ]),
     },
     {
@@ -204,14 +203,14 @@ let cannons;
 const getItemNames = () => new Map(apiItems.map((item) => [item.Id, cleanName(item.Name)]));
 const getShipMass = (id) => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0;
 const getSpeedDegrees = (specs) => {
-    const calcPortSpeed = specs.MaxSpeed * speedConstA - speedConstB;
-    const speedDegrees = specs.SpeedToWind.map((speed) => roundToThousands(speed * calcPortSpeed));
+    const maxSpeed = round(specs.MaxSpeed * speedConstM - speedConstB, 2);
+    const speedDegrees = specs.SpeedToWind.map((speed) => roundToThousands(speed * maxSpeed));
     const { length } = specs.SpeedToWind;
     for (let i = 1; i < (length - 1) * 2; i += 2) {
         speedDegrees.unshift(speedDegrees[i]);
     }
     speedDegrees.pop();
-    return { calcPortSpeed, speedDegrees };
+    return { maxSpeed, speedDegrees };
 };
 const isNumber = (name) => !Number.isNaN(Number(name));
 const getGunData = (cannon) => [
@@ -241,7 +240,7 @@ const convertGenericShipData = () => {
         };
         let totalCannonCrew = 0;
         let totalCarroCrew = 0;
-        const { calcPortSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs);
+        const { maxSpeed, speedDegrees } = getSpeedDegrees(apiShip.Specs);
         const addDeck = (deckLimit, index) => {
             if (deckLimit) {
                 const gunsPerDeck = apiShip.GunsPerDeck[index];
@@ -301,7 +300,7 @@ const convertGenericShipData = () => {
             speedDegrees,
             speed: {
                 min: speedDegrees.reduce((a, b) => Math.min(a, b)),
-                max: roundToThousands(calcPortSpeed),
+                max: roundToThousands(maxSpeed),
             },
             sides: { armour: apiShip.HealthInfo.LeftArmor },
             bow: { armour: apiShip.HealthInfo.FrontArmor },
