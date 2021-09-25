@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>1275</Value>
+        <Value>3300</Value>
       </Value>
     </Pair>
     <Pair>
@@ -81,7 +81,7 @@
     <Pair>
       <Key>SAIL_RISING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>5.3</Value>
       </Value>
     </Pair>
     <Pair>
@@ -147,7 +147,7 @@
     <Pair>
       <Key>SAIL_DECREASING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>2.5</Value>
+        <Value>2.6</Value>
       </Value>
     </Pair>
   </Attributes>

@@ -22,7 +22,7 @@
     <Pair>
       <Key>DAMAGE_MULTIPLIER</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>1.5</Value>
+        <Value>3</Value>
       </Value>
     </Pair>
     <Pair>

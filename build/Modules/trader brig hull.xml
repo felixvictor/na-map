@@ -168,7 +168,7 @@
     <Pair>
       <Key>SHIP_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>659</Value>
+        <Value>550</Value>
       </Value>
     </Pair>
     <Pair>
@@ -274,7 +274,7 @@
     <Pair>
       <Key>SHIP_TURNING_SPEED_RHEAS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>2.5</Value>
+        <Value>1</Value>
       </Value>
     </Pair>
     <Pair>
@@ -598,7 +598,7 @@
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.047</Value>
+        <Value>0.0444</Value>
       </Value>
     </Pair>
     <Pair>
@@ -681,7 +681,7 @@
     <Pair>
       <Key>SHIP_SPEED_YARD_POWER_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1.5</Value>
+        <Value>2</Value>
       </Value>
     </Pair>
     <Pair>
