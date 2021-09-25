@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.9](///compare/v13.3.8...v13.3.9) (2021-09-25)
+
+
+### Bug Fixes
+
+* **patch:** ship September patch a2d8610
+
 ### [13.3.8](///compare/v13.3.7...v13.3.8) (2021-09-19)
 
 
