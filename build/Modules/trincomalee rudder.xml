@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>215</Value>
+        <Value>395</Value>
       </Value>
     </Pair>
     <Pair>
@@ -28,13 +28,13 @@
     <Pair>
       <Key>SHIP_TURNING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>2.57</Value>
+        <Value>4.51</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>REPAIR_MODULE_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>30</Value>
+        <Value>40</Value>
       </Value>
     </Pair>
     <Pair>

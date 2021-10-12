@@ -81,7 +81,7 @@
     <Pair>
       <Key>RHEA_TURN_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>19</Value>
+        <Value>16</Value>
       </Value>
     </Pair>
     <Pair>
