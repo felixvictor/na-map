@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.10](///compare/v13.3.9...v13.3.10) (2021-10-12)
+
+
+### Bug Fixes
+
+* **patch:** 8/12 October 2021 rudder patch e028b52
+
 ### [13.3.9](///compare/v13.3.8...v13.3.9) (2021-09-25)
 
 
