@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.11](///compare/v13.3.10...v13.3.11) (2021-10-22)
+
+
+### Bug Fixes
+
+* **patch:** 22 October 2021 speed patch 18e63e0
+
 ### [13.3.10](///compare/v13.3.9...v13.3.10) (2021-10-12)
 
 
