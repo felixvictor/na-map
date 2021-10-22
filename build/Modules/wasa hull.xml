@@ -69,34 +69,52 @@
           <TangentOut>2.6693244</TangentOut>
         </Value>
         <Value>
-          <Time>0.06841522</Time>
-          <Value>0.1826224</Value>
-          <TangentIn>2.324915</TangentIn>
-          <TangentOut>2.324915</TangentOut>
+          <Time>0.09371338</Time>
+          <Value>0.211779788</Value>
+          <TangentIn>1.82129443</TangentIn>
+          <TangentOut>1.82129443</TangentOut>
         </Value>
         <Value>
-          <Time>0.2140097</Time>
-          <Value>0.4709731</Value>
-          <TangentIn>1.63452029</TangentIn>
-          <TangentOut>1.63452029</TangentOut>
+          <Time>0.2</Time>
+          <Value>0.4</Value>
+          <TangentIn>1.4799304</TangentIn>
+          <TangentOut>1.4799304</TangentOut>
         </Value>
         <Value>
-          <Time>0.369156361</Time>
-          <Value>0.670884967</Value>
-          <TangentIn>1.0108515</TangentIn>
-          <TangentOut>1.0108515</TangentOut>
+          <Time>0.35</Time>
+          <Value>0.6</Value>
+          <TangentIn>1.14190269</TangentIn>
+          <TangentOut>1.14190269</TangentOut>
         </Value>
         <Value>
-          <Time>0.6238132</Time>
-          <Value>0.8575913</Value>
-          <TangentIn>0.5558634</TangentIn>
-          <TangentOut>0.5558634</TangentOut>
+          <Time>0.6</Time>
+          <Value>0.88</Value>
+          <TangentIn>1.16000009</TangentIn>
+          <TangentOut>1.16000009</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.7</Time>
+          <Value>1</Value>
+          <TangentIn>1.15000021</TangentIn>
+          <TangentOut>1.15000021</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.8</Time>
+          <Value>1.11</Value>
+          <TangentIn>1.10000014</TangentIn>
+          <TangentOut>1.10000014</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.9</Time>
+          <Value>1.22</Value>
+          <TangentIn>1.10000014</TangentIn>
+          <TangentOut>1.10000014</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
-          <Value>1</Value>
-          <TangentIn>0.236492574</TangentIn>
-          <TangentOut>0.236492574</TangentOut>
+          <Value>1.33</Value>
+          <TangentIn>1.0999999</TangentIn>
+          <TangentOut>1.0999999</TangentOut>
         </Value>
       </Value>
     </Pair>
@@ -258,21 +276,15 @@
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
-          <Time>0.1</Time>
+          <Time>0.5</Time>
           <Value>0</Value>
           <TangentIn>0</TangentIn>
-          <TangentOut>1.66666675</TangentOut>
-        </Value>
-        <Value>
-          <Time>0.7</Time>
-          <Value>1</Value>
-          <TangentIn>1.66666675</TangentIn>
-          <TangentOut>0</TangentOut>
+          <TangentOut>2</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
           <Value>1</Value>
-          <TangentIn>0</TangentIn>
+          <TangentIn>2</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
       </Value>
@@ -741,7 +753,7 @@
     <Pair>
       <Key>SHIP_PHYSICS_ACC_TURN_PENALTY</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.199</Value>
+        <Value>0.187</Value>
       </Value>
     </Pair>
   </Attributes>
