@@ -13,8 +13,8 @@ import { HtmlString, SVGString } from "./interface"
 export const ϕ = (1 + Math.sqrt(5)) / 2
 export const timeFactor = 2.63
 export const speedFactor = 390
-export const speedConstM = 0.091_860_176_037_713_3
-export const speedConstB = -0.002_415_136_643_632_5
+export const speedConstM = 0.082_734_693_268_484_8
+export const speedConstB = 0.002_714_944_794_261_6
 export const defaultFontSize = 16
 export const defaultCircleSize = 16
 export const degreesFullCircle = 360
