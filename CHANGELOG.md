@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.13](///compare/v13.3.12...v13.3.13) (2021-11-01)
+
+
+### Bug Fixes
+
+* **patch:** October ship speeds a279984
+
 ### [13.3.12](///compare/v13.3.11...v13.3.12) (2021-10-26)
 
 
