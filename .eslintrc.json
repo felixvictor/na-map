@@ -50,6 +50,7 @@
                 "unicorn/no-useless-undefined": "off",
                 "unicorn/prevent-abbreviations": "off",
                 "unicorn/prefer-node-protocol": "off",
+                "unicorn/template-indent": "off",
                 "tsdoc/syntax": "warn",
                 "@typescript-eslint/ban-ts-comment": "off",
                 "@typescript-eslint/class-literal-property-style": "off",
