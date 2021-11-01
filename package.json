@@ -181,7 +181,7 @@
         "prettier": "^2.4.1",
         "prettier-plugin-packagejson": "^2.2.13",
         "recursive-readdir": "^2.2.2",
-        "sass": "^1.41.1",
+        "sass": "^1.43.4",
         "sass-loader": "^12.3.0",
         "sassdoc": "^2.7.3",
         "shellcheck": "^1.0.0",
