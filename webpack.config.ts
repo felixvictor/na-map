@@ -134,10 +134,10 @@ const svgoOpt = {
             params: {
                 overrides: {
                     removeViewBox: false,
-                    removeScriptElement: true,
                 },
             },
         } as DefaultPlugins,
+        { name: "removeScriptElement" } as DefaultPlugin<"removeScriptElement">,
     ],
 }
 
