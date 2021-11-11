@@ -208,7 +208,6 @@
         "yarn-deduplicate": "^3.1.0"
     },
     "peerDependencies": {
-        "@types/node": "^13.9.1",
         "jquery": "^3.6.0"
     },
     "engines": {
