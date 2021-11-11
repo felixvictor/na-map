@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.14](///compare/v13.3.13...v13.3.14) (2021-11-11)
+
+
+### Bug Fixes
+
+* **misc:** node-fetch import, peerDependencies edde20e
+
 ### [13.3.13](///compare/v13.3.12...v13.3.13) (2021-11-01)
 
 
