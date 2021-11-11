@@ -9,7 +9,7 @@
  */
 import * as fs from "fs";
 import path from "path";
-import { default as nodeFetch } from "node-fetch";
+import fetch from "node-fetch";
 import { currentServerStartDate as serverDate, sortBy } from "../common/common";
 import { apiBaseFiles } from "../common/common-var";
 import { saveJsonAsync, xzAsync } from "../common/common-file";
@@ -31,7 +31,7 @@ const deleteAPIFiles = (fileName) => {
 };
 const readNAJson = async (url) => {
     try {
-        const response = await nodeFetch(url.toString());
+        const response = await fetch(url.toString());
         if (response.ok) {
             const text = (await response.text()).replace(/^var .+ = /, "").replace(/;$/, "");
             return JSON.parse(text);
