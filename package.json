@@ -212,7 +212,7 @@
         "jquery": "^3.6.0"
     },
     "engines": {
-        "node": ">=14"
+        "node": ">=16"
     },
     "sass": "src/scss/main.scss"
 }
