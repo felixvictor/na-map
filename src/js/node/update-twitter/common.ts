@@ -30,7 +30,7 @@ export const getCooldownTime = (tweetTime: string | undefined, nation: PortBattl
         ? getNextServerStartDateTime(tweetTime).format(dateTimeFormat)
         : getTimeEstimate(tweetTime, dateTimeFormatTwitter).add(portBattleCooldown, "hour").format(dateTimeFormat)
 
-export const isDateAfterNow = (date: string): boolean => dayjs.utc(date, dateTimeFormat).isAfter(dayjs.utc())
+export const isDateInFuture = (date: string): boolean => dayjs.utc(date, dateTimeFormat).isAfter(dayjs.utc())
 
 export const getNationIdFromFullName = (nationName: NationFullName): number => findNationByName(nationName)?.id ?? 0
 

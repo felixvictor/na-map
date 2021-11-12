@@ -19,11 +19,11 @@ import {
     getNationShortNameFromFullName,
     getNationShortNameFromId,
     getPortBattleTime,
-    getTweetTimeFormatted,
+    getTweetTimeFormatted, isDateInFuture,
     isTweetTimeOneDayAgo,
     isTweetTimeThreeDaysAgo,
-    isTweetTimeToday,
-} from "./common"
+    isTweetTimeToday
+} from "./common";
 
 import {
     AttackerNationShortName,
@@ -92,11 +92,13 @@ const cooldownOn = (portName: string, nation: PortBattleNationShortName, tweetTi
 
     console.log("*************", nation, cooldownTime)
 
-    const updatedPort = {
-        cooldownTime,
-    } as PortBattlePerServer
+    if (isDateInFuture(cooldownTime)) {
+        const updatedPort = {
+            cooldownTime,
+        } as PortBattlePerServer
 
-    updatePort(portName, updatedPort)
+        updatePort(portName, updatedPort)
+    }
 }
 
 /**
