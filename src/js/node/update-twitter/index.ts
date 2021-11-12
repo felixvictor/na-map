@@ -88,9 +88,9 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
 }
 
 const cooldownOn = (portName: string, nation: PortBattleNationShortName, tweetTime: string): void => {
-    const cooldownTime = getCooldownTime(tweetTime)
-
+    const cooldownTime = getCooldownTime(tweetTime, nation)
     console.log("      --- cooldown on", portName)
+    console.log("*************", nation, cooldownTime)
 
     const updatedPort = {
         cooldownTime,

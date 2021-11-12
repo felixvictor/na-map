@@ -1,6 +1,6 @@
 import path from "path"
 
-import { getActiveTime, getNationIdFromFullName, getTweetTimeDayjs, isExpireAfterNow } from "./common"
+import { getActiveTime, getNationIdFromFullName, getTweetTimeDayjs, isDateAfterNow } from "./common"
 import { sortBy } from "../../common/common"
 import { readJson, saveJsonAsync } from "../../common/common-file"
 import { getCommonPaths } from "../../common/common-dir"
@@ -37,7 +37,7 @@ const cleanExpiredAndDoubleEntries = (flagSet: Set<FlagEntity>): Map<string, num
     const cleanedFlags = new Map<string, number>()
 
     for (const flag of flagSet) {
-        if (isExpireAfterNow(flag.expire)) {
+        if (isDateAfterNow(flag.expire)) {
             cleanedFlags.set(flag.expire, flag.number)
         }
     }

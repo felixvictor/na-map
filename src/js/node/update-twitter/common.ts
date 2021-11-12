@@ -10,7 +10,7 @@ import {
     NationShortName,
     PortBattleNationShortName,
 } from "../../common/common"
-import { flagValidity, portBattleCooldown } from "../../common/common-var"
+import { flagValidity, portBattleCooldown, serverMaintenanceHour } from "../../common/common-var"
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -25,10 +25,12 @@ export const getCaptureTime = (tweetTime: string | undefined): string =>
 
 export const getClanName = (clanNameRegexResult: string) => clanNameRegexResult.trim()
 
-export const getCooldownTime = (tweetTime: string | undefined): string =>
-    getTimeEstimate(tweetTime, dateTimeFormatTwitter).add(portBattleCooldown, "hour").format(dateTimeFormat)
+export const getCooldownTime = (tweetTime: string | undefined, nation: PortBattleNationShortName): string =>
+    nation === "NT"
+        ? getNextServerStartDateTime(tweetTime).format(dateTimeFormat)
+        : getTimeEstimate(tweetTime, dateTimeFormatTwitter).add(portBattleCooldown, "hour").format(dateTimeFormat)
 
-export const isExpireAfterNow = (date: string): boolean => dayjs.utc(date, dateTimeFormat).isAfter(dayjs.utc())
+export const isDateAfterNow = (date: string): boolean => dayjs.utc(date, dateTimeFormat).isAfter(dayjs.utc())
 
 export const getNationIdFromFullName = (nationName: NationFullName): number => findNationByName(nationName)?.id ?? 0
 
@@ -36,6 +38,14 @@ export const getNationShortNameFromId = (nationId: number): NationShortName => f
 
 export const getNationShortNameFromFullName = (nationName: NationFullName): PortBattleNationShortName =>
     findNationByName(nationName)?.short ?? ""
+
+const getNextServerStartDateTime = (time: string | undefined): dayjs.Dayjs => {
+    const timeDayjs = dayjs.utc(time, dateTimeFormatTwitter)
+    // Next server start after twitter date
+    const nextServerStartDateTime = timeDayjs.add(1, "day").utc().hour(serverMaintenanceHour).minute(0).second(0)
+
+    return nextServerStartDateTime
+}
 
 export const getPortBattleTime = (date: string): string => dayjs.utc(date, "D MMM YYYY HH:mm").format(dateTimeFormat)
 
