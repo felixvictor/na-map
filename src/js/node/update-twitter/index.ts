@@ -89,7 +89,7 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
 
 const cooldownOn = (portName: string, nation: PortBattleNationShortName, tweetTime: string): void => {
     const cooldownTime = getCooldownTime(tweetTime, nation)
-    console.log("      --- cooldown on", portName)
+
     console.log("*************", nation, cooldownTime)
 
     const updatedPort = {
@@ -258,7 +258,7 @@ const capturedRegex = new RegExp(
 )
 const npcCapturedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders captured port (${portR}) \\((${nationR})\\)`, "u")
 const defendedRegex = new RegExp(
-    `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR})( \\(${nationR}\\))? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
+    `\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR}) ?\\(?(${nationR})?\\)? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`,
     "u"
 )
 const npcDefendedRegex = new RegExp(
@@ -313,15 +313,15 @@ const checkCooldown = (tweet: string): void => {
     let result: RegExpExecArray | null
 
     if ((result = capturedRegex.exec(tweet)) !== null) {
-        const nationFullName = result[4]
-        const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullName)
+        const nationFullNameRegexResult = result[4]
+        const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullNameRegexResult)
         foundCooldown(result, nation)
     } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         const nation: PortBattleNationShortName = "NT"
         foundCooldown(result, nation)
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
-        const nationFullName = result[4]
-        const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullName)
+        const nationFullNameRegexResult = result[4]
+        const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullNameRegexResult)
         foundCooldown(result, nation)
         // eslint-disable-next-line no-negated-condition
     } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
