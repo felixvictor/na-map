@@ -22,7 +22,8 @@ export const cannonFamilyList = {
 export const cannonEntityType = ["name", "family", "damage", "generic", "penetration"];
 export const peneDistance = [50, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500];
 export const nationShortName = ["CN", "DE", "DK", "ES", "FR", "FT", "GB", "NT", "PL", "PR", "RU", "SE", "US", "VP"];
-const attackerNationShortName = [...nationShortName, "n/a", ""];
+const portBattleNationShortName = [...nationShortName, ""];
+const attackerNationShortName = [...portBattleNationShortName, "n/a"];
 export const nationShortNameAlternative = [
     "CNa",
     "DEa",
