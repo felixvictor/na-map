@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.15](///compare/v13.3.14...v13.3.15) (2021-11-12)
+
+
+### Bug Fixes
+
+* **get tweets:** port captured by raiders are attackable after next maintenance d019cfa
+* **get tweets:** port captured by raiders are attackable after next maintenance 7471efb
+* **get tweets:** regex for a defended port 93318a1
+
 ### [13.3.14](///compare/v13.3.13...v13.3.14) (2021-11-11)
 
 
