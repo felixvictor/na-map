@@ -44,7 +44,6 @@ const updatePort = (portName, updatedPort) => {
 };
 const cooldownOn = (portName, nation, tweetTime) => {
     const cooldownTime = getCooldownTime(tweetTime, nation);
-    console.log("*************", nation, cooldownTime);
     if (isDateInFuture(cooldownTime)) {
         const updatedPort = {
             cooldownTime,
