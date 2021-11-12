@@ -46,7 +46,9 @@ export type NationShortName = typeof nationShortName[number]
 export type NationShortNameList<T> = {
     [K in NationShortName]: T
 }
-const attackerNationShortName = [...nationShortName, "n/a", ""]
+const portBattleNationShortName = [...nationShortName, ""]
+export type PortBattleNationShortName = typeof portBattleNationShortName[number]
+const attackerNationShortName = [...portBattleNationShortName, "n/a"]
 export type AttackerNationShortName = typeof attackerNationShortName[number]
 
 export const nationShortNameAlternative = [

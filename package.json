@@ -7,7 +7,7 @@
     "scripts": {
         "build:commit-js": "git commit -m 'build: update dist' -- ./dist || true",
         "build:data:convert": "yarn node --experimental-specifier-resolution=node dist/js/node/convert-api-data.mjs",
-        "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter.mjs ${BEARER_TOKEN}",
+        "build:data:twitter": "export $(cat .env | xargs) && yarn node --experimental-specifier-resolution=node dist/js/node/update-twitter/index.mjs ${BEARER_TOKEN}",
         "build:deploy-main": "       TARGET=na-map       run-s prod       build:push-prod deploy:netlify",
         "build:deploy-main-quiet": " TARGET=na-map       run-s prod-quiet build:push-prod deploy:netlify",
         "build:deploy-test": "       TARGET=na-map-test  run-s prod                         deploy:netlify-test",
@@ -16,6 +16,7 @@
         "build:js:1:pre": "rm -rf dist",
         "build:js:2:node": "tsc --project src/js/node/tsconfig.json",
         "build:js:3:post:mv": "find ./dist/js -name \"*.js\" -type f -regextype posix-egrep -regex \".*/(common|node)/.+\" -exec bash -c 'mv \"$1\" \"${1%.js}\".mjs' - '{}' ';'",
+        "build:js:4:post:rm": "find ./dist/js -name \"*.js.map\" -type f -regextype posix-egrep -regex \".*/(common|node)/.+\" -exec bash -c 'rm \"$1\"' - '{}' ';'",
         "build:load": "yarn node --experimental-specifier-resolution=node dist/js/node/load-api-data.mjs",
         "build:push-prod": "git add --ignore-errors . && (git diff-index --quiet HEAD || git commit -m 'build: update public') && git push --quiet gitlab",
         "clean:src:js": "find ./src/js -name \"*.ts\" -type f -regextype posix-egrep -regex \".*/(browser|common|node)/.+\" -exec bash -c 'for file in \"${1%.ts}\".js \"${1%.ts}\".js.map; do [ -e \"$file\" ] && rm -f \"$file\"; done' - '{}' ';'",

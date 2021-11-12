@@ -22,6 +22,7 @@ import {
     NationShortName,
     NationShortNameAlternative,
     PeneDistance,
+    PortBattleNationShortName,
 } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
 import { FrontlinesType, LootType, PortBonus, WoodFamily, WoodType } from "./types"
@@ -345,7 +346,7 @@ export interface InventoryEntity {
 export interface PortBattlePerServer {
     id: number
     name: string
-    nation: NationShortName
+    nation: PortBattleNationShortName
     capturer?: string
     captured?: string
     attackerNation?: AttackerNationShortName

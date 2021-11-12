@@ -1,14 +1,8 @@
 import filterXSS from "xss"
 import { default as nodeFetch, RequestInit } from "node-fetch"
 
-import dayjs from "dayjs"
-import customParseFormat from "dayjs/plugin/customParseFormat.js"
-import utc from "dayjs/plugin/utc.js"
-dayjs.extend(customParseFormat)
-dayjs.extend(utc)
-
-import { currentServerStartDateTime } from "../common/common"
-import { cleanName } from "../common/common-node"
+import { getSinceDateTimeLastSevenDays, getSinceDateTimeThisMaintenance } from "./common"
+import { cleanName } from "../../common/common-node"
 
 type NextToken = string | undefined
 interface TwitterSearchResult {
@@ -119,12 +113,12 @@ const getTwitterData = async (
  * Get tweets since sinceDateTime
  * @param sinceDateTime - Start dateTime
  */
-const getTweetsSince = async (sinceDateTime: dayjs.Dayjs): Promise<void> => {
+const getTweetsSince = async (sinceDateTime: string): Promise<void> => {
     let nextToken: NextToken
 
     do {
         // noinspection JSUnusedAssignment
-        nextToken = await getTwitterData(queryFrom, sinceDateTime.toISOString(), nextToken) // eslint-disable-line no-await-in-loop
+        nextToken = await getTwitterData(queryFrom, sinceDateTime, nextToken) // eslint-disable-line no-await-in-loop
     } while (nextToken)
 }
 
@@ -132,14 +126,16 @@ const getTweetsSince = async (sinceDateTime: dayjs.Dayjs): Promise<void> => {
  * Get all available tweets from the 7 last days
  */
 const getTweetsFull = async (): Promise<void> => {
-    await getTweetsSince(dayjs.utc().subtract(7, "day"))
+    const sinceDateTime = getSinceDateTimeLastSevenDays()
+    await getTweetsSince(sinceDateTime)
 }
 
 /**
  * Get tweets since maintenance
  */
 const getTweetsSinceMaintenance = async (): Promise<void> => {
-    await getTweetsSince(dayjs.utc(currentServerStartDateTime))
+    const sinceDateTime = getSinceDateTimeThisMaintenance()
+    await getTweetsSince(sinceDateTime)
 }
 
 /**
