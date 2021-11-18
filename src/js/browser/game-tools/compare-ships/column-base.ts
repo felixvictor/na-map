@@ -54,8 +54,8 @@ export class ColumnBase extends Column {
 
         this._setBackground()
         this._setupDrag()
-        this._drawWindProfile()
         this._setupShipOutline()
+        this._drawWindProfile()
         this._printText()
     }
 

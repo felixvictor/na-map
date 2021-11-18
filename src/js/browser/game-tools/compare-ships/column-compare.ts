@@ -58,8 +58,8 @@ export class ColumnCompare extends Column {
         this.shipCompareData = shipCompareData
 
         this._setupDrag()
-        this._drawDifferenceProfile()
         this._setupShipOutline()
+        this._drawDifferenceProfile()
         this._injectTextComparison()
     }
 
