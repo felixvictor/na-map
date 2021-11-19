@@ -19,11 +19,12 @@ import {
     getNationShortNameFromFullName,
     getNationShortNameFromId,
     getPortBattleTime,
-    getTweetTimeFormatted, isDateInFuture,
+    getTweetTimeFormatted,
+    isDateInFuture,
     isTweetTimeOneDayAgo,
     isTweetTimeThreeDaysAgo,
-    isTweetTimeToday
-} from "./common";
+    isTweetTimeToday,
+} from "./common"
 
 import {
     AttackerNationShortName,

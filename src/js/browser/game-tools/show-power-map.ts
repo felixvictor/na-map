@@ -681,8 +681,8 @@ export default class PowerMap {
     }
 
     _getTopAlignedTransform(element: SVGGElement): ZoomTransform {
-        const { a: scale, e: tx } = element.transform.baseVal.consolidate().matrix
-        return d3ZoomIdentity.scale(scale).translate(tx / scale, 0)
+        const { a: scale, e: tx } = element.transform.baseVal.consolidate()?.matrix || {}
+        return scale && tx ? d3ZoomIdentity.scale(scale).translate(tx / scale, 0) : ({} as ZoomTransform)
     }
 
     async _initCanvas(): Promise<void> {

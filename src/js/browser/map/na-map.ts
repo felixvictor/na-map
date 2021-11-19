@@ -377,11 +377,11 @@ class NAMap {
             tiles: data,
         } = tiles
 
-        // @ts-expect-error
         this.#gMap
             .attr("transform", `translate(${tx * k},${ty * k}) scale(${k})`)
             .selectAll<HTMLImageElement, Tile>("image")
-            .data(data, (d: Tile) => d)
+            // @ts-expect-error
+            .data<Tile>(data, (d: Tile) => d)
             .join((enter) =>
                 enter
                     .append("image")
