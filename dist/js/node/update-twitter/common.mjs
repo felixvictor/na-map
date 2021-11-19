@@ -41,7 +41,7 @@ export const isTweetTimeOneDayAgo = (tweetTime) => {
     return (tweetTimeDayjs.isAfter(dayjs.utc(currentServerStartDateTime).subtract(1, "day")) &&
         tweetTimeDayjs.isBefore(dayjs.utc(currentServerStartDateTime)));
 };
-export const isTweetTimeThreeDaysAgo = (tweetTime) => {
+export const isTweetTimeInLastThreeDays = (tweetTime) => {
     const tweetTimeDayjs = getTweetTimeDayjs(tweetTime);
     return (tweetTimeDayjs.isAfter(dayjs.utc(currentServerStartDateTime).subtract(3, "day")) &&
         tweetTimeDayjs.isBefore(dayjs.utc(currentServerStartDateTime)));

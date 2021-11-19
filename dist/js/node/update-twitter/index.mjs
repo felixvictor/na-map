@@ -10,7 +10,7 @@
 import path from "path";
 import { getTweets, runType } from "./get-tweets";
 import { flagAcquired, initFlags, updateFlags } from "./get-flag-data";
-import { getCaptureTime, getClanName, getCooldownTime, getNationShortNameFromFullName, getNationShortNameFromId, getPortBattleTime, getTweetTimeFormatted, isDateInFuture, isTweetTimeOneDayAgo, isTweetTimeThreeDaysAgo, isTweetTimeToday } from "./common";
+import { getCaptureTime, getClanName, getCooldownTime, getNationShortNameFromFullName, getNationShortNameFromId, getPortBattleTime, isDateInFuture, isTweetTimeOneDayAgo, isTweetTimeInLastThreeDays, isTweetTimeToday, } from "./common";
 import { currentServerStartDate as serverDate, } from "../../common/common";
 import { getCommonPaths } from "../../common/common-dir";
 import { readJson, saveJsonAsync, xz } from "../../common/common-file";
@@ -54,8 +54,7 @@ const cooldownOn = (portName, nation, tweetTime) => {
 const portCaptured = (result, nation, capturer) => {
     const tweetTimeRegexResult = result[1];
     const portNameRegexResult = result[2];
-    const tweetTimeFormatted = getTweetTimeFormatted(tweetTimeRegexResult);
-    const captured = getCaptureTime(tweetTimeFormatted);
+    const captured = getCaptureTime(tweetTimeRegexResult);
     console.log("      --- captured", portNameRegexResult);
     const updatedPort = {
         nation,
@@ -63,7 +62,6 @@ const portCaptured = (result, nation, capturer) => {
         captured,
     };
     updatePort(portNameRegexResult, updatedPort);
-    cooldownOn(portNameRegexResult, nation, tweetTimeRegexResult);
 };
 const captured = (result) => {
     const clanNameRegexResult = result[3];
@@ -173,10 +171,12 @@ const checkCooldown = (tweet) => {
     if ((result = capturedRegex.exec(tweet)) !== null) {
         const nationFullNameRegexResult = result[4];
         const nation = getNationShortNameFromFullName(nationFullNameRegexResult);
+        captured(result);
         foundCooldown(result, nation);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         const nation = "NT";
+        npcCaptured(result);
         foundCooldown(result, nation);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
@@ -260,7 +260,7 @@ const updatePorts = async () => {
         }
         const tweetTimeRegexResult = result[1];
         checkFlags(tweet);
-        if (isTweetTimeThreeDaysAgo(tweetTimeRegexResult)) {
+        if (isTweetTimeInLastThreeDays(tweetTimeRegexResult)) {
             checkCooldown(tweet);
         }
         if (isTweetTimeOneDayAgo(tweetTimeRegexResult)) {
