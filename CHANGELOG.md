@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.19](///compare/v13.3.18...v13.3.19) (2021-11-19)
+
+
+### Bug Fixes
+
+* **get tweets:** port captured 8104f12
+* **ship compare:** carro damage for some ships 5be43c6
+
 ### [13.3.18](///compare/v13.3.17...v13.3.18) (2021-11-18)
 
 
