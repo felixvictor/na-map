@@ -80,7 +80,7 @@ export const isTweetTimeOneDayAgo = (tweetTime: string): boolean => {
     )
 }
 
-export const isTweetTimeThreeDaysAgo = (tweetTime: string): boolean => {
+export const isTweetTimeInLastThreeDays = (tweetTime: string): boolean => {
     const tweetTimeDayjs = getTweetTimeDayjs(tweetTime)
 
     return (

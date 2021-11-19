@@ -22,7 +22,7 @@ import {
     getTweetTimeFormatted,
     isDateInFuture,
     isTweetTimeOneDayAgo,
-    isTweetTimeThreeDaysAgo,
+    isTweetTimeInLastThreeDays,
     isTweetTimeToday,
 } from "./common"
 
@@ -110,8 +110,7 @@ const portCaptured = (result: RegExpExecArray, nation: PortBattleNationShortName
     const tweetTimeRegexResult = result[1]
     const portNameRegexResult = result[2]
 
-    const tweetTimeFormatted = getTweetTimeFormatted(tweetTimeRegexResult)
-    const captured = getCaptureTime(tweetTimeFormatted)
+    const captured = getCaptureTime(tweetTimeRegexResult)
 
     console.log("      --- captured", portNameRegexResult)
 
@@ -122,7 +121,6 @@ const portCaptured = (result: RegExpExecArray, nation: PortBattleNationShortName
     } as PortBattlePerServer
 
     updatePort(portNameRegexResult, updatedPort)
-    cooldownOn(portNameRegexResult, nation, tweetTimeRegexResult)
 }
 
 /**
@@ -316,9 +314,11 @@ const checkCooldown = (tweet: string): void => {
     if ((result = capturedRegex.exec(tweet)) !== null) {
         const nationFullNameRegexResult = result[4]
         const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullNameRegexResult)
+        captured(result)
         foundCooldown(result, nation)
     } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         const nation: PortBattleNationShortName = "NT"
+        npcCaptured(result)
         foundCooldown(result, nation)
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
         const nationFullNameRegexResult = result[4]
@@ -405,7 +405,7 @@ const updatePorts = async (): Promise<void> => {
 
         checkFlags(tweet)
 
-        if (isTweetTimeThreeDaysAgo(tweetTimeRegexResult)) {
+        if (isTweetTimeInLastThreeDays(tweetTimeRegexResult)) {
             checkCooldown(tweet)
         }
 
