@@ -1583,10 +1583,10 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@netlify/build@^18.22.0":
-  version "18.24.0"
-  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-18.24.0.tgz#8398c5a64934f81a9d71ac29834d16a5fbc915a3"
-  integrity sha512-/XeSGBpI+IDHFstUAxc0SqQED9/D642GG8DtmuQWozyaLjObzHrpMalhvq0tQknRuOQw6O2z3oqrdp6biP5NLw==
+"@netlify/build@^18.25.1":
+  version "18.25.1"
+  resolved "https://registry.yarnpkg.com/@netlify/build/-/build-18.25.1.tgz#2b1fb0f0528216965d408e726ffb53312d67fa6b"
+  integrity sha512-3T4u66wc5357wYhwHsJ2MAA3zvCDlhaCylTjzXH9gnUHABZTNbgWSRsWaNdGseNzbQc5P/TAP5f3OGKtS3+45Q==
   dependencies:
     "@bugsnag/js" "^7.0.0"
     "@netlify/cache-utils" "^2.0.0"
@@ -7937,10 +7937,10 @@ hasha@^5.2.2:
     is-stream "^2.0.0"
     type-fest "^0.8.0"
 
-hashids@^2.2.9:
-  version "2.2.9"
-  resolved "https://registry.yarnpkg.com/hashids/-/hashids-2.2.9.tgz#51ebec3beb8b36540b2911113fe2d3ed51504ae4"
-  integrity sha512-YeNrCzo6dQxR2hd8enVqwD4m5XqA9JXUXaBaRyPNsvuiRwXDgRbLwrLfsLXb6P9aVMPWF0UXfieOUPZIJVVXxQ==
+hashids@^2.2.10:
+  version "2.2.10"
+  resolved "https://registry.yarnpkg.com/hashids/-/hashids-2.2.10.tgz#82f45538cf03ce73e31b78d1abe78d287cf760c4"
+  integrity sha512-nXnYums7F8B5Y+GSThutLPlKMaamW1yjWNZVt0WModiJfdjaDZHnhYTWblS+h1OoBx3yjwiBwxldPP3nIbFSSA==
 
 he@^1.2.0:
   version "1.2.0"
@@ -10284,12 +10284,12 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-netlify-cli@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-7.0.0.tgz#169cf6e2746eb3e62215894a5055c4f3c8e93895"
-  integrity sha512-9eh3FHnBJFKuV9fn+iktwd2zyhD0IQEe8b3LcR3KqyDvsKrZAX+X+qS4Wek9N/g5SdyZ972g4yhRElhhcZCziQ==
+netlify-cli@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-7.0.2.tgz#d49d68fe0636320eec9c39ce8e8d16ff0ecb4e97"
+  integrity sha512-ELkXYhqLKe4K+M40hIGoF5OdpYttYNjepXUQkhVuy/2rpjj2gAr1MZRt2lBxmXyGlgnTeD7nHa18CU7tDutnVA==
   dependencies:
-    "@netlify/build" "^18.22.0"
+    "@netlify/build" "^18.25.1"
     "@netlify/config" "^15.8.2"
     "@netlify/framework-info" "^5.11.0"
     "@netlify/local-functions-proxy" "^1.1.1"
