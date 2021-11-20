@@ -209,18 +209,26 @@ const checkPort = (tweet) => {
     let matched = true;
     if ((result = capturedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true;
+        const nationFullNameRegexResult = result[4];
+        const nation = getNationShortNameFromFullName(nationFullNameRegexResult);
         captured(result);
+        foundCooldown(result, nation);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true;
+        const nationFullNameRegexResult = result[4];
+        const nation = getNationShortNameFromFullName(nationFullNameRegexResult);
         npcCaptured(result);
+        foundCooldown(result, nation);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
         const nationFullNameRegexResult = result[4];
         const nation = getNationShortNameFromFullName(nationFullNameRegexResult);
         foundCooldown(result, nation);
     }
     else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
+        isPortDataChanged = true;
         const nation = "NT";
         foundCooldown(result, nation);
     }
