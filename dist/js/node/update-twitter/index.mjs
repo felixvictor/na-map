@@ -44,6 +44,7 @@ const updatePort = (portName, updatedPort) => {
 };
 const cooldownOn = (portName, nation, tweetTime) => {
     const cooldownTime = getCooldownTime(tweetTime, nation);
+    console.log("cooldownOn", tweetTime, nation, cooldownTime);
     if (isDateInFuture(cooldownTime)) {
         const updatedPort = {
             cooldownTime,
@@ -216,8 +217,7 @@ const checkPort = (tweet) => {
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true;
-        const nationFullNameRegexResult = result[4];
-        const nation = getNationShortNameFromFullName(nationFullNameRegexResult);
+        const nation = "NT";
         npcCaptured(result);
         foundCooldown(result, nation);
     }
