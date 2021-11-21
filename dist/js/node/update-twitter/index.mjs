@@ -143,23 +143,24 @@ const defenderR = "[\\w ]+";
 const timeR = "\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}";
 const pbTimeR = "\\d{1,2} \\w{3} \\d{4} \\d{2}:\\d{2}";
 const percentageR = "\\d*\\.?\\d";
-const capturedRegex = new RegExp(`\\[(${timeR}) UTC\\] (${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`, "u");
-const npcCapturedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders captured port (${portR}) \\((${nationR})\\)`, "u");
-const defendedRegex = new RegExp(`\\[(${timeR}) UTC\\] (${portR}) defended by (${clanR}) ?\\(?(${nationR})?\\)? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`, "u");
-const npcDefendedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders failed to capture port (${portR}) \\((${nationR})\\)`, "u");
-const hostilityLevelUpRegex = new RegExp(`\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`, "u");
-const hostilityLevelDownRegex = new RegExp(`\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`, "u");
-const portBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] The port battle for (${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`, "u");
-const npcPortBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC port battle for port (${portR})(?: \\(${nationR}\\)) will be started at (${pbTimeR}) UTC`, "u");
+const capturedRegex = new RegExp(`\\[(${timeR}) UTC\\] (?<port>${portR}) captured by (${clanR}) ?\\(?(${nationR})?\\)?\\. Previous owner: (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`, "u");
+const npcCapturedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders captured port (?<port>${portR}) \\((${nationR})\\)`, "u");
+const defendedRegex = new RegExp(`\\[(${timeR}) UTC\\] (?<port>${portR}) defended by (${clanR}) ?\\(?(${nationR})?\\)? against (${clanR}) ?\\(?(${nationR})?\\)? #PBCaribbean #PBCaribbean${portHashR}`, "u");
+const npcDefendedRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC Raiders failed to capture port (?<port>${portR}) \\((${nationR})\\)`, "u");
+const hostilityLevelUpRegex = new RegExp(`\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (?<port>${portR}) \\((${nationR})\\) increased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`, "u");
+const hostilityLevelDownRegex = new RegExp(`\\[(${timeR}) UTC\\] The hostility level of the clan (${clanR}) \\((${nationR})\\) on the port (?<port>${portR}) \\((${nationR})\\) decreased to (${percentageR})%\\. The previous value was (${percentageR})% #HOCaribbean${portHashR}`, "u");
+const portBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] The port battle for (?<port>${portR}) \\((${nationR})\\) is scheduled for (${pbTimeR}) UTC\\. Defender: (${defenderR})\\. Attacker: (${clanR}) ?\\(?(${nationR})?\\)?\\. BR: \\d+ #PBCaribbean #PBCaribbean${portHashR} #NavalAction`, "u");
+const npcPortBattleRegex = new RegExp(`\\[(${timeR}) UTC\\] NPC port battle for port (?<port>${portR})(?: \\(${nationR}\\)) will be started at (${pbTimeR}) UTC`, "u");
 const rumorRegex = new RegExp(`\\[(${timeR}) UTC\\] Rumour has it that a great storm has destroyed a large fleet in the West Indies`, "u");
-const gainHostilityRegex = new RegExp(`\\[(${timeR}) UTC\\] The port (${portR}) \\((${nationR})\\) can gain hostility`, "u");
-const acquireFlagRegex = new RegExp(`\\[(${timeR}) UTC\\] (${nationR}) got (\\d+) conquest flag\\(s\\)`, "u");
-const checkDateRegex = new RegExp(`\\[(${timeR}) UTC\\]`, "u");
+const gainHostilityRegex = new RegExp(`\\[(?<tweetTime>${timeR}) UTC\\] The port (?<port>${portR}) \\((${nationR})\\) can gain hostility`, "u");
 const checkFlags = (tweet) => {
-    let result;
-    if ((result = acquireFlagRegex.exec(tweet)) !== null) {
-        flagAcquired(result);
+    const acquireFlagRegex = new RegExp(`\\[(?<tweetTime>${timeR}) UTC\\] (?<flagNation>${nationR}) got (?<flagNumber>\\d+) conquest flag\\(s\\)`, "u");
+    const match = tweet.match(acquireFlagRegex);
+    if (match && match.groups) {
+        flagAcquired(match.groups.tweetTime, match.groups.flagNation, match.groups.flagNumber);
+        return true;
     }
+    return false;
 };
 const foundCooldown = (result, nation) => {
     const tweetTimeRegexResult = result[1];
@@ -207,7 +208,6 @@ const checkPBAndRaid = (tweet) => {
 };
 const checkPort = (tweet) => {
     let result;
-    let matched = true;
     if ((result = capturedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true;
         const nationFullNameRegexResult = result[4];
@@ -255,28 +255,27 @@ const checkPort = (tweet) => {
     else if (rumorRegex.exec(tweet) !== null) {
     }
     else {
-        matched = false;
+        return false;
     }
-    return matched;
+    return true;
 };
 const updatePorts = async () => {
+    const checkDateRegex = new RegExp(`\\[(?<flagTime>${timeR}) UTC\\]`, "u");
     for (const tweet of tweets) {
         console.log("\ntweet", tweet);
-        const result = checkDateRegex.exec(tweet);
-        if (!result) {
+        const match = tweet.match(checkDateRegex);
+        if (!(match && match.groups)) {
             return;
         }
-        const tweetTimeRegexResult = result[1];
         checkFlags(tweet);
-        if (isTweetTimeInLastThreeDays(tweetTimeRegexResult)) {
+        if (isTweetTimeInLastThreeDays(match.groups.tweetTime)) {
             checkCooldown(tweet);
         }
-        if (isTweetTimeOneDayAgo(tweetTimeRegexResult)) {
+        if (isTweetTimeOneDayAgo(match.groups.tweetTime)) {
             checkPBAndRaid(tweet);
         }
-        else if (isTweetTimeToday(tweetTimeRegexResult)) {
-            const matched = checkPort(tweet);
-            if (!matched && acquireFlagRegex.exec(tweet) === null) {
+        else if (isTweetTimeToday(match.groups.tweetTime)) {
+            if (!checkPort(tweet) && !checkFlags(tweet)) {
                 console.log(`\n\n***************************************\nUnmatched tweet: ${tweet}\n`);
             }
         }
