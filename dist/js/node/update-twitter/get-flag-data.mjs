@@ -8,12 +8,13 @@ const commonPaths = getCommonPaths();
 const flagsFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-flags.json`);
 let flagsPerNations = [];
 const flagsMap = new Map();
-export const flagAcquired = (tweetTimeRegex, flagNationRegex, flagNumberRegex) => {
-    const numberOfFlags = Number(flagNumberRegex);
-    const tweetTimeDayjs = getTweetTimeDayjs(tweetTimeRegex);
-    const nationId = getNationIdFromFullName(flagNationRegex);
+export const flagAcquired = (result) => {
+    const nationName = result[2];
+    const numberOfFlags = Number(result[3]);
+    const tweetTimeDayjs = getTweetTimeDayjs(result[1]);
+    const nationId = getNationIdFromFullName(nationName);
     const active = getActiveTime(tweetTimeDayjs);
-    console.log("      --- conquest flag", numberOfFlags, flagNationRegex, active);
+    console.log("      --- conquest flag", numberOfFlags, nationName, active);
     const flag = { expire: active, number: numberOfFlags };
     const flagsSet = flagsMap.get(nationId) ?? new Set();
     flagsSet.add(flag);
