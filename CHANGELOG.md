@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.22](///compare/v13.3.21...v13.3.22) (2021-11-22)
+
+
+### Bug Fixes
+
+* **get tweets:** port defended by bots 29cce70
+
 ### [13.3.21](///compare/v13.3.20...v13.3.21) (2021-11-21)
 
 
