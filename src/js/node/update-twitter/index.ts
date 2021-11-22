@@ -90,7 +90,7 @@ const updatePort = (portName: string, updatedPort: PortBattlePerServer): void =>
 
 const cooldownOn = (portName: string, nation: PortBattleNationShortName, tweetTime: string): void => {
     const cooldownTime = getCooldownTime(tweetTime, nation)
-    console.log("cooldownOn", tweetTime, nation, cooldownTime)
+
     if (isDateInFuture(cooldownTime)) {
         const updatedPort = {
             cooldownTime,
@@ -365,7 +365,8 @@ const checkPort = (tweet: string): boolean => {
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
         const nationFullNameRegexResult = result[4]
-        const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullNameRegexResult)
+        const nation: PortBattleNationShortName =
+            result[3] === "neutral bots" ? "NT" : getNationShortNameFromFullName(nationFullNameRegexResult)
         foundCooldown(result, nation)
     } else if ((result = npcDefendedRegex.exec(tweet)) !== null) {
         isPortDataChanged = true
