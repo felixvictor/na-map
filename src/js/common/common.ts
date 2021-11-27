@@ -220,7 +220,7 @@ export const isEmpty = (object: Record<string, unknown> | unknown | undefined): 
 /**
  * {@link https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript}
  * @param   string - String
- * @returns Uppercased string
+ * @returns Upper-cased string
  */
 export const capitalizeFirstLetter = (string: string): string => string.charAt(0).toUpperCase() + string.slice(1)
 
@@ -248,7 +248,7 @@ export const findNationByNationShortName = (nationShortName: string): Nation | u
 /**
  * Find Nation object based on nation id
  */
-export const findNationById = (nationId: number): Nation => nationMap.get(nationId)!
+export const findNationById = (nationId: number): Nation | undefined => nationMap.get(nationId)
 
 /**
  * Write fetch error to console

@@ -40,7 +40,7 @@ import { APIPort } from "api-port"
 
 const commonPaths = getCommonPaths()
 const APIPortFilename = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`)
-const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`)
+const pbFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`)
 
 let ports: PortBattlePerServer[] = []
 
@@ -427,7 +427,7 @@ const updatePorts = async (): Promise<void> => {
     }
 
     if (isPortDataChanged) {
-        await saveJsonAsync(portFilename, ports)
+        await saveJsonAsync(pbFilename, ports)
     }
 }
 
@@ -441,12 +441,12 @@ const getAPIPortData = (): APIPort[] => {
 
 const getPortMaintenanceDefaults = (): void => {
     const apiPorts: APIPort[] = getAPIPortData()
-    const currentPorts: PortBattlePerServer[] = readJson(portFilename)
+    const pbPorts: PortBattlePerServer[] = readJson(pbFilename)
 
     const getCaptureDate = (portId: number): string | undefined => {
-        const index = currentPorts.findIndex((port) => port.id === portId)
+        const index = pbPorts.findIndex((port) => port.id === portId)
 
-        return currentPorts[index].captured
+        return pbPorts[index].captured
     }
 
     ports = apiPorts.map(
@@ -461,7 +461,7 @@ const getPortMaintenanceDefaults = (): void => {
 }
 
 const getPortCurrent = (): void => {
-    ports = readJson(portFilename)
+    ports = readJson(pbFilename)
 }
 
 const updateTwitter = async (): Promise<void> => {

@@ -359,7 +359,7 @@ export default class PowerMap {
                         .attr("class", "nation-name")
                         .attr("x", Math.floor(this.#legendColumnPadding / 2))
                         .attr("y", "25%")
-                        .html((d) => `${findNationById(d[0]).sortName}`)
+                        .html((d) => `${findNationById(d[0])?.sortName}`)
                         .style("fill", (d) => getContrastColour(this.#colourScale(d[0])))
 
                     svg.append("rect")

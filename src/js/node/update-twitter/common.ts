@@ -34,7 +34,7 @@ export const isDateInFuture = (date: string): boolean => dayjs.utc(date, dateTim
 
 export const getNationIdFromFullName = (nationName: NationFullName): number => findNationByName(nationName)?.id ?? 0
 
-export const getNationShortNameFromId = (nationId: number): NationShortName => findNationById(nationId).short
+export const getNationShortNameFromId = (nationId: number): NationShortName => findNationById(nationId)?.short ?? "n/a"
 
 export const getNationShortNameFromFullName = (nationName: NationFullName): PortBattleNationShortName =>
     findNationByName(nationName)?.short ?? ""
