@@ -46,6 +46,7 @@
                 "operator-linebreak": ["error", "after", { "overrides": { "?": "before", ":": "before" } }],
                 "quotes": ["error", "double", { "allowTemplateLiterals": true, "avoidEscape": true }],
                 "semi": ["error", "never"],
+                "unicorn/no-await-expression-member": "off",
                 "unicorn/no-nested-ternary": "off",
                 "unicorn/no-useless-undefined": "off",
                 "unicorn/prevent-abbreviations": "off",

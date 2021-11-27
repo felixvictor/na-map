@@ -138,7 +138,7 @@ export default class DisplayPbZones {
                     .attr("class", "svg-text-center fill-white")
                     .attr("x", (d) => d.pbCircles.map((pbCircle) => pbCircle[0]).join(","))
                     .attr("y", (d) => d.pbCircles.map((pbCircle) => pbCircle[1]).join(","))
-                    .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCharCode(65 + i)).join(""))
+                    .text((d) => d.pbCircles.map((pbCircle, i) => String.fromCodePoint(65 + i)).join(""))
 
                 // Spawn points
                 if (this.#serverType === "PVP") {
@@ -151,7 +151,7 @@ export default class DisplayPbZones {
                         .attr("class", "svg-text-center fill-text")
                         .attr("x", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[0]).join(","))
                         .attr("y", (d) => d.spawnPoints.map((spawnPoint) => spawnPoint[1]).join(","))
-                        .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCharCode(88 + i)).join(""))
+                        .text((d) => d.spawnPoints.map((spawnPoint, i) => String.fromCodePoint(88 + i)).join(""))
                 }
 
                 return g
@@ -227,7 +227,7 @@ export default class DisplayPbZones {
                     .attr("class", "svg-text-center fill-white")
                     .attr("x", (d) => d.raidCircles.map((raidCircle) => raidCircle[0]).join(","))
                     .attr("y", (d) => d.raidCircles.map((raidCircle) => raidCircle[1]).join(","))
-                    .text((d) => d.raidCircles.map((raidCircle, i) => String.fromCharCode(65 + i)).join(""))
+                    .text((d) => d.raidCircles.map((raidCircle, i) => String.fromCodePoint(65 + i)).join(""))
 
                 // Raid points
                 g.append("path")
@@ -239,7 +239,7 @@ export default class DisplayPbZones {
                     .attr("class", "svg-text-center fill-text")
                     .attr("x", (d) => d.raidPoints.map((raidPoint) => raidPoint[0]).join(","))
                     .attr("y", (d) => d.raidPoints.map((raidPoint) => raidPoint[1]).join(","))
-                    .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCharCode(49 + i)).join(""))
+                    .text((d) => d.raidPoints.map((raidPoint, i) => String.fromCodePoint(49 + i)).join(""))
                 return g
             })
     }

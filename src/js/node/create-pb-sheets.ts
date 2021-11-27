@@ -261,7 +261,7 @@ const getExcelAlpha = (colNum: number): string => {
     let columnName = ""
     while (remaining > 0) {
         const mod = (remaining - 1) % 26
-        columnName = String.fromCharCode(aCharCode + mod) + columnName
+        columnName = String.fromCodePoint(aCharCode + mod) + columnName
         remaining = (remaining - 1 - mod) / 26
     }
 

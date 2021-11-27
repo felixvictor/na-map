@@ -19,7 +19,6 @@ import {
     getNationShortNameFromFullName,
     getNationShortNameFromId,
     getPortBattleTime,
-    getTweetTimeFormatted,
     isDateInFuture,
     isTweetTimeOneDayAgo,
     isTweetTimeInLastThreeDays,
