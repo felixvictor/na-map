@@ -455,7 +455,7 @@ const getPortMaintenanceDefaults = (): void => {
             name: cleanName(apiPort.Name),
             nation: getNationShortNameFromId(apiPort.Nation),
             capturer: apiPort.Capturer as string,
-            captured: getCaptureDate(Number(apiPort.Id)),
+            captured: apiPort.Nation === 0 ? "" : getCaptureDate(Number(apiPort.Id)),
         })
     )
 }
@@ -465,10 +465,10 @@ const getPortCurrent = (): void => {
 }
 
 const updateTwitter = async (): Promise<void> => {
-    if (runType.startsWith("full")) {
-        getPortMaintenanceDefaults()
-    } else {
+    if (runType.startsWith("partial")) {
         getPortCurrent()
+    } else {
+        getPortMaintenanceDefaults()
     }
 
     initFlags()
