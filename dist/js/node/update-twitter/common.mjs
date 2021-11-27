@@ -15,7 +15,7 @@ export const getCooldownTime = (tweetTime, nation) => nation === "NT"
     : getTimeEstimate(tweetTime, dateTimeFormatTwitter).add(portBattleCooldown, "hour").format(dateTimeFormat);
 export const isDateInFuture = (date) => dayjs.utc(date, dateTimeFormat).isAfter(dayjs.utc());
 export const getNationIdFromFullName = (nationName) => findNationByName(nationName)?.id ?? 0;
-export const getNationShortNameFromId = (nationId) => findNationById(nationId).short;
+export const getNationShortNameFromId = (nationId) => findNationById(nationId)?.short ?? "n/a";
 export const getNationShortNameFromFullName = (nationName) => findNationByName(nationName)?.short ?? "";
 const getNextServerStartDateTime = (time) => {
     const timeDayjs = dayjs.utc(time, dateTimeFormatTwitter);

@@ -11,7 +11,7 @@ import path from "path";
 import { getCommonPaths } from "./common-dir";
 import { capitalizeFirstLetter, currentServerDateMonth, currentServerDateYear } from "./common";
 export const cleanName = (name) => name
-    .replace(/u([\da-f]{4})/gi, (match) => String.fromCharCode(Number.parseInt(match.replace(/u/g, ""), 16)))
+    .replace(/u([\da-f]{4})/gi, (match) => String.fromCodePoint(Number.parseInt(match.replace(/u/g, ""), 16)))
     .replace(/'/g, "’")
     .replace(" oak", " Oak")
     .replace(" (S)", "\u202F(S)")

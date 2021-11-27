@@ -18,7 +18,7 @@ import { serverIds } from "../../common/servers";
 import { baseAPIFilename, cleanName } from "../../common/common-node";
 const commonPaths = getCommonPaths();
 const APIPortFilename = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`);
-const portFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`);
+const pbFilename = path.resolve(commonPaths.dirGenServer, `${serverIds[0]}-pb.json`);
 let ports = [];
 let tweets = [];
 let isPortDataChanged = false;
@@ -281,7 +281,7 @@ const updatePorts = async () => {
         }
     }
     if (isPortDataChanged) {
-        await saveJsonAsync(portFilename, ports);
+        await saveJsonAsync(pbFilename, ports);
     }
 };
 const getAPIPortData = () => {
@@ -292,28 +292,28 @@ const getAPIPortData = () => {
 };
 const getPortMaintenanceDefaults = () => {
     const apiPorts = getAPIPortData();
-    const currentPorts = readJson(portFilename);
+    const pbPorts = readJson(pbFilename);
     const getCaptureDate = (portId) => {
-        const index = currentPorts.findIndex((port) => port.id === portId);
-        return currentPorts[index].captured;
+        const index = pbPorts.findIndex((port) => port.id === portId);
+        return pbPorts[index].captured;
     };
     ports = apiPorts.map((apiPort) => ({
         id: Number(apiPort.Id),
         name: cleanName(apiPort.Name),
         nation: getNationShortNameFromId(apiPort.Nation),
         capturer: apiPort.Capturer,
-        captured: getCaptureDate(Number(apiPort.Id)),
+        captured: apiPort.Nation === 0 ? "" : getCaptureDate(Number(apiPort.Id)),
     }));
 };
 const getPortCurrent = () => {
-    ports = readJson(portFilename);
+    ports = readJson(pbFilename);
 };
 const updateTwitter = async () => {
-    if (runType.startsWith("full")) {
-        getPortMaintenanceDefaults();
+    if (runType.startsWith("partial")) {
+        getPortCurrent();
     }
     else {
-        getPortCurrent();
+        getPortMaintenanceDefaults();
     }
     initFlags();
     tweets = await getTweets();
