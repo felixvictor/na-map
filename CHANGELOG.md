@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.3.23](///compare/v13.3.22...v13.3.23) (2021-11-27)
+
+
+### Bug Fixes
+
+* **get tweets:** port dropped to neutral (might not be resolved) af93e68
+
 ### [13.3.22](///compare/v13.3.21...v13.3.22) (2021-11-22)
 
 
