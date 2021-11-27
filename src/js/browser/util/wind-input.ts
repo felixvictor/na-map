@@ -64,14 +64,8 @@ export default class WindInput {
         // const formGroupA = form.append("div").attr("class", "form-group")
         const formGroupA = form
         const slider = formGroupA.append("div").attr("class", "text-center")
-        slider
-            .append("label")
-            .attr("for", this.#sliderId)
-            .text("Current in-game wind")
-        slider
-            .append("div")
-            .attr("id", this.#sliderId)
-            .attr("class", "rslider d-inline-block")
+        slider.append("label").attr("for", this.#sliderId).text("Current in-game wind")
+        slider.append("div").attr("id", this.#sliderId).attr("class", "rslider d-inline-block")
     }
 
     _getInputValue(): number {

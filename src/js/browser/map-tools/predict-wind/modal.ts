@@ -47,10 +47,7 @@ export default class PredictWindModal extends Modal {
         // Add time input
         const form = body.select("form")
         const block = form.append("div").attr("class", "mt-3")
-        block
-            .append("label")
-            .attr("for", this.#timeInputId)
-            .text("Predict time (server time)")
+        block.append("label").attr("for", this.#timeInputId).text("Predict time (server time)")
 
         const inputGroup = block
             .append("div")

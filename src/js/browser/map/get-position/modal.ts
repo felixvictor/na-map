@@ -77,11 +77,7 @@ export default class GetPositionModal extends Modal {
                 .attr("list", "defaultDistances")
                 .attr("min", 0)
                 .attr("max", 1000)
-            formGroup
-                .append("label")
-                .attr("for", this.#inputId[id])
-                .attr("class", "ps-4")
-                .text("Distance in k")
+            formGroup.append("label").attr("for", this.#inputId[id]).attr("class", "ps-4").text("Distance in k")
 
             this.#inputSel[id] = input.node() as HTMLInputElement
         }

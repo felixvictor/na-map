@@ -59,10 +59,7 @@ export default class F11Modal extends Modal {
         const body = super.bodySel
         super.removeFooter()
 
-        const form = body
-            .append("form")
-            .attr("id", this.#formId)
-            .attr("role", "form")
+        const form = body.append("form").attr("id", this.#formId).attr("role", "form")
         this.#formSel = form.node()!
 
         const formGroup1 = form.append("div").attr("class", "form-floating")
@@ -77,10 +74,7 @@ export default class F11Modal extends Modal {
             .attr("max", "819")
             .attr("step", "1")
             .attr("tabindex", "1")
-        formGroup1
-            .append("label")
-            .attr("for", this.#xInputId)
-            .text("X coordinate in k")
+        formGroup1.append("label").attr("for", this.#xInputId).text("X coordinate in k")
 
         const formGroup2 = form.append("div").attr("class", "form-floating")
         formGroup2
@@ -94,10 +88,7 @@ export default class F11Modal extends Modal {
             .attr("min", "-819")
             .attr("max", "819")
             .attr("tabindex", "2")
-        formGroup2
-            .append("label")
-            .attr("for", this.#zInputId)
-            .text("Z coordinate in k")
+        formGroup2.append("label").attr("for", this.#zInputId).text("Z coordinate in k")
 
         form.append("div")
             .attr("class", "form-text mt-1 mb-3")

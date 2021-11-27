@@ -23,8 +23,8 @@
             "extends": [
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
-                "prettier",
                 "plugin:unicorn/recommended",
+                "prettier",
                 "plugin:prettier/recommended"
             ],
             "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
@@ -86,7 +86,7 @@
                 "es2020": true,
                 "node": true
             },
-            "extends": ["eslint:recommended", "plugin:unicorn/recommended", "plugin:prettier/recommended"],
+            "extends": ["eslint:recommended", "plugin:unicorn/recommended", "prettier", "plugin:prettier/recommended"],
             "rules": {
                 "capitalized-comments": "off",
                 "new-cap": "off",

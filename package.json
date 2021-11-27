@@ -178,7 +178,7 @@
         "postcss-cli": "^9.0.2",
         "postcss-loader": "^6.2.1",
         "preload-webpack-plugin": "^3.0.0-beta.4",
-        "prettier": "^2.4.1",
+        "prettier": "^2.5.0",
         "prettier-plugin-packagejson": "^2.2.15",
         "recursive-readdir": "^2.2.2",
         "sass": "^1.43.5",

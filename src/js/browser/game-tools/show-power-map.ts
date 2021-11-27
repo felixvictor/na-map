@@ -432,13 +432,7 @@ export default class PowerMap {
                 },
                 (update) => update,
                 (exit) =>
-                    exit
-                        .attr("opacity", 0.3)
-                        .transition()
-                        .duration(this.#delay)
-                        .attr("opacity", 0)
-                        .remove()
-                        .selection()
+                    exit.attr("opacity", 0.3).transition().duration(this.#delay).attr("opacity", 0).remove().selection()
             )
 
         // Remember old indexes

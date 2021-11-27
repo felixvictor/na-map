@@ -54,10 +54,7 @@ export default class Toast {
             .attr("width", "48px")
             .attr("src", iconSmallSrc)
             .attr("alt", "logo")
-        header
-            .append("em")
-            .attr("class", "me-auto")
-            .html(this.#title)
+        header.append("em").attr("class", "me-auto").html(this.#title)
         header
             .append("button")
             .attr("type", "button")
@@ -65,10 +62,7 @@ export default class Toast {
             .attr("data-bs-dismiss", "toast")
             .attr("aria-label", "Close")
 
-        this.#toast
-            .append("div")
-            .attr("class", "toast-body")
-            .html(this.#text)
+        this.#toast.append("div").attr("class", "toast-body").html(this.#text)
     }
 
     _show(): void {

@@ -58,11 +58,7 @@ export default class Modal {
         const content = dialog.append("div").attr("class", "modal-content")
 
         const header = content.append("header").attr("class", "modal-header")
-        header
-            .append("h5")
-            .attr("class", "modal-title")
-            .attr("id", `title-${this.#modalId}`)
-            .html(this.#baseName)
+        header.append("h5").attr("class", "modal-title").attr("id", `title-${this.#modalId}`).html(this.#baseName)
         header
             .append("button")
             .attr("type", "button")
