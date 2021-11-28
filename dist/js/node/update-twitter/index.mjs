@@ -171,12 +171,10 @@ const checkCooldown = (tweet) => {
     if ((result = capturedRegex.exec(tweet)) !== null) {
         const nationFullNameRegexResult = result[4];
         const nation = getNationShortNameFromFullName(nationFullNameRegexResult);
-        captured(result);
         foundCooldown(result, nation);
     }
     else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         const nation = "NT";
-        npcCaptured(result);
         foundCooldown(result, nation);
     }
     else if ((result = defendedRegex.exec(tweet)) !== null) {
