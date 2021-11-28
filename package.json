@@ -23,6 +23,7 @@
         "deploy:netlify": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY}",
         "deploy:netlify-test": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST}",
         "deploy:netlify-test2": "export $(cat .env | xargs) && netlify deploy --prod --dir public --site ${KEY_NETLIFY_TEST2}",
+        "check-neutral-ports": "node --experimental-specifier-resolution=node --experimental-modules --loader ts-node/esm src/helper/check-neutral-ports.ts",
         "docs": "run-p 'docs:*'",
         "docs:js": "documentation build src/js/**.js build/**.mjs -f html -o ./doc-js",
         "docs:sass": "sassdoc src/scss -d ./doc-sass",
