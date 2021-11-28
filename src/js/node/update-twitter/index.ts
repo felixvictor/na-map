@@ -313,11 +313,9 @@ const checkCooldown = (tweet: string): void => {
     if ((result = capturedRegex.exec(tweet)) !== null) {
         const nationFullNameRegexResult = result[4]
         const nation: PortBattleNationShortName = getNationShortNameFromFullName(nationFullNameRegexResult)
-        captured(result)
         foundCooldown(result, nation)
     } else if ((result = npcCapturedRegex.exec(tweet)) !== null) {
         const nation: PortBattleNationShortName = "NT"
-        npcCaptured(result)
         foundCooldown(result, nation)
     } else if ((result = defendedRegex.exec(tweet)) !== null) {
         const nationFullNameRegexResult = result[4]
