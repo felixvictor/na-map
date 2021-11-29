@@ -2,7 +2,7 @@
  * This file is part of na-map.
  *
  * @file      Move api files to directories (year|month).
- * @module    src/node/move-api-files
+ * @module    src/helper/move-api-files
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2021
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -11,8 +11,8 @@
 import * as fs from "fs"
 import path from "path"
 
-import { getCommonPaths } from "../common/common-dir"
-import { makeDirAsync } from "../common/common-file"
+import { getCommonPaths } from "../js/common/common-dir"
+import { makeDirAsync } from "../js/common/common-file"
 
 const commonPaths = getCommonPaths()
 const monthRegex = /^api-.+-\d{4}-(\d{2})-\d{2}\.json(\.xz)?$/
