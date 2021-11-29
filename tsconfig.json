@@ -1,4 +1,9 @@
 {
+    "ts-node": {
+        "moduleTypes": {
+            "src/**/*": "esm"
+        }
+    },
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",

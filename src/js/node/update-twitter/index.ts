@@ -36,7 +36,7 @@ import { serverIds } from "../../common/servers"
 import { PortBattlePerServer } from "../../common/gen-json"
 import { baseAPIFilename, cleanName } from "../../common/common-node"
 
-import { APIPort } from "api-port"
+import { APIPort } from "../api-port"
 
 const commonPaths = getCommonPaths()
 const APIPortFilename = path.resolve(baseAPIFilename, `${serverIds[0]}-Ports-${serverDate}.json`)

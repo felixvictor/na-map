@@ -325,6 +325,7 @@ export const getNextServerStart = (): dayjs.Dayjs => getServerStartDateTime(1)
 
 export const currentServerStartDateTime = getCurrentServerStart().format("YYYY-MM-DD HH:mm")
 export const currentServerStartDate = getCurrentServerStart().format("YYYY-MM-DD")
+export const previousServerStartDate = getCurrentServerStart().add(-1, "day").format("YYYY-MM-DD")
 export const currentServerDateYear = String(dayjs(currentServerStartDate).year())
 export const currentServerDateMonth = String(dayjs(currentServerStartDate).month() + 1).padStart(2, "0")
 
