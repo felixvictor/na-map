@@ -1583,7 +1583,7 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@netlify/build@^20.0.2":
+"@netlify/build@^20.0.3":
   version "20.0.4"
   resolved "https://registry.yarnpkg.com/@netlify/build/-/build-20.0.4.tgz#a29b7b679e2c435f78ff1dd3e128d67b8045291e"
   integrity sha512-hEv5YwrgK3xkzWulnG1iD7+g/qEB/6NadXfLCkwXquW7NM624C1UAy6XI9FhOmoqYQ10cLVDz1KnUUsa5TETKQ==
@@ -10094,12 +10094,12 @@ nested-error-stacks@^2.0.0, nested-error-stacks@^2.1.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-2.1.0.tgz#0fbdcf3e13fe4994781280524f8b96b0cdff9c61"
   integrity sha512-AO81vsIO1k1sM4Zrd6Hu7regmJN1NSiAja10gc4bX3F0wd+9rQmcuHQaHVQCYIEC8iFXnE+mavh23GOt7wBgug==
 
-netlify-cli@^8.0.11:
-  version "8.0.12"
-  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-8.0.12.tgz#c61315416e6215ff8216b3de8dfc161456e34756"
-  integrity sha512-CdaIVCaj1TKj6jvv/gN2koJEWx15fbJELFuXptnBiUuYMZj3ARvjWWYZijXBCgTH77io/zB5xFryZc4zAo9feQ==
+netlify-cli@^8.0.13:
+  version "8.0.13"
+  resolved "https://registry.yarnpkg.com/netlify-cli/-/netlify-cli-8.0.13.tgz#6b8ad9fcb74ed4b6c70b34e24afaf263f677b566"
+  integrity sha512-XxsOkKWzZonmjQ1Lee1lUFoJD9uk4eZMh7x2E3D+FUwF4Rk8CvN8hVtlUPvOjzyiDdaS+rmEaa/BM7RPtjGVzA==
   dependencies:
-    "@netlify/build" "^20.0.2"
+    "@netlify/build" "^20.0.3"
     "@netlify/config" "^16.0.5"
     "@netlify/framework-info" "^6.0.0"
     "@netlify/local-functions-proxy" "^1.1.1"
@@ -10174,7 +10174,7 @@ netlify-cli@^8.0.11:
     multiparty "^4.2.1"
     netlify "^10.0.0"
     netlify-headers-parser "^5.0.0"
-    netlify-redirect-parser "^12.0.0"
+    netlify-redirect-parser "^13.0.0"
     netlify-redirector "^0.2.1"
     node-fetch "^2.6.0"
     node-version-alias "^1.0.1"
@@ -10227,6 +10227,16 @@ netlify-redirect-parser@^12.0.0:
   version "12.0.0"
   resolved "https://registry.yarnpkg.com/netlify-redirect-parser/-/netlify-redirect-parser-12.0.0.tgz#73348b45b2c519fcbc1192d4d9705c3c1d582728"
   integrity sha512-PUI3o9Jolc9bp0rE4R4E2PwnfUQYKC5o4G+uQqMuanm29aled6PbhIUYI/3Xbahn785OC93ozu1fP1tcSHJ/Ug==
+  dependencies:
+    filter-obj "^2.0.2"
+    is-plain-obj "^3.0.0"
+    path-exists "^4.0.0"
+    toml "^3.0.0"
+
+netlify-redirect-parser@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/netlify-redirect-parser/-/netlify-redirect-parser-13.0.0.tgz#a7d66dc515a47efd1e7b57b441808c6f0fb9148b"
+  integrity sha512-ptTSxYPDmeZgoECkX6utbXdjlJat35OkioKFyBCf7anmoi2bSoZEWgIDZE4SwiQUhDsfkJo1MdZd0GO91MKXuA==
   dependencies:
     filter-obj "^2.0.2"
     is-plain-obj "^3.0.0"
