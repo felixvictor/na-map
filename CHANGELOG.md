@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.4.0](///compare/v13.3.26...v13.4.0) (2021-12-02)
+
+
+### Features
+
+* font JuniusX -> Junicode Two (1.032 beta) 5b9338b
+
 ### [13.3.26](///compare/v13.3.25...v13.3.26) (2021-11-29)
 
 ### [13.3.25](///compare/v13.3.24...v13.3.25) (2021-11-29)
