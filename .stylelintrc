@@ -1,16 +1,14 @@
 {
-  "cache": true,
-  "extends": [
-    "stylelint-config-prettier",
-    "stylelint-config-twbs-bootstrap/scss",
-    "stylelint-prettier/recommended"
-  ],
-  "plugins": [
-    "stylelint-prettier",
-    "stylelint-scss"
-  ],
-  "rules": {
-    "indentation": 4,
-    "prettier/prettier": true
-  }
+    "cache": true,
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-standard-scss",
+        "stylelint-config-twbs-bootstrap",
+        "stylelint-prettier/recommended"
+    ],
+    "plugins": ["stylelint-order", "stylelint-scss", "stylelint-prettier"],
+    "rules": {
+        "indentation": 4,
+        "prettier/prettier": true
+    }
 }
