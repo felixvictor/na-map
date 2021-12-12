@@ -49,6 +49,13 @@
         }
     }
 
+    @each $color, $value in $papers {
+        .paper-#{$color} {
+            color: color-contrast($value);
+            background-color: $value;
+        }
+    }
+
     @each $color, $value in $grays {
         .gray-#{$color} {
             color: color-contrast($value);
@@ -58,6 +65,13 @@
 
     @each $color, $value in $blues {
         .blue-#{$color} {
+            color: color-contrast($value);
+            background-color: $value;
+        }
+    }
+
+    @each $color, $value in $yellows {
+        .yellow-#{$color} {
             color: color-contrast($value);
             background-color: $value;
         }

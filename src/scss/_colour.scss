@@ -8,8 +8,10 @@
 /// license   http://www.gnu.org/licenses/gpl.html
 ////
 
+@use "sass:color";
+
 @function colour-mixin($colour) {
-    @return mix(hsl(hue($colour), $sat, $lit), $colour, $mix-weight);
+    @return color.mix(hsl(color.hue($colour), $primary-sat, $primary-lit), $colour, $mix-weight);
 }
 
 // Colour scheme
@@ -21,13 +23,13 @@ $secondary-colour: #666542;
 $secondary: $secondary-colour;
 $mix-weight: 40%;
 
-$sat: saturation($primary-colour);
-$lit: lightness($primary-colour);
-$hue: hue($primary-colour);
+$primary-sat: color.saturation($primary-colour);
+$primary-lit: color.lightness($primary-colour);
+$primary-hue: color.hue($primary-colour);
 
 $paper: colour-mixin(#e0d3af);
 
-$primary-050: tint-color($primary, 90%);
+$primary-050: tint-color($primary, 85%);
 $primary-100: tint-color($primary, 80%);
 $primary-200: tint-color($primary, 60%);
 $primary-300: tint-color($primary, 40%);
@@ -38,7 +40,7 @@ $primary-700: shade-color($primary, 40%);
 $primary-800: shade-color($primary, 60%);
 $primary-900: shade-color($primary, 80%);
 
-$secondary-050: tint-color($secondary, 90%);
+$secondary-050: tint-color($secondary, 85%);
 $secondary-100: tint-color($secondary, 80%);
 $secondary-200: tint-color($secondary, 60%);
 $secondary-300: tint-color($secondary, 40%);
@@ -49,7 +51,7 @@ $secondary-700: shade-color($secondary, 40%);
 $secondary-800: shade-color($secondary, 60%);
 $secondary-900: shade-color($secondary, 80%);
 
-$paper-050: tint-color($paper, 90%);
+$paper-050: tint-color($paper, 85%);
 $paper-100: tint-color($paper, 80%);
 $paper-200: tint-color($paper, 60%);
 $paper-300: tint-color($paper, 40%);
@@ -275,6 +277,19 @@ $secondarys: (
     "900": $secondary-900,
 );
 
+$papers: (
+    "050": $paper-050,
+    "100": $paper-100,
+    "200": $paper-200,
+    "300": $paper-300,
+    "400": $paper-400,
+    "500": $paper-500,
+    "600": $paper-600,
+    "700": $paper-700,
+    "800": $paper-800,
+    "900": $paper-900,
+);
+
 $blues: (
     "100": $blue-100,
     "200": $blue-200,
@@ -285,4 +300,16 @@ $blues: (
     "700": $blue-700,
     "800": $blue-800,
     "900": $blue-900,
+);
+
+$yellows: (
+    "100": $yellow-100,
+    "200": $yellow-200,
+    "300": $yellow-300,
+    "400": $yellow-400,
+    "500": $yellow-500,
+    "600": $yellow-600,
+    "700": $yellow-700,
+    "800": $yellow-800,
+    "900": $yellow-900,
 );
