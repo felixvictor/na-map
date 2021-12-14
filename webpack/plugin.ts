@@ -2,6 +2,7 @@ import path from "path"
 import webpack from "webpack"
 
 import CopyPlugin from "copy-webpack-plugin"
+import { CleanWebpackPlugin } from "clean-webpack-plugin"
 import FaviconsPlugin from "favicons-webpack-plugin"
 import { FaviconWebpackPlugionOptions } from "favicons-webpack-plugin/src/options"
 import HtmlPlugin from "html-webpack-plugin"
@@ -98,6 +99,7 @@ const faviconsOpt: FaviconWebpackPlugionOptions = {
 
 export const plugins = [
     new webpack.ProgressPlugin(),
+    new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
         filename: isProduction ? "[name].[contenthash].css" : "[name].css",
     }),
