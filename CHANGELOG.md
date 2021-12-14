@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.5.0](///compare/v13.4.3...v13.5.0) (2021-12-14)
+
+
+### Features
+
+* improved colour palettes 252a5ab
+* improved colour palettes (050) 0153188
+
 ### [13.4.3](///compare/v13.4.2...v13.4.3) (2021-12-08)
 
 ### [13.4.2](///compare/v13.4.1...v13.4.2) (2021-12-02)
