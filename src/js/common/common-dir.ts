@@ -25,15 +25,16 @@ const buildPath = (...args: string[]) => {
 // https://stackoverflow.com/a/50052194
 
 interface DirList {
-    dirOutput: string
-    dirDataOut: string
-    dirBuild: string
     dirAPI: string
-    dirModules: string
-    dirSrc: string
-    dirLib: string
-    dirGenServer: string
+    dirBuild: string
+    dirDataOut: string
     dirGenGeneric: string
+    dirGenServer: string
+    dirLib: string
+    dirModules: string
+    dirOutput: string
+    dirSrc: string
+    dirWebpack: string
     fileBuilding: string
     fileCannon: string
     fileLoot: string
@@ -62,17 +63,19 @@ export function getCommonPaths(appRoot = process.env.PWD ?? ""): DirList {
     const dirGenServer = buildPath(dirLib, "gen-server")
     const dirGenGeneric = buildPath(dirLib, "gen-generic")
     const dirSrc = buildPath(appRoot, "src")
+    const dirWebpack = buildPath(appRoot, "webpack")
 
     return {
-        dirOutput,
-        dirDataOut: buildPath(dirOutput, "data"),
-        dirBuild,
         dirAPI,
-        dirModules: buildPath(dirBuild, "Modules"),
-        dirSrc,
-        dirLib,
-        dirGenServer,
+        dirBuild,
+        dirDataOut: buildPath(dirOutput, "data"),
         dirGenGeneric,
+        dirGenServer,
+        dirLib,
+        dirModules: buildPath(dirBuild, "Modules"),
+        dirOutput,
+        dirSrc,
+        dirWebpack,
 
         filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
         filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),

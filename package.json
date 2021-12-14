@@ -43,11 +43,11 @@
         "pre-build:port-bonus": "node --experimental-specifier-resolution=node --experimental-modules --loader ts-node/esm src/js/node/convert-port-bonus.ts",
         "pre-build:tiles": "vips dzsave /mnt/na-map.tif src/images/map --depth onetile --layout google --tile-size 256 --overlap 0 --suffix .webp[Q=100,reduction-effort=6]",
         "preprod": "rm -rf public/",
-        "prod": "      TS_NODE_PROJECT='tsconfig-for-webpack-config.json'            webpack --config webpack.config.ts --mode=production --color",
+        "prod": "      TS_NODE_PROJECT='webpack/tsconfig-for-webpack-config.json'            webpack --config webpack/webpack.config.ts --mode=production --color",
         "preprod-quiet": "rm -rf public/",
-        "prod-quiet": "TS_NODE_PROJECT='tsconfig-for-webpack-config.json' QUIET=true webpack --config webpack.config.ts --mode=production --color",
+        "prod-quiet": "TS_NODE_PROJECT='webpack/tsconfig-for-webpack-config.json' QUIET=true webpack --config webpack/webpack.config.ts --mode=production --color",
         "release": "standard-version",
-        "start": "TS_NODE_PROJECT='tsconfig-for-webpack-config.json' webpack serve --config webpack.config.ts --mode=development --color --hot --open"
+        "start": "TS_NODE_PROJECT='webpack/tsconfig-for-webpack-config.json' webpack serve --config webpack/webpack.config.ts --mode=development --color --hot --open"
     },
     "browserslist": [
         "defaults and supports es6-module and last 1 version and not ios > 0 and not safari > 0"
