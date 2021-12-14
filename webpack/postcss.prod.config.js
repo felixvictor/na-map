@@ -21,7 +21,7 @@ const portBonusType = ["crew", "gunnery", "hull", "mast", "sailing"]
 const purgecssSafelistStandard = portBonusType.map((bonus) => `icon-${bonus}`)
 
 const purgecssOpt = {
-    content: ["./src/**/*.{ejs, ts, mts}"],
+    content: ["./src/**/*.{ejs,ts,mts}"],
     safelist: { standard: purgecssSafelistStandard, deep: purgecssSafelistDeep },
     variables: true,
 }
