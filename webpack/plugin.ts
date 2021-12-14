@@ -25,7 +25,7 @@ import {
     primary300,
     themeColour,
 } from "./colours"
-import { dirEjs, dirLib, dirMap, dirOutput, dirPrefixIcons, dirSrc, fileLogo } from "./dir"
+import { dirEjs, dirGenGeneric, dirGenServer, dirMap, dirOutput, dirPrefixIcons, dirSrc, fileLogo } from "./dir"
 import { isProduction, TARGET } from "./env"
 import { repairs } from "./repairs"
 
@@ -135,8 +135,8 @@ export const plugins = [
     new CopyPlugin({
         patterns: [
             { from: "netlify.toml" },
-            { from: `${dirLib}/gen-generic/*.xlsx`, to: `${dirOutput}/data/[name][ext]` },
-            { from: `${dirLib}/gen-server`, to: `${dirOutput}/data` },
+            { from: `${dirGenGeneric}/*.xlsx`, to: `${dirOutput}/data/[name][ext]` },
+            { from: `${dirGenServer}`, to: `${dirOutput}/data` },
             { from: `${dirSrc}/google979f2cf3bed204d6.html` },
             { from: dirMap, to: `${dirOutput}/images/map` },
         ],

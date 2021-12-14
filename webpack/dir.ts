@@ -5,7 +5,7 @@ import TSCONFIG from "../tsconfig.json"
 import { getCommonPaths } from "../src/js/common/common-dir"
 
 export const commonPaths = getCommonPaths()
-export const { dirGenGeneric, dirLib, dirOutput, dirSrc, dirWebpack } = commonPaths
+export const { dirGenGeneric, dirGenServer, dirLib, dirOutput, dirSrc, dirWebpack } = commonPaths
 
 export const dirEjs = path.resolve(dirSrc, "ejs")
 export const dirFlags = path.resolve(dirSrc, "images", "flags")
