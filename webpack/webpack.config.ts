@@ -39,7 +39,7 @@ const config: webpack.Configuration = {
 
     output: {
         crossOriginLoading: "anonymous",
-        filename: isProduction ? "[name].[contenthash].mjs" : "[name].mjs",
+        filename: isProduction ? "[name].[contenthash].js" : "[name].js",
         path: dirOutput,
         publicPath,
     },
