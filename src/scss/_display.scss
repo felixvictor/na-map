@@ -150,8 +150,8 @@ text,
 .sub-title,
 .title {
     font-weight: 300;
-    font-stretch: condensed;
     font-feature-settings: "c2sc", "smcp";
+    font-stretch: condensed;
     text-anchor: middle;
     text {
         fill: $primary-900;

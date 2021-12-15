@@ -16,14 +16,14 @@
 }
 
 svg {
-    stroke-width: 0.05rem;
     overflow: auto;
+    stroke-width: 0.05rem;
     text {
         pointer-events: none;
         user-select: none;
-        stroke: none;
-        text-anchor: start;
         dominant-baseline: mathematical;
+        text-anchor: start;
+        stroke: none;
     }
 }
 
@@ -93,13 +93,13 @@ svg {
 }
 
 .background-primary-light {
-    fill-opacity: 0.3;
     fill: $primary-300;
+    fill-opacity: 0.3;
 }
 
 .background-red {
-    fill-opacity: 0.3;
     fill: $red-600;
+    fill-opacity: 0.3;
 }
 
 .stroke-contrast-text {
@@ -224,9 +224,9 @@ $wind-profile-colour: $paper-700;
     text {
         font-size: small;
         pointer-events: none;
-        stroke: none;
-        text-anchor: middle;
         dominant-baseline: mathematical;
+        text-anchor: middle;
+        stroke: none;
     }
 }
 
@@ -244,8 +244,8 @@ $wind-profile-colour: $paper-700;
 .drag-active {
     filter: none;
     stroke: $orange !important;
-    stroke-width: 4rem;
     stroke-opacity: 0.4;
+    stroke-width: 4rem;
 }
 
 .trade-link {
@@ -258,8 +258,8 @@ $wind-profile-colour: $paper-700;
 }
 
 .trade-label {
-    fill: $overlay-text-colour;
     text-anchor: middle;
+    fill: $overlay-text-colour;
 }
 
 .trade-head {
@@ -285,8 +285,8 @@ $wind-profile-colour: $paper-700;
 
     text {
         font-style: italic;
-        fill: $primary-100;
         text-anchor: end;
+        fill: $primary-100;
     }
 }
 
@@ -326,8 +326,8 @@ $wind-profile-colour: $paper-700;
 }
 
 .speed-text text {
-    fill: $paper-500;
     dominant-baseline: auto;
+    fill: $paper-500;
 }
 
 .base-profile,
@@ -340,6 +340,6 @@ $wind-profile-colour: $paper-700;
 }
 
 .comp-profile {
-    stroke-width: 3px;
     stroke: $secondary-800;
+    stroke-width: 3px;
 }

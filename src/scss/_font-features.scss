@@ -9,10 +9,10 @@
 ////
 
 body {
-    font-variant-alternates: styleset(ss18); // (needs also calt)
     font-kerning: normal;
-    font-variant-caps: normal;
     font-variant-ligatures: common-ligatures contextual; // liga calt
+    font-variant-caps: normal;
+    font-variant-alternates: styleset(ss18); // (needs also calt)
     font-variant-numeric: oldstyle-nums proportional-nums; // onum pnum
 }
 
