@@ -1,8 +1,11 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "esnext",
-    "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
+    "ts-node": {
+      "transpileOnly": true
+    },
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "esModuleInterop": true,
+        "resolveJsonModule": true
+    }
 }
