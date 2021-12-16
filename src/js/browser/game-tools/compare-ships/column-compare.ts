@@ -31,6 +31,7 @@ import { CompareShips } from "./compare-ships"
 import { colourWhite, pluralise, segmentRadians } from "common/common-browser"
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor } from "common/common-game-tools"
 
+import { maxShallowWaterBR } from "common/common"
 import { ShipData } from "common/gen-json"
 import { HtmlString } from "common/interface"
 import { DragData, ShipDisplayData } from "compare-ships"
@@ -585,7 +586,11 @@ export class ColumnCompare extends Column {
                 this.shipCompareData.sails.armour,
                 this._shipBaseData.sails.armour
             )}`,
-            shipRating: `${getOrdinal(this.shipCompareData.class)} rate`,
+            shipRating: `${getOrdinal(this.shipCompareData.class)} rate</br>${
+                this.shipCompareData.battleRating <= maxShallowWaterBR
+                    ? '<i class="mt-2 icon icon-small icon-light icon-shallow" role="img" aria-label="Shallow"></i>'
+                    : '<i class="mt-2 icon icon-small icon-light icon-deep" role="img" aria-label="Deep"></i>'
+            }`,
             sideArmor: `${formatInt(this.shipCompareData.sides.armour)}\u00A0${getDiff(
                 this.shipCompareData.sides.armour,
                 this._shipBaseData.sides.armour

@@ -14,6 +14,7 @@ $icon-dir: "../icons";
 
 $icon-size: 24px;
 $icon-size-large: math.round($icon-size * 1.2);
+$icon-size-small: math.round(math.div($icon-size, 1.3));
 
 .icon {
     display: inline-block;
@@ -29,8 +30,17 @@ $icon-size-large: math.round($icon-size * 1.2);
     height: $icon-size-large;
 }
 
+.icon-small {
+    width: $icon-size-small;
+    height: $icon-size-small;
+}
+
 .icon-light {
     background-color: $secondary-400;
+}
+
+.icon-lighter {
+    background-color: $paper-600;
 }
 
 .icon-navbar {

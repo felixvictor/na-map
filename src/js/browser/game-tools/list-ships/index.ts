@@ -9,7 +9,7 @@
  */
 
 import { registerEvent } from "../../analytics"
-import { sortBy } from "common/common"
+import { maxShallowWaterBR, sortBy } from "common/common"
 import { getIdFromBaseName } from "common/common-browser"
 import { formatFloatFixed, formatInt } from "common/common-format"
 import { beautifyShipName } from "common/common-game-tools"
@@ -53,7 +53,14 @@ export default class ShipList {
         this.#shipListData = shipData.map(
             (ship: ShipData): ShipListData => [
                 [ship.class, String(ship.class)],
-                [ship.name, beautifyShipName(ship.name)],
+                [
+                    ship.name,
+                    `${beautifyShipName(ship.name)} ${
+                        ship.battleRating <= maxShallowWaterBR
+                            ? '<i class="ps-2 icon icon-small icon-lighter icon-shallow" role="img" aria-label="Shallow"></i>'
+                            : ""
+                    }`,
+                ],
                 [ship.guns.total, String(ship.guns.total)],
                 [ship.guns.damage.cannons, formatInt(ship.guns.damage.cannons)],
                 [ship.battleRating, formatInt(ship.battleRating)],

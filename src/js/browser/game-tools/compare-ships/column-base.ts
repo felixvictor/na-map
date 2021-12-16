@@ -33,6 +33,7 @@ import { ColumnCompare } from "./column-compare"
 import { hullRepairsVolume, repairsSetSize, rigRepairsVolume, rumRepairsFactor } from "common/common-game-tools"
 import { default as shipIcon } from "icons/icon-ship.svg"
 
+import { maxShallowWaterBR } from "common/common"
 import { ShipData } from "common/gen-json"
 import { DragData, ShipDisplayData } from "compare-ships"
 import { HtmlString } from "common/interface"
@@ -430,7 +431,11 @@ export class ColumnBase extends Column {
             )}</span>`,
             sailingCrew: formatInt(this.shipData.crew.sailing ?? 0),
             sails: formatInt(this.shipData.sails.armour),
-            shipRating: `${getOrdinal(this.shipData.class)} rate`,
+            shipRating: `${getOrdinal(this.shipData.class)} rate</br>${
+                this.shipData.battleRating <= maxShallowWaterBR
+                    ? '<i class="mt-2 icon icon-small icon-light icon-shallow" role="img" aria-label="Shallow"></i>'
+                    : '<i class="mt-2 icon icon-small icon-light icon-deep" role="img" aria-label="Deep"></i>'
+            }`,
             sideArmor: `${formatInt(this.shipData.sides.armour)}</br><span class="badge badge-highlight">${formatInt(
                 this.shipData.sides.thickness
             )}</span>`,
