@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.6.0](///compare/v13.5.2...v13.6.0) (2021-12-16)
+
+
+### Features
+
+* shallow/deep water icons added for ships in ship list and ship compare f4c5d8c
+
 ### [13.5.2](///compare/v13.5.1...v13.5.2) (2021-12-15)
 
 ### [13.5.1](///compare/v13.5.0...v13.5.1) (2021-12-14)
