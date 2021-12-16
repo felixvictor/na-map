@@ -14,7 +14,7 @@ import css, { Declaration, Rule } from "css"
 import Excel from "exceljs"
 import sass from "sass"
 
-import { currentServerStartDate, range, sortBy } from "../common/common"
+import { currentServerStartDate, maxShallowWaterBR, minDeepWaterBR, range, sortBy } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
 import { executeCommand, readJson } from "../common/common-file"
 
@@ -30,8 +30,6 @@ interface PortBR {
 
 const commonPaths = getCommonPaths()
 
-const shallowWaterFrigates = new Set(["Cerberus", "Hercules", "L’Hermione", "La Renommée", "Surprise"])
-const minDeepWaterBR = 80
 const maxNumPlayers = 25
 const columnWidth = 20
 const rowHeight = 24
@@ -70,7 +68,9 @@ const columnsHeader = [
 const numColumnsHeader = columnsHeader.length
 const numColumnsTotal = numColumnsHeader + maxNumPlayers
 
-const fileScssPreCompile = path.resolve("src", "scss", "pre-compile.scss")
+const fileScssPreCompile = path.resolve(commonPaths.dirSrc, "scss", "pre-compile.scss")
+
+const isAIShip = (name: string): boolean => ["Basic", "Rooki", "Trade", "Tutor"].includes(name.slice(0, 5))
 
 const getArgbColour = (hexColour: string): argbColour => `00${hexColour.replace("#", "")}`
 const defaultColour: argbColour = getArgbColour("#44ff00")
@@ -80,11 +80,7 @@ const defaultColour: argbColour = getArgbColour("#44ff00")
  * @returns Colours
  */
 const setColours = (): ColourMap => {
-    const compiledCss = sass
-        .renderSync({
-            file: fileScssPreCompile,
-        })
-        .css.toString()
+    const compiledCss = sass.compile(fileScssPreCompile, { loadPaths: ["./"] }).css
     const parsedCss = css.parse(compiledCss)
     return new Map(
         (
@@ -194,19 +190,11 @@ const setupData = () => {
         .sort((a, b) => a.name.localeCompare(b.name))
 
     dwShips = shipsOrig
-        .filter(
-            (ship) =>
-                !["Basic", "Hulk ", "Rooki", "Trade", "Tutor"].includes(ship.name.slice(0, 5)) &&
-                (ship.battleRating >= minDeepWaterBR || ship.name === "Mortar Brig")
-        )
+        .filter((ship) => !isAIShip(ship.name) && (ship.battleRating >= minDeepWaterBR || ship.name === "Mortar Brig"))
         .sort(sortBy(["class", "-battleRating", "name"]))
 
     swShips = shipsOrig
-        .filter(
-            (ship) =>
-                shallowWaterFrigates.has(ship.name) ||
-                (ship.class >= 6 && !["Basic", "Rooki", "Trade", "Tutor"].includes(ship.name.slice(0, 5)))
-        )
+        .filter((ship) => !isAIShip(ship.name) && ship.battleRating <= maxShallowWaterBR)
         .sort(sortBy(["class", "-battleRating", "name"]))
 }
 
