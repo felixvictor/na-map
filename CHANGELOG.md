@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.1](///compare/v13.6.0...v13.6.1) (2021-12-17)
+
+
+### Bug Fixes
+
+* **about:** updated Aquillas' guide 66c0017
+
 ## [13.6.0](///compare/v13.5.2...v13.6.0) (2021-12-16)
 
 
