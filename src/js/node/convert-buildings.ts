@@ -60,6 +60,7 @@ let apiItems: APIItemGeneric[]
 
 const getItemsCrafted = (buildingId: number): BuildingResult[] =>
     apiItems
+        .filter((item) => item.Id <= 2291) // work around
         .filter(
             (item) =>
                 (!item.NotUsed || itemIsUsed.has(item.Id)) &&

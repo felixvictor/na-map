@@ -86,7 +86,9 @@ const convertRecipes = async (): Promise<void> => {
         apiItems.filter((item) => !item.NotUsed && item.Upgrade).map((item) => [item.Id, item.Upgrade ?? 0])
     )
 
-    const filteredItems = apiItems.filter(
+    const filteredItems = apiItems
+        .filter((item) => item.Id !== 1361 && item.Id !== 1956)
+        .filter(
         (apiRecipe) => recipeItemTypes.has(apiRecipe.ItemType) && (!apiRecipe.NotUsed || itemIsUsed.has(apiRecipe.Id))
     ) as APIRecipeResource[] | APIRecipeModuleResource[]
     for (const apiRecipe of filteredItems) {

@@ -189,6 +189,64 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         ["NONE MUSKETS_ACCURACY_BONUS", "Muskets accuracy"],
         ["NONE MUSKETS_PERCENTAGE_OF_CREW", "Crew with muskets"],
         ["NONE PERK_BOARDING_ATTACK_COST_MODIFIER", "Boarding attack cost"],
+
+        ["NONE DAMAGE_CANNON_DESTROY_PROBABILITY", ""],
+        ["NONE PERK_ARSENAL_CASTIRONKNOWLEDGE", ""],
+        ["NONE PERK_ARSENAL_CASTIRONKNOWLEDGE", ""],
+        ["NONE PERK_ARSENAL_COMBAT_RECORDING", ""],
+        ["NONE PERK_ARSENAL_CONICAL_CHAMBER", ""],
+        ["NONE PERK_ARSENAL_FUEL_WASTE_REDUCTION", ""],
+        ["NONE PERK_ARSENAL_FUEL_WASTE_REDUCTION_GUNFOUNDRY", ""],
+        ["NONE PERK_ARSENAL_FUEL_WASTE_REDUCTION_SMELTER", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY_PERCENT_INCREASER", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY_PERCENT_INCREASER", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY_PERCENT_INCREASER", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY_PROC_INCREASER", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY_PROC_INCREASER", ""],
+        ["NONE PERK_ARSENAL_GUNFOUNDRY_PROC_INCREASER", ""],
+        ["NONE PERK_ARSENAL_INCH_12_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_18_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_24_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_32_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_36_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_42_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_4_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_68_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_6_DRILL", ""],
+        ["NONE PERK_ARSENAL_INCH_9_DRILL", ""],
+        ["NONE PERK_ARSENAL_LESS_UPKEEP", ""],
+        ["NONE PERK_ARSENAL_LIGHT_WEIGHT_HEAVY", ""],
+        ["NONE PERK_ARSENAL_LONG_BARREL", ""],
+        ["NONE PERK_ARSENAL_METALLURGY", ""],
+        ["NONE PERK_ARSENAL_METAL_WASTE_REDUCTION", ""],
+        ["NONE PERK_ARSENAL_METAL_WASTE_REDUCTION", ""],
+        ["NONE PERK_ARSENAL_MORTAR", ""],
+        ["NONE PERK_ARSENAL_MORTAR_DRILL", ""],
+        ["NONE PERK_ARSENAL_MORTAR_DRILL", ""],
+        ["NONE PERK_ARSENAL_PRECISE_LONG", ""],
+        ["NONE PERK_ARSENAL_RARE_GUN_IDENTIFICATION", ""],
+        ["NONE PERK_ARSENAL_RARE_METAL_IDENTIFICATION", ""],
+        ["NONE PERK_ARSENAL_RE_BORING", ""],
+        ["NONE PERK_ARSENAL_RING", ""],
+        ["NONE PERK_ARSENAL_SHORT_GUN", ""],
+        ["NONE PERK_ARSENAL_SHORT_HOWITZER", ""],
+        ["NONE PERK_ARSENAL_SMELTING", ""],
+        ["NONE PERK_ARSENAL_SMELTING_TIME_DECREASE", ""],
+        ["NONE PERK_ARSENAL_SMELTING_TIME_DECREASE", ""],
+        ["NONE PERK_ARSENAL_STEEL_KNOWLEDGE", ""],
+        ["NONE PERK_ARSENAL_STEEL_KNOWLEDGE", ""],
+        ["NONE PERK_ARSENAL_TOTAL_EFFICIENTY", ""],
+        ["NONE PERK_ARSENAL_WRROUGHT_IRON_UNDERSTANDING", ""],
+        ["NONE PERK_ARSENAL_WRROUGHT_IRON_UNDERSTANDING", ""],
+        ["NONE PERK_CANNON_RELOAD_MODIFICATOR", ""],
+        ["NONE PERK_CANNON_RELOAD_MODIFICATOR", ""],
+        ["NONE PERK_CANNON_RELOAD_MODIFICATOR", ""],
+        ["NONE PERK_FIRE_CHANCE", ""],
+        ["NONE PERK_SEARCH", ""],
+        ["NONE SHIP_MAX_SPEED_OW", "Open world speed"],
+        ["NONE SHIP_TURNING_SPEED_OW", "Open world turn rate"],
+
         ["NONE PERK_BOARDING_DEFEND_COST_MODIFIER", "Boarding defend cost"],
         ["NONE PERK_BOARDING_ENEMY_EXTRA_CREW_REQUIREMENT", "Enemy boarding crew needed"],
         ["NONE PERK_BOARDING_ENEMY_MORALE_LOSS_MODIFIER", "Enemy boarding morale loss"],
@@ -331,6 +389,9 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         }
     }
 
+    const getModifierName = (modifier: ModifiersEntity): APIModifierName =>
+        `${modifier.Slot} ${modifier.MappingIds.join(",")}`
+
     /**
      * Get module modifier properties
      * @param APImodifiers - Module modifier data
@@ -338,16 +399,24 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
      */
     const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesEntity[] => {
         return APImodifiers.filter((modifier) => {
-            const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
+            const apiModifierName = getModifierName(modifier)
             if (!modifiers.has(apiModifierName)) {
                 console.log(`${apiModifierName} modifier not defined`)
                 return true
             }
+            /*
+            console.log(
+                "modifiers",
+                modifiers.get(apiModifierName),
+                "unequal ''",
+                modifiers.get(apiModifierName) !== ""
+            )
 
+             */
             return modifiers.get(apiModifierName) !== ""
         })
             .flatMap((modifier) => {
-                const apiModifierName: APIModifierName = `${modifier.Slot} ${modifier.MappingIds.join(",")}`
+                const apiModifierName = getModifierName(modifier)
                 const modifierName = modifiers.get(apiModifierName) ?? ""
 
                 let amount = modifier.Percentage
@@ -445,11 +514,10 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
     }
 
     const apiModules = apiItems
-        .filter(
-            (item) =>
-                item.ItemType === "Module" &&
-                ((item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
-        )
+        .filter((item) => item.ItemType === "Module")
+        .filter((item) => item.Id !== 1338)
+        .filter((item) => item.Id <= 2594) // work around
+        .filter((item) => (item.ModuleType === "Permanent" && !item.NotUsed) || item.ModuleType !== "Permanent")
         .filter((item) => !notUsedExceptionalWoodIds.has(item.Id)) as APIModule[]
 
     for (const apiModule of apiModules) {
