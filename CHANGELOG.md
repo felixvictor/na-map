@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.2](///compare/v13.6.1...v13.6.2) (2021-12-20)
+
+
+### Bug Fixes
+
+* **cannon data:** 20 December 2021 patch (additional guns, not used yet) c5dc868
+* **data:** 20 December 2021 patch 2084029
+* **list modules:** table padding 9af7e78
+* **ship data:** 20 December 2021 patch (ratio of muskets) 0fa9380
+
 ### [13.6.1](///compare/v13.6.0...v13.6.1) (2021-12-17)
 
 
