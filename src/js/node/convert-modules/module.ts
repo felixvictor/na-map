@@ -191,7 +191,6 @@ export const setModule = (module: ModuleConvertEntity): void => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
-    if (module.name === "Northern Master Carpenters") console.log(APImodifiers, cleanedModule)
     modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? ({} as CleanedModule) : cleanedModule)
 }
 
