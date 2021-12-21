@@ -86,7 +86,7 @@ export default class ListModules {
      */
     _getRows(moduleType: string): HtmlString[] {
         /**
-         * Rate code mapped into human readable string
+         * Rate code mapped into human-readable string
          */
         const rates = new Map<string, string>([
             ["L", `${getOrdinal(1)}\u202F\u2013\u202F${getOrdinal(3)}`],
@@ -132,23 +132,28 @@ export default class ListModules {
                         !module.hasSamePropertiesAsPrevious
                     ) {
                         rows.push(
-                            `<tr><td>${
-                                module.name
-                            }<br>${rate}</td><td class="py-0"><table class="table table-sm table-hover text-table text-start mb-0"><tbody>${module.properties
-                                .map((property) => {
-                                    let amount
-                                    if (property.isPercentage) {
-                                        amount = formatSignPercentOldstyle(property.amount / 100)
-                                    } else {
-                                        amount =
-                                            property.amount < 1 && property.amount > 0
-                                                ? formatPP(property.amount, 1)
-                                                : formatSignInt(property.amount)
-                                    }
+                            `<tr>
+                                <td class="pe-2">${module.name}<br>${rate}</td>
+                                <td class="py-0 ps-0">
+                                    <table class="table table-sm table-hover text-table text-start mb-0"><tbody>${module.properties
+                                        .map((property) => {
+                                            let amount
+                                            if (property.isPercentage) {
+                                                amount = formatSignPercentOldstyle(property.amount / 100)
+                                            } else {
+                                                amount =
+                                                    property.amount < 1 && property.amount > 0
+                                                        ? formatPP(property.amount, 1)
+                                                        : formatSignInt(property.amount)
+                                            }
 
-                                    return `<tr><td>${property.modifier}</td><td>${amount}</td></tr>`
-                                })
-                                .join("")}</tbody></table></td></tr>`
+                                            return `<tr>
+                                                        <td class="pe-2">${property.modifier}</td>
+                                                        <td class="text-end pe-2">${amount}</td>
+                                                    </tr>`
+                                        })
+                                        .join("")}</tbody></table></td>
+                            </tr>`
                         )
                     }
                 }
@@ -170,7 +175,11 @@ export default class ListModules {
         for (const column of Array.from({ length: splitRows.length }).keys()) {
             text += `<div class="col-md-${Math.floor(12 / splitRows.length)}">`
             text += '<table class="table table-sm table-striped table-hover text-table text-start"><thead>'
-            text += "<tr><th>Module</th><th>Modifier</th></tr></thead><tbody>"
+            text += `<tr>
+                        <th>Module</th>
+                        <th>Modifier</th>
+                    </tr>`
+            text += "</thead><tbody>"
             text += splitRows[column].join("")
             text += "</tbody></table></div>"
         }
