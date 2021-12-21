@@ -388,7 +388,7 @@ const convertGenericShipData = (): ShipData[] => {
             const cannonBroadsideDamage = Math.round((gunsPerDeck * cannonDamageCurrentDeck) / 2)
             guns.damage.cannons += cannonBroadsideDamage
 
-            const carroDamageCurrentDeck = cannonData.get(guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0
+            const carroDamageCurrentDeck = carroData.get(guns.gunsPerDeck[deckIndex].maxCarroLb)?.damage ?? 0
             guns.damage.carronades +=
                 carroDamageCurrentDeck > 0
                     ? Math.round((gunsPerDeck * carroDamageCurrentDeck) / 2)
