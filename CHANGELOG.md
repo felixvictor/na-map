@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.5](///compare/v13.6.4...v13.6.5) (2021-12-21)
+
+
+### Bug Fixes
+
+* **ship compare:** damage format b32624d
+
 ### [13.6.4](///compare/v13.6.3...v13.6.4) (2021-12-21)
 
 
