@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.3](///compare/v13.6.2...v13.6.3) (2021-12-21)
+
+
+### Bug Fixes
+
+* **data:** 20 December 2021 patch 683ae21
+* **list modules:** table padding 98c82de
+
 ### [13.6.2](///compare/v13.6.1...v13.6.2) (2021-12-20)
 
 
