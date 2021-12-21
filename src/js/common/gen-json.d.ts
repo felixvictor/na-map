@@ -174,7 +174,7 @@ export interface ModuleEntity {
     name: string
     usageType: string
     moduleLevel: string
-    properties: ModulePropertiesEntity[]
+    properties: ModulePropertiesEntity[] | undefined
     type: string
     hasSamePropertiesAsPrevious?: boolean
 }

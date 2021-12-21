@@ -136,7 +136,7 @@ export default class ListModules {
                                 <td class="pe-2">${module.name}<br>${rate}</td>
                                 <td class="py-0 ps-0">
                                     <table class="table table-sm table-hover text-table text-start mb-0"><tbody>${module.properties
-                                        .map((property) => {
+                                        ?.map((property) => {
                                             let amount
                                             if (property.isPercentage) {
                                                 amount = formatSignPercentOldstyle(property.amount / 100)
