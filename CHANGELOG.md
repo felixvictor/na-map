@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.4](///compare/v13.6.3...v13.6.4) (2021-12-21)
+
+
+### Bug Fixes
+
+* **cannon data:** carro broadside damage c6bf3a7
+* **data:** 20 December 2021 patch a2dd884
+
 ### [13.6.3](///compare/v13.6.2...v13.6.3) (2021-12-21)
 
 
