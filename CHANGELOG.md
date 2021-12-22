@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.6](///compare/v13.6.5...v13.6.6) (2021-12-22)
+
+
+### Bug Fixes
+
+* **ship compare:** perks e41da5f
+* **ship speeds:** 20 December 2021 patch e4712ee
+
 ### [13.6.5](///compare/v13.6.4...v13.6.5) (2021-12-21)
 
 
