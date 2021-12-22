@@ -1,0 +1,302 @@
+[
+  {
+    "id": 286,
+    "name": "Santísima Trinidad",
+    "maxSpeed": 8
+  },
+  {
+    "id": 650,
+    "name": "L'Océan",
+    "maxSpeed": 8.3
+  },
+  {
+    "id": 2350,
+    "name": "Victory 1765",
+    "maxSpeed": 8.5
+  },
+  {
+    "id": 294,
+    "name": "Victory",
+    "maxSpeed": 8.5
+  },
+  {
+    "id": 2487,
+    "name": "Santa Ana",
+    "maxSpeed": 8.7
+  },
+  {
+    "id": 268,
+    "name": "Le Bucentaure",
+    "maxSpeed": 8.7
+  },
+  {
+    "id": 1664,
+    "name": "Christian",
+    "maxSpeed": 8.7
+  },
+  {
+    "id": 2235,
+    "name": "Implacable",
+    "maxSpeed": 9.4
+  },
+  {
+    "id": 279,
+    "name": "St. Pavel",
+    "maxSpeed": 9
+  },
+  {
+    "id": 2229,
+    "name": "Redoutable",
+    "maxSpeed": 9.6
+  },
+  {
+    "id": 2318,
+    "name": "Admiraal de Ruyter",
+    "maxSpeed": 9.8
+  },
+  {
+    "id": 265,
+    "name": "Bellona",
+    "maxSpeed": 10.04
+  },
+  {
+    "id": 359,
+    "name": "3rd Rate",
+    "maxSpeed": 10.1
+  },
+  {
+    "id": 1021,
+    "name": "Wasa",
+    "maxSpeed": 10.2
+  },
+  {
+    "id": 970,
+    "name": "Wapen von Hamburg",
+    "maxSpeed": 10.6
+  },
+  {
+    "id": 694,
+    "name": "Agamemnon",
+    "maxSpeed": 10.8
+  },
+  {
+    "id": 395,
+    "name": "Ingermanland",
+    "maxSpeed": 10.8
+  },
+  {
+    "id": 1938,
+    "name": "Rättvisan",
+    "maxSpeed": 11
+  },
+  {
+    "id": 1674,
+    "name": "Constitution",
+    "maxSpeed": 11.3
+  },
+  {
+    "id": 270,
+    "name": "United States",
+    "maxSpeed": 11.3
+  },
+  {
+    "id": 2078,
+    "name": "Leopard",
+    "maxSpeed": 11.6
+  },
+  {
+    "id": 293,
+    "name": "Trincomalee",
+    "maxSpeed": 11.9
+  },
+  {
+    "id": 768,
+    "name": "Endymion",
+    "maxSpeed": 11.95
+  },
+  {
+    "id": 787,
+    "name": "Indefatigable",
+    "maxSpeed": 11.85
+  },
+  {
+    "id": 1665,
+    "name": "Diana",
+    "maxSpeed": 11.9
+  },
+  {
+    "id": 272,
+    "name": "Essex",
+    "maxSpeed": 12
+  },
+  {
+    "id": 986,
+    "name": "L'hermione",
+    "maxSpeed": 12.1
+  },
+  {
+    "id": 592,
+    "name": "Santa Cecilia",
+    "maxSpeed": 12.15
+  },
+  {
+    "id": 281,
+    "name": "Pirate Frigate",
+    "maxSpeed": 12.2
+  },
+  {
+    "id": 273,
+    "name": "Frigate",
+    "maxSpeed": 12
+  },
+  {
+    "id": 264,
+    "name": "La Belle-Poule",
+    "maxSpeed": 12
+  },
+  {
+    "id": 288,
+    "name": "Surprise",
+    "maxSpeed": 12.1
+  },
+  {
+    "id": 1675,
+    "name": "Hercules",
+    "maxSpeed": 12.1
+  },
+  {
+    "id": 425,
+    "name": "Indiaman",
+    "maxSpeed": 11
+  },
+  {
+    "id": 285,
+    "name": "La Renommée",
+    "maxSpeed": 12.2
+  },
+  {
+    "id": 269,
+    "name": "Cerberus",
+    "maxSpeed": 12.3
+  },
+  {
+    "id": 1020,
+    "name": "Pandora",
+    "maxSpeed": 12.3
+  },
+  {
+    "id": 284,
+    "name": "Rattlesnake Heavy",
+    "maxSpeed": 12.3
+  },
+  {
+    "id": 1676,
+    "name": "Le Requin",
+    "maxSpeed": 12
+  },
+  {
+    "id": 1561,
+    "name": "Le Gros Ventre Refit",
+    "maxSpeed": 12.3
+  },
+  {
+    "id": 287,
+    "name": "Snow",
+    "maxSpeed": 12.5
+  },
+  {
+    "id": 292,
+    "name": "TradersSnow",
+    "maxSpeed": 12
+  },
+  {
+    "id": 278,
+    "name": "Niagara",
+    "maxSpeed": 12.5
+  },
+  {
+    "id": 396,
+    "name": "Le Gros Ventre",
+    "maxSpeed": 12
+  },
+  {
+    "id": 276,
+    "name": "Mercury",
+    "maxSpeed": 12.5
+  },
+  {
+    "id": 1125,
+    "name": "Prince de Neufchâtel",
+    "maxSpeed": 13
+  },
+  {
+    "id": 277,
+    "name": "Navy Brig",
+    "maxSpeed": 12.69
+  },
+  {
+    "id": 283,
+    "name": "Rattlesnake",
+    "maxSpeed": 12.5
+  },
+  {
+    "id": 266,
+    "name": "Brig",
+    "maxSpeed": 12.6
+  },
+  {
+    "id": 289,
+    "name": "TradersBrig",
+    "maxSpeed": 12
+  },
+  {
+    "id": 271,
+    "name": "Cutter",
+    "maxSpeed": 13
+  },
+  {
+    "id": 290,
+    "name": "TradersCutter",
+    "maxSpeed": 13
+  },
+  {
+    "id": 295,
+    "name": "Yacht",
+    "maxSpeed": 13
+  },
+  {
+    "id": 393,
+    "name": "Yacht Silver",
+    "maxSpeed": 13
+  },
+  {
+    "id": 282,
+    "name": "Privateer",
+    "maxSpeed": 13.5
+  },
+  {
+    "id": 280,
+    "name": "Pickle",
+    "maxSpeed": 12.6
+  },
+  {
+    "id": 267,
+    "name": "Mortar Brig",
+    "maxSpeed": 11.7
+  },
+  {
+    "id": 274,
+    "name": "Lynx",
+    "maxSpeed": 13.5
+  },
+  {
+    "id": 291,
+    "name": "TradersLynx",
+    "maxSpeed": 12.49
+  },
+  {
+    "id": 695,
+    "name": "GunBoat",
+    "maxSpeed": 13
+  }
+]
