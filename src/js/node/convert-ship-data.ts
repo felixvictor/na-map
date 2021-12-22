@@ -286,7 +286,7 @@ const getItemNames = (): Map<number, string> => new Map(apiItems.map((item) => [
 const getShipMass = (id: number): number => apiItems.find((apiItem) => id === apiItem.Id)?.ShipMass ?? 0
 
 const getSpeedDegrees = (specs: Specs): { maxSpeed: number; speedDegrees: number[] } => {
-    const maxSpeed = round(specs.MaxSpeed * speedConstM - speedConstB, 2)
+    const maxSpeed = round(specs.MaxSpeed * speedConstM + speedConstB, 1)
     const speedDegrees = specs.SpeedToWind.map((speed: number) => roundToThousands(speed * maxSpeed))
     const { length } = specs.SpeedToWind
 
