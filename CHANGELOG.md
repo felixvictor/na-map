@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.7](///compare/v13.6.6...v13.6.7) (2021-12-25)
+
+
+### Bug Fixes
+
+* **list loot:** format chest lifetime 016475a
+
 ### [13.6.6](///compare/v13.6.5...v13.6.6) (2021-12-22)
 
 
