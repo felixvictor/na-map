@@ -240,7 +240,7 @@ export default class ListLoot {
         if (currentChest) {
             return html`
                 <p>
-                    Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(
+                    Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(
                         currentChest.lifetime
                     )} hours
                 </p>
