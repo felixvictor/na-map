@@ -240,11 +240,11 @@ export default class ListLoot {
         if (currentChest) {
             return html`
                 <p>
-                    Weight ${formatInt(currentChest.weight)} tons<br />Lifetime ${formatInt(currentChest.lifetime)}
-                    hours
+                    Weight ${formatInt(currentChest.weight)} tons<br />Lifetime
+                    ${formatInt(currentChest.lifetime)} hours
                 </p>
                 ${currentChest.itemGroup.map(
-                    (group) => html` <h5>Group chance: ${ListLoot._printChance(group.chance)}</h5>
+                    (group) => html`<h5>Group chance: ${ListLoot._printChance(group.chance)}</h5>
                         ${this._getLootItemsText(group.items.sort(sortBy(["name"])), "Item", false)}`
                 )}
             `
