@@ -9,7 +9,7 @@
  */
 
 import { exec, execSync } from "child_process"
-import { default as fs, promises as pfs } from "fs"
+import { default as fs, promises as fsPromises } from "fs"
 import path from "path"
 import { promisify } from "util"
 
@@ -35,20 +35,20 @@ export const fileExists = (fileName: string): boolean => fs.existsSync(fileName)
  * Make directories (recursive)
  */
 export const makeDirAsync = async (dir: string): Promise<void> => {
-    await pfs.mkdir(dir, { recursive: true })
+    await fsPromises.mkdir(dir, { recursive: true })
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const saveJsonAsync = async (fileName: string, data: object): Promise<void> => {
     await makeDirAsync(path.dirname(fileName))
-    await pfs.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
+    await fsPromises.writeFile(fileName, JSON.stringify(data), { encoding: "utf8" })
 }
 
 export const saveTextFile = (fileName: string, data: string): void => {
     fs.writeFileSync(fileName, data, { encoding: "utf8" })
 }
 
-const isNodeError = (error: Error): error is ErrnoException => error instanceof Error
+export const isNodeError = (error: unknown): error is ErrnoException => error instanceof Error
 
 export const readTextFile = (fileName: string): string => {
     let data = ""
@@ -125,7 +125,7 @@ export const executeCommand = (command: string): Buffer => {
     try {
         result = execSync(command)
     } catch (error: unknown) {
-        if (isNodeError(error as Error) && (error as ErrnoException).code === "ENOENT") {
+        if (isNodeError(error) && error.code === "ENOENT") {
             console.error("Command failed -->", error)
         } else {
             putFetchError(error as string)

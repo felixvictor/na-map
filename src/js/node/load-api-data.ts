@@ -8,13 +8,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import * as fs from "fs"
-import path from "path"
+import * as fsPromises from "node:fs/promises"
+import path from "node:path"
 import fetch from "node-fetch"
 
 import { currentServerStartDate as serverDate, sortBy } from "../common/common"
 import { apiBaseFiles } from "../common/common-var"
-import { saveJsonAsync, xzAsync } from "../common/common-file"
+import { isNodeError, saveJsonAsync, xzAsync } from "../common/common-file"
 import { baseAPIFilename } from "../common/common-node"
 import { serverIds } from "../common/servers"
 
@@ -32,19 +32,21 @@ const serverBaseName = "cleanopenworldprod"
  * Delete file (ignore if file does not exist)
  * @param fileName - File name
  */
-const deleteFile = (fileName: string): void => {
-    fs.unlink(fileName, (error) => {
-        if (error && error.code !== "ENOENT") {
-            throw new Error(`Error deleteFile: ${error.message}`)
+const deleteFile = async (fileName: string): Promise<void> => {
+    try {
+        await fsPromises.unlink(fileName)
+    } catch (error: unknown) {
+        if (isNodeError(error) && error.code !== "ENOENT") {
+            throw new Error(`Error deleteFile ${fileName}`)
         }
-    })
+    }
 }
 
 /**
  * Delete API data (uncompressed and compressed)
  * @param fileName - File name
  */
-const deleteAPIFiles = (fileName: string): void => {
+const deleteAPIFiles = async (fileName: string): Promise<void> => {
     deleteFile(fileName)
     deleteFile(`${fileName}.xz`)
 }
@@ -95,7 +97,6 @@ const loadData = async (baseAPIFilename: string): Promise<boolean> => {
         for (const apiBaseFile of apiBaseFiles) {
             const outfileName = path.resolve(baseAPIFilename, `${serverName}-${apiBaseFile}-${serverDate}.json`)
 
-            // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
             deletePromise.push(deleteAPIFiles(outfileName))
             getPromise.push(getAPIDataAndSave(serverName, apiBaseFile, outfileName))
         }
