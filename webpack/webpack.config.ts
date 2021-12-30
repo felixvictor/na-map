@@ -4,7 +4,7 @@
  * webpack.config
  */
 
-import path from "path"
+import path from "node:path"
 import webpack from "webpack"
 
 // const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")

@@ -26,7 +26,7 @@ import {
     themeColour,
 } from "./colours"
 import { dirEjs, dirGenGeneric, dirGenServer, dirMap, dirOutput, dirPrefixIcons, dirSrc, fileLogo } from "./dir"
-import { isProduction, TARGET } from "./env"
+import { isProduction, isQuiet, TARGET } from "./env"
 import { repairs } from "./repairs"
 
 const libraryName = PACKAGE.name
@@ -98,7 +98,6 @@ const faviconsOpt: FaviconWebpackPlugionOptions = {
 }
 
 export const plugins = [
-    new webpack.ProgressPlugin(),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
         filename: isProduction ? "[name].[contenthash].css" : "[name].css",
@@ -146,3 +145,11 @@ export const plugins = [
     new SitemapPlugin({ base: targetUrl, paths: sitemapPaths, options: { skipgzip: false } }),
     new SubresourceIntegrityPlugin(),
 ]
+
+if (!isQuiet) {
+    plugins.push(
+        new webpack.ProgressPlugin({
+            percentBy: "entries",
+        })
+    )
+}
