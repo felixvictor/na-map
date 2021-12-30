@@ -523,7 +523,9 @@ const isSourceDataChanged = (): boolean => {
 }
 
 export const createPortBattleSheet = async (): Promise<void> => {
-    if (!isSourceDataChanged()) {
+    const isUpdateNeeded = isSourceDataChanged()
+
+    if (isUpdateNeeded) {
         setupData()
         await createPortBattleSheets()
     }
