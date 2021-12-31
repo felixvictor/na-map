@@ -1,7 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 *~
+.pnp.*
 .yarn/*
-!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
@@ -10,7 +10,6 @@
 .idea/
 .netlify
 /.env
-/.pnp.js
 /build/API/
 /build/Modules.zip
 /doc-js/
