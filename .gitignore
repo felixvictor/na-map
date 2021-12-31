@@ -1,13 +1,14 @@
 # Created by .ignore support plugin (hsz.mobi)
 *~
+.yarn/*
+!.yarn/cache
+!.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
 .idea/
 .netlify
-.pnp.*
-.yarn/*
 /.env
 /.pnp.js
 /build/API/
