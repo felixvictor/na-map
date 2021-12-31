@@ -208,5 +208,6 @@
     "engines": {
         "node": ">=16"
     },
-    "sass": "src/scss/main.scss"
+    "sass": "src/scss/main.scss",
+    "packageManager": "yarn@3.1.1"
 }
