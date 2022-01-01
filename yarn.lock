@@ -13516,6 +13516,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mvdan-sh@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "mvdan-sh@npm:0.5.0"
+  checksum: b662308861c8d77076513d7f154ec2e340b28f34bedcf413450381255408dd6749b92b51b56946945cf016887789decfe7e89f3b201a71e3d908f59bd9e77474
+  languageName: node
+  linkType: hard
+
 "na-map@workspace:.":
   version: 0.0.0-use.local
   resolution: "na-map@workspace:."
@@ -13598,6 +13605,7 @@ __metadata:
     d3-zoom: ^3.0.0
     dayjs: ^1.10.7
     diff2html-cli: ^5.1.10
+    dotenv: ^10.0.0
     ejs-lint: ^1.2.0
     eslint: ^8.5.0
     eslint-config-prettier: ^8.3.0
@@ -13629,6 +13637,7 @@ __metadata:
     preact-render-to-string: ^5.1.19
     prettier: ^2.5.1
     prettier-plugin-packagejson: ^2.2.15
+    prettier-plugin-sh: ^0.8.1
     recursive-readdir: ^2.2.2
     round-slider: ^1.6.1
     sass: ^1.45.2
@@ -15825,6 +15834,17 @@ __metadata:
   peerDependencies:
     prettier: ">= 1.16.0"
   checksum: 2cd79e9fbabc2a5701e156ab5f6adc0fad270ad81b02f2b88fed6302ad790987e0fdef64deeee5fc2d0e80cdd4db431645e0904cfbd69f60c5ba01d6c8ef22d0
+  languageName: node
+  linkType: hard
+
+"prettier-plugin-sh@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "prettier-plugin-sh@npm:0.8.1"
+  dependencies:
+    mvdan-sh: ^0.5.0
+  peerDependencies:
+    prettier: ^2.0.0
+  checksum: a4fb3627ceedd5c6bc29d5339df323805a9ba999bd91e43f216619a316a5d01f12ed79e9f349b2479ccc76b34938b31a01fcb008078ffd58aac27449315cb020
   languageName: node
   linkType: hard
 

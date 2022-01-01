@@ -1,5 +1,6 @@
-import filterXSS from "xss"
+import dotenv from "dotenv"
 import { default as nodeFetch, RequestInit } from "node-fetch"
+import filterXSS from "xss"
 
 import { getSinceDateTimeLastSevenDays, getSinceDateTimeThisMaintenance } from "./common"
 import { cleanName } from "../../common/common-node"
@@ -33,8 +34,10 @@ const maxResults = "100"
 const queryFrom = "from:zz569k"
 const endpointUrl = "https://api.twitter.com/2/tweets/search/recent"
 
-const bearerToken = process.argv[2]
-export const runType = process.argv[3] ?? "full"
+const { parsed: dotEnvData } = dotenv.config()
+
+const bearerToken = dotEnvData?.BEARER_TOKEN
+export const runType = process.argv[2] ?? "full"
 
 const tweets: string[] = []
 
