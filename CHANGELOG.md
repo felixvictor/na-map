@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.6.12](///compare/v13.6.11...v13.6.12) (2022-01-02)
+
+
+### Bug Fixes
+
+* **select ports:** reset other selects f37923a
+
 ### [13.6.11](///compare/v13.6.10...v13.6.11) (2022-01-01)
 
 ### [13.6.10](///compare/v13.6.9...v13.6.10) (2021-12-30)
