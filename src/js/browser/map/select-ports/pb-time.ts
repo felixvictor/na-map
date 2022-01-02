@@ -12,7 +12,7 @@ import { registerEvent } from "../../analytics"
 import { getPortBattleTime } from "common/common-browser"
 import { HtmlString } from "common/interface"
 import DisplayPorts from "../display-ports"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 
 export default class SelectPBTimeWindow {
     #select = {} as Select
@@ -40,13 +40,13 @@ export default class SelectPBTimeWindow {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions = {
+        const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
         }
 
-        this.#select = new Select(this.#baseId, undefined, bsSelectOptions, this._getOptions())
+        this.#select = new Select(this.#baseId, undefined, selectOptions, this._getOptions())
     }
 
     _selected(): void {

@@ -50,7 +50,7 @@ import { Ownership, OwnershipNation } from "common/gen-json"
 import { ServerId } from "common/servers"
 import { HtmlString } from "common/interface"
 import Modal from "util/modal"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 
 /**
  *
@@ -177,9 +177,9 @@ export default class ShowPortOwnerships {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: "Select region" }
+        const selectOptions: Partial<SelectOptions> = { noneSelectedText: "Select region" }
 
-        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, selectOptions, this._getOptions())
     }
 
     _setupSelectListener(): void {

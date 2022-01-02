@@ -23,7 +23,7 @@ import { woodType } from "common/types"
 
 import { WoodData } from "../compare-woods/data"
 import Modal from "util/modal"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 
 interface ItemNeeded {
     // item
@@ -128,18 +128,18 @@ export default class ListShipBlueprints {
     }
 
     _setupShipSelect(): void {
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: "Select blueprint" }
+        const selectOptions: Partial<SelectOptions> = { noneSelectedText: "Select blueprint" }
 
-        this.#selectShip = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
+        this.#selectShip = new Select(this.#baseId, this.#modal!.baseIdSelects, selectOptions, this._getOptions())
     }
 
     _setupWoodSelects(): void {
         for (const type of woodType) {
-            const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: `Select ${type}` }
+            const selectOptions: Partial<SelectOptions> = { noneSelectedText: `Select ${type}` }
             this.#selectWood[type] = new Select(
                 `${this.#baseId}-wood-${type}`,
                 this.#modal!.baseIdSelects,
-                bsSelectOptions,
+                selectOptions,
                 this.#woodData.getOptions(type)
             )
             this.#selectWood[type].disable()
@@ -201,11 +201,12 @@ export default class ListShipBlueprints {
                 .join((enter) => enter.append("tr"))
 
             // Data join cells
-            // @ts-expect-error
             rows.selectAll("td")
+                // @ts-expect-error
                 .data((d) => d)
                 .join((enter) => enter.append("td"))
                 .classed("text-start", (d, i) => i === 0)
+                // @ts-expect-error
                 .html((d) => d)
         }
 

@@ -4,7 +4,7 @@ import { HtmlString } from "common/interface"
 import { ShipColumnTypeList, ModuleType, ModuleTypeList } from "compare-ships"
 import { ShipColumnType } from "./index"
 import { WoodColumnTypeList, WoodTypeList } from "compare-woods"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 import CompareShipsModal from "./modal"
 import { WoodData } from "../compare-woods/data"
 
@@ -121,15 +121,13 @@ export class CompareShipsSelect {
 
     initModuleSelects(columnId: string, moduleType: ModuleType, options: HtmlString): void {
         const divBaseId = this.#modal.getBaseId(columnId)
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = {
+        const selectOptions: Partial<SelectOptions> = {
             actionsBox: true,
             countSelectedText(amount: number) {
                 return `${amount} ${moduleType.toLowerCase()}s selected`
             },
             deselectAllText: "Clear",
             liveSearch: true,
-            liveSearchNormalize: true,
-            liveSearchPlaceholder: "Search ...",
             maxOptions: moduleType.startsWith("Ship trim") ? 6 : 5,
             selectedTextFormat: "count > 1",
             title: `${moduleType}`,
@@ -139,7 +137,7 @@ export class CompareShipsSelect {
         this.#selectModule[columnId][moduleType] = new Select(
             `${divBaseId}-${moduleType.replace(/\s/, "")}`,
             this.#modal.getBaseIdSelects(columnId),
-            bsSelectOptions,
+            selectOptions,
             options,
             true
         )

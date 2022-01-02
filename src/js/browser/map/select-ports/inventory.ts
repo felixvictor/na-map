@@ -16,7 +16,7 @@ import { NationShortName, sortBy } from "common/common"
 import { HtmlString } from "common/interface"
 import { InventoryEntity } from "common/gen-json"
 
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 import DisplayPorts from "../display-ports"
 import { NAMap } from "../na-map"
 
@@ -41,7 +41,7 @@ export default class SelectPortsSelectInventory {
     }
 
     show(show: boolean): void {
-        const selectSel = this.#select.select$.get(0)
+        const selectSel = this.#select.select$.get(0) ?? ({} as HTMLSelectElement)
 
         if (show) {
             selectSel.classList.remove("d-none")
@@ -72,16 +72,14 @@ export default class SelectPortsSelectInventory {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions = {
+        const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: true,
-            liveSearchNormalize: true,
-            liveSearchPlaceholder: "Search ...",
             title: this.#baseName,
             virtualScroll: true,
         }
 
-        this.#select = new Select(this.#baseId, undefined, bsSelectOptions, "")
+        this.#select = new Select(this.#baseId, undefined, selectOptions, "")
     }
 
     _setupListener(): void {

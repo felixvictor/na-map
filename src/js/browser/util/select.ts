@@ -13,6 +13,46 @@ import "bootstrap-select/js/bootstrap-select"
 import { select as d3Select, Selection } from "d3-selection"
 import { HtmlString } from "common/interface"
 
+export interface SelectOptions {
+    actionsBox: boolean
+    //     container: string | false
+    countSelectedText: string | ((numSelected: number, numTotal: number) => string)
+    deselectAllText: string
+    //     dropdownAlignRight: "auto" | boolean
+    dropupAuto: boolean
+    //     header: string
+    //     hideDisabled: boolean
+    //     iconBase: string
+    liveSearch: boolean
+    // liveSearchNormalize: boolean
+    // liveSearchPlaceholder: string | null
+    // liveSearchStyle: string
+    maxOptions: number | false
+    //     maxOptionsText: string | any[] | ((numAll: number, numGroup: number) => [string, string])
+    //     mobile: boolean
+    //     multipleSeparator: string
+    //     noneResultsText: string
+    noneSelectedText: string
+    //     sanitize: boolean
+    //     sanitizeFn: null | ((unsafeElements: Array<HTMLElement | ChildNode | Node>) => void)
+    //     selectAllText: string
+    selectedTextFormat: string
+    //     selectOnTab: boolean
+    //     showContent: boolean
+    //     showIcon: boolean
+    //     showSubtext: boolean
+    //     showTick: boolean
+    //     size: "auto" | number | false
+    //     style: string | null
+    //     styleBase: string | null
+    //     tickIcon: string
+    title: string | null
+    virtualScroll: boolean | number
+    width: string | false
+    //     windowPadding: number | [number, number, number, number]
+    //     whiteList: Record<string, string[]>
+}
+
 export default class Select {
     #select$ = {} as JQuery<HTMLSelectElement>
     readonly #bsSelectOptions: Partial<BootstrapSelectOptions>
@@ -24,13 +64,13 @@ export default class Select {
     constructor(
         id: HtmlString,
         selectsDivId: HtmlString | undefined,
-        bsSelectOptions: Partial<BootstrapSelectOptions>,
+        selectOptions: Partial<SelectOptions>,
         options: HtmlString,
         isMultiple = false
     ) {
         this.#id = `${id}-select`
         this.#selectsDiv = selectsDivId ? d3Select(`#${selectsDivId}`) : undefined
-        this.#bsSelectOptions = bsSelectOptions
+        this.#bsSelectOptions = this.getOptions(selectOptions)
         this.#isMultiple = isMultiple
 
         this._init(options)
@@ -58,6 +98,17 @@ export default class Select {
 
     get select$(): JQuery<HTMLSelectElement> {
         return this.#select$
+    }
+
+    getOptions(selectOptions: Partial<SelectOptions>): Partial<BootstrapSelectOptions> {
+        const bsSelectOptions: Partial<BootstrapSelectOptions> = selectOptions
+
+        if (selectOptions.liveSearch) {
+            bsSelectOptions.liveSearchNormalize = true
+            bsSelectOptions.liveSearchPlaceholder = "Search ..."
+        }
+
+        return bsSelectOptions
     }
 
     getValues(): string | number | string[] | undefined {

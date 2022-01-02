@@ -19,7 +19,7 @@ import { Module, RecipeEntity, RecipeGroup } from "common/gen-json"
 import { HtmlString } from "common/interface"
 
 import Modal from "util/modal"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 import { sortBy } from "common/common"
 import { getOrdinal } from "common/common-math"
 
@@ -96,17 +96,15 @@ export default class ListRecipes {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = {
+        const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: true,
-            liveSearchNormalize: true,
-            liveSearchPlaceholder: "Search ...",
             title: "Select item",
             virtualScroll: true,
             width: "fit",
         }
 
-        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, selectOptions, this._getOptions())
 
         d3Select(`#${this.#modal!.baseIdSelects} label`)
             .attr("class", "text-muted ps-2")
@@ -158,7 +156,7 @@ export default class ListRecipes {
             for (const module of modules) {
                 ;[moduleType] = type
                 properties = `<tr><td>${module.properties
-                    .map((property) => {
+                    ?.map((property) => {
                         const amount = property.isPercentage
                             ? formatSignPercentOldstyle(property.amount / 100)
                             : property.amount

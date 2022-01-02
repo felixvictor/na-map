@@ -28,7 +28,7 @@ import { lootType, LootType } from "common/types"
 import { HtmlResult, HtmlString } from "common/interface"
 import { LootItemMap, SourceDetail } from "list-loot"
 
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 import Modal from "util/modal"
 
 const html = htm.bind(h)
@@ -159,23 +159,21 @@ export default class ListLoot {
 
         for (const type of this.#types) {
             const title = type === "loot" ? "ship loot" : type === "fish" ? "fishing region" : type
-            const selectpickerOptions: Partial<BootstrapSelectOptions> = {
+            const selectOptions: Partial<SelectOptions> = {
                 dropupAuto: false,
                 liveSearch: true,
-                liveSearchNormalize: true,
-                liveSearchPlaceholder: "Search ...",
                 title: `Select ${title}`,
                 virtualScroll: true,
             }
 
             if (type === "item") {
-                selectpickerOptions.width = "440px" // 2 * 220
+                selectOptions.width = "440px" // 2 * 220
             }
 
             this.#select[type] = new Select(
                 `${this.#baseId}-${type}`,
                 this.#modal!.baseIdSelects,
-                selectpickerOptions,
+                selectOptions,
                 this._getOptions(type)
             )
         }

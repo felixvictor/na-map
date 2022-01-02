@@ -12,7 +12,7 @@ import { registerEvent } from "../../analytics"
 import { Nation, nations, simpleStringSort, sortBy, validNationShortName } from "common/common"
 import { HtmlString } from "common/interface"
 import DisplayPorts from "../display-ports"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 
 export default class SelectPortsNationClan {
     #selectClan = {} as Select
@@ -46,13 +46,13 @@ export default class SelectPortsNationClan {
             .join("")}`
 
     _setupNationSelect(): void {
-        const bsSelectOptions = {
+        const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
         }
         const options = this._getNationOptions(true)
-        this.#selectNation = new Select(this.#baseIdNation, undefined, bsSelectOptions, options)
+        this.#selectNation = new Select(this.#baseIdNation, undefined, selectOptions, options)
     }
 
     _getClanOptions(): HtmlString {
@@ -72,17 +72,17 @@ export default class SelectPortsNationClan {
     }
 
     _setupClanSelect(): void {
-        const bsSelectOptions = {
+        const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: false,
             virtualScroll: true,
         }
         const options = this._getClanOptions()
 
-        this.#selectClan = new Select(this.#baseIdClan, undefined, bsSelectOptions, options)
+        this.#selectClan = new Select(this.#baseIdClan, undefined, selectOptions, options)
         this.#selectClanButton = this.#selectClan.select$
             .get(0)
-            .parentNode?.querySelector("button") as HTMLButtonElement
+            ?.parentNode?.querySelector("button") as HTMLButtonElement
     }
 
     _setupSelects(): void {

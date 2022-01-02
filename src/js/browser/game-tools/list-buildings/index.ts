@@ -19,7 +19,7 @@ import { Building, BuildingResult } from "common/gen-json"
 import { HtmlString } from "common/interface"
 
 import Modal from "util/modal"
-import Select from "util/select"
+import Select, { SelectOptions } from "util/select"
 
 export default class ListBuildings {
     readonly #baseId: HtmlString
@@ -70,9 +70,9 @@ export default class ListBuildings {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = { noneSelectedText: "Select building" }
+        const selectOptions: Partial<SelectOptions> = { noneSelectedText: "Select building" }
 
-        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions(), false)
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, selectOptions, this._getOptions(), false)
         this.#labelSel = this.#modal!.selectsSel.select("label")
         this.#labelSel.attr("class", "ps-2")
     }

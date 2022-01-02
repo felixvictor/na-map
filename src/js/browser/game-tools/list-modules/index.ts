@@ -13,12 +13,13 @@ import { formatPP, formatSignInt, formatSignPercentOldstyle } from "common/commo
 import { getOrdinal } from "common/common-math"
 import { chunkify } from "../../util"
 
-import { Module, ModuleEntity } from "common/gen-json"
-import { HtmlString } from "common/interface"
 import { sortBy } from "common/common"
-import Modal from "util/modal"
 import { getIdFromBaseName } from "common/common-browser"
-import Select from "util/select"
+import Modal from "util/modal"
+import Select, { SelectOptions } from "util/select"
+
+import { HtmlString } from "common/interface"
+import { Module, ModuleEntity } from "common/gen-json"
 
 export default class ListModules {
     readonly #baseId: HtmlString
@@ -65,12 +66,12 @@ export default class ListModules {
     }
 
     _setupSelect(): void {
-        const bsSelectOptions: Partial<BootstrapSelectOptions> = {
+        const selectOptions: Partial<SelectOptions> = {
             noneSelectedText: "Select module category",
             width: "fit",
         }
 
-        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, bsSelectOptions, this._getOptions())
+        this.#select = new Select(this.#baseId, this.#modal!.baseIdSelects, selectOptions, this._getOptions())
     }
 
     _setupSelectListener(): void {
