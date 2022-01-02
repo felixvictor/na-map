@@ -88,7 +88,7 @@ export default class ShowPortOwnerships {
      */
     static getHeight(): number {
         const factor = 0.75
-        return Math.floor(top.innerHeight * factor)
+        return Math.floor((top?.innerHeight ?? 0) * factor)
     }
 
     /**
@@ -286,11 +286,10 @@ export default class ShowPortOwnerships {
                 .selectAll(".area-label")
                 .data(stacked)
                 .join((enter) =>
-                    // @ts-expect-error
                     enter
                         .append("text")
                         .attr("class", "area-label text-shadow")
-                        .text((d) => labelNames.get(d.key))
+                        .text((d) => labelNames.get(d.key) ?? "")
                         .attr("fill", (d) => getContrastColour(findNationByNationShortName(d.key)?.colours[0] ?? ""))
                         .attr("transform", d3AreaLabel(area))
                 )
