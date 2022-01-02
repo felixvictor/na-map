@@ -96,6 +96,21 @@ export default class Select {
         return value ? [String(value)] : []
     }
 
+    static resetAll(): void {
+        $(".selectpicker").val("default").selectpicker("refresh")
+    }
+
+    static resetAllExcept(selectWhiteList$: JQuery<HTMLSelectElement>[]): void {
+        // Set of selects that should not be refreshed
+        const selectWhiteList = new Set(selectWhiteList$.map((select) => select[0]))
+
+        $(".selectpicker").each(function (index, element) {
+            if (!selectWhiteList.has(element as HTMLSelectElement)) {
+                $(this).val("default").selectpicker("refresh")
+            }
+        })
+    }
+
     get select$(): JQuery<HTMLSelectElement> {
         return this.#select$
     }

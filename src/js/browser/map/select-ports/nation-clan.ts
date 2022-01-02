@@ -130,11 +130,13 @@ export default class SelectPortsNationClan {
         this.#selectClan.select$.on("change", async () => {
             registerEvent("Menu", this.#baseIdNation)
 
+            Select.resetAllExcept([this.#selectClan.select$, this.#selectNation.select$])
             this._clanSelected()
         })
         this.#selectNation.select$.on("change", async () => {
             registerEvent("Menu", this.#baseIdClan)
 
+            Select.resetAllExcept([this.#selectClan.select$, this.#selectNation.select$])
             this._nationSelected()
             this._clanRefresh()
         })

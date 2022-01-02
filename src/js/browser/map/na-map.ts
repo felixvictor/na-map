@@ -34,6 +34,7 @@ import ShowF11 from "./show-f11"
 import ShowTrades from "./show-trades"
 import TrilateratePosition from "./get-position"
 import WindRose from "./wind-rose"
+import Select from "util/select"
 
 export type Tile = [number, number, number]
 
@@ -399,7 +400,7 @@ class NAMap {
         this._portSelect.clearMap()
         this.showTrades.clearMap()
         this.#windRose.clearMap()
-        $(".selectpicker").val("default").selectpicker("refresh")
+        Select.resetAll()
     }
 
     _initModal(): void {

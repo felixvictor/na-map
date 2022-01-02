@@ -86,6 +86,7 @@ export default class SelectPortsSelectInventory {
         this.#select.select$.on("change", () => {
             registerEvent("Menu", this.#baseName)
 
+            Select.resetAllExcept([this.#select.select$])
             this._selectSelected()
         })
     }

@@ -64,6 +64,7 @@ export default class SelectPortsSelectGoods {
         this.#select.select$.on("change", () => {
             registerEvent("Menu", this.#baseName)
 
+            Select.resetAllExcept([this.#select.select$])
             this._selectSelected()
         })
     }

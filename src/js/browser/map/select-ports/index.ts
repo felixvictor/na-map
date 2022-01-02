@@ -26,6 +26,7 @@ import SelectPBTimeWindow from "./pb-time"
 import SelectPortsSelectGoods from "./goods"
 import SelectPortsSelectPorts from "./ports"
 import SelectPortsNationClan from "./nation-clan"
+import Select from "util/select";
 
 type PortDepth = "deep" | "shallow"
 
@@ -46,27 +47,35 @@ export default class SelectPorts {
 
     _setupListener(): void {
         document.querySelector("#menu-prop-deep")?.addEventListener("click", () => {
+            Select.resetAll()
             this._depthSelected("deep")
         })
         document.querySelector("#menu-prop-shallow")?.addEventListener("click", () => {
+            Select.resetAll()
             this._depthSelected("shallow")
         })
         document.querySelector("#menu-prop-all")?.addEventListener("click", () => {
+            Select.resetAll()
             this._allSelected()
         })
         document.querySelector("#menu-prop-non-capturable")?.addEventListener("click", () => {
+            Select.resetAll()
             this._nonCapSelected()
         })
         document.querySelector("#menu-prop-today")?.addEventListener("click", () => {
+            Select.resetAll()
             this._capturedToday()
         })
         document.querySelector("#menu-prop-yesterday")?.addEventListener("click", () => {
+            Select.resetAll()
             this._capturedYesterday()
         })
         document.querySelector("#menu-prop-this-week")?.addEventListener("click", () => {
+            Select.resetAll()
             this._capturedThisWeek()
         })
         document.querySelector("#menu-prop-last-week")?.addEventListener("click", () => {
+            Select.resetAll()
             this._capturedLastWeek()
         })
 
