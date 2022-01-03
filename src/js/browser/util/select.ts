@@ -126,7 +126,7 @@ export default class Select {
         return bsSelectOptions
     }
 
-    getValues(): string | number | string[] | undefined {
+    getValues(): SelectValue {
         return this.#select$.val()
     }
 
