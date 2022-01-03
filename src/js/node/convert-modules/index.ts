@@ -19,10 +19,13 @@ import { APIItemGeneric, APIModule } from "../api-item"
 import { ModuleConvertEntity } from "../../common/gen-json"
 
 import { levels, notUsedExceptionalWoodIds, notUsedModules, usedModules } from "./common"
-import { isDoubleEntry, saveModules, setModule } from "./module"
+import { saveModules, setModule } from "./module"
 import { saveWoods, setWood } from "./wood"
 
 let apiItems: APIItemGeneric[]
+const addedModules = new Set<string>()
+
+const isDoubleEntry = (module: ModuleConvertEntity): boolean => addedModules.has(module.name + module.moduleLevel)
 
 /**
  * Convert API module data
@@ -59,16 +62,19 @@ export const convertModulesAndWoodData = async (): Promise<void> => {
         }
 
         // Ignore double entries
-        if (isDoubleEntry(module)) {
+        if (!isDoubleEntry(module)) {
+            let isModuleAdded = false
+
             // Check for wood module
-            if (
+            isModuleAdded =
                 (module.name.endsWith(" Planking") && module.moduleType === "Hidden") ||
                 (module.name.endsWith(" Frame") && module.moduleType === "Hidden") ||
                 module.name === "Crew Space"
-            ) {
-                setWood(module)
-            } else {
-                setModule(module)
+                    ? setWood(module)
+                    : setModule(module)
+
+            if (isModuleAdded) {
+                addedModules.add(module.name + module.moduleLevel)
             }
         }
     }

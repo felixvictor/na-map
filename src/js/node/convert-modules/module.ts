@@ -133,7 +133,7 @@ const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesE
         .sort(sortBy(["modifier"]))
 }
 
-export const setModule = (module: ModuleConvertEntity): void => {
+export const setModule = (module: ModuleConvertEntity): boolean => {
     let dontSave = false
 
     module.properties = getModuleProperties(module.APImodifiers)
@@ -192,9 +192,9 @@ export const setModule = (module: ModuleConvertEntity): void => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { APImodifiers, moduleType, sortingGroup, permanentType, ...cleanedModule } = module
     modules.set(cleanedModule.name + cleanedModule.moduleLevel, dontSave ? ({} as CleanedModule) : cleanedModule)
-}
 
-export const isDoubleEntry = (module: ModuleConvertEntity): boolean => !modules.has(module.name + module.moduleLevel)
+    return !dontSave
+}
 
 export const saveModules = async () => {
     // Get the non-empty setModules and sort

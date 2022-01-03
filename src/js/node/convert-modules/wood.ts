@@ -17,7 +17,7 @@ woods.frame = []
  * Set wood properties
  * @param module - Module data
  */
-export const setWood = (module: ModuleConvertEntity): void => {
+export const setWood = (module: ModuleConvertEntity): boolean => {
     const wood = {} as WoodTrimOrFrame
     wood.id = module.id
 
@@ -79,6 +79,8 @@ export const setWood = (module: ModuleConvertEntity): void => {
         wood.name = module.name.replace(" Frame", "")
         woods.frame.push(wood)
     }
+
+    return true
 }
 
 export const saveWoods = async () => {
