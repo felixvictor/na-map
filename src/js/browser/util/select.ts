@@ -53,6 +53,8 @@ export interface SelectOptions {
     //     whiteList: Record<string, string[]>
 }
 
+type SelectValue = string | number | string[] | undefined
+
 export default class Select {
     #select$ = {} as JQuery<HTMLSelectElement>
     readonly #bsSelectOptions: Partial<BootstrapSelectOptions>
@@ -76,24 +78,22 @@ export default class Select {
         this._init(options)
     }
 
-    static getSelectValueAsNumberArray(value: string | number | string[] | undefined): number[] {
+    static #getSelectValueAsArray<T>(value: SelectValue, conversionFunction: (value: SelectValue) => T): T[] {
         if (Array.isArray(value)) {
             // Multiple selects
-            return value.map((element) => Number(element))
+            return value.map((element) => conversionFunction(element))
         }
 
         // Single select
-        return value ? [Number(value)] : []
+        return value ? [conversionFunction(value)] : []
     }
 
-    static getSelectValueAsStringArray(value: number | number[]): string[] {
-        if (Array.isArray(value)) {
-            // Multiple selects
-            return value.map((element) => String(element))
-        }
+    static getSelectValueAsNumberArray(value: SelectValue): number[] {
+        return this.#getSelectValueAsArray<number>(value, Number)
+    }
 
-        // Single select
-        return value ? [String(value)] : []
+    static getSelectValueAsStringArray(value: SelectValue): string[] {
+        return this.#getSelectValueAsArray<string>(value, String)
     }
 
     static resetAll(): void {
@@ -130,7 +130,7 @@ export default class Select {
         return this.#select$.val()
     }
 
-    setSelectValues(ids: number | number[]): void {
+    setSelectValues(ids: SelectValue): void {
         const value = Select.getSelectValueAsStringArray(ids)
 
         if (value.length > 0) {
@@ -158,7 +158,7 @@ export default class Select {
         this.#select$.selectpicker("refresh")
     }
 
-    reset(value: string | number | string[] = "default"): void {
+    reset(value: SelectValue = "default"): void {
         this.#select$.val(value).selectpicker("refresh")
     }
 
