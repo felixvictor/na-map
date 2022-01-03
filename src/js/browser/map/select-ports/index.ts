@@ -26,7 +26,7 @@ import SelectPBTimeWindow from "./pb-time"
 import SelectPortsSelectGoods from "./goods"
 import SelectPortsSelectPorts from "./ports"
 import SelectPortsNationClan from "./nation-clan"
-import Select from "util/select";
+import Select from "util/select"
 
 type PortDepth = "deep" | "shallow"
 
