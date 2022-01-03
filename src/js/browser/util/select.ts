@@ -53,7 +53,7 @@ export interface SelectOptions {
     //     whiteList: Record<string, string[]>
 }
 
-type SelectValue = string | number | string[] | undefined
+export type SelectValue = string | number | string[] | undefined
 
 export default class Select {
     #select$ = {} as JQuery<HTMLSelectElement>

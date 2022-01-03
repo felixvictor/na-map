@@ -4,7 +4,7 @@ import { HtmlString } from "common/interface"
 import { ShipColumnTypeList, ModuleType, ModuleTypeList } from "compare-ships"
 import { ShipColumnType } from "./index"
 import { WoodColumnTypeList, WoodTypeList } from "compare-woods"
-import Select, { SelectOptions } from "util/select"
+import Select, { SelectOptions, SelectValue } from "util/select"
 import CompareShipsModal from "./modal"
 import { WoodData } from "../compare-woods/data"
 
@@ -57,11 +57,11 @@ export class CompareShipsSelect {
         }
     }
 
-    setModulesPerType(columnId: ShipColumnType, moduleType: ModuleType, ids: number[]): void {
+    setModulesPerType(columnId: ShipColumnType, moduleType: ModuleType, ids: SelectValue): void {
         this.#selectModule[columnId][moduleType].setSelectValues(ids)
     }
 
-    setModules(columnId: ShipColumnType, moduleIds: Map<string, number[]>): void {
+    setModules(columnId: ShipColumnType, moduleIds: Map<string, SelectValue>): void {
         for (const [moduleType, ids] of moduleIds) {
             this.setModulesPerType(columnId, moduleType, ids)
         }
