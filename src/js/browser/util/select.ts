@@ -75,7 +75,7 @@ export default class Select {
         this.#bsSelectOptions = this.getOptions(selectOptions)
         this.#isMultiple = isMultiple
 
-        this._init(options)
+        this.#init(options)
     }
 
     static #getSelectValueAsArray<T>(value: SelectValue, conversionFunction: (value: SelectValue) => T): T[] {
@@ -167,7 +167,7 @@ export default class Select {
         this.select$.append(options)
     }
 
-    _injectSelects(): void {
+    #injectSelects(): void {
         const div = this.#selectsDiv!.append("div").attr("class", "mb-1")
 
         div.append("select")
@@ -178,18 +178,18 @@ export default class Select {
         div.append("label").attr("for", this.#id)
     }
 
-    _construct(): void {
+    #construct(): void {
         this.#select$.selectpicker(this.#bsSelectOptions)
     }
 
-    _init(options: HtmlString): void {
+    #init(options: HtmlString): void {
         if (this.#selectsDiv) {
-            this._injectSelects()
+            this.#injectSelects()
         }
 
         this.#select$ = $(`#${this.#id}`)
         this.setOptions(options)
-        this._construct()
+        this.#construct()
         this.reset()
     }
 }
