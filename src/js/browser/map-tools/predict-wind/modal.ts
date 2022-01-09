@@ -4,7 +4,7 @@
  * @file      Predict wind modal.
  * @module    map-tools/predict-wind/modal
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 

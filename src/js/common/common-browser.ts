@@ -4,7 +4,7 @@
  * @file      Common data and functions for browser.
  * @module    src/node/common-browser
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
