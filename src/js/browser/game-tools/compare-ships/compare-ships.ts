@@ -98,9 +98,9 @@ export class CompareShips {
         return rate <= 3 ? "L" : rate <= 5 ? "M" : "S"
     }
 
-    static _getModifierFromModule(properties: ModulePropertiesEntity[]): HtmlString {
+    static _getModifierFromModule(properties: ModulePropertiesEntity[] | undefined): HtmlString {
         return `<p class="mb-0">${properties
-            .map((property) => {
+            ?.map((property) => {
                 let amount
                 if (property.isPercentage) {
                     amount = formatSignPercentOldstyle(property.amount / 100)
@@ -438,7 +438,7 @@ export class CompareShips {
             this.#moduleDataDefault.flatMap((type) =>
                 type[1]
                     .filter((module) =>
-                        module.properties.some((property) => {
+                        module.properties?.some((property) => {
                             return this.#moduleAndWoodChanges.has(property.modifier)
                         })
                     )
