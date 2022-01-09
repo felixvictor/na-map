@@ -78,7 +78,7 @@ export default class Select {
         this.#init(options)
     }
 
-    static #getSelectValueAsArray<T>(value: SelectValue, conversionFunction: (value: SelectValue) => T): T[] {
+    static #getSelectValueAsArray<T>(value: unknown, conversionFunction: (value: unknown) => T): T[] {
         if (Array.isArray(value)) {
             // Multiple selects
             return value.map((element) => conversionFunction(element))
@@ -92,7 +92,7 @@ export default class Select {
         return this.#getSelectValueAsArray<number>(value, Number)
     }
 
-    static getSelectValueAsStringArray(value: SelectValue): string[] {
+    static getSelectValueAsStringArray(value: unknown): string[] {
         return this.#getSelectValueAsArray<string>(value, String)
     }
 
@@ -130,7 +130,7 @@ export default class Select {
         return this.#select$.val()
     }
 
-    setSelectValues(ids: SelectValue): void {
+    setSelectValues(ids: unknown): void {
         const value = Select.getSelectValueAsStringArray(ids)
 
         if (value.length > 0) {
