@@ -74,6 +74,7 @@ class NAMap {
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #windRose!: WindRose
     #modal: Modal | undefined = undefined
+    #timeoutId = 0
 
     readonly rem = defaultFontSize // Font size in px
     serverName: ServerId
@@ -244,6 +245,17 @@ class NAMap {
         */
     }
 
+    #resize(): void {
+        // console.log("resize")
+    }
+
+    #resizeTimer(): void {
+        const delay = 250
+
+        window.clearTimeout(this.#timeoutId)
+        this.#timeoutId = window.setTimeout(this.#resize, delay)
+    }
+
     _setupListener(): void {
         this._svg
             // eslint-disable-next-line unicorn/no-null
@@ -281,6 +293,8 @@ class NAMap {
         document.querySelector("#show-grid")?.addEventListener("change", () => {
             this._showGridSelected()
         })
+
+        window.addEventListener("resize", () => this.#resizeTimer)
     }
 
     _setupSvg(): void {
