@@ -13,7 +13,12 @@ export const apiBaseFiles = ["ItemTemplates", "Ports", "Shops"]
 export const serverTwitterNames = new Set(["eu1"])
 
 export const serverMaintenanceHour = 10
-export const mapSize = 8192
-export const distanceMapSize = 8192
 export const portBattleCooldown = 48 // in hours
 export const flagValidity = 7 // in days
+
+export const mapSize = 8192
+export const distanceMapSize = 8192
+export const maxMapScale = 256
+export const maxTileZoom = 5
+export const minMapScale = 1
+export const tileSize = 256

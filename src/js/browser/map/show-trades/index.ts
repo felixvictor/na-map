@@ -19,6 +19,7 @@ import { nations, NationShortName } from "common/common"
 import { loadJsonFile } from "common/common-browser"
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
 import { defaultFontSize, Extent, Point, roundToThousands } from "common/common-math"
+import { minMapScale } from "common/common-var"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
@@ -92,7 +93,7 @@ export default class ShowTrades {
         this.#map = map
         this._serverName = this.#map.serverName
 
-        this._minScale = this.#map.minMapScale
+        this._minScale = minMapScale
         this._scale = this._minScale
         this._fontSize = defaultFontSize
 
