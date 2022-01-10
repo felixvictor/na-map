@@ -12,16 +12,13 @@ import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selectio
 import { D3ZoomEvent, zoom as d3Zoom, ZoomBehavior, zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
 
 import { registerEvent } from "../../analytics"
-import { appDescription, appTitle, appVersion } from "common/common-browser"
 import { defaultFontSize, Extent, nearestPow2 } from "common/common-math"
 import { mapSize, maxMapScale, minMapScale, tileSize } from "common/common-var"
-import { displayClan } from "../../util"
 
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 import { ServerId } from "common/servers"
 
 import Cookie from "util/cookie"
-import Modal from "util/modal"
 
 import DisplayGrid from "../display-grid"
 import DisplayPbZones from "../display-pb-zones"
@@ -35,7 +32,9 @@ import ShowTrades from "../show-trades"
 import TrilateratePosition from "../get-position"
 import WindRose from "../wind-rose"
 import Select from "util/select"
+
 import { TileMap } from "./tile-map"
+import { About } from "./about"
 
 /**
  * Display naval action map
@@ -45,7 +44,6 @@ class NAMap {
     #extent = {} as Extent
     #initialMapScale = minMapScale
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
-    #modal: Modal | undefined = undefined
     #overfillZoom = false
     #tileMap!: TileMap
     #timeoutId = 0
@@ -218,6 +216,8 @@ class NAMap {
         void new TrilateratePosition(this._ports)
         void new PowerMap(this, this.serverName, this.coord)
 
+        void new About()
+
         /*
         Marks.forEach(mark => {
             performance.measure(mark,`${mark}-start`,`${mark}-end`);
@@ -264,10 +264,6 @@ class NAMap {
         document.querySelector("#reset")?.addEventListener("click", () => {
             this._clearMap()
         })
-        document.querySelector("#about")?.addEventListener("click", () => {
-            this._showAbout()
-        })
-
         document.querySelector("#double-click-action")?.addEventListener("change", () => {
             this._doubleClickSelected()
         })
@@ -320,25 +316,6 @@ class NAMap {
         this.showTrades.clearMap()
         this.#windRose.clearMap()
         Select.resetAll()
-    }
-
-    _initModal(): void {
-        this.#modal = new Modal(`${appTitle} <span class="text-primary small">v${appVersion}</span>`, "lg")
-        const body = this.#modal.bodySel
-
-        body.html(
-            `<p>${appDescription} Please check the <a href="https://forum.game-labs.net/topic/23980-yet-another-map-naval-action-map/">Game-Labs forum post</a> for further details. Feedback is very welcome.</p>
-                    <p>Designed by iB aka Felix Victor, <em>Bastards</em> clan ${displayClan("(BASTD)")}</a>.</p>
-                    <div class="alert alert-secondary" role="alert"><h5 class="alert-heading">Did you know?</h5><p class="mb-0">My clan mate, Aquillas, wrote a most comprehensive <a href="https://drive.google.com/file/d/1PGysQwYg6aCQKq1dJQWtlc443IdO_drG/view">user guide</a>.</p></div>`
-        )
-    }
-
-    _showAbout(): void {
-        if (this.#modal) {
-            this.#modal.show()
-        } else {
-            this._initModal()
-        }
     }
 
     _doDoubleClickAction(event: Event): void {
