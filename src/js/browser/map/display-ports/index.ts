@@ -63,7 +63,7 @@ import {
     ϕ,
 } from "common/common-math"
 import { displayClanLitHtml } from "common/common-game-tools"
-import { serverMaintenanceHour } from "common/common-var"
+import { minMapScale, serverMaintenanceHour } from "common/common-var"
 
 import {
     PortBattlePerServer,
@@ -76,13 +76,14 @@ import {
 } from "common/gen-json"
 import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
-import { Area, countyPolygon, patrolZones, regionPolygon } from "./map-data"
+import { Area, countyPolygon, patrolZones, regionPolygon } from "../map-data"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
 import { default as swordsIcon } from "icons/icon-swords.svg"
-import { NAMap } from "./na-map"
-import ShowF11 from "./show-f11"
+import { NAMap } from "../na-map"
+import ShowF11 from "../show-f11"
+import { Flags } from "./flags"
 
 const html = htm.bind(h)
 
@@ -190,10 +191,9 @@ export default class DisplayPorts {
     readonly #cookie: Cookie
     readonly #f11: ShowF11
     readonly #fontSize = defaultFontSize
-    readonly #iconSize = 48
+
     readonly #minRadiusFactor = ϕ
     readonly #maxRadiusFactor = ϕ * 4
-    readonly #minScale: number
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
     readonly #serverName: string
@@ -201,8 +201,7 @@ export default class DisplayPorts {
 
     constructor(readonly map: NAMap) {
         this.#serverName = this.map.serverName
-        this.#minScale = this.map.minMapScale
-        this.#scale = this.#minScale
+        this.#scale = minMapScale
         this.#f11 = this.map.f11
 
         /**
@@ -247,7 +246,7 @@ export default class DisplayPorts {
         this._setupCounties()
         this._setupPatrolZones()
         this._setupSummary()
-        this._setupFlags()
+        void new Flags()
     }
 
     async _loadData(): Promise<ReadData> {
@@ -266,8 +265,9 @@ export default class DisplayPorts {
         this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
 
         const readData = {} as ReadData
-        readData.ports = (await import(/* webpackChunkName: "data-ports" */ "../../../../lib/gen-generic/ports.json"))
-            .default as PortBasic[]
+        readData.ports = (
+            await import(/* webpackChunkName: "data-ports" */ "../../../../../lib/gen-generic/ports.json")
+        ).default as PortBasic[]
         await loadJsonFiles<PortJsonData>(dataSources, readData)
 
         return readData
@@ -451,95 +451,6 @@ export default class DisplayPorts {
         this.#portSummaryNetIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
         this.#portSummaryTextNetIncome = this.#portSummaryNetIncome.append<HTMLDivElement>("div")
         this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("net<br>income")
-    }
-
-    _setupFlags(): void {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getPattern = (id: string): SVGPatternElement => {
-            const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern")
-            pattern.id = id
-            pattern.setAttribute("width", "133%")
-            pattern.setAttribute("height", "100%")
-            pattern.setAttribute("viewBox", `6 6 ${this.#iconSize} ${this.#iconSize * 0.75}`)
-
-            return pattern
-        }
-
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getImage = (nation: NationShortName): SVGImageElement => {
-            const image = document.createElementNS("http://www.w3.org/2000/svg", "image")
-            image.setAttribute("width", String(this.#iconSize))
-            image.setAttribute("height", String(this.#iconSize))
-            image.setAttribute("href", nationFlags[nation].replace('"', "").replace('"', ""))
-
-            return image
-        }
-
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getCircleCapital = (): SVGCircleElement => {
-            const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-            circleCapital.setAttribute("cx", String(this.#iconSize / 2))
-            circleCapital.setAttribute("cy", String(this.#iconSize / 2))
-            circleCapital.setAttribute("r", "16")
-            circleCapital.setAttribute("class", "circle-highlight-yellow")
-
-            return circleCapital
-        }
-
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getCircleRegionCapital = (): SVGCircleElement => {
-            const circleCapital = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-            circleCapital.setAttribute("cx", String(this.#iconSize / 2))
-            circleCapital.setAttribute("cy", String(this.#iconSize / 2))
-            circleCapital.setAttribute("r", "16")
-            circleCapital.setAttribute("class", "circle-highlight")
-
-            return circleCapital
-        }
-
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getRectAvail = (): SVGRectElement => {
-            const rectAvail = document.createElementNS("http://www.w3.org/2000/svg", "rect")
-            rectAvail.setAttribute("height", "480")
-            rectAvail.setAttribute("width", "640")
-            rectAvail.setAttribute("fill", primary300)
-            rectAvail.setAttribute("fill-opacity", "0.7")
-
-            return rectAvail
-        }
-
-        const svgDefNode = document.querySelector<SVGDefsElement>("#na-svg defs")!
-
-        for (const nation of nations.map((d) => d.short)) {
-            const patternElement = getPattern(nation)
-            patternElement.append(getImage(nation))
-            // eslint-disable-next-line unicorn/prefer-dom-node-append
-            const patternNode = svgDefNode.appendChild(patternElement)
-
-            if (nation !== "FT") {
-                const patternRegionCapital = patternNode.cloneNode(true) as SVGPatternElement
-                patternRegionCapital.id = `${nation}r`
-                patternRegionCapital.append(getCircleRegionCapital())
-                svgDefNode.append(patternRegionCapital)
-            }
-
-            if (nation !== "NT" && nation !== "FT") {
-                const patternCapital = patternNode.cloneNode(true) as SVGPatternElement
-                patternCapital.id = `${nation}c`
-                patternCapital.append(getCircleCapital())
-                svgDefNode.append(patternCapital)
-
-                const patternAvail = patternNode.cloneNode(true) as SVGPatternElement
-                patternAvail.id = `${nation}a`
-                patternAvail.append(getRectAvail())
-                svgDefNode.append(patternAvail)
-
-                const patternRegionCapitalAvail = patternAvail.cloneNode(true) as SVGPatternElement
-                patternRegionCapitalAvail.id = `${nation}ra`
-                patternRegionCapitalAvail.append(getCircleRegionCapital())
-                svgDefNode.append(patternRegionCapitalAvail)
-            }
-        }
     }
 
     _getPortName(id: number): string {
