@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.7.0](///compare/v13.6.13...v13.7.0) (2022-01-10)
+
+
+### Features
+
+* window resize WIP 1b2bf47
+
 ### [13.6.13](///compare/v13.6.12...v13.6.13) (2022-01-03)
 
 
