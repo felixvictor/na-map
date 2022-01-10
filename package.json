@@ -30,6 +30,7 @@
         "helper:build:tiles": "vips dzsave /mnt/na-map.tif src/images/map --depth onetile --layout google --tile-size 256 --overlap 0 --suffix .webp[Q=100,reduction-effort=6]",
         "helper:check-neutral-ports": "yarn node --experimental-specifier-resolution=node --experimental-modules --loader ts-node/esm src/helper/check-neutral-ports.ts",
         "helper:get-ship-speed-constants": "yarn node --experimental-specifier-resolution=node --experimental-modules --loader ts-node/esm src/helper/get-ship-speed-constants.ts",
+        "helper:loc": "npx cloc --by-file --not-match-f='.d.ts' --quiet ./src/js",
         "helper:size:css": "find public/ -iname '*.css' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
         "helper:size:js": "find public/ -iname '*.js' -not -iname 'data-*.js' -exec du -bc {} + | sort -k 2 | sed 's|public/||'",
         "helper:size:largest": "du -a ~/ -BM | sort -n -r | head -n 15",
