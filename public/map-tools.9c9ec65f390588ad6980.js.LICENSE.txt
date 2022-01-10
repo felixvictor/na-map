@@ -4,7 +4,7 @@
  * @file      Map tools main file.
  * @module    map-tools/index
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -14,7 +14,7 @@
  * @file      Predict wind modal.
  * @module    map-tools/predict-wind/modal
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,7 +24,7 @@
  * @file      Predict wind.
  * @module    map-tools/predict-wind
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -34,6 +34,6 @@
  * @file      Wind input per slider.
  * @module    util/wind-input
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */

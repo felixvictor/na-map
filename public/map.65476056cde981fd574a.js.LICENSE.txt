@@ -18,7 +18,7 @@
  * @file      Display grid.
  * @module    map-tools/display-grid
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -28,7 +28,7 @@
  * @file      Display map.
  * @module    map/map
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -38,7 +38,7 @@
  * @file      Display port battle zones.
  * @module    map/display-pb-zones
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -48,7 +48,7 @@
  * @file      Display ports.
  * @module    map/display-ports
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -58,7 +58,7 @@
  * @file      Get position.
  * @module    get-position
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -68,7 +68,7 @@
  * @file      Journey labels.
  * @module    map-tools/make-journey/labels
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -78,7 +78,7 @@
  * @file      Journey summary.
  * @module    map-tools/make-journey/summary
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -88,7 +88,7 @@
  * @file      Make a journey.
  * @module    map-tools/make-journey
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -98,7 +98,7 @@
  * @file      Make journey modal.
  * @module    map-tools/make-journey/modal
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -108,7 +108,7 @@
  * @file      Port ownership list.
  * @module    game-tools/list-port-ownerships
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -118,7 +118,7 @@
  * @file      Predict wind cookies.
  * @module    map-tools/wind-rose/cookie
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -128,7 +128,7 @@
  * @file      Predict wind modal.
  * @module    map-tools/wind-rose/modal
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -138,7 +138,7 @@
  * @file      Select port battle time window.
  * @module    map/select-ports/pb-time
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -148,7 +148,7 @@
  * @file      Select ports clan select.
  * @module    map/select-ports/clan
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -158,7 +158,7 @@
  * @file      Select ports inventory select.
  * @module    map/select-ports/inventory
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -168,7 +168,7 @@
  * @file      Select ports select goods.
  * @module    map/select-ports/goods
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -178,7 +178,7 @@
  * @file      Select ports select ports.
  * @module    map/select-ports/ports
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -188,7 +188,7 @@
  * @file      Select ports.
  * @module    map/select-ports
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -198,7 +198,7 @@
  * @file      Show F11 coordinates.
  * @module    map-tools/show-f11
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -208,7 +208,7 @@
  * @file      Show trades.
  * @module    map-tools/show-trades
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -218,7 +218,7 @@
  * @file      Show wind rose continuously.
  * @module    map-tools/wind-rose
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -228,7 +228,7 @@
  * @file      Toast.
  * @module    util/toast
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -238,6 +238,6 @@
  * @file      Wind input per slider.
  * @module    util/wind-input
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */

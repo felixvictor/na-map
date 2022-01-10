@@ -4,7 +4,7 @@
  * @file      Compare woods ColumnBase class.
  * @module    game-tools/compare-woods/wood-base
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -14,7 +14,7 @@
  * @file      Compare woods ColumnCompare class.
  * @module    game-tools/compare-woods/wood-comparison
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -24,7 +24,7 @@
  * @file      Compare woods CompareWoods class.
  * @module    game-tools/compare-woods/compare-woods
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -34,7 +34,7 @@
  * @file      Compare woods Wood class.
  * @module    game-tools/compare-woods/wood
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -44,7 +44,7 @@
  * @file      Compare woods.
  * @module    game-tools/compare-woods
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -54,7 +54,7 @@
  * @file      Income map.
  * @module    game-tools/show-income-map
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -64,7 +64,7 @@
  * @file      List buildings.
  * @module    game-tools/list-buildings
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -74,7 +74,7 @@
  * @file      List cannons.
  * @module    game-tools/list-cannons
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -84,7 +84,7 @@
  * @file      List conquest flags.
  * @module    game-tools/list-flags
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -94,7 +94,7 @@
  * @file      List ingredients.
  * @module    game-tools/list-ingredients
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -104,7 +104,7 @@
  * @file      List loot and chests.
  * @module    game-tools/list-loot
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -114,7 +114,7 @@
  * @file      List modules.
  * @module    game-tools/list-modules
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -124,7 +124,7 @@
  * @file      List port battles.
  * @module    game-tools/list-pb
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -134,7 +134,7 @@
  * @file      List port bonus.
  * @module    game-tools/list-port-bonus
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -144,7 +144,7 @@
  * @file      List recipes.
  * @module    game-tools/list-recipes
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -154,7 +154,7 @@
  * @file      List ship blueprints.
  * @module    game-tools/list-ship-blueprints
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -164,7 +164,7 @@
  * @file      List woods.
  * @module    game-tools/list-woods
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -174,7 +174,7 @@
  * @file      Port ownership list.
  * @module    game-tools/show-port-ownerships
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -184,7 +184,7 @@
  * @file      Wood compare modal.
  * @module    map-tools/compare-woods/modal
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
@@ -194,6 +194,6 @@
  * @file      ship list.
  * @module    ship-list
  * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2021
+ * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
  */
