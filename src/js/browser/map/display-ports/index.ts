@@ -8,51 +8,17 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
-
 import { min as d3Min, max as d3Max } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
 import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
-import htm from "htm"
-import { h, VNode } from "preact"
-import render from "preact-render-to-string"
 
-import dayjs from "dayjs"
-import "dayjs/locale/en-gb"
-import customParseFormat from "dayjs/plugin/customParseFormat.js"
-import relativeTime from "dayjs/plugin/relativeTime.js"
-import utc from "dayjs/plugin/utc.js"
-dayjs.extend(customParseFormat)
-dayjs.extend(relativeTime)
-dayjs.extend(utc)
-dayjs.locale("en-gb")
-
-import { capitalizeFirstLetter, findNationByNationShortName, NationShortName, simpleStringSort } from "common/common"
-import {
-    colourGreenDark,
-    colourLight,
-    colourRedDark,
-    getPortBattleTimeHtml,
-    loadJsonFile,
-    loadJsonFiles,
-} from "common/common-browser"
-import { formatInt, formatPercentHtml, formatSiCurrency, formatSiIntHtml } from "common/common-format"
+import { colourGreenDark, colourLight, colourRedDark, loadJsonFiles } from "common/common-browser"
 import { defaultCircleSize, Extent, Point, roundToThousands, ϕ } from "common/common-math"
-import { displayClanLitHtml } from "common/common-game-tools"
 import { minMapScale } from "common/common-var"
 
-import {
-    PortBattlePerServer,
-    PortBasic,
-    PortPerServer,
-    PortWithTrades,
-    TradeItem,
-    TradeGoodProfit,
-    GoodList,
-} from "common/gen-json"
-import { DataSource, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
-import { PortBonus, portBonusType } from "common/types"
+import { PortBattlePerServer, PortBasic, PortPerServer, PortWithTrades } from "common/gen-json"
+import { DataSource, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { colourScaleCounty } from "./map-data"
 
 import Cookie from "util/cookie"
@@ -64,51 +30,12 @@ import { Counties } from "./counties"
 import { Flags } from "./flags"
 import { PatrolZones } from "./patrol-zones"
 import { CurrentPort, PortNames } from "./port-names"
+import { PortIcons } from "./port-icons"
 import { Regions } from "./regions"
 import { Summary } from "./summary"
 
-const html = htm.bind(h)
-
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
-
-interface Profit {
-    profit: HtmlResult[]
-    profitPerTon: HtmlResult[]
-}
-
-interface PortForDisplay {
-    name: string
-    icon: NationShortName
-    availableForAll: boolean
-    shallow: boolean
-    county: string
-    region: string
-    countyCapital: boolean
-    capital: boolean
-    capturer: HtmlResult
-    captureTime: string
-    cooldownTime?: HtmlResult
-    attack: HtmlResult
-    isNPCAttacker: boolean
-    pbTimeRange: HtmlResult
-    brLimit: string
-    portPoints: string
-    taxIncome: HtmlResult
-    portTax: HtmlResult
-    netIncome: HtmlResult
-    tradingCompany: number
-    laborHoursDiscount: number
-    dropsTrading: string
-    consumesTrading: string
-    producesNonTrading: string
-    dropsNonTrading: string
-    tradePort: string
-    tradePortId?: number
-    goodsToSellInTradePort: Profit
-    goodsToBuyInTradePort: Profit
-    portBonus?: PortBonus
-}
 
 interface ReadData {
     [index: string]: PortBasic[] | PortPerServer[] | PortBattlePerServer[]
@@ -125,7 +52,6 @@ export default class DisplayPorts {
     #colourScalePoints!: ScaleLinear<string, string>
     #colourScaleTax!: ScaleLinear<string, string>
     #counties!: Counties
-    #gIcon = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gPort = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gPortCircle = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound = {} as Point
@@ -139,6 +65,7 @@ export default class DisplayPorts {
     #portData = {} as PortWithTrades[]
     #portDataDefault!: PortWithTrades[]
     #portDataFiltered!: PortWithTrades[]
+    portIcons!: PortIcons
     #portNames!: PortNames
     #portRadius!: ScaleLinear<number, number>
     #regions!: Regions
@@ -147,9 +74,6 @@ export default class DisplayPorts {
     #showRadius = ""
     #showTradePortPartners = false
     #summary!: Summary
-    #tooltip: BSTooltip | undefined = undefined
-    #tradeItem = {} as Map<number, TradeItem>
-    #tradePortId = 0
     #upperBound = {} as Point
     #zoomLevel: ZoomLevel = "initial"
     readonly #baseId = "show-radius"
@@ -192,7 +116,7 @@ export default class DisplayPorts {
         await this._loadAndSetupData()
     }
 
-    _setupData(data: ReadData): void {
+    async _setupData(data: ReadData): Promise<void> {
         // Combine port data with port battle data
         this.#portDataDefault = data.ports.map((port: PortBasic) => {
             const serverData = data.server.find((d: PortPerServer) => d.id === port.id) ?? ({} as PortPerServer)
@@ -206,11 +130,13 @@ export default class DisplayPorts {
         this._setupScales()
         this._setupListener()
         this._setupSvg()
+        this.#summary = new Summary()
+        this.portIcons = new PortIcons(this.#serverName, this.map)
+        await this.portIcons.loadData()
         this.#portNames = new PortNames()
         this.#counties = new Counties()
         this.#regions = new Regions()
         this.#patrolZones = new PatrolZones(this.#serverName)
-        this.#summary = new Summary()
         void new Flags()
     }
 
@@ -225,9 +151,6 @@ export default class DisplayPorts {
                 name: "pb",
             },
         ]
-
-        const tradeItems = await loadJsonFile<TradeItem[]>(`${this.#serverName}-items.json`)
-        this.tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
 
         const readData = {} as ReadData
         readData.ports = (
@@ -310,383 +233,11 @@ export default class DisplayPorts {
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
         this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
-        this.#gIcon = this.#gPort
-            .append<SVGGElement>("g")
-            .attr("data-ui-component", "port-icons")
-            .attr("class", "click-circle")
-    }
-
-    _getPortName(id: number): string {
-        return id ? this.#portDataDefault.find((port) => port.id === id)?.name ?? "" : ""
-    }
-
-    _formatItems = (items: GoodList | undefined): string =>
-        items
-            ?.map((item) => this.tradeItem.get(item)?.name ?? "")
-            .sort(simpleStringSort)
-            .join(", ") ?? ""
-
-    _sortByProfit = (a: TradeGoodProfit, b: TradeGoodProfit): number => b.profit.profit - a.profit.profit
-
-    _sortByProfitPerTon = (a: TradeGoodProfit, b: TradeGoodProfit): number =>
-        b.profit.profitPerTon - a.profit.profitPerTon
-
-    _formatProfits = (profits: TradeGoodProfit[]): HtmlResult =>
-        html`${profits
-            ?.sort(this._sortByProfit)
-            ?.map(
-                (good, index) =>
-                    html`<span style="white-space: nowrap;">${good.name} (${formatSiIntHtml(good.profit.profit)})</span
-                        >${index === profits.length - 1 ? html`` : html`, `}`
-            )}`
-
-    _formatProfitsPerTon = (profits: TradeGoodProfit[]): HtmlResult =>
-        html`${profits
-            ?.sort(this._sortByProfitPerTon)
-            ?.map(
-                (good, index) =>
-                    html`<span style="white-space: nowrap;"
-                            >${good.name} (${formatSiIntHtml(good.profit.profitPerTon)})</span
-                        >${index === profits.length - 1 ? html`` : html`, `}`
-            )}`
-
-    // eslint-disable-next-line complexity
-    _getText(portProperties: PortWithTrades): PortForDisplay {
-        /*
-        const getCoord = (portId: number): Coordinate => {
-            const port = this.#portDataDefault.find((port) => port.id === portId)!
-            return { x: port.coordinates[0], y: port.coordinates[1] }
-        }
-
-        const getKDistance = (fromPortId: number, toPortId: number): number => {
-            const fromPortCoord = getCoord(fromPortId)
-            const toPortCoord = getCoord(toPortId)
-            return getDistance(fromPortCoord, toPortCoord)
-        }
-        */
-
-        const portBattleST = dayjs.utc(portProperties.portBattle)
-        const portBattleLT = dayjs.utc(portProperties.portBattle).local()
-        const localTime = portBattleST === portBattleLT ? "" : ` (${portBattleLT.format("H.mm")} local)`
-
-        const cooldownTimeST = dayjs.utc(portProperties.cooldownTime)
-        const cooldownTimeLT = dayjs.utc(portProperties.cooldownTime).local()
-        const cooldownTimeLocal = cooldownTimeST === cooldownTimeLT ? "" : ` (${cooldownTimeLT.format("H.mm")} local)`
-        const portBattleStartTime = getPortBattleTimeHtml(portProperties.portBattleStartTime)
-        const endSyllable = portBattleST.isAfter(dayjs.utc()) ? "s" : "ed"
-        const attackHostility = portProperties.portBattle
-            ? html`<span
-                      class="flag-icon-${portProperties.attackerNation} flag-icon-small me-1"
-                      role="img"
-                      title="${findNationByNationShortName(portProperties?.attackerNation ?? "")?.sortName ?? ""}"
-                  ></span
-                  >${displayClanLitHtml(portProperties.attackerClan)} attack${portProperties.portBattle
-                      ? html`${endSyllable} ${portBattleST.fromNow()} at ${portBattleST.format("H.mm")}${localTime}`
-                      : html`s: ${formatPercentHtml(portProperties.attackHostility ?? 0)} hostility`}`
-            : html``
-
-        const port = {
-            name: portProperties.name,
-            icon: portProperties.nation,
-            availableForAll: portProperties.availableForAll,
-            shallow: portProperties.shallow,
-            county: portProperties.county === "" ? "" : portProperties.county,
-            region: portProperties.region === "" ? "" : portProperties.region,
-            countyCapital: portProperties.countyCapital,
-            capital: !portProperties.capturable && portProperties.nation !== "FT",
-            capturer: portProperties.capturer ? displayClanLitHtml(portProperties.capturer) : html``,
-            captureTime: portProperties.captured
-                ? `${capitalizeFirstLetter(dayjs.utc(portProperties.captured).fromNow())}`
-                : "",
-            attack: portProperties.attackHostility ? attackHostility : html``,
-            isNPCAttacker: portProperties.attackerNation === "NT",
-            pbTimeRange: portProperties.capturable ? portBattleStartTime : "",
-            brLimit: formatInt(portProperties.brLimit),
-            portPoints: portProperties.capturable ? formatInt(portProperties.portPoints) : "",
-            taxIncome: formatSiIntHtml(portProperties.taxIncome),
-            portTax: formatPercentHtml(portProperties.portTax),
-            netIncome: formatSiIntHtml(portProperties.netIncome),
-            tradingCompany: portProperties.tradingCompany,
-            laborHoursDiscount: portProperties.laborHoursDiscount,
-            dropsTrading: this._formatItems(portProperties.dropsTrading),
-            consumesTrading: this._formatItems(portProperties.consumesTrading),
-            producesNonTrading: this._formatItems(portProperties.producesNonTrading),
-            dropsNonTrading: this._formatItems(portProperties.dropsNonTrading),
-            tradePort: this._getPortName(this.tradePortId),
-            goodsToSellInTradePort: {
-                profit: this._formatProfits(portProperties.goodsToSellInTradePort),
-                profitPerTon: this._formatProfitsPerTon(portProperties.goodsToSellInTradePort),
-            },
-            goodsToBuyInTradePort: {
-                profit: this._formatProfits(portProperties.goodsToBuyInTradePort),
-                profitPerTon: this._formatProfitsPerTon(portProperties.goodsToBuyInTradePort),
-            },
-        } as PortForDisplay
-
-        if (port.dropsTrading.length > 0 && port.dropsNonTrading.length > 0) {
-            port.dropsNonTrading += "\u00A0\u2012 "
-        }
-
-        if (portProperties.cooldownTime) {
-            port.cooldownTime = html`${cooldownTimeST.fromNow()} at <em>approximately</em> ${cooldownTimeST.format(
-                    "H.mm"
-                )}${cooldownTimeLocal}`
-        }
-
-        if (portProperties.portBonus) {
-            port.portBonus = portProperties.portBonus
-        }
-
-        return port
-    }
-
-    _showProfits = (goods: Profit, tradePort: string, tradeDirection: string): HtmlResult => {
-        const colour = tradeDirection === "buy" ? "alert-success" : "alert-danger"
-        const instruction =
-            tradeDirection === "buy" ? `Buy here and sell in ${tradePort}` : `Buy in ${tradePort} and sell here`
-
-        return goods.profit?.[0] === undefined
-            ? html``
-            : html`<div class="alert ${colour} mt-2 mb-2 text-start" role="alert">
-                  <div class="alert-heading"><span class="caps">${instruction}</span> (net value in reales)</div>
-                  <p class="my-1"><em>By profit per item</em>: ${goods.profit}</p>
-                  <p class="my-1"><em>By profit per ton</em>: ${goods.profitPerTon}</p>
-              </div>`
-    }
-
-    // eslint-disable-next-line complexity
-    _tooltipData(port: PortForDisplay): VNode {
-        const getPortBonus = (): HtmlResult => {
-            return html`${portBonusType.map((bonus) => {
-                return html`${port?.portBonus?.[bonus]
-                    ? html`<div class="me-1">
-                          <i class="icon icon-light icon-${bonus}" role="img" aria-label="${bonus} bonus"></i>
-                          <div class="x-large text-lighter text-center">${port.portBonus[bonus]}</div>
-                      </div>`
-                    : html``}`
-            })}`
-        }
-
-        const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
-
-        const h = html`
-            <div class="d-flex justify-content-between mb-4">
-                <div class="d-flex">
-                    <i class="flag-icon-${port.icon} flag-icon-large ${iconBorder}" role="img" />
-
-                    <div class="text-start align-self-center compress mx-3">
-                        <div class="large mb-1">${port.name}</div>
-                        <div class="caps">${port.county}</div>
-                        <div class="caps">${port.region}</div>
-                    </div>
-                </div>
-
-                ${port.portBonus ? html`<div class="d-flex align-self-end me-1">${getPortBonus()}</div>` : html``}
-
-                <div class="d-flex flex-column justify-content-end align-self-center">
-                    <div class="ms-auto">
-                        ${port.portPoints ? html`<span class="x-large text-lighter">${port.portPoints}</span>` : html``}
-                    </div>
-                    <div class="ms-auto">
-                        ${port.laborHoursDiscount
-                            ? html`<i
-                                  class="icon icon-light icon-labour me-1"
-                                  role="img"
-                                  aria-label="Labour hour discount level ${port.laborHoursDiscount}"
-                              ></i>`
-                            : html``}
-                        ${port.tradingCompany
-                            ? html`<i
-                                  class="icon icon-light icon-trading me-1"
-                                  role="img"
-                                  aria-label="Trading company level ${port.tradingCompany}"
-                              ></i>`
-                            : html``}
-                        ${port.availableForAll
-                            ? html`<i
-                                  class="icon icon-light icon-open me-1"
-                                  role="img"
-                                  aria-label="Accessible to all"
-                              ></i>`
-                            : html``}
-                        ${port.shallow
-                            ? html`<i class="icon icon-light icon-shallow" role="img" aria-label="Shallow"></i>`
-                            : html`<i class="icon icon-light icon-deep" role="img" aria-label="Deep"></i>`}
-                    </div>
-                </div>
-            </div>
-
-            ${port.attack === undefined
-                ? html`${port.cooldownTime
-                      ? html`<div class="alert alert-success mt-2" role="alert">
-                            Port battle cooldown ends ${port.cooldownTime}
-                        </div>`
-                      : html``}`
-                : html`<div class="alert mt-2 ${port.isNPCAttacker ? "alert-warning" : "alert-danger"}" role="alert">
-                      ${port.attack}
-                  </div>`}
-
-            <div class="d-flex text-start mb-2 compress">
-                ${port.capital || port.icon === "FT"
-                    ? html`<div>${port.portTax}<br /><span class="des top-0">Tax rate</span></div>`
-                    : html`
-                          <div class="me-3">
-                              ${port.pbTimeRange}<br />
-                              <span class="des top-0">Battle timer</span>
-                          </div>
-                          <div class="me-3">
-                              ${port.brLimit}<br />
-                              <span class="des top-0">Rating</span>
-                          </div>
-                          ${port.capturer
-                              ? html` <div class="me-3">
-                                        ${port.capturer}<br />
-                                        <span class="des top-0">Capturer</span>
-                                    </div>
-                                    <div class="me-5">
-                                        ${port.captureTime}<br />
-                                        <span class="des top-0">Capture</span>
-                                    </div>`
-                              : html``}
-
-                          <div class="ms-auto me-3">
-                              ${port.taxIncome} (${port.portTax})<br />
-                              <span class="des top-0">Tax income</span>
-                          </div>
-                          <div>
-                              ${port.netIncome}<br />
-                              <span class="des top-0">Net income</span>
-                          </div>
-                      `}
-            </div>
-
-            ${this.showRadius === "tradePorts"
-                ? html`${this._showProfits(port.goodsToSellInTradePort, port.tradePort, "buy")}${this._showProfits(
-                      port.goodsToBuyInTradePort,
-                      port.tradePort,
-                      "sell"
-                  )}`
-                : html` ${port.producesNonTrading.length > 0
-                      ? html`<p class="mb-2">
-                            <span class="caps">Produces—</span
-                            ><span class="non-trading">${port.producesNonTrading}</span>
-                        </p>`
-                      : html``}
-                  ${port.dropsTrading.length > 0 || port.dropsNonTrading.length > 0
-                      ? html`<p class="mb-2">
-                            <span class="caps">Drops—</span>
-                            ${port.dropsNonTrading
-                                ? html`<span class="non-trading">${port.dropsNonTrading}</span>`
-                                : html``}
-                            ${port.dropsTrading}
-                        </p> `
-                      : html``}
-                  ${port.consumesTrading.length > 0
-                      ? html`<p class="mb-2"><span class="caps">Consumes—</span>${port.consumesTrading}</p>`
-                      : html``}`}
-        `
-        return h as VNode
-    }
-
-    _getInventory(port: PortWithTrades): HtmlString {
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        const getItemName = (id: number): string => this.tradeItem.get(id)?.name ?? ""
-
-        let h: HtmlString = ""
-        const buy = port.inventory
-            .filter((good) => good.buyQuantity > 0 && good.buyPrice > 0)
-            .sort((a, b) => getItemName(a.id).localeCompare(getItemName(b.id)))
-            .map((good) => {
-                return `${formatInt(good.buyQuantity)} ${getItemName(good.id)} @ ${formatSiCurrency(good.buyPrice)}`
-            })
-            .join("<br>")
-        const sell = port.inventory
-            .filter((good) => good.sellQuantity > 0 && good.sellPrice > 0)
-            .sort((a, b) => getItemName(a.id).localeCompare(getItemName(b.id)))
-            .map((good) => {
-                return `${formatInt(good.sellQuantity)} ${getItemName(good.id)} @ ${formatSiCurrency(good.sellPrice)}`
-            })
-            .join("<br>")
-
-        h += `<h5 class="caps">${port.name} <span class="small">${port.nation}</span></h5>`
-        if (buy.length > 0) {
-            h += "<h6>Buy</h6>"
-            h += buy
-        }
-
-        if (buy.length > 0 && sell.length > 0) {
-            h += "<p></p>"
-        }
-
-        if (sell.length > 0) {
-            h += "<h6>Sell</h6>"
-            h += sell
-        }
-
-        return h
-    }
-
-    _hideDetails(): void {
-        if (this.#tooltip !== undefined) {
-            this.#tooltip.dispose()
-            this.#tooltip = undefined
-        }
-    }
-
-    _showDetails(event: Event, d: PortWithTrades): void {
-        const element = event.currentTarget as Element
-
-        this._hideDetails()
-        this.#tooltip = new BSTooltip(element, {
-            html: true,
-            placement: "auto",
-            trigger: "manual",
-            title: render(this._tooltipData(this._getText(d))),
-            sanitize: false,
-        })
-        this.#tooltip.show()
-
-        if (this.map.showTrades.show) {
-            if (this.map.showTrades.listType !== "inventory") {
-                this.map.showTrades.listType = "inventory"
-            }
-
-            this.map.showTrades.update(this._getInventory(d))
-        }
-    }
-
-    _updateIcons(): void {
-        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
-        const circleSize = this.#circleSize / circleScale
-        const data = this.#portDataFiltered
-
-        this.#gIcon
-            .selectAll<SVGCircleElement, PortWithTrades>("circle")
-            .data(data, (d) => String(d.id))
-            .join((enter) =>
-                enter
-                    .append("circle")
-                    .attr("fill", (d) => {
-                        const appendix = `${d.nation === "FT" || d.nation === "NT" || d.capturable ? "" : "c"}${
-                            d.countyCapital && d.capturable ? "r" : ""
-                        }${d.availableForAll && d.nation !== "NT" ? "a" : ""}`
-                        return `url(#${d.nation}${appendix})`
-                    })
-                    .attr("cx", (d) => d.coordinates[0])
-                    .attr("cy", (d) => d.coordinates[1])
-                    .on("click", (event: Event, d: PortWithTrades) => {
-                        this._showDetails(event, d)
-                    })
-                    .on("mouseleave", () => {
-                        this._hideDetails()
-                    })
-            )
-            .attr("r", circleSize)
     }
 
     _getTradePortMarker(port: PortWithTrades): string {
         let marker = ""
-        if (port.id === this.tradePortId) {
+        if (port.id === this.portIcons.tradePort.id) {
             marker = "here"
         } else if (port.sellInTradePort && port.buyInTradePort) {
             marker = "both"
@@ -803,7 +354,7 @@ export default class DisplayPorts {
 
                         case "tradePorts":
                             cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
-                            r = (d): number => (d.id === this.tradePortId ? rMax : rMax / 2)
+                            r = (d): number => (d.id === this.portIcons.tradePort.id ? rMax : rMax / 2)
 
                             break
 
@@ -852,7 +403,7 @@ export default class DisplayPorts {
         this.#scale = scale ?? this.#scale
 
         this._filterVisible()
-        this._updateIcons()
+        this.portIcons.update(this.#scale, this.showRadius, this.#portData)
         this._updatePortCircles()
         this.portNamesUpdate()
         this.#counties.update(this.zoomLevel, this.#lowerBound, this.#upperBound, this.showRadius)
@@ -934,28 +485,12 @@ export default class DisplayPorts {
         this.#showRadius = newShowRadius
     }
 
-    get tradeItem(): Map<number, TradeItem> {
-        return this.#tradeItem
-    }
-
-    set tradeItem(newTradeItem: Map<number, TradeItem>) {
-        this.#tradeItem = newTradeItem
-    }
-
     get showTradePortPartners(): boolean {
         return this.#showCurrentGood
     }
 
     set showTradePortPartners(newShowTradePortPartners: boolean) {
         this.#showTradePortPartners = newShowTradePortPartners
-    }
-
-    get tradePortId(): number {
-        return this.#tradePortId
-    }
-
-    set tradePortId(newTradePortId: number) {
-        this.#tradePortId = newTradePortId
     }
 
     get zoomLevel(): ZoomLevel {

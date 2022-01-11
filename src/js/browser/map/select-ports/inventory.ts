@@ -60,7 +60,7 @@ export default class SelectPortsSelectInventory {
         for (const port of this.#ports.portDataDefault) {
             if (port.inventory) {
                 for (const good of port.inventory) {
-                    selectGoods.set(good.id, this.#ports.tradeItem.get(good.id)?.name ?? "")
+                    selectGoods.set(good.id, this.#ports.portIcons.getTradeItem(good.id)?.name ?? "")
                 }
             }
         }
@@ -94,7 +94,7 @@ export default class SelectPortsSelectInventory {
     _getPortList(goodIdSelected: number, buyGoods: goodMap, sellGoods: goodMap): HtmlString {
         let h: HtmlString = ""
 
-        h += `<h5>${this.#ports.tradeItem.get(goodIdSelected)?.name ?? ""}</h5>`
+        h += `<h5>${this.#ports.portIcons.getTradeItem(goodIdSelected)?.name ?? ""}</h5>`
         if (buyGoods.size > 0) {
             h += "<h6>Buy</h6>"
             for (const [, value] of buyGoods) {

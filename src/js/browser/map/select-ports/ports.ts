@@ -98,10 +98,10 @@ export default class SelectPortsSelectPorts {
     }
 
     _setTradePortPartners(): void {
-        this.#tradePort = (this.#ports.portDataDefault.find((port) => port.id === this.#ports.tradePortId) ??
-            []) as PortWithTrades
+        this.#tradePort = (this.#ports.portDataDefault.find((port) => port.id === this.#ports.portIcons.tradePort.id) ??
+            {}) as PortWithTrades
 
-        if (this.#tradePort) {
+        if (this.#tradePort.id) {
             this._setTradeRelations()
         }
     }
@@ -113,19 +113,19 @@ export default class SelectPortsSelectPorts {
     }
 
     _getBuyPrice(itemId: number): number {
-        return this.#ports.tradeItem.get(itemId)?.buyPrice ?? 0
+        return this.#ports.portIcons.getTradeItem(itemId)?.buyPrice ?? 0
     }
 
     _getSellPrice(itemId: number): number {
-        return this.#ports.tradeItem.get(itemId)?.sellPrice ?? 0
+        return this.#ports.portIcons.getTradeItem(itemId)?.sellPrice ?? 0
     }
 
     _getWeight(itemId: number): number {
-        return this.#ports.tradeItem.get(itemId)?.weight ?? 0
+        return this.#ports.portIcons.getTradeItem(itemId)?.weight ?? 0
     }
 
     _getDistanceFactor(itemId: number): number {
-        return this.#ports.tradeItem.get(itemId)?.distanceFactor ?? 0
+        return this.#ports.portIcons.getTradeItem(itemId)?.distanceFactor ?? 0
     }
 
     _getPortTax(portId: number): number {
@@ -207,7 +207,7 @@ export default class SelectPortsSelectPorts {
         return (sellPort.consumesTrading
             ?.filter((good) => tradePortProducedGoods.has(good))
             .map((good) => ({
-                name: this.#ports.tradeItem.get(good)?.name ?? "",
+                name: this.#ports.portIcons.getTradeItem(good)?.name ?? "",
                 profit: this._getProfit(this.#tradePort, sellPort, good),
             })) ?? []) as TradeGoodProfit[]
     }
@@ -218,7 +218,7 @@ export default class SelectPortsSelectPorts {
         return (buyPort.dropsTrading
             ?.filter((good) => tradePortConsumedGoods.has(good))
             .map((good) => ({
-                name: this.#ports.tradeItem.get(good)?.name ?? "",
+                name: this.#ports.portIcons.getTradeItem(good)?.name ?? "",
                 profit: this._getProfit(buyPort, this.#tradePort, good),
             })) ?? []) as TradeGoodProfit[]
     }
@@ -235,7 +235,13 @@ export default class SelectPortsSelectPorts {
 
                 return port
             })
-            .filter((port) => port.id === this.#ports.tradePortId || port.sellInTradePort || port.buyInTradePort)
+            .filter(
+                (port) => port.id === this.#ports.portIcons.tradePort.id || port.sellInTradePort || port.buyInTradePort
+            )
+    }
+
+    #getPortName(id: number): string {
+        return this.#ports.portDataDefault.find((port) => port.id === id)?.name ?? ""
     }
 
     _selectSelected(): void {
@@ -248,7 +254,10 @@ export default class SelectPortsSelectPorts {
             id: Number(id),
             coord: { x: Number(x), y: Number(y) },
         }
-        this.#ports.tradePortId = Number(id)
+        this.#ports.portIcons.tradePort = {
+            id: Number(id),
+            name: this.#getPortName(Number(id)),
+        }
 
         this._setTradePortPartners()
 

@@ -41,7 +41,7 @@ export default class SelectPortsSelectGoods {
                 const goodList = port[type] as GoodList
                 if (goodList) {
                     for (const good of goodList) {
-                        selectGoods.set(good, this.#ports.tradeItem.get(good)?.name ?? "")
+                        selectGoods.set(good, this.#ports.portIcons.getTradeItem(good)?.name ?? "")
                     }
                 }
             }
