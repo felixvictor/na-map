@@ -90,7 +90,7 @@
         "round-slider": "^1.6.1",
         "seedrandom": "^3.0.5",
         "textures": "^1.2.3",
-        "timelines-chart": "https://github.com/felixvictor/timelines-chart"
+        "timelines-chart": "^2.11.3"
     },
     "devDependencies": {
         "@babel/cli": "^7.16.8",
