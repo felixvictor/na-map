@@ -101,7 +101,7 @@ export default class DisplayPbZones {
 
     _refreshPBZones(): void {
         void this.refresh()
-        this._ports.updateTexts()
+        this._ports.portNamesUpdate()
     }
 
     _showPBZonesSelected(): void {

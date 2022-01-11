@@ -38,17 +38,7 @@ import {
     loadJsonFiles,
 } from "common/common-browser"
 import { formatInt, formatPercentHtml, formatSiCurrency, formatSiIntHtml } from "common/common-format"
-import {
-    Coordinate,
-    defaultCircleSize,
-    defaultFontSize,
-    degreesHalfCircle,
-    degreesToRadians,
-    Extent,
-    Point,
-    roundToThousands,
-    ϕ,
-} from "common/common-math"
+import { defaultCircleSize, Extent, Point, roundToThousands, ϕ } from "common/common-math"
 import { displayClanLitHtml } from "common/common-game-tools"
 import { minMapScale } from "common/common-var"
 
@@ -70,21 +60,18 @@ import RadioButton from "util/radio-button"
 import { NAMap } from "../na-map"
 import ShowF11 from "../show-f11"
 
+import { Counties } from "./counties"
 import { Flags } from "./flags"
 import { PatrolZones } from "./patrol-zones"
-import { Summary } from "./summary"
-import { Counties } from "./counties"
+import { CurrentPort, PortNames } from "./port-names"
 import { Regions } from "./regions"
+import { Summary } from "./summary"
 
 const html = htm.bind(h)
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
 
-interface CurrentPort {
-    id: number
-    coord: Coordinate
-}
 interface Profit {
     profit: HtmlResult[]
     profitPerTon: HtmlResult[]
@@ -138,11 +125,9 @@ export default class DisplayPorts {
     #colourScalePoints!: ScaleLinear<string, string>
     #colourScaleTax!: ScaleLinear<string, string>
     #counties!: Counties
-    #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
     #gIcon = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gPort = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #gPortCircle = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gText = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound = {} as Point
     #maxNetIncome!: number
     #maxPortPoints!: number
@@ -154,6 +139,7 @@ export default class DisplayPorts {
     #portData = {} as PortWithTrades[]
     #portDataDefault!: PortWithTrades[]
     #portDataFiltered!: PortWithTrades[]
+    #portNames!: PortNames
     #portRadius!: ScaleLinear<number, number>
     #regions!: Regions
     #scale = 0
@@ -170,13 +156,11 @@ export default class DisplayPorts {
     readonly #circleSize = defaultCircleSize
     readonly #cookie: Cookie
     readonly #f11: ShowF11
-    readonly #fontSize = defaultFontSize
     readonly #maxRadiusFactor = ϕ * 4
     readonly #minRadiusFactor = ϕ
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
     readonly #serverName: string
-    readonly #showPBZones = "all"
 
     constructor(readonly map: NAMap) {
         this.#serverName = this.map.serverName
@@ -222,6 +206,7 @@ export default class DisplayPorts {
         this._setupScales()
         this._setupListener()
         this._setupSvg()
+        this.#portNames = new PortNames()
         this.#counties = new Counties()
         this.#regions = new Regions()
         this.#patrolZones = new PatrolZones(this.#serverName)
@@ -329,10 +314,6 @@ export default class DisplayPorts {
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-icons")
             .attr("class", "click-circle")
-        this.#gText = this.#gPort
-            .append<SVGGElement>("g")
-            .attr("data-ui-component", "port-names")
-            .attr("class", "fill-white")
     }
 
     _getPortName(id: number): string {
@@ -863,56 +844,8 @@ export default class DisplayPorts {
             .attr("fill", (d) => fill(d))
     }
 
-    _updateTextsX(d: PortWithTrades, circleSize: number): number {
-        return this.zoomLevel === "pbZone" &&
-            (this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id))
-            ? d.coordinates[0] + Math.round(circleSize * 1.3 * Math.cos(degreesToRadians(d.angle)))
-            : d.coordinates[0]
-    }
-
-    _updateTextsY(d: PortWithTrades, circleSize: number, fontSize: number): number {
-        const deltaY = circleSize + fontSize * 1.2
-
-        if (this.zoomLevel !== "pbZone") {
-            return d.coordinates[1] + deltaY
-        }
-
-        const dy = d.angle > 90 && d.angle < 270 ? fontSize : 0
-        return this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id)
-            ? d.coordinates[1] + Math.round(circleSize * 1.3 * Math.sin(degreesToRadians(d.angle))) + dy
-            : d.coordinates[1] + deltaY
-    }
-
-    _updateTextsAnchor(d: PortWithTrades): string {
-        if (
-            this.zoomLevel === "pbZone" &&
-            (this.#showPBZones === "all" || (this.#showPBZones === "single" && d.id === this.currentPort.id))
-        ) {
-            return d.angle > 0 && d.angle < degreesHalfCircle ? "start" : "end"
-        }
-
-        return "middle"
-    }
-
-    updateTexts(): void {
-        if (this.zoomLevel === "initial") {
-            this.#gText.classed("d-none", true)
-        } else {
-            const circleSize = roundToThousands(this.#circleSize / this.#scale)
-            const fontSize = roundToThousands(this.#fontSize / this.#scale)
-            const data = this.#portDataFiltered
-
-            this.#gText
-                .selectAll<SVGTextElement, PortWithTrades>("text")
-                .data(data, (d) => String(d.id))
-                .join((enter) => enter.append("text").text((d) => d.name))
-                .attr("x", (d) => this._updateTextsX(d, circleSize))
-                .attr("y", (d) => this._updateTextsY(d, circleSize, fontSize))
-                .style("text-anchor", (d) => this._updateTextsAnchor(d))
-                .style("dominant-baseline", "auto")
-
-            this.#gText.attr("font-size", `${fontSize}px`).classed("d-none", false)
-        }
+    portNamesUpdate() {
+        this.#portNames.update(this.zoomLevel, this.#scale, this.#portDataFiltered)
     }
 
     update(scale?: number): void {
@@ -921,7 +854,7 @@ export default class DisplayPorts {
         this._filterVisible()
         this._updateIcons()
         this._updatePortCircles()
-        this.updateTexts()
+        this.portNamesUpdate()
         this.#counties.update(this.zoomLevel, this.#lowerBound, this.#upperBound, this.showRadius)
         this.#regions.update(this.zoomLevel, this.#lowerBound, this.#upperBound)
         this.#patrolZones.update(this.zoomLevel)
@@ -974,11 +907,11 @@ export default class DisplayPorts {
     }
 
     get currentPort(): CurrentPort {
-        return this.#currentPort
+        return this.#portNames.currentPort
     }
 
     set currentPort(newCurrentPort: CurrentPort) {
-        this.#currentPort = newCurrentPort
+        this.#portNames.currentPort = newCurrentPort
     }
 
     get portData(): PortWithTrades[] {
