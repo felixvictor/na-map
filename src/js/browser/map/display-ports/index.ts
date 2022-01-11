@@ -10,15 +10,13 @@
 
 import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
-import { min as d3Min, max as d3Max, sum as d3Sum } from "d3-array"
+import { min as d3Min, max as d3Max } from "d3-array"
 import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
-// import { polygonCentroid as d3PolygonCentroid, polygonHull as d3PolygonHull } from "d3-polygon";
-import { ScaleLinear, scaleLinear as d3ScaleLinear, ScaleOrdinal, scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
+import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 import htm from "htm"
 import { h, VNode } from "preact"
 import render from "preact-render-to-string"
-// import { curveCatmullRomClosed as d3CurveCatmullRomClosed, line as d3Line } from "d3-shape";
 
 import dayjs from "dayjs"
 import "dayjs/locale/en-gb"
@@ -30,40 +28,29 @@ dayjs.extend(relativeTime)
 dayjs.extend(utc)
 dayjs.locale("en-gb")
 
-import {
-    capitalizeFirstLetter,
-    findNationByNationShortName,
-    nations,
-    NationShortName,
-    simpleStringSort,
-} from "common/common"
+import { capitalizeFirstLetter, findNationByNationShortName, NationShortName, simpleStringSort } from "common/common"
 import {
     colourGreenDark,
     colourLight,
-    colourList,
     colourRedDark,
     getPortBattleTimeHtml,
     loadJsonFile,
     loadJsonFiles,
-    nationFlags,
-    primary300,
 } from "common/common-browser"
-import { formatInt, formatPercentHtml, formatSiCurrency, formatSiInt, formatSiIntHtml } from "common/common-format"
+import { formatInt, formatPercentHtml, formatSiCurrency, formatSiIntHtml } from "common/common-format"
 import {
     Coordinate,
     defaultCircleSize,
     defaultFontSize,
     degreesHalfCircle,
     degreesToRadians,
-    distancePoints,
     Extent,
-    getOrdinalSVG,
     Point,
     roundToThousands,
     ϕ,
 } from "common/common-math"
 import { displayClanLitHtml } from "common/common-game-tools"
-import { minMapScale, serverMaintenanceHour } from "common/common-var"
+import { minMapScale } from "common/common-var"
 
 import {
     PortBattlePerServer,
@@ -74,16 +61,20 @@ import {
     TradeGoodProfit,
     GoodList,
 } from "common/gen-json"
-import { DataSource, DivDatum, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
+import { DataSource, HtmlResult, HtmlString, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
 import { PortBonus, portBonusType } from "common/types"
-import { Area, countyPolygon, patrolZones, regionPolygon } from "../map-data"
+import { colourScaleCounty } from "./map-data"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
-import { default as swordsIcon } from "icons/icon-swords.svg"
 import { NAMap } from "../na-map"
 import ShowF11 from "../show-f11"
+
 import { Flags } from "./flags"
+import { PatrolZones } from "./patrol-zones"
+import { Summary } from "./summary"
+import { Counties } from "./counties"
+import { Regions } from "./regions"
 
 const html = htm.bind(h)
 
@@ -140,32 +131,18 @@ interface ReadData {
 }
 
 export default class DisplayPorts {
-    #circleType = ""
-    #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
-    #portData = {} as PortWithTrades[]
-    #portDataDefault!: PortWithTrades[]
-    #showCurrentGood = false
-    #showRadius = ""
-    #showTradePortPartners = false
-    #tradeItem = {} as Map<number, TradeItem>
-    #tradePortId = 0
-    #zoomLevel: ZoomLevel = "initial"
     #attackRadius!: ScaleLinear<number, number>
-    #colourScaleCounty!: ScaleOrdinal<string, string>
+    #circleType = ""
     #colourScaleHostility!: ScaleLinear<string, string>
     #colourScaleNet!: ScaleLinear<string, string>
     #colourScalePoints!: ScaleLinear<string, string>
     #colourScaleTax!: ScaleLinear<string, string>
-    #countyPolygon = countyPolygon
-    #countyPolygonFiltered = [] as Area[]
-    #divPortSummary!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #gCounty!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gIcon!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPort!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPortCircle!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPZ!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gRegion!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gText!: Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #counties!: Counties
+    #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
+    #gIcon = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPort = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gPortCircle = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #gText = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound = {} as Point
     #maxNetIncome!: number
     #maxPortPoints!: number
@@ -173,27 +150,29 @@ export default class DisplayPorts {
     #minNetIncome!: number
     #minPortPoints!: number
     #minTaxIncome!: number
+    #patrolZones!: PatrolZones
+    #portData = {} as PortWithTrades[]
+    #portDataDefault!: PortWithTrades[]
     #portDataFiltered!: PortWithTrades[]
     #portRadius!: ScaleLinear<number, number>
-    #portSummaryNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryNumPorts!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTextNetIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTextNumPorts!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #portSummaryTextTaxIncome!: Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
-    #regionPolygon = regionPolygon
-    #regionPolygonFiltered = [] as Area[]
+    #regions!: Regions
     #scale = 0
+    #showCurrentGood = false
+    #showRadius = ""
+    #showTradePortPartners = false
+    #summary!: Summary
     #tooltip: BSTooltip | undefined = undefined
+    #tradeItem = {} as Map<number, TradeItem>
+    #tradePortId = 0
     #upperBound = {} as Point
+    #zoomLevel: ZoomLevel = "initial"
     readonly #baseId = "show-radius"
     readonly #circleSize = defaultCircleSize
     readonly #cookie: Cookie
     readonly #f11: ShowF11
     readonly #fontSize = defaultFontSize
-
-    readonly #minRadiusFactor = ϕ
     readonly #maxRadiusFactor = ϕ * 4
+    readonly #minRadiusFactor = ϕ
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
     readonly #serverName: string
@@ -243,9 +222,10 @@ export default class DisplayPorts {
         this._setupScales()
         this._setupListener()
         this._setupSvg()
-        this._setupCounties()
-        this._setupPatrolZones()
-        this._setupSummary()
+        this.#counties = new Counties()
+        this.#regions = new Regions()
+        this.#patrolZones = new PatrolZones(this.#serverName)
+        this.#summary = new Summary()
         void new Flags()
     }
 
@@ -286,7 +266,6 @@ export default class DisplayPorts {
             .domain([0, 1])
             .range([colourLight, colourRedDark])
             .interpolate(d3InterpolateHcl)
-        this.#colourScaleCounty = d3ScaleOrdinal<string, string>().range(colourList)
 
         this.#minTaxIncome = d3Min(this.portData, (d) => d.taxIncome) ?? 0
         this.#maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
@@ -345,11 +324,6 @@ export default class DisplayPorts {
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
-        this.#gRegion = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "region").attr("class", "title")
-        this.#gCounty = this.#gPort
-            .append<SVGGElement>("g")
-            .attr("data-ui-component", "county")
-            .attr("class", "sub-title")
         this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
         this.#gIcon = this.#gPort
             .append<SVGGElement>("g")
@@ -359,98 +333,6 @@ export default class DisplayPorts {
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-names")
             .attr("class", "fill-white")
-        this.#gPZ = this.#gPort
-            .append<SVGGElement>("g")
-            .attr("data-ui-component", "patrol-zone")
-            .attr("class", "fill-yellow-dark")
-    }
-
-    _setupCounties(): void {
-        // Sort by distance, origin is top left corner
-        const origin = { x: this.map.coord.max / 2, y: this.map.coord.max / 2 }
-        this.#countyPolygon = this.#countyPolygon.sort((a, b) => {
-            const pointA = { x: a.centroid[0], y: a.centroid[1] }
-            const pointB = { x: b.centroid[0], y: b.centroid[1] }
-
-            return distancePoints(origin, pointA) - distancePoints(origin, pointB)
-        })
-        this.#colourScaleCounty.domain(this.#countyPolygon.map((county) => county.name))
-    }
-
-    _setupPatrolZones(): void {
-        const start = dayjs.utc("2021-01-17").hour(serverMaintenanceHour)
-
-        let index = dayjs.utc().diff(start, "day")
-        if (this.#serverName === "eu2") {
-            index += 4
-        }
-
-        index %= patrolZones.length
-
-        // console.log(start.format("YYYY-MM-DD hh.mm"), index)
-
-        const { radius, name, shallow, shipClass } = patrolZones[index]
-        const swordSize = radius * 1.6
-        const [x, y] = patrolZones[index].coordinates
-        const dyFactor = 1.3
-        const dy = Math.round(radius / dyFactor)
-        const fontSize = Math.round((this.#fontSize * radius) / 100)
-
-        this.#gPZ.append("circle").attr("class", "background-yellow").attr("cx", x).attr("cy", y).attr("r", radius)
-        this.#gPZ
-            .append("image")
-            .attr("height", swordSize)
-            .attr("width", swordSize)
-            .attr("x", x)
-            .attr("y", y)
-            .attr("transform", `translate(${Math.floor(-swordSize / 2)},${Math.floor(-swordSize / 1.6)})`)
-            .attr("xlink:href", swordsIcon)
-            .attr("alt", "Patrol zone")
-        this.#gPZ
-            .append("text")
-            .attr("class", "svg-text-center")
-            .attr("x", x)
-            .attr("y", y)
-            .attr("dy", dy)
-            .attr("font-size", Math.round(fontSize * 1.6))
-            .text(name)
-        this.#gPZ
-            .append("text")
-            .attr("class", "svg-text-center")
-            .attr("x", x)
-            .attr("y", y)
-            .attr("dy", dy - fontSize * 1.6)
-            .attr("font-size", fontSize)
-            .html(
-                shallow
-                    ? "Shallow water ships"
-                    : `${
-                          shipClass ? `${getOrdinalSVG(shipClass.min)} to ${getOrdinalSVG(shipClass.max)} rate` : "All"
-                      } ships`
-            )
-    }
-
-    _setupSummary(): void {
-        // Main box
-        this.#divPortSummary = d3Select<HTMLDivElement, DivDatum>("main #summary-column")
-            .append<HTMLDivElement>("div")
-            .attr("id", "port-summary")
-            .attr("class", "port-summary shadow port-summary-no-wind")
-
-        // Number of selected ports
-        this.#portSummaryNumPorts = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
-        this.#portSummaryTextNumPorts = this.#portSummaryNumPorts.append<HTMLDivElement>("div")
-        this.#portSummaryNumPorts.append<HTMLDivElement>("div").attr("class", "overlay-des").html("selected<br>ports")
-
-        // Total tax income
-        this.#portSummaryTaxIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
-        this.#portSummaryTextTaxIncome = this.#portSummaryTaxIncome.append<HTMLDivElement>("div")
-        this.#portSummaryTaxIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("tax<br>income")
-
-        // Total net income
-        this.#portSummaryNetIncome = this.#divPortSummary.append<HTMLDivElement>("div").attr("class", "block")
-        this.#portSummaryTextNetIncome = this.#portSummaryNetIncome.append<HTMLDivElement>("div")
-        this.#portSummaryNetIncome.append<HTMLDivElement>("div").attr("class", "overlay-des").html("net<br>income")
     }
 
     _getPortName(id: number): string {
@@ -933,7 +815,7 @@ export default class DisplayPorts {
                                         ? "bubble capital"
                                         : "bubble non-capital"
                                     : "bubble not-capturable"
-                            fill = (d): string => (d.capturable ? this.#colourScaleCounty(d.county) : "")
+                            fill = (d): string => (d.capturable ? colourScaleCounty(d.county) : "")
                             r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
 
                             break
@@ -1033,104 +915,6 @@ export default class DisplayPorts {
         }
     }
 
-    _updateSummary(): void {
-        const numberPorts = Object.keys(this.#portData).length
-        let taxTotal = 0
-        let netTotal = 0
-
-        if (numberPorts) {
-            taxTotal = d3Sum(this.#portData, (d) => d.taxIncome)
-            netTotal = d3Sum(this.#portData, (d) => d.netIncome)
-        }
-
-        this.#portSummaryTextNumPorts.text(`${numberPorts}`)
-        this.#portSummaryTextTaxIncome.html(`${formatSiInt(taxTotal)}`)
-        this.#portSummaryTextNetIncome.html(`${formatSiInt(netTotal)}`)
-    }
-
-    _updateCounties(): void {
-        if (this.zoomLevel === "portLabel") {
-            const data = this.#countyPolygonFiltered
-
-            this.#gCounty
-                .selectAll<SVGTextElement, Area>("text")
-                .data(data, (d) => d.name)
-                .join(
-                    (enter) =>
-                        enter
-                            .append("text")
-                            .attr("class", "svg-text-center")
-                            .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                            .text((d) => d.name),
-                    (update) =>
-                        update.attr("fill", (d: Area): string =>
-                            this.showRadius === "county" ? this.#colourScaleCounty(d.name) : ""
-                        )
-                )
-
-            /*
-            const curve = d3CurveCatmullRomClosed;
-            const line = d3Line().curve(curve);
-            this._gCounty
-                .selectAll("path")
-                .data(data, d => d.name)
-                .join(enter =>
-                    enter
-                        .append("path")
-                        .attr("d", d => line(d.polygon))
-                        .attr("fill", "#373")
-                );
-            */
-
-            this.#gCounty.classed("d-none", false)
-        } else {
-            this.#gCounty.classed("d-none", true)
-        }
-    }
-
-    _updateRegions(): void {
-        if (this.zoomLevel === "initial") {
-            const data = this.#regionPolygonFiltered
-
-            this.#gRegion
-                .selectAll<SVGTextElement, Area>("text")
-                .data(data, (d) => d.name)
-                .join((enter) =>
-                    enter
-                        .append("text")
-                        .attr("class", "svg-text-center")
-                        .attr("transform", (d) => `translate(${d.centroid[0]},${d.centroid[1]})rotate(${d.angle})`)
-                        .text((d) => d.name)
-                )
-
-            /* Show polygon for test purposes
-            const d3line2 = d3
-                .line()
-                .x(d => d[0])
-                .y(d => d[1]);
-
-            this._gRegion
-                .selectAll("path")
-                .data(data)
-                .enter()
-                .append("path")
-                .attr("d", d => d3line2(d.polygon))
-                .attr("fill", "#999");
-                */
-            this.#gRegion.classed("d-none", false)
-        } else {
-            this.#gRegion.classed("d-none", true)
-        }
-    }
-
-    _updatePZ(): void {
-        if (this.zoomLevel === "pbZone") {
-            this.#gPZ.classed("d-none", true)
-        } else {
-            this.#gPZ.classed("d-none", false)
-        }
-    }
-
     update(scale?: number): void {
         this.#scale = scale ?? this.#scale
 
@@ -1138,10 +922,10 @@ export default class DisplayPorts {
         this._updateIcons()
         this._updatePortCircles()
         this.updateTexts()
-        this._updateSummary()
-        this._updateCounties()
-        this._updateRegions()
-        this._updatePZ()
+        this.#counties.update(this.zoomLevel, this.#lowerBound, this.#upperBound, this.showRadius)
+        this.#regions.update(this.zoomLevel, this.#lowerBound, this.#upperBound)
+        this.#patrolZones.update(this.zoomLevel)
+        this.#summary.update(this.#portData)
     }
 
     _filterVisible(): void {
@@ -1156,22 +940,6 @@ export default class DisplayPorts {
                     port.coordinates[1] <= this.#upperBound[1]
             )
         }
-
-        this.#countyPolygonFiltered = this.#countyPolygon.filter(
-            (county) =>
-                county.centroid[0] >= this.#lowerBound[0] &&
-                county.centroid[0] <= this.#upperBound[0] &&
-                county.centroid[1] >= this.#lowerBound[1] &&
-                county.centroid[1] <= this.#upperBound[1]
-        )
-
-        this.#regionPolygonFiltered = this.#regionPolygon.filter(
-            (region) =>
-                region.centroid[0] >= this.#lowerBound[0] &&
-                region.centroid[0] <= this.#upperBound[0] &&
-                region.centroid[1] >= this.#lowerBound[1] &&
-                region.centroid[1] <= this.#upperBound[1]
-        )
     }
 
     /**
@@ -1183,10 +951,6 @@ export default class DisplayPorts {
         this.#upperBound = viewport[1]
     }
 
-    _showSummary(): void {
-        this.#divPortSummary.classed("hidden", false)
-    }
-
     setShowRadiusSetting(showRadius = this.#radioButtonValues[0]): void {
         this.showRadius = showRadius
         this.#radios.set(this.showRadius)
@@ -1194,7 +958,7 @@ export default class DisplayPorts {
     }
 
     clearMap(scale?: number): void {
-        this._showSummary()
+        this.#summary.show()
         this.#portData = this.#portDataDefault
         this.circleType = ""
         this.setShowRadiusSetting()

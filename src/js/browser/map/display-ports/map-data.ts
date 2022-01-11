@@ -1,4 +1,7 @@
-import { Point } from "common/common-math"
+import { distancePoints, Point } from "common/common-math"
+import { scaleOrdinal as d3ScaleOrdinal } from "d3-scale"
+import { colourList } from "common/common-browser"
+import { mapSize } from "common/common-var"
 
 export interface Area {
     name: string
@@ -120,6 +123,19 @@ export const countyPolygon = [
     { name: "Virgin Islands", centroid: [7220, 3840], angle: 350 },
     { name: "Windward Isles", centroid: [7800, 5244], angle: 0 },
 ] as Area[]
+
+// Sort by distance, origin is top left corner
+const origin = { x: mapSize / 2, y: mapSize / 2 }
+const countyPolygonSorted = countyPolygon.sort((a, b) => {
+    const pointA = { x: a.centroid[0], y: a.centroid[1] }
+    const pointB = { x: b.centroid[0], y: b.centroid[1] }
+
+    return distancePoints(origin, pointA) - distancePoints(origin, pointB)
+})
+
+export const colourScaleCounty = d3ScaleOrdinal<string, string>()
+    .range(colourList)
+    .domain(countyPolygonSorted.map((county) => county.name))
 
 /*
 ** Automatic calculation of text position

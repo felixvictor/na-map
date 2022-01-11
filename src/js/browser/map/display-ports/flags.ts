@@ -1,6 +1,5 @@
 import { nations, NationShortName } from "common/common"
 import { nationFlags, primary300 } from "common/common-browser"
-import { HtmlString } from "common/interface"
 
 export class Flags {
     readonly #iconSize = 48
