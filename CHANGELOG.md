@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.8.0](///compare/v13.7.0...v13.8.0) (2022-01-12)
+
+
+### Features
+
+* window resize 2ebeae4
+
+
+### Bug Fixes
+
+* **display port:** proper await 0f0b9e5
+
 ## [13.7.0](///compare/v13.6.13...v13.7.0) (2022-01-10)
 
 
