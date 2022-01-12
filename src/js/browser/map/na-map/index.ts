@@ -227,14 +227,19 @@ class NAMap {
     }
 
     #resize(): void {
-        // console.log("resize")
+        this._setHeightWidth()
+        this.#initialMapScale = this._getInitialMapScale()
+        this._initialZoomAndPan()
+        this._setFlexOverlayHeight()
     }
 
     #resizeTimer(): void {
         const delay = 250
 
         window.clearTimeout(this.#timeoutId)
-        this.#timeoutId = window.setTimeout(this.#resize, delay)
+        this.#timeoutId = window.setTimeout(() => {
+            this.#resize()
+        }, delay)
     }
 
     _setupListener(): void {
@@ -271,7 +276,9 @@ class NAMap {
             this._showGridSelected()
         })
 
-        window.addEventListener("resize", () => this.#resizeTimer)
+        window.addEventListener("resize", () => {
+            this.#resizeTimer()
+        })
     }
 
     _setupSvg(): void {
@@ -385,10 +392,8 @@ class NAMap {
         this.zoomLevel = "initial"
 
         this.#tileMap = new TileMap(this.extent, this.coord)
-        this.#initialMapScale = this._getInitialMapScale()
-        this._initialZoomAndPan()
+        this.#resize()
         this._checkF11Coord()
-        this._setFlexOverlayHeight()
 
         document.querySelector<HTMLElement>("#navbar-left")?.classList.remove("d-none")
     }
