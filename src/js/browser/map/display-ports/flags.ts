@@ -1,7 +1,7 @@
 import { nations, NationShortName } from "common/common"
 import { nationFlags, primary300 } from "common/common-browser"
 
-export class Flags {
+export default class Flags {
     readonly #iconSize = 48
     readonly #svgDefNode: SVGDefsElement
 

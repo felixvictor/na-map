@@ -15,7 +15,7 @@ export interface CurrentPort {
     coord: Coordinate
 }
 
-export class PortNames {
+export default class PortNames {
     #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
     #gPortNames = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #scale = 1

@@ -23,13 +23,13 @@ import { NAMap } from "../na-map"
 import ShowF11 from "../show-f11"
 
 import PortCircles from "./circles"
-import { Counties } from "./counties"
-import { Flags } from "./flags"
-import { PatrolZones } from "./patrol-zones"
-import { CurrentPort, PortNames } from "./port-names"
-import { PortIcons } from "./port-icons"
-import { Regions } from "./regions"
-import { Summary } from "./summary"
+import Counties from "./counties"
+import Flags from "./flags"
+import PatrolZones from "./patrol-zones"
+import PortIcons from "./port-icons"
+import PortNames, { CurrentPort } from "./port-names"
+import Regions from "./regions"
+import Summary from "./summary"
 
 interface ReadData {
     [index: string]: PortBasic[] | PortPerServer[] | PortBattlePerServer[]

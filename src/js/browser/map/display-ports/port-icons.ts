@@ -72,7 +72,7 @@ interface PortForDisplay {
     portBonus?: PortBonus
 }
 
-export class PortIcons {
+export default class PortIcons {
     #gIcon = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #showRadius = ""
     #tooltip: BSTooltip | undefined = undefined

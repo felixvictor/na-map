@@ -12,7 +12,7 @@ interface Tiles {
     scale: number
 }
 
-export class TileMap {
+export default class TileMap {
     #x0 = 0
     #x1 = 0
     #y0 = 0

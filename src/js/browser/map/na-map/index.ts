@@ -33,8 +33,8 @@ import TrilateratePosition from "../get-position"
 import WindRose from "../wind-rose"
 import Select from "util/select"
 
-import { TileMap } from "./tile-map"
-import { About } from "./about"
+import TileMap from "./tile-map"
+import About from "./about"
 
 /**
  * Display naval action map

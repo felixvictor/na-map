@@ -3,7 +3,7 @@ import { SVGGDatum, ZoomLevel } from "common/interface"
 import { select as d3Select, Selection } from "d3-selection"
 import { Point } from "common/common-math"
 
-export class Regions {
+export default class Regions {
     #gRegion = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #regionPolygon = regionPolygon
 

@@ -15,7 +15,7 @@ import { default as swordsIcon } from "icons/icon-swords.svg"
 import { select as d3Select, Selection } from "d3-selection"
 import { SVGGDatum, ZoomLevel } from "common/interface"
 
-export class PatrolZones {
+export default class PatrolZones {
     #gPZ = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
 
     readonly #serverName: string

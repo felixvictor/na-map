@@ -6,7 +6,7 @@ import { formatSiInt } from "common/common-format"
 import { DivDatum } from "common/interface"
 import { PortWithTrades } from "common/gen-json"
 
-export class Summary {
+export default class Summary {
     #divPortSummary = {} as Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #portSummaryNetIncome = {} as Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
     #portSummaryNumPorts = {} as Selection<HTMLDivElement, DivDatum, HTMLElement, unknown>
