@@ -8,24 +8,21 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import { min as d3Min, max as d3Max } from "d3-array"
-import { interpolateHcl as d3InterpolateHcl } from "d3-interpolate"
-import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
 
-import { colourGreenDark, colourLight, colourRedDark, loadJsonFiles } from "common/common-browser"
-import { defaultCircleSize, Extent, Point, roundToThousands, ϕ } from "common/common-math"
+import { loadJsonFiles } from "common/common-browser"
+import { Extent, Point } from "common/common-math"
 import { minMapScale } from "common/common-var"
 
 import { PortBattlePerServer, PortBasic, PortPerServer, PortWithTrades } from "common/gen-json"
 import { DataSource, PortJsonData, SVGGDatum, ZoomLevel } from "common/interface"
-import { colourScaleCounty } from "./map-data"
 
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
 import { NAMap } from "../na-map"
 import ShowF11 from "../show-f11"
 
+import PortCircles from "./circles"
 import { Counties } from "./counties"
 import { Flags } from "./flags"
 import { PatrolZones } from "./patrol-zones"
@@ -33,9 +30,6 @@ import { CurrentPort, PortNames } from "./port-names"
 import { PortIcons } from "./port-icons"
 import { Regions } from "./regions"
 import { Summary } from "./summary"
-
-type PortCircleStringF = (d: PortWithTrades) => string
-type PortCircleNumberF = (d: PortWithTrades) => number
 
 interface ReadData {
     [index: string]: PortBasic[] | PortPerServer[] | PortBattlePerServer[]
@@ -45,29 +39,15 @@ interface ReadData {
 }
 
 export default class DisplayPorts {
-    #attackRadius!: ScaleLinear<number, number>
-    #circleType = ""
-    #colourScaleHostility!: ScaleLinear<string, string>
-    #colourScaleNet!: ScaleLinear<string, string>
-    #colourScalePoints!: ScaleLinear<string, string>
-    #colourScaleTax!: ScaleLinear<string, string>
     #counties!: Counties
     #gPort = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
-    #gPortCircle = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
     #lowerBound = {} as Point
-    #maxNetIncome!: number
-    #maxPortPoints!: number
-    #maxTaxIncome!: number
-    #minNetIncome!: number
-    #minPortPoints!: number
-    #minTaxIncome!: number
     #patrolZones!: PatrolZones
+    #portCircles!: PortCircles
     #portData = {} as PortWithTrades[]
     #portDataDefault!: PortWithTrades[]
     #portDataFiltered!: PortWithTrades[]
-    portIcons!: PortIcons
     #portNames!: PortNames
-    #portRadius!: ScaleLinear<number, number>
     #regions!: Regions
     #scale = 0
     #showCurrentGood = false
@@ -76,12 +56,10 @@ export default class DisplayPorts {
     #summary!: Summary
     #upperBound = {} as Point
     #zoomLevel: ZoomLevel = "initial"
+    portIcons!: PortIcons
     readonly #baseId = "show-radius"
-    readonly #circleSize = defaultCircleSize
     readonly #cookie: Cookie
     readonly #f11: ShowF11
-    readonly #maxRadiusFactor = ϕ * 4
-    readonly #minRadiusFactor = ϕ
     readonly #radioButtonValues: string[]
     readonly #radios: RadioButton
     readonly #serverName: string
@@ -127,10 +105,10 @@ export default class DisplayPorts {
         })
         this.#portData = this.#portDataDefault
 
-        this._setupScales()
         this._setupListener()
         this._setupSvg()
         this.#summary = new Summary()
+        this.#portCircles = new PortCircles(this.#portDataDefault)
         this.portIcons = new PortIcons(this.#serverName, this.map)
         await this.portIcons.loadData()
         this.#portNames = new PortNames()
@@ -164,37 +142,6 @@ export default class DisplayPorts {
     async _loadAndSetupData(): Promise<void> {
         const readData = await this._loadData()
         this._setupData(readData)
-    }
-
-    _setupScales(): void {
-        this.#portRadius = d3ScaleLinear()
-        this.#attackRadius = d3ScaleLinear().domain([0, 1])
-
-        this.#colourScaleHostility = d3ScaleLinear<string, string>()
-            .domain([0, 1])
-            .range([colourLight, colourRedDark])
-            .interpolate(d3InterpolateHcl)
-
-        this.#minTaxIncome = d3Min(this.portData, (d) => d.taxIncome) ?? 0
-        this.#maxTaxIncome = d3Max(this.portData, (d) => d.taxIncome) ?? 0
-        this.#colourScaleTax = d3ScaleLinear<string, string>()
-            .domain([this.#minTaxIncome, this.#maxTaxIncome])
-            .range([colourLight, colourGreenDark])
-            .interpolate(d3InterpolateHcl)
-
-        this.#minNetIncome = d3Min(this.portData, (d) => d.netIncome) ?? 0
-        this.#maxNetIncome = d3Max(this.portData, (d) => d.netIncome) ?? 0
-        this.#colourScaleNet = d3ScaleLinear<string, string>()
-            .domain([this.#minNetIncome, 0, this.#maxNetIncome])
-            .range([colourRedDark, colourLight, colourGreenDark])
-            .interpolate(d3InterpolateHcl)
-
-        this.#minPortPoints = d3Min(this.portData, (d) => d.portPoints) ?? 0
-        this.#maxPortPoints = d3Max(this.portData, (d) => d.portPoints) ?? 0
-        this.#colourScalePoints = d3ScaleLinear<string, string>()
-            .domain([this.#minPortPoints, this.#maxPortPoints])
-            .range([colourLight, colourGreenDark])
-            .interpolate(d3InterpolateHcl)
     }
 
     _setupListener(): void {
@@ -232,167 +179,6 @@ export default class DisplayPorts {
             .insert("g", "g.f11")
             .attr("data-ui-component", "ports")
             .attr("id", "ports")
-        this.#gPortCircle = this.#gPort.append<SVGGElement>("g").attr("data-ui-component", "port-circles")
-    }
-
-    _getTradePortMarker(port: PortWithTrades): string {
-        let marker = ""
-        if (port.id === this.portIcons.tradePort.id) {
-            marker = "here"
-        } else if (port.sellInTradePort && port.buyInTradePort) {
-            marker = "both"
-        } else if (port.sellInTradePort) {
-            marker = "pos"
-        } else if (port.buyInTradePort) {
-            marker = "neg"
-        }
-
-        return marker
-    }
-
-    _getAttackMarker(port: PortWithTrades): string {
-        let marker = ""
-        if (port.cooldownTime) {
-            marker = "cooldown"
-        } else if (port.attackerNation === "NT") {
-            marker = "raider"
-        }
-
-        return marker
-    }
-
-    _getFrontlineMarker(port: PortWithTrades): string {
-        let marker = ""
-        if (port.ownPort) {
-            marker = "pos"
-        } else if (port.enemyPort) {
-            marker = "neg"
-        }
-
-        return marker
-    }
-
-    _updatePortCircles(): void {
-        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
-        const scaledCircleSize = this.#circleSize / circleScale
-        const rMin = roundToThousands(scaledCircleSize * this.#minRadiusFactor)
-        const rMax = roundToThousands(scaledCircleSize * this.#maxRadiusFactor)
-
-        const incomeThreshold = 100_000
-        const portPointThreshold = 30
-        let data = this.#portDataFiltered
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        let cssClass: PortCircleStringF = () => ""
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        let r: PortCircleNumberF = () => 0
-        // eslint-disable-next-line unicorn/consistent-function-scoping
-        let fill: PortCircleStringF = () => ""
-
-        // noinspection IfStatementWithTooManyBranchesJS
-        switch (this.showRadius) {
-            case "tax":
-                data = this.#portDataFiltered.filter((d) => d.capturable && d.taxIncome > incomeThreshold)
-                this.#portRadius.domain([this.#minTaxIncome, this.#maxTaxIncome]).range([rMin, rMax])
-                cssClass = (): string => "bubble"
-                fill = (d): string => this.#colourScaleTax(d.taxIncome) ?? ""
-                r = (d): number => this.#portRadius(d.taxIncome) ?? 0
-
-                break
-
-            case "net":
-                data = this.#portDataFiltered.filter((d) => d.capturable && Math.abs(d.netIncome) > incomeThreshold)
-                this.#portRadius.domain([this.#minNetIncome, this.#maxNetIncome]).range([rMin, rMax])
-                cssClass = (): string => "bubble"
-                fill = (d): string => this.#colourScaleNet(d.netIncome) ?? ""
-                r = (d): number => this.#portRadius(Math.abs(d.netIncome)) ?? 0
-
-                break
-
-            case "points":
-                data = this.#portDataFiltered.filter((d) => d.capturable && d.portPoints > portPointThreshold)
-                this.#portRadius.domain([this.#minPortPoints, this.#maxPortPoints]).range([rMin, rMax / 2])
-                cssClass = (): string => "bubble"
-                fill = (d): string => this.#colourScalePoints(d.portPoints) ?? ""
-                r = (d): number => this.#portRadius(d.portPoints) ?? 0
-
-                break
-
-            case "position":
-                cssClass = (): string => "bubble here"
-                r = (d): number => d.distance ?? 0
-
-                break
-
-            case "attack":
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                data = this.#portDataFiltered.filter((port) => port.attackHostility || port.cooldownTime)
-                this.#attackRadius.range([rMin, rMax / 1.5])
-                cssClass = (d): string => `bubble ${this._getAttackMarker(d)}`
-                fill = (d): string =>
-                    d.attackerNation === "NT" ? "" : this.#colourScaleHostility(d.attackHostility ?? 0) ?? ""
-                r = (d): number => this.#attackRadius(d.attackHostility ?? (d.cooldownTime ? 0.2 : 0)) ?? 0
-
-                break
-
-            default:
-                if (this.circleType === "currentGood") {
-                    cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
-                    r = (): number => rMax / 2
-                } else {
-                    switch (this.showRadius) {
-                        case "county":
-                            cssClass = (d): string =>
-                                d.capturable
-                                    ? d.countyCapital
-                                        ? "bubble capital"
-                                        : "bubble non-capital"
-                                    : "bubble not-capturable"
-                            fill = (d): string => (d.capturable ? colourScaleCounty(d.county) : "")
-                            r = (d): number => (d.capturable ? rMax / 2 : rMax / 3)
-
-                            break
-
-                        case "tradePorts":
-                            cssClass = (d): string => `bubble ${this._getTradePortMarker(d)}`
-                            r = (d): number => (d.id === this.portIcons.tradePort.id ? rMax : rMax / 2)
-
-                            break
-
-                        case "frontline":
-                            cssClass = (d): string => `bubble ${this._getFrontlineMarker(d)}`
-                            r = (d): number => (d.ownPort ? rMax / 3 : rMax / 2)
-                            data = data.filter((d) => d.enemyPort ?? d.ownPort)
-
-                            break
-
-                        case "currentGood":
-                            cssClass = (d): string => `bubble ${d.isSource ? "pos" : "neg"}`
-                            r = (): number => rMax / 2
-
-                            break
-
-                        case "off":
-                            data = []
-
-                            break
-
-                        // No default
-                    }
-                }
-        }
-
-        this.#gPortCircle
-            .selectAll<SVGCircleElement, PortWithTrades>("circle")
-            .data(data, (d) => String(d.id))
-            .join((enter) =>
-                enter
-                    .append("circle")
-                    .attr("cx", (d) => d.coordinates[0])
-                    .attr("cy", (d) => d.coordinates[1])
-            )
-            .attr("class", (d) => cssClass(d))
-            .attr("r", (d) => r(d))
-            .attr("fill", (d) => fill(d))
     }
 
     portNamesUpdate() {
@@ -404,7 +190,7 @@ export default class DisplayPorts {
 
         this._filterVisible()
         this.portIcons.update(this.#scale, this.showRadius, this.#portData)
-        this._updatePortCircles()
+        this.#portCircles.update(this.#scale, this.#portDataFiltered, this.showRadius, this.portIcons.tradePort.id)
         this.portNamesUpdate()
         this.#counties.update(this.zoomLevel, this.#lowerBound, this.#upperBound, this.showRadius)
         this.#regions.update(this.zoomLevel, this.#lowerBound, this.#upperBound)
@@ -444,17 +230,8 @@ export default class DisplayPorts {
     clearMap(scale?: number): void {
         this.#summary.show()
         this.#portData = this.#portDataDefault
-        this.circleType = ""
         this.setShowRadiusSetting()
         this.update(scale)
-    }
-
-    get circleType(): string {
-        return this.#circleType
-    }
-
-    set circleType(newCircleType: string) {
-        this.#circleType = newCircleType
     }
 
     get currentPort(): CurrentPort {
