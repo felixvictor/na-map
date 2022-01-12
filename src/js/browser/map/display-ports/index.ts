@@ -141,7 +141,7 @@ export default class DisplayPorts {
 
     async _loadAndSetupData(): Promise<void> {
         const readData = await this._loadData()
-        this._setupData(readData)
+        await this._setupData(readData)
     }
 
     _setupListener(): void {
