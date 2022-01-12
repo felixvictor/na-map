@@ -2832,6 +2832,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@netlify/plugins-list@npm:^6.2.1":
+  version: 6.2.1
+  resolution: "@netlify/plugins-list@npm:6.2.1"
+  checksum: a20a46ee856ea0fdd139374885660681c7fa7c6cca0eda155e5785ebd94374b8ab0595ff5ebc52bf08abd4d76ae33c53a04b925cfcd221acd7b7ac1eb9976b1e
+  languageName: node
+  linkType: hard
+
 "@netlify/routing-local-proxy-darwin-arm64@npm:^0.34.1":
   version: 0.34.1
   resolution: "@netlify/routing-local-proxy-darwin-arm64@npm:0.34.1"
@@ -3750,12 +3757,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jquery@npm:^3.5.12":
-  version: 3.5.12
-  resolution: "@types/jquery@npm:3.5.12"
+"@types/jquery@npm:^3.5.13":
+  version: 3.5.13
+  resolution: "@types/jquery@npm:3.5.13"
   dependencies:
     "@types/sizzle": "*"
-  checksum: 8619ca4e7b64e385327dcb163c564cc5067e5223d7e55d9182374f51c0307bfdd12514b0b9e1e8b6a89249e32014dfc7fa4271d8f5c016a11852f9c2ab166033
+  checksum: cb4e6aacaf36905049d5ac93da1fabed17da285fafe38c88feba89d7c9912e108c934ea05c908b87ae199f2830e5e002a72d0cc8aaef4a33539581d0a7a6abe8
   languageName: node
   linkType: hard
 
@@ -10578,6 +10585,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graceful-fs@npm:^4.2.9":
+  version: 4.2.9
+  resolution: "graceful-fs@npm:4.2.9"
+  checksum: 68ea4e07ff2c041ada184f9278b830375f8e0b75154e3f080af6b70f66172fabb4108d19b3863a96b53fc068a310b9b6493d86d1291acc5f3861eb4b79d26ad6
+  languageName: node
+  linkType: hard
+
 "gzip-size@npm:^6.0.0":
   version: 6.0.0
   resolution: "gzip-size@npm:6.0.0"
@@ -13056,9 +13070,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lzma-native@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "lzma-native@npm:8.0.1"
+"lzma-native@npm:^8.0.5":
+  version: 8.0.5
+  resolution: "lzma-native@npm:8.0.5"
   dependencies:
     node-addon-api: ^3.1.0
     node-gyp: latest
@@ -13066,7 +13080,7 @@ __metadata:
     readable-stream: ^3.6.0
   bin:
     lzmajs: bin/lzmajs
-  checksum: abf2c527101060ab450d49c28693226ab175aeb2b56d976fb4ce49985ddba1e8251bd0e5af13fa225dac80faa805b71f0bba984c0ac1f7db5fbbc65e9f8d7b62
+  checksum: af35c6706b29d9a0a79bdcd29cb200999f1782751cc1e7229009ab4b37c51f823ed207b27e6b88b54b5d0d8a3a92c74bff2040d464fe7c787d9d69f8916a2d3a
   languageName: node
   linkType: hard
 
@@ -13836,7 +13850,7 @@ __metadata:
     "@types/d3-zoom": ^3.0.1
     "@types/google.analytics": ^0.0.42
     "@types/got": ^9.6.12
-    "@types/jquery": ^3.5.12
+    "@types/jquery": ^3.5.13
     "@types/js-cookie": ^3.0.1
     "@types/lzma-native": ^4.0.1
     "@types/mini-css-extract-plugin": ^2.4.0
@@ -13900,10 +13914,10 @@ __metadata:
     husky: ^7.0.4
     image-promise: ^7.0.1
     js-cookie: ^3.0.1
-    lzma-native: ^8.0.1
+    lzma-native: ^8.0.5
     mini-css-extract-plugin: ^2.4.6
     mini-svg-data-uri: ^1.4.3
-    netlify-cli: ^8.6.18
+    netlify-cli: ^8.6.21
     node-fetch: ^3.1.0
     npm-run-all: ^4.1.5
     pngjs: ^6.0.0
@@ -13940,10 +13954,10 @@ __metadata:
     ts-node: ^10.4.0
     typescript: ^4.5.4
     utility-types: ^3.10.0
-    webpack: ^5.65.0
+    webpack: ^5.66.0
     webpack-bundle-analyzer: ^4.5.0
     webpack-cli: ^4.9.1
-    webpack-dev-server: ^4.7.2
+    webpack-dev-server: ^4.7.3
     webpack-subresource-integrity: ^5.0.0
     xml-js: ^1.6.11
     xss: ^1.0.10
@@ -14029,16 +14043,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"netlify-cli@npm:^8.6.18":
-  version: 8.6.18
-  resolution: "netlify-cli@npm:8.6.18"
+"netlify-cli@npm:^8.6.21":
+  version: 8.6.21
+  resolution: "netlify-cli@npm:8.6.21"
   dependencies:
     "@netlify/build": ^26.1.0
     "@netlify/config": ^17.0.3
     "@netlify/framework-info": ^8.0.0
     "@netlify/local-functions-proxy": ^1.1.1
     "@netlify/plugin-edge-handlers": ^3.0.2
-    "@netlify/plugins-list": ^6.2.0
+    "@netlify/plugins-list": ^6.2.1
     "@netlify/routing-local-proxy": ^0.34.1
     "@netlify/zip-it-and-ship-it": 5.4.0
     "@octokit/rest": ^18.0.0
@@ -14139,7 +14153,7 @@ __metadata:
   bin:
     netlify: bin/run
     ntl: bin/run
-  checksum: 77b8bffb2c5da2a988beabb8161ebb766bdcd1f2a3460ce0d27bcea794cba9c73fc95913705f168994cd580b6f842baca5a72d551591b105076f624173263c6b
+  checksum: 4a48f82eadf4b2687b66b74313fdf591e56f639f9827c329663955519691d7845974bc34353bd08bfe105e2aa6210cdfd660988a32ef79a675a40d5701ccad98
   languageName: node
   linkType: hard
 
@@ -14260,10 +14274,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-forge@npm:^0.10.0":
-  version: 0.10.0
-  resolution: "node-forge@npm:0.10.0"
-  checksum: 5aa6dc9922e424a20ef101d2f517418e2bc9cfc0255dd22e0701c0fad1568445f510ee67f6f3fcdf085812c4ca1b847b8ba45683b34776828e41f5c1794e42e1
+"node-forge@npm:^1.2.0":
+  version: 1.2.1
+  resolution: "node-forge@npm:1.2.1"
+  checksum: af4f88c3f69362359f35f6a9e231b35c96d906eeb6e976fb92742afe7fcdd76439dc22b41ce3755389d171f6320756ec7505bdfa7b252466c091b8c519a22674
   languageName: node
   linkType: hard
 
@@ -17374,12 +17388,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selfsigned@npm:^1.10.11":
-  version: 1.10.11
-  resolution: "selfsigned@npm:1.10.11"
+"selfsigned@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "selfsigned@npm:2.0.0"
   dependencies:
-    node-forge: ^0.10.0
-  checksum: 1fd8fd317dc0b7d713d12d828131ac03c53abf41c4538b263fecd37bbc15688526c631654049ff00806b757ccb85492de6a13d6fefcad5cb54926631e48a76e1
+    node-forge: ^1.2.0
+  checksum: 43fca39a5aded2a8e97c1756af74c049a9dde12d47d302820f7d507d25c2ad7da4b04bc439a36620d63b4c0149bcf34ae7a729f978bf3b1bf48859c36ae34cee
   languageName: node
   linkType: hard
 
@@ -20042,9 +20056,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:^4.7.2":
-  version: 4.7.2
-  resolution: "webpack-dev-server@npm:4.7.2"
+"webpack-dev-server@npm:^4.7.3":
+  version: 4.7.3
+  resolution: "webpack-dev-server@npm:4.7.3"
   dependencies:
     "@types/bonjour": ^3.5.9
     "@types/connect-history-api-fallback": ^1.3.5
@@ -20068,7 +20082,7 @@ __metadata:
     p-retry: ^4.5.0
     portfinder: ^1.0.28
     schema-utils: ^4.0.0
-    selfsigned: ^1.10.11
+    selfsigned: ^2.0.0
     serve-index: ^1.9.1
     sockjs: ^0.3.21
     spdy: ^4.0.2
@@ -20082,7 +20096,7 @@ __metadata:
       optional: true
   bin:
     webpack-dev-server: bin/webpack-dev-server.js
-  checksum: d3dd7d61f25a2ac1ac64d4298396043b1b8b46c009afc12c7af4d7c7724b077baa84d4ea353f1956e3f591ab09cde1d15f18d94e8884c1adaa2e1d816c37f814
+  checksum: 6062db1ba62e372ab3bd127f0c1a575a0758ad15338bff56e65f344bfa495d566049752a3e0c18d44469123e2f0cd2ba26cc0cab8d4ca704e8b4ace596871b21
   languageName: node
   linkType: hard
 
@@ -20128,7 +20142,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5, webpack@npm:^5.65.0":
+"webpack@npm:^5":
   version: 5.65.0
   resolution: "webpack@npm:5.65.0"
   dependencies:
@@ -20162,6 +20176,43 @@ __metadata:
   bin:
     webpack: bin/webpack.js
   checksum: 221ab8ccd440cb678269e86689704bbef81cf41393eb266625873e30c6980ffaa055bb1a7d14bf9fc0f5a2e6f03d15d068cbb995bc876757c01a4ca27fd2870c
+  languageName: node
+  linkType: hard
+
+"webpack@npm:^5.66.0":
+  version: 5.66.0
+  resolution: "webpack@npm:5.66.0"
+  dependencies:
+    "@types/eslint-scope": ^3.7.0
+    "@types/estree": ^0.0.50
+    "@webassemblyjs/ast": 1.11.1
+    "@webassemblyjs/wasm-edit": 1.11.1
+    "@webassemblyjs/wasm-parser": 1.11.1
+    acorn: ^8.4.1
+    acorn-import-assertions: ^1.7.6
+    browserslist: ^4.14.5
+    chrome-trace-event: ^1.0.2
+    enhanced-resolve: ^5.8.3
+    es-module-lexer: ^0.9.0
+    eslint-scope: 5.1.1
+    events: ^3.2.0
+    glob-to-regexp: ^0.4.1
+    graceful-fs: ^4.2.9
+    json-parse-better-errors: ^1.0.2
+    loader-runner: ^4.2.0
+    mime-types: ^2.1.27
+    neo-async: ^2.6.2
+    schema-utils: ^3.1.0
+    tapable: ^2.1.1
+    terser-webpack-plugin: ^5.1.3
+    watchpack: ^2.3.1
+    webpack-sources: ^3.2.2
+  peerDependenciesMeta:
+    webpack-cli:
+      optional: true
+  bin:
+    webpack: bin/webpack.js
+  checksum: 5a44664a840fd64c5383aa78847b205ae0b42b607f85ee1d6a568617a210c1b9caab1822bce40a89a3b5eb0f626a83fb5fe2055c638aa230897bf224030d28e8
   languageName: node
   linkType: hard
 
