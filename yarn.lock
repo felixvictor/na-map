@@ -5480,13 +5480,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap-select@npm:^1.14.0-beta2":
-  version: 1.14.0-beta2
-  resolution: "bootstrap-select@npm:1.14.0-beta2"
+"bootstrap-select@https://github.com/snapappointments/bootstrap-select":
+  version: 1.14.0-beta3
+  resolution: "bootstrap-select@https://github.com/snapappointments/bootstrap-select.git#commit=225ca0a9f092941d78d54ed449354655f258e5dd"
   peerDependencies:
     bootstrap: ">=3.0.0"
     jquery: 1.9.1 - 3
-  checksum: bb598d04a66865f6f108158ab3584dc14594ca9a0a1f02817088f7584ec3146f65cc044e9235f031554654b0e3059dc1972f1d33803d1553b08f151497cfe97c
+  checksum: 0a2428d218b22b6bdf43ed48306c3f9acb0cbf37d215d74d5e9d17637c6112bb38cb1a4987537fe9406bba189a688c65d6943f202c2d87451e5b8e300be3bb00
   languageName: node
   linkType: hard
 
@@ -13857,7 +13857,7 @@ __metadata:
     autoprefixer: ^10.4.2
     babel-loader: ^8.2.3
     bootstrap: ^5.1.3
-    bootstrap-select: ^1.14.0-beta2
+    bootstrap-select: "https://github.com/snapappointments/bootstrap-select"
     clean-webpack-plugin: ^4.0.0
     collections: ^5.1.13
     copy-webpack-plugin: ^10.2.0
