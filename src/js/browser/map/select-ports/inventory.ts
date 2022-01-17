@@ -18,7 +18,7 @@ import { InventoryEntity } from "common/gen-json"
 
 import Select, { SelectOptions } from "util/select"
 import DisplayPorts from "../display-ports"
-import { NAMap } from "../na-map"
+import List from "../show-trades/list"
 
 type goodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>
 
@@ -27,12 +27,12 @@ export default class SelectPortsSelectInventory {
     #baseId: HtmlString
     #select = {} as Select
     #isInventorySelected = false
-    #map: NAMap
+    #list: List
     #ports: DisplayPorts
 
-    constructor(ports: DisplayPorts, map: NAMap) {
+    constructor(ports: DisplayPorts, list: List) {
         this.#ports = ports
-        this.#map = map
+        this.#list = list
 
         this.#baseId = `port-select-${getIdFromBaseName(this.#baseName)}`
 
@@ -150,11 +150,11 @@ export default class SelectPortsSelectInventory {
         this.#ports.setShowRadiusSetting("off")
         this.#ports.portData = portsFiltered
         this.#ports.showRadius = "tradePorts"
-        if (this.#map.showTrades.listType !== "portList") {
-            this.#map.showTrades.listType = "portList"
+        if (this.#list.listType !== "portList") {
+            this.#list.listType = "portList"
         }
 
-        this.#map.showTrades.update(this._getPortList(goodIdSelected, buyGoods, sellGoods))
+        this.#list.update(undefined, undefined, this._getPortList(goodIdSelected, buyGoods, sellGoods))
         this.#ports.update()
     }
 

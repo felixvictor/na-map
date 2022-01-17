@@ -450,8 +450,8 @@ export default class PortIcons {
         this.#tooltip.show()
 
         if (this.map.showTrades.show) {
-            if (this.map.showTrades.listType !== "inventory") {
-                this.map.showTrades.listType = "inventory"
+            if (this.map.showTrades.list.listType !== "inventory") {
+                this.map.showTrades.list.listType = "inventory"
             }
 
             this.map.showTrades.update(this.#getInventory(d))

@@ -206,7 +206,7 @@ class NAMap {
         this._grid = new DisplayGrid(this)
         this._portSelect = new SelectPorts(this._ports)
 
-        this.showTrades = new ShowTrades(this._ports, this)
+        this.showTrades = new ShowTrades(this._ports, this.serverName, this.#extent)
         await this.showTrades.showOrHide()
         this.f11 = new ShowF11(this, this.coord)
 
