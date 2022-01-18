@@ -2,24 +2,20 @@ import { select as d3Select, Selection } from "d3-selection"
 
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
 
-import { addDes, addInfo, getId, hideElem, PortData, showElem } from "./common"
+import { addDes, addInfo, baseId, getId, headId, hideElem, numTrades, showElem } from "./common"
 
-import { PortWithTrades, Trade } from "common/gen-json"
+import { Trade } from "common/gen-json"
 import { HtmlString } from "common/interface"
 
+import TradeData from "./trade-data"
+
 export default class List {
+    #cardId = `${baseId}-card`
+    #listDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
+    #listType = "tradeList"
     #tradeDetailsDiv = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
     #tradeDetailsHead = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #list = {} as Selection<HTMLDivElement, unknown, HTMLElement, unknown>
-    #listType = "tradeList"
-    #linkData = [] as Trade[]
-    #linkDataDefault = [] as Trade[]
-    #tradeItem = new Map<number, string>()
-    #portData = new Map<number, Partial<PortData>>()
-
-    #linkDataFiltered = [] as Trade[]
-
-    #profitText = ""
+    #tradeData = {} as TradeData
 
     constructor() {
         this.#setupSvg()
@@ -34,22 +30,22 @@ export default class List {
 
         switch (this.#listType) {
             case "inventory":
-                this.#linkData = []
+                this.#tradeData.emptyLinkDataFiltered()
                 hideElem(this.#tradeDetailsHead)
-                this.#list.remove()
-                this.#list = this.#tradeDetailsDiv.append("div").attr("class", "small p-2")
+                this.#listDiv.remove()
+                this.#listDiv = this.#tradeDetailsDiv.append("div").attr("class", "small p-2")
                 break
             case "portList":
-                this.#linkData = []
+                this.#tradeData.emptyLinkDataFiltered()
                 hideElem(this.#tradeDetailsHead)
-                this.#list.remove()
-                this.#list = this.#tradeDetailsDiv.append("div").attr("class", "small p-2")
+                this.#listDiv.remove()
+                this.#listDiv = this.#tradeDetailsDiv.append("div").attr("class", "small p-2")
                 break
             default:
-                this.#linkData = this.#linkDataDefault
+                this.#tradeData.resetLinkData()
                 showElem(this.#tradeDetailsHead)
-                this.#list.remove()
-                this.#list = this.#tradeDetailsDiv.append("div").attr("class", "trade-list small")
+                this.#listDiv.remove()
+                this.#listDiv = this.#tradeDetailsDiv.append("div").attr("class", "trade-list small")
                 break
         }
     }
@@ -58,90 +54,77 @@ export default class List {
         return this.#tradeDetailsDiv
     }
 
-    get tradeDetailsHead(): Selection<HTMLDivElement, unknown, HTMLElement, unknown> {
-        return this.#tradeDetailsHead
-    }
-
-    setupData(portData: PortWithTrades[], linkDataDefault: Trade[], tradeItem: Map<number, string>): void {
-        this.#portData = new Map<number, Partial<PortData>>(
-            portData.map((port) => [
-                port.id,
-                {
-                    name: port.name,
-                    nation: port.nation,
-                    isShallow: port.shallow,
-                } as Partial<PortData>,
-            ])
-        )
-
-        this.#linkDataDefault = linkDataDefault
-        this.#linkData = linkDataDefault
-        this.#tradeItem = tradeItem
+    set tradeData(tradeData: TradeData) {
+        this.#tradeData = tradeData
     }
 
     #setupSvg() {
         this.#tradeDetailsDiv = d3Select<HTMLDivElement, unknown>("main #summary-column")
             .append("div")
-            .attr("id", "trade-details")
+            .attr("id", baseId)
             .attr("class", "trade-details")
-        this.#tradeDetailsHead = this.#tradeDetailsDiv.append("div")
+        this.#tradeDetailsHead = this.#tradeDetailsDiv.append("div").attr("id", headId).attr("class", "p-2")
 
-        this.#list = this.#tradeDetailsDiv.append("div").attr("class", "trade-list small")
+        this.#tradeDetailsHead
+            .append("button")
+            .attr("type", "button")
+            .attr("class", "btn btn-small btn-outline-primary mb-2")
+            .attr("data-bs-toggle", "collapse")
+            .attr("data-bs-target", this.#cardId)
+            .attr("aria-expanded", "false")
+            .text("Info")
+        this.#tradeDetailsHead
+            .append("div")
+            .attr("id", this.#cardId)
+            .attr("class", "collapse")
+            .append("div")
+            .attr("class", "card card-body small mx-n2")
+            .text(
+                "Trade data is static (snapshot taken during maintenance). " +
+                    "Therefore, price and/or quantity may not be available anymore. " +
+                    "Data is limited as buy and sell prices at a certain port are " +
+                    "only known when this port has this good in its inventory or " +
+                    "a buy/sell contract. " +
+                    "Better sell ports may be found using the in-game trader tool."
+            )
+
+        this.#listDiv = this.#tradeDetailsDiv.append("div").attr("class", "trade-list small")
     }
 
     #updateInventory(inventory?: string): void {
-        this.#list.html(inventory ?? "")
+        this.#listDiv.html(inventory ?? "")
     }
 
     #updatePortList(portList?: string): void {
-        this.#list.html(portList ?? "")
-    }
-
-    #getItemName(itemId: number): string {
-        return this.#tradeItem.get(itemId) ?? ""
-    }
-
-    #getPortName(portId: number): string {
-        return this.#portData.get(portId)?.name ?? ""
-    }
-
-    #getPortNation(portId: number): string {
-        return this.#portData.get(portId)?.nation ?? ""
-    }
-
-    #portIsShallow(portId: number): boolean {
-        return this.#portData.get(portId)?.isShallow ?? true
-    }
-
-    #getPortDepth(portId: number): string {
-        return this.#portIsShallow(portId) ? "(shallow)" : "(deep)"
+        this.#listDiv.html(portList ?? "")
     }
 
     #getTradeLimitedData(trade: Trade): HtmlString {
         const weight = trade.weightPerItem * trade.quantity
 
         let h = "" as HtmlString
-        h += addInfo(`${formatInt(trade.quantity)} ${this.#getItemName(trade.good)}`) + addDes("trade")
-        h += addInfo(`${formatSiCurrency(trade.profit ?? 0)}`) + addDes(this.#profitText)
+        h += addInfo(`${formatInt(trade.quantity)} ${this.#tradeData.getItemName(trade.good)}`) + addDes("trade")
+        h += addInfo(`${formatSiCurrency(trade.profit ?? 0)}`) + addDes(this.#tradeData.profitText)
         h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight")
         h +=
             addInfo(
-                `${this.#getPortName(trade.source.id)} <span class="caps">${this.#getPortNation(
+                `${this.#tradeData.getPortName(trade.source.id)} <span class="caps">${this.#tradeData.getPortNation(
                     trade.source.id
                 )}</span>`
-            ) + addDes(`from ${this.#getPortDepth(trade.source.id)}`)
+            ) + addDes(`from ${this.#tradeData.getPortDepth(trade.source.id)}`)
         h +=
             addInfo(
-                `${this.#getPortName(trade.target.id)} <span class="caps">${this.#getPortNation(
+                `${this.#tradeData.getPortName(trade.target.id)} <span class="caps">${this.#tradeData.getPortNation(
                     trade.target.id
                 )}</span>`
-            ) + addDes(`to ${this.#getPortDepth(trade.target.id)}`)
+            ) + addDes(`to ${this.#tradeData.getPortDepth(trade.target.id)}`)
         h += addInfo(`${formatSiInt(trade.distance)}`) + addDes("sail distance")
 
         return h
     }
 
-    #updateTradeList(): void {
+    #updateTradeList(isInventorySelected: boolean): void {
+        const data = isInventorySelected ? [] : this.#tradeData.linkDataFiltered.slice(0, numTrades)
         let highlightLink: Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
         const highlightOn = (_event: Event, d: Trade): void => {
@@ -154,23 +137,16 @@ export default class List {
             highlightLink.dispatch("mouseleave")
         }
 
-        this.#list
+        this.#listDiv
             .selectAll<HTMLDivElement, Trade>("div.block")
-            .data(this.#linkDataFiltered, (d) => getId(d))
+            .data(data, (d) => getId(d))
             .join((enter) =>
                 enter.append("div").attr("class", "block").on("mouseenter", highlightOn).on("mouseleave", highlightOff)
             )
             .html((d) => this.#getTradeLimitedData(d))
     }
 
-    update(linkDataFiltered: Trade[] | undefined, profitText: string | undefined, info?: string): void {
-        if (linkDataFiltered) {
-            this.#linkDataFiltered = linkDataFiltered
-        }
-        if (profitText) {
-            this.#profitText = profitText
-        }
-
+    update(isInventorySelected: boolean, info?: string): void {
         switch (this.#listType) {
             case "inventory":
                 this.#updateInventory(info)
@@ -179,7 +155,7 @@ export default class List {
                 this.#updatePortList(info)
                 break
             default:
-                this.#updateTradeList()
+                this.#updateTradeList(isInventorySelected)
                 break
         }
     }

@@ -162,6 +162,10 @@ export default class Select {
         this.#select$.val(value).selectpicker("refresh")
     }
 
+    selectAll(): void {
+        this.#select$.selectpicker("selectAll")
+    }
+
     setOptions(options: HtmlString): void {
         this.select$.empty()
         this.select$.append(options)

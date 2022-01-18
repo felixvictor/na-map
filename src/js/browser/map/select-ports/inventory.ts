@@ -154,7 +154,7 @@ export default class SelectPortsSelectInventory {
             this.#list.listType = "portList"
         }
 
-        this.#list.update(undefined, undefined, this._getPortList(goodIdSelected, buyGoods, sellGoods))
+        this.#list.update(this.#isInventorySelected, this._getPortList(goodIdSelected, buyGoods, sellGoods))
         this.#ports.update()
     }
 

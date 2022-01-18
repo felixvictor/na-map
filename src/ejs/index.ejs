@@ -32,10 +32,9 @@
 
 <% function makeCheckboxGroup(data) { %>
     <h6 class="dropdown-header"><%= data.title %></h6>
-    <div class="ms-3 mb-3" id="<%= data.name %>">
-        <input type="checkbox" class="btn-check" name="<%= data.name %>" id="<%= data.name %>-<%= data.name %>"
-               autocomplete="off">
-        <label class="btn btn-toggle" for="<%= data.name %>-<%= data.name %>" title="<%= data.title %>">
+    <div class="ms-3 mb-3">
+        <input type="checkbox" class="btn-check" id="<%= data.name %>" autocomplete="off">
+        <label class="btn btn-toggle" for="<%= data.name %>" title="<%= data.title %>">
             <i class="icon icon-<%= data.name %> icon-navbar" role="img" aria-label="<%= data.title %>"></i>
         </label>
     </div>

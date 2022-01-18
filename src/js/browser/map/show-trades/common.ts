@@ -3,13 +3,17 @@ import { HtmlString } from "common/interface"
 import { Trade } from "common/gen-json"
 import { NationShortName } from "common/common"
 
-export interface PortData {
+export interface NodeData {
     name: string
     nation: NationShortName
     isShallow: boolean
     x: number
     y: number
 }
+
+export const numTrades = 30
+export const baseId = "trade-details"
+export const headId = `${baseId}-head`
 
 export const showElem = (elem: Selection<HTMLDivElement, unknown, HTMLElement, unknown>): void => {
     elem.classed("d-none", false)

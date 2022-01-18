@@ -8,6 +8,9 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
+type Id = string
+type Ids = Array<Id>
+
 /**
  * RadioButton
  */
@@ -15,11 +18,11 @@ export default class RadioButton {
     // Radio button name
     readonly #name: string
     // Radio button ids
-    readonly #ids: readonly string[]
+    readonly #ids: Ids
     // Default checked radio button id
-    readonly #default: string
+    readonly #default: Id
 
-    constructor(name: string, ids: readonly string[]) {
+    constructor(name: string, ids: Ids) {
         this.#name = name.replace(/ /g, "")
         this.#ids = ids
         ;[this.#default] = ids
@@ -28,14 +31,14 @@ export default class RadioButton {
     /**
      * Set radio button
      */
-    set(id: string): void {
+    set(id: Id): void {
         ;((document.querySelector(`#${this.#name}-${id}`) ?? {}) as HTMLInputElement).checked = true
     }
 
     /**
      * Get radio button value
      */
-    get(): string {
+    get(): Id {
         // Radio button value
         let { value } = (document.querySelector(`input[name="${this.#name}"]:checked`) ?? {}) as HTMLInputElement
 

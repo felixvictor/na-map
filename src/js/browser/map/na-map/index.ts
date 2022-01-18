@@ -18,20 +18,21 @@ import { mapSize, maxMapScale, minMapScale, tileSize } from "common/common-var"
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 import { ServerId } from "common/servers"
 
+import Checkbox from "util/checkbox"
 import Cookie from "util/cookie"
+import RadioButton from "util/radio-button"
+import Select from "util/select"
 
 import DisplayGrid from "../display-grid"
 import DisplayPbZones from "../display-pb-zones"
 import DisplayPorts from "../display-ports"
 import MakeJourney from "../make-journey"
 import PowerMap from "../../game-tools/show-power-map"
-import RadioButton from "util/radio-button"
 import SelectPorts from "../select-ports"
 import ShowF11 from "../show-f11"
 import ShowTrades from "../show-trades"
 import TrilateratePosition from "../get-position"
 import WindRose from "../wind-rose"
-import Select from "util/select"
 
 import TileMap from "./tile-map"
 import About from "./about"
@@ -41,7 +42,10 @@ import About from "./about"
  */
 class NAMap {
     #currentMapScale = minMapScale
-    #extent = {} as Extent
+    #extent = [
+        [0, 0],
+        [mapSize, mapSize],
+    ] as Extent
     #initialMapScale = minMapScale
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #overfillZoom = false
@@ -58,7 +62,7 @@ class NAMap {
     private _pbZone!: DisplayPbZones
     private _portSelect!: SelectPorts
     private _ports!: DisplayPorts
-    private _showGrid!: string
+    private _showGrid!: boolean
     private _svg!: Selection<SVGSVGElement, Event, HTMLElement, unknown>
     private _zoomLevel!: ZoomLevel
     private readonly _doubleClickActionCookie: Cookie
@@ -68,8 +72,8 @@ class NAMap {
     private readonly _searchParams: URLSearchParams
     private readonly _showGridCookie: Cookie
     private readonly _showGridId: string
-    private readonly _showGridRadios: RadioButton
-    private readonly _showGridValues: string[]
+    private readonly _showGridCheckbox: Checkbox
+    private readonly _showGridValues = [String(false), String(true)] // Possible values for show trade checkboxes (first is default value)
     readonly #PBZoneZoomThreshold = 2
     readonly #labelZoomThreshold = 0.25
     readonly #wheelDelta = 1
@@ -140,10 +144,8 @@ class NAMap {
         /**
          * ShowGrid settings
          */
-        this._showGridValues = ["off", "on"]
-
         this._showGridCookie = new Cookie({ id: this._showGridId, values: this._showGridValues })
-        this._showGridRadios = new RadioButton(this._showGridId, this._showGridValues)
+        this._showGridCheckbox = new Checkbox(this._showGridId)
 
         /**
          * Get showGrid setting from cookie or use default value
@@ -186,7 +188,7 @@ class NAMap {
     _getShowGridValue(): string {
         const r = this._showGridCookie.get()
 
-        this._showGridRadios.set(r)
+        this._showGridCheckbox.set(Boolean(r))
 
         return r
     }
@@ -206,7 +208,7 @@ class NAMap {
         this._grid = new DisplayGrid(this)
         this._portSelect = new SelectPorts(this._ports)
 
-        this.showTrades = new ShowTrades(this._ports, this.serverName, this.#extent)
+        this.showTrades = new ShowTrades(this._ports, this.serverName)
         await this.showTrades.showOrHide()
         this.f11 = new ShowF11(this, this.coord)
 
@@ -308,10 +310,10 @@ class NAMap {
     }
 
     _showGridSelected(): void {
-        this._showGrid = this._showGridRadios.get()
-        this._grid.show = this._showGrid === "on"
+        this._showGrid = this._showGridCheckbox.get()
+        this._grid.show = this._showGrid
 
-        this._showGridCookie.set(this._showGrid)
+        this._showGridCookie.set(String(this._showGrid))
 
         this._grid.update()
     }
@@ -437,11 +439,6 @@ class NAMap {
          * Height of map svg (screen coordinates)
          */
         this.height = this._getHeight()
-
-        this.#extent = [
-            [0, 0],
-            [this.width, this.height],
-        ]
     }
 
     _setSvgSize(): void {
