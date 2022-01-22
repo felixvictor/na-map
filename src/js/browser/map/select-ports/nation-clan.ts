@@ -42,7 +42,10 @@ export default class SelectPortsNationClan {
             // Exclude neutral nation and free towns when neutralPortsIncluded is set
             .filter((nation) => !(!neutralPortsIncluded && (nation.short === "FT" || nation.short === "NT")))
             .sort(sortBy(["name"]))
-            .map((nation: Nation): string => `<option value="${nation.short}">${nation.name}</option>`)
+            .map(
+                (nation: Nation): string =>
+                    `<option data-icon="flag-icon-${nation.short} flag-icon-small" value="${nation.short}">${nation.name}</option>`
+            )
             .join("")}`
 
     _setupNationSelect(): void {
