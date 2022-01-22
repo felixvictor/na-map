@@ -85,7 +85,6 @@ export default class ShowTrades {
             showElem(this.list.tradeDetailsDiv)
         } else {
             hideElem(this.list.tradeDetailsDiv)
-            this.#tradeData.emptyLinkDataFiltered()
         }
     }
 
@@ -141,12 +140,6 @@ export default class ShowTrades {
 
     clearMap(): void {
         this.list.listType = "tradeList"
-
-        if (this.show) {
-            this.#tradeData.resetLinkData()
-        } else {
-            this.#tradeData.emptyLinkDataFiltered()
-        }
 
         this.update()
     }
