@@ -1,3 +1,5 @@
+import "bootstrap/js/dist/collapse"
+
 import { select as d3Select, Selection } from "d3-selection"
 
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
@@ -63,14 +65,14 @@ export default class List {
             .append("div")
             .attr("id", baseId)
             .attr("class", "trade-details")
-        this.#tradeDetailsHead = this.#tradeDetailsDiv.append("div").attr("id", headId).attr("class", "p-2")
+        this.#tradeDetailsHead = this.#tradeDetailsDiv.append("div").attr("id", headId).attr("class", "px-2")
 
         this.#tradeDetailsHead
             .append("button")
             .attr("type", "button")
-            .attr("class", "btn btn-small btn-outline-primary mb-2")
+            .attr("class", "btn btn-small btn-outline-primary my-2")
             .attr("data-bs-toggle", "collapse")
-            .attr("data-bs-target", this.#cardId)
+            .attr("data-bs-target", `#${this.#cardId}`)
             .attr("aria-expanded", "false")
             .text("Info")
         this.#tradeDetailsHead
@@ -78,7 +80,7 @@ export default class List {
             .attr("id", this.#cardId)
             .attr("class", "collapse")
             .append("div")
-            .attr("class", "card card-body small mx-n2")
+            .attr("class", "card card-body small mx-n2 px-2")
             .text(
                 "Trade data is static (snapshot taken during maintenance). " +
                     "Therefore, price and/or quantity may not be available anymore. " +
@@ -108,15 +110,15 @@ export default class List {
         h += addInfo(`${formatSiInt(weight)} ${weight === 1 ? "ton" : "tons"}`) + addDes("weight")
         h +=
             addInfo(
-                `${this.#tradeData.getPortName(trade.source.id)} <span class="caps">${this.#tradeData.getPortNation(
+                `${this.#tradeData.getPortName(trade.source.id)} <span class="flag-icon-${this.#tradeData.getPortNation(
                     trade.source.id
-                )}</span>`
+                )} flag-icon-small me-1" role="img"></span>`
             ) + addDes(`from ${this.#tradeData.getPortDepth(trade.source.id)}`)
         h +=
             addInfo(
-                `${this.#tradeData.getPortName(trade.target.id)} <span class="caps">${this.#tradeData.getPortNation(
+                `${this.#tradeData.getPortName(trade.target.id)} <span class="flag-icon-${this.#tradeData.getPortNation(
                     trade.target.id
-                )}</span>`
+                )} flag-icon-small me-1" role="img"></span>`
             ) + addDes(`to ${this.#tradeData.getPortDepth(trade.target.id)}`)
         h += addInfo(`${formatSiInt(trade.distance)}`) + addDes("sail distance")
 
@@ -141,7 +143,11 @@ export default class List {
             .selectAll<HTMLDivElement, Trade>("div.block")
             .data(data, (d) => getId(d))
             .join((enter) =>
-                enter.append("div").attr("class", "block").on("mouseenter", highlightOn).on("mouseleave", highlightOff)
+                enter
+                    .append("div")
+                    .attr("class", "block px-2")
+                    .on("mouseenter", highlightOn)
+                    .on("mouseleave", highlightOff)
             )
             .html((d) => this.#getTradeLimitedData(d))
     }

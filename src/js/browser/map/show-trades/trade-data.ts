@@ -47,7 +47,12 @@ export default class TradeData {
     }
 
     static getOptions(): HtmlString {
-        return `${nations.map((nation) => `<option value="${nation.short}" selected>${nation.name}</option>`).join("")}`
+        return `${nations
+            .map(
+                (nation) =>
+                    `<option data-icon="flag-icon-${nation.short} flag-icon-small" value="${nation.short}" selected></option>`
+            )
+            .join("")}`
     }
 
     get linkDataFiltered(): Trade[] {
@@ -98,8 +103,8 @@ export default class TradeData {
         const profitRadioGroup = d3Select(`#${headId}`)
             .append("div")
             .attr("id", this.#profitId)
-            .attr("class", "align-self-center radio-group")
-        profitRadioGroup.append("legend").attr("class", "col-form-label").text("Sort net profit by")
+            .attr("class", "align-self-center radio-group pb-1")
+        profitRadioGroup.append("legend").attr("class", "col-form-label pt-1 pb-0").text("Sort net profit by")
 
         for (const button of this.#profitRadioValues) {
             const id = `${this.#profitId}-${button.replace(/ /g, "")}`
@@ -124,7 +129,7 @@ export default class TradeData {
             countSelectedText(amount: number) {
                 const text = amount === nations.length ? "All" : String(amount)
 
-                return `${text} nations selected`
+                return `${text} nations`
             },
             selectedTextFormat: "count > 1",
             title: "Select nations",

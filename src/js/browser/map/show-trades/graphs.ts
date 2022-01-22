@@ -5,8 +5,8 @@ import { scaleLinear as d3ScaleLinear, scalePoint as d3ScalePoint } from "d3-sca
 import { select as d3Select, Selection } from "d3-selection"
 
 import { formatInt, formatSiCurrency, formatSiInt } from "common/common-format"
-import { Coordinate } from "common/common-math"
 import { minMapScale } from "common/common-var"
+import { Coordinate } from "common/common-math"
 
 import {
     addDes,

@@ -8,8 +8,6 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-import "bootstrap/js/dist/collapse"
-
 import { ZoomTransform } from "d3-zoom"
 
 import { Extent } from "common/common-math"
