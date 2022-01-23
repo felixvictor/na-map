@@ -70,7 +70,7 @@ export default class List {
         this.#tradeDetailsHead
             .append("button")
             .attr("type", "button")
-            .attr("class", "btn btn-small btn-outline-primary my-2")
+            .attr("class", "btn btn-small btn-outline-light my-2")
             .attr("data-bs-toggle", "collapse")
             .attr("data-bs-target", `#${this.#cardId}`)
             .attr("aria-expanded", "false")

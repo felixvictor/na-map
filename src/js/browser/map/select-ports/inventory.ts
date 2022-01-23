@@ -35,7 +35,7 @@ export default class SelectPortsSelectInventory {
         this.#showTrades = showTrades
 
         this.#baseId = `port-select-${getIdFromBaseName(this.#baseName)}`
-        console.log("SelectPortsSelectInventory constructor", this.#showTrades)
+
         this._setupSelect()
         this._setupListener()
     }
@@ -98,9 +98,11 @@ export default class SelectPortsSelectInventory {
         if (buyGoods.size > 0) {
             h += "<h6>Buy</h6>"
             for (const [, value] of buyGoods) {
-                h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
-                    value.good.buyQuantity
-                )} @ ${formatSiCurrency(value.good.buyPrice)}<br>`
+                h += `${value.name} <span class="flag-icon-${
+                    value.nation
+                } flag-icon-small me-1" role="img"></span>: ${formatInt(value.good.buyQuantity)} @ ${formatSiCurrency(
+                    value.good.buyPrice
+                )}<br>`
             }
         }
 
@@ -111,9 +113,11 @@ export default class SelectPortsSelectInventory {
         if (sellGoods.size > 0) {
             h += "<h6>Sell</h6>"
             for (const [, value] of sellGoods) {
-                h += `${value.name} <span class="caps">${value.nation}</span>: ${formatInt(
-                    value.good.sellQuantity
-                )} @ ${formatSiCurrency(value.good.sellPrice)}<br>`
+                h += `${value.name} <span class="flag-icon-${
+                    value.nation
+                } flag-icon-small me-1" role="img"></span>: ${formatInt(value.good.sellQuantity)} @ ${formatSiCurrency(
+                    value.good.sellPrice
+                )}<br>`
             }
         }
 

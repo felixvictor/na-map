@@ -108,12 +108,12 @@
     flex: 1 1 auto;
     flex-direction: column;
     overflow-y: scroll;
-    color: $overlay-text-colour;
+    color: $dark-overlay-text-colour;
     pointer-events: all;
-    background: $overlay-background;
+    background: $dark-overlay-background;
 
     .card {
-        background: $overlay-background;
+        background: $dark-overlay-background;
     }
 }
 
@@ -123,11 +123,11 @@
     padding-top: $spacer;
 
     .block:nth-of-type(odd) {
-        background: $overlay-background-contrast;
+        background: $dark-overlay-background-contrast;
     }
 
     .des {
-        color: $overlay-text-colour-contrast;
+        color: $dark-overlay-text-colour-contrast;
     }
 }
 
