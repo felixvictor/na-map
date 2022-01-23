@@ -26,13 +26,14 @@ import TradeData from "./trade-data"
  * Show trades
  */
 export default class ShowTrades {
-    #graphs: Graphs
+    #graphs = {} as Graphs
     #inventorySelect = {} as SelectPortsSelectInventory
     #isDataLoaded = false
     #ports: DisplayPorts
     #scale = 1
-    #tradeData: TradeData
-    list: List
+    #serverName: string
+    #tradeData = {} as TradeData
+    list = {} as List
     readonly #showCookie: Cookie
     readonly #showCheckboxId = "show-trades"
     readonly #showCheckboxValues = [String(false), String(true)] // Possible values for show trade checkboxes (first is default value)
@@ -41,50 +42,58 @@ export default class ShowTrades {
 
     constructor(ports: DisplayPorts, serverName: string) {
         this.#ports = ports
+        this.#serverName = serverName
 
         this.#showCookie = new Cookie({ id: this.#showCheckboxId, values: this.#showCheckboxValues })
         this.#showCheckbox = new Checkbox(this.#showCheckboxId)
 
+        this.#setupShowListener()
         this.show = this.#getShowValue()
-
-        this.list = new List()
-        this.#graphs = new Graphs()
-        this.#tradeData = new TradeData(serverName)
-
-        this.#setupListener()
-
-        this.#inventorySelect = new SelectPortsSelectInventory(ports, this.list)
     }
 
-    #setupListener(): void {
+    #setupShowListener(): void {
         document.querySelector(`#${this.#showCheckboxId}`)?.addEventListener("click", async () => {
             this.#showSelected()
         })
+    }
+
+    /**
+     * Get show value from cookie or use default value
+     */
+    #getShowValue(): boolean {
+        const r = this.#showCookie.get() === "true"
+
+        this.#showCheckbox.set(r)
+
+        return r
+    }
+
+    #setupListListener(): void {
         document.querySelector(`#${this.#tradeData.profitId}`)?.addEventListener("change", () => {
             this.#profitValueSelected()
         })
         this.#tradeData.selectNation$.on("change", () => {
-            this.#nationChanged()
+            this.#reset()
         })
     }
 
     async #setupData(): Promise<void> {
+        this.list = new List()
+        this.#graphs = new Graphs()
+        this.#tradeData = new TradeData(this.#serverName)
+        this.#inventorySelect = new SelectPortsSelectInventory(this.#ports, this.list)
+
+        this.#setupListListener()
         await this.#tradeData.loadAndSetupData()
 
         this.list.tradeData = this.#tradeData
         this.#graphs.tradeData = this.#tradeData
     }
 
-    async showOrHide(): Promise<void> {
-        if (this.show) {
-            if (!this.#isDataLoaded) {
-                await this.#setupData()
-                this.#isDataLoaded = true
-            }
-
-            showElem(this.list.tradeDetailsDiv)
-        } else {
-            hideElem(this.list.tradeDetailsDiv)
+    async init(): Promise<void> {
+        if (this.show && !this.#isDataLoaded) {
+            await this.#setupData()
+            this.#isDataLoaded = true
         }
     }
 
@@ -93,9 +102,16 @@ export default class ShowTrades {
 
         this.#showCookie.set(String(this.show))
 
-        await this.showOrHide()
+        await this.init()
         this.#inventorySelect.show(this.show)
-        this.#tradeData.show()
+
+        if (this.show) {
+            showElem(this.list.tradeDetailsDiv)
+            this.#tradeData.reset()
+        } else {
+            hideElem(this.list.tradeDetailsDiv)
+            this.#tradeData.emptyLinkDataFiltered()
+        }
 
         this.update()
     }
@@ -105,49 +121,36 @@ export default class ShowTrades {
         this.update()
     }
 
-    #nationChanged(): void {
-        this.#tradeData.changeFilter()
+    #reset(): void {
+        this.#tradeData.reset()
         this.update()
     }
 
-    /**
-     * Get show value from cookie or use default value
-     */
-    #getShowValue(): boolean {
-        const r = Boolean(this.#showCookie.get())
-
-        this.#showCheckbox.set(r)
-
-        return r
-    }
-
     update(info?: string): void {
-        if (this.show) {
-            this.#tradeData.filterTradesByVisiblePorts()
-            this.list.update(this.#inventorySelect.isInventorySelected, info)
-        } else {
-            this.#tradeData.emptyLinkDataFiltered()
-        }
-
+        this.list.update(this.#inventorySelect.isInventorySelected, info)
         this.#graphs.update(this.#scale)
     }
 
     transform(transform: ZoomTransform): void {
         this.#scale = transform.k
 
-        this.update()
+        if (this.show) {
+            this.update()
+        }
     }
 
     clearMap(): void {
         this.list.listType = "tradeList"
 
-        this.update()
+        this.#reset()
     }
 
     /**
      * Set bounds of current viewport
      */
-    setBounds(viewport?: Extent): void {
-        this.#tradeData.setBounds(viewport)
+    setBounds(viewport: Extent): void {
+        if (this.show) {
+            this.#tradeData.setBounds(viewport)
+        }
     }
 }

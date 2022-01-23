@@ -99,7 +99,7 @@ export default class Graphs {
     }
 
     #getSiblingLinks(sourceId: number, targetId: number): number[] {
-        return this.#tradeData.linkDataFiltered
+        return this.#tradeData.data
             .filter(
                 (link) =>
                     (link.source.id === sourceId && link.target.id === targetId) ||
@@ -170,7 +170,7 @@ export default class Graphs {
      * {@link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0}
      */
     #updateJoin(): void {
-        const data = this.#tradeData.linkDataFiltered.slice(0, numTrades) ?? []
+        const data = this.#tradeData.data.slice(0, numTrades) ?? []
         const extent = d3Extent(data, (d: Trade): number => d.profit ?? 0) as number[]
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this.#scale, 15 / this.#scale])

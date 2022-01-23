@@ -44,7 +44,7 @@ export default class List {
                 this.#listDiv = this.#tradeDetailsDiv.append("div").attr("class", "small p-2")
                 break
             default:
-                this.#tradeData.resetLinkData()
+                this.#tradeData.resetData()
                 showElem(this.#tradeDetailsHead)
                 this.#listDiv.remove()
                 this.#listDiv = this.#tradeDetailsDiv.append("div").attr("class", "trade-list small")
@@ -126,7 +126,7 @@ export default class List {
     }
 
     #updateTradeList(isInventorySelected: boolean): void {
-        const data = isInventorySelected ? [] : this.#tradeData.linkDataFiltered.slice(0, numTrades)
+        const data = isInventorySelected ? [] : this.#tradeData.data.slice(0, numTrades)
         let highlightLink: Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
         const highlightOn = (_event: Event, d: Trade): void => {

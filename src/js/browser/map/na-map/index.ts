@@ -80,7 +80,7 @@ class NAMap {
     readonly gridOverlay: HTMLElement
     readonly rem = defaultFontSize // Font size in px
     serverName: ServerId
-    showGrid: string
+    showGrid: boolean
     showTrades!: ShowTrades
     width = 0
     xGridBackgroundHeight: number
@@ -185,10 +185,10 @@ class NAMap {
      * Read cookie for showGrid
      * @returns showGrid
      */
-    _getShowGridValue(): string {
-        const r = this._showGridCookie.get()
+    _getShowGridValue(): boolean {
+        const r = this._showGridCookie.get() === "true"
 
-        this._showGridCheckbox.set(Boolean(r))
+        this._showGridCheckbox.set(r)
 
         return r
     }
@@ -209,7 +209,7 @@ class NAMap {
         this._portSelect = new SelectPorts(this._ports)
 
         this.showTrades = new ShowTrades(this._ports, this.serverName)
-        await this.showTrades.showOrHide()
+        await this.showTrades.init()
         this.f11 = new ShowF11(this, this.coord)
 
         this._init()

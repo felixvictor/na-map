@@ -15,8 +15,8 @@ import { HtmlString } from "common/interface"
 import { getProfitPerDistance, getProfitPerWeight, headId, NodeData } from "./common"
 
 export default class TradeData {
-    #linkDataDefault = [] as Trade[]
-    #linkDataFiltered = [] as Trade[]
+    #dataDefault = [] as Trade[]
+    #dataFiltered = [] as Trade[]
     #lowerBound = [0, 0] as Point
     #nodeData = new Map<number, NodeData>()
     #portData = [] as PortWithTrades[]
@@ -26,7 +26,7 @@ export default class TradeData {
     #profitValue: string
     #selectNation = {} as Select
     #serverName: string
-    #tradeItem = new Map<number, string>()
+    #tradeItemNames = new Map<number, string>()
     #upperBound = [mapSize, mapSize] as Point
     readonly #baseId = "show-trades"
     readonly #profitCookie: Cookie
@@ -55,8 +55,8 @@ export default class TradeData {
             .join("")}`
     }
 
-    get linkDataFiltered(): Trade[] {
-        return this.#linkDataFiltered
+    get data(): Trade[] {
+        return this.#dataFiltered
     }
 
     get profitId(): string {
@@ -72,7 +72,7 @@ export default class TradeData {
     }
 
     getItemName(itemId: number): string {
-        return this.#tradeItem.get(itemId) ?? ""
+        return this.#tradeItemNames.get(itemId) ?? ""
     }
 
     getPortName(portId: number): string {
@@ -145,7 +145,7 @@ export default class TradeData {
 
         this.#profitCookie.set(this.#profitValue)
 
-        this.#sortLinkData()
+        this.#sortByProfit()
     }
 
     /**
@@ -184,10 +184,10 @@ export default class TradeData {
             return { ...port, ...pbPortData } as PortWithTrades
         })
 
-        this.#linkDataDefault = await loadJsonFile<Trade[]>(`${this.#serverName}-trades.json`)
+        this.#dataDefault = await loadJsonFile<Trade[]>(`${this.#serverName}-trades.json`)
 
         const tradeItems = await loadJsonFile<TradeItem[]>(`${this.#serverName}-items.json`)
-        this.#tradeItem = new Map(tradeItems.map((item) => [item.id, item.name]))
+        this.#tradeItemNames = new Map(tradeItems.map((item) => [item.id, item.name]))
     }
 
     #setupData() {
@@ -204,8 +204,8 @@ export default class TradeData {
             ])
         )
 
-        this.setBounds()
-        this.changeFilter()
+        this.#filterPortsByVisiblePorts()
+        this.reset()
     }
 
     async loadAndSetupData(): Promise<void> {
@@ -213,8 +213,8 @@ export default class TradeData {
         this.#setupData()
     }
 
-    #sortLinkData(): void {
-        this.#linkDataFiltered = this.#linkDataFiltered
+    #sortByProfit(): void {
+        this.#dataFiltered = this.#dataFiltered
             .map((trade) => {
                 switch (this.#profitValue) {
                     case "weight":
@@ -236,7 +236,7 @@ export default class TradeData {
     }
 
     #filterTradesBySelectedNations(): void {
-        this.#linkDataFiltered = this.#linkDataFiltered.filter(
+        this.#dataFiltered = this.#dataFiltered.filter(
             (trade) =>
                 this.#portIdBySelectedNations.has(trade.source.id) && this.#portIdBySelectedNations.has(trade.target.id)
         )
@@ -249,37 +249,7 @@ export default class TradeData {
         )
     }
 
-    filterTradesByVisiblePorts(): void {
-        this.#linkDataFiltered = this.#linkDataFiltered.filter(
-            (trade) => this.#portIdVisiblePorts.has(trade.source.id) || this.#portIdVisiblePorts.has(trade.target.id)
-        )
-    }
-
-    changeFilter(): void {
-        this.#linkDataFiltered = this.#linkDataDefault
-        this.#filterPortsBySelectedNations()
-        this.#filterTradesBySelectedNations()
-        this.filterTradesByVisiblePorts()
-        this.#sortLinkData()
-    }
-
-    emptyLinkDataFiltered() {
-        this.#linkDataFiltered = []
-    }
-
-    resetLinkData() {
-        this.#linkDataFiltered = this.#linkDataDefault
-    }
-
-    /**
-     * Set bounds of current viewport
-     */
-    setBounds(viewport?: Extent): void {
-        if (viewport) {
-            this.#lowerBound = viewport[0]
-            this.#upperBound = viewport[1]
-        }
-
+    #filterPortsByVisiblePorts(): void {
         this.#portIdVisiblePorts = new Set(
             this.#portData
                 .filter(
@@ -293,7 +263,35 @@ export default class TradeData {
         )
     }
 
-    show() {
+    filterTradesByVisiblePorts(): void {
+        this.#dataFiltered = this.#dataFiltered.filter(
+            (trade) => this.#portIdVisiblePorts.has(trade.source.id) || this.#portIdVisiblePorts.has(trade.target.id)
+        )
+    }
+
+    reset(): void {
+        this.resetData()
+        this.#filterPortsBySelectedNations()
         this.#filterTradesBySelectedNations()
+        this.filterTradesByVisiblePorts()
+        this.#sortByProfit()
+    }
+
+    emptyLinkDataFiltered() {
+        this.#dataFiltered = []
+    }
+
+    resetData() {
+        this.#dataFiltered = this.#dataDefault
+    }
+
+    /**
+     * Set bounds of current viewport
+     */
+    setBounds(viewport: Extent): void {
+        this.#lowerBound = viewport[0]
+        this.#upperBound = viewport[1]
+
+        this.#filterPortsByVisiblePorts()
     }
 }
