@@ -81,10 +81,11 @@ export default class ShowTrades {
         this.list = new List()
         this.#graphs = new Graphs()
         this.#tradeData = new TradeData(this.#serverName)
-        this.#inventorySelect = new SelectPortsSelectInventory(this.#ports, this.list)
+        this.#inventorySelect = new SelectPortsSelectInventory(this.#ports, this)
 
         this.#setupListListener()
         await this.#tradeData.loadAndSetupData()
+        this.#inventorySelect.show(this.show)
 
         this.list.tradeData = this.#tradeData
         this.#graphs.tradeData = this.#tradeData
@@ -128,7 +129,7 @@ export default class ShowTrades {
 
     update(info?: string): void {
         this.list.update(this.#inventorySelect.isInventorySelected, info)
-        this.#graphs.update(this.#scale)
+        this.#graphs.update(this.#inventorySelect.isInventorySelected, this.#scale)
     }
 
     transform(transform: ZoomTransform): void {

@@ -18,24 +18,24 @@ import { InventoryEntity } from "common/gen-json"
 
 import Select, { SelectOptions } from "util/select"
 import DisplayPorts from "../display-ports"
-import List from "../show-trades/list"
+import ShowTrades from "../show-trades"
 
-type goodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>
+type GoodMap = Map<string, { name: string; nation: NationShortName; good: InventoryEntity }>
 
 export default class SelectPortsSelectInventory {
     #baseName = "Show good availability"
     #baseId: HtmlString
     #select = {} as Select
     #isInventorySelected = false
-    #list: List
+    #showTrades: ShowTrades
     #ports: DisplayPorts
 
-    constructor(ports: DisplayPorts, list: List) {
+    constructor(ports: DisplayPorts, showTrades: ShowTrades) {
         this.#ports = ports
-        this.#list = list
+        this.#showTrades = showTrades
 
         this.#baseId = `port-select-${getIdFromBaseName(this.#baseName)}`
-
+        console.log("SelectPortsSelectInventory constructor", this.#showTrades)
         this._setupSelect()
         this._setupListener()
     }
@@ -91,7 +91,7 @@ export default class SelectPortsSelectInventory {
         })
     }
 
-    _getPortList(goodIdSelected: number, buyGoods: goodMap, sellGoods: goodMap): HtmlString {
+    _getPortList(goodIdSelected: number, buyGoods: GoodMap, sellGoods: GoodMap): HtmlString {
         let h: HtmlString = ""
 
         h += `<h5>${this.#ports.portIcons.getTradeItem(goodIdSelected)?.name ?? ""}</h5>`
@@ -122,8 +122,8 @@ export default class SelectPortsSelectInventory {
 
     _selectSelected(): void {
         const goodIdSelected = Number(this.#select.getValues())
-        const buyGoods = new Map() as goodMap
-        const sellGoods = new Map() as goodMap
+        const buyGoods = new Map() as GoodMap
+        const sellGoods = new Map() as GoodMap
 
         this.#isInventorySelected = true
 
@@ -150,11 +150,11 @@ export default class SelectPortsSelectInventory {
         this.#ports.setShowRadiusSetting("off")
         this.#ports.portData = portsFiltered
         this.#ports.showRadius = "tradePorts"
-        if (this.#list.listType !== "portList") {
-            this.#list.listType = "portList"
+        if (this.#showTrades.list.listType !== "portList") {
+            this.#showTrades.list.listType = "portList"
         }
 
-        this.#list.update(this.#isInventorySelected, this._getPortList(goodIdSelected, buyGoods, sellGoods))
+        this.#showTrades.update(this._getPortList(goodIdSelected, buyGoods, sellGoods))
         this.#ports.update()
     }
 

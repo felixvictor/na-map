@@ -169,8 +169,8 @@ export default class Graphs {
     /**
      * {@link https://bl.ocks.org/mattkohl/146d301c0fc20d89d85880df537de7b0}
      */
-    #updateJoin(): void {
-        const data = this.#tradeData.data.slice(0, numTrades) ?? []
+    #updateJoin(isInventorySelected: boolean): void {
+        const data = isInventorySelected ? [] : this.#tradeData.data.slice(0, numTrades)
         const extent = d3Extent(data, (d: Trade): number => d.profit ?? 0) as number[]
         const linkWidthScale = d3ScaleLinear()
             .range([5 / this.#scale, 15 / this.#scale])
@@ -197,10 +197,10 @@ export default class Graphs {
             .attr("stroke-width", (d) => `${linkWidthScale(d.profit ?? 0) ?? 0}px`)
     }
 
-    update(scale: number) {
+    update(isInventorySelected: boolean, scale: number) {
         this.#scale = scale
 
         this.#hideDetails(undefined)
-        this.#updateJoin()
+        this.#updateJoin(isInventorySelected)
     }
 }
