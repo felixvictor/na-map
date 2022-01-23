@@ -50,7 +50,7 @@ export default class DisplayGrid {
         /**
          * Show status
          */
-        this.#isShown = this.#map.showGrid === "on"
+        this.#isShown = this.#map.showGrid
 
         /**
          * Minimum world coordinate
