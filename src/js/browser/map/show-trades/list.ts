@@ -129,12 +129,14 @@ export default class List {
         const data = isInventorySelected ? [] : this.#tradeData.data.slice(0, numTrades)
         let highlightLink: Selection<SVGPathElement, unknown, HTMLElement, unknown>
 
-        const highlightOn = (_event: Event, d: Trade): void => {
+        const highlightOn = (element: HTMLDivElement, _event: Event, d: Trade): void => {
+            d3Select(element).classed("opacity-75", true)
             highlightLink = d3Select<SVGPathElement, unknown>(`path#${getId(d)}`).attr("class", "highlight")
             highlightLink.dispatch("click")
         }
 
-        const highlightOff = (): void => {
+        const highlightOff = (element: HTMLDivElement): void => {
+            d3Select(element).classed("opacity-75", false)
             highlightLink.classed("highlight", false)
             highlightLink.dispatch("mouseleave")
         }
@@ -146,8 +148,12 @@ export default class List {
                 enter
                     .append("div")
                     .attr("class", "block px-2")
-                    .on("mouseenter", highlightOn)
-                    .on("mouseleave", highlightOff)
+                    .on("mouseenter", function (this: HTMLDivElement, event: Event, d: Trade) {
+                        highlightOn(this, event, d)
+                    })
+                    .on("mouseleave", function (this: HTMLDivElement) {
+                        highlightOff(this)
+                    })
             )
             .html((d) => this.#getTradeLimitedData(d))
     }

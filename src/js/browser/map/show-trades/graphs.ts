@@ -82,17 +82,17 @@ export default class Graphs {
         h += startBlock("Route")
         h +=
             addInfo(
-                `${this.#tradeData.getPortName(trade.source.id)} <span class="caps">${this.#tradeData.getPortNation(
+                `${this.#tradeData.getPortName(trade.source.id)} <span class="flag-icon-${this.#tradeData.getPortNation(
                     trade.source.id
-                )}</span>`
+                )} flag-icon-small me-1" role="img"></span>`
             ) + addDes(`from ${this.#tradeData.getPortDepth(trade.source.id)}`)
         h +=
             addInfo(
-                `${this.#tradeData.getPortName(trade.target.id)} <span class="caps">${this.#tradeData.getPortNation(
+                `${this.#tradeData.getPortName(trade.target.id)} <span class="flag-icon-${this.#tradeData.getPortNation(
                     trade.target.id
-                )}</span>`
+                )} flag-icon-small me-1" role="img"></span>`
             ) + addDes(`to ${this.#tradeData.getPortDepth(trade.source.id)}`)
-        h += addInfo(`${formatSiInt(trade.distance)}`) + addDes("sail distance")
+        h += addInfo(`${formatSiInt(trade.distance)}`) + addDes("distance")
         h += endBlock()
 
         return h

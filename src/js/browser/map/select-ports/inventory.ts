@@ -165,4 +165,9 @@ export default class SelectPortsSelectInventory {
     get isInventorySelected(): boolean {
         return this.#isInventorySelected
     }
+
+    reset(): void {
+        this.#select.reset()
+        this.#isInventorySelected = false
+    }
 }
