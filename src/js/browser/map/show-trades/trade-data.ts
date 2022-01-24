@@ -205,7 +205,7 @@ export default class TradeData {
         )
 
         this.#filterPortsByVisiblePorts()
-        this.reset()
+        this.resetFilter()
     }
 
     async loadAndSetupData(): Promise<void> {
@@ -270,6 +270,11 @@ export default class TradeData {
     }
 
     reset(): void {
+        this.#selectNation.selectAll()
+        this.resetFilter()
+    }
+
+    resetFilter(): void {
         this.resetData()
         this.#filterPortsBySelectedNations()
         this.#filterTradesBySelectedNations()

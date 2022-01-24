@@ -319,12 +319,12 @@ class NAMap {
     }
 
     _clearMap(): void {
+        Select.resetAll()
         this.f11.clearMap()
         this._ports.clearMap()
         this._portSelect.clearMap()
         this.showTrades.clearMap()
         this.#windRose.clearMap()
-        Select.resetAll()
     }
 
     _doDoubleClickAction(event: Event): void {

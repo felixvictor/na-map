@@ -73,7 +73,8 @@ export default class ShowTrades {
             this.#profitValueSelected()
         })
         this.#tradeData.selectNation$.on("change", () => {
-            this.#reset()
+            this.#tradeData.resetFilter()
+            this.update()
         })
     }
 
@@ -122,11 +123,6 @@ export default class ShowTrades {
         this.update()
     }
 
-    #reset(): void {
-        this.#tradeData.reset()
-        this.update()
-    }
-
     update(info?: string): void {
         this.list.update(this.#inventorySelect.isInventorySelected, info)
         this.#graphs.update(this.#inventorySelect.isInventorySelected, this.#scale)
@@ -144,7 +140,8 @@ export default class ShowTrades {
         this.list.listType = "tradeList"
 
         this.#inventorySelect.reset()
-        this.#reset()
+        this.#tradeData.reset()
+        this.update()
     }
 
     /**
