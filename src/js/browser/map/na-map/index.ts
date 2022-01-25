@@ -49,7 +49,7 @@ class NAMap {
     #initialMapScale = minMapScale
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #overfillZoom = false
-    #tileMap!: TileMap
+    #tileMap: TileMap
     #timeoutId = 0
     #windRose!: WindRose
     #zoom = {} as ZoomBehavior<SVGSVGElement, Event>
@@ -154,6 +154,7 @@ class NAMap {
 
         this.gridOverlay = document.querySelectorAll<HTMLElement>(".overlay")[0]
 
+        this.#tileMap = new TileMap()
         this._setHeightWidth()
         this._setupSvg()
         this._setSvgSize()
@@ -299,6 +300,8 @@ class NAMap {
 
         this._svg.append<SVGDefsElement>("defs")
         this.#mainG = this._svg.append("g").attr("id", "map")
+
+        this.#tileMap.setupSvg()
     }
 
     _doubleClickSelected(): void {
@@ -372,9 +375,9 @@ class NAMap {
 
         this.#tileMap.drawMap(zoomTransform)
 
-        this._ports.setBounds(this.#tileMap.viewport)
-        this._pbZone.setBounds(this.#tileMap.viewport)
-        this.showTrades.setBounds(this.#tileMap.viewport)
+        this._ports.setBounds(this.#extent)
+        this._pbZone.setBounds(this.#extent)
+        this.showTrades.setBounds(this.#extent)
 
         const mapTransform = this.#tileMap.getMapTransform(zoomTransform)
         this._grid.transform(mapTransform)
@@ -393,7 +396,6 @@ class NAMap {
     _init(): void {
         this.zoomLevel = "initial"
 
-        this.#tileMap = new TileMap(this.extent, this.coord)
         this.#resize()
         this._checkF11Coord()
 
@@ -439,6 +441,12 @@ class NAMap {
          * Height of map svg (screen coordinates)
          */
         this.height = this._getHeight()
+
+        this.#extent = [
+            [0, 0],
+            [this.width, this.height],
+        ]
+        this.#tileMap.setViewport(this.#extent)
     }
 
     _setSvgSize(): void {
@@ -515,10 +523,6 @@ class NAMap {
         } else {
             this.zoomAndPan(this._ports.currentPort.coord.x, this._ports.currentPort.coord.y)
         }
-    }
-
-    get extent(): Extent {
-        return this.#extent
     }
 }
 

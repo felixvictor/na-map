@@ -1,8 +1,7 @@
 import { select as d3Select, Selection } from "d3-selection"
 import { zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
-import { maxTileZoom, tileSize } from "common/common-var"
+import { mapSize, maxTileZoom, tileSize } from "common/common-var"
 import { Extent } from "common/common-math"
-import { MinMaxCoord } from "common/interface"
 
 type Tile = [number, number, number]
 
@@ -17,30 +16,22 @@ export default class TileMap {
     #x1 = 0
     #y0 = 0
     #y1 = 0
-    #coord: MinMaxCoord
     #gMap = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #viewport = {} as Extent
     #currentTranslate = [0, 0]
 
-    constructor(extent: Extent, coord: MinMaxCoord) {
+    setViewport(extent: Extent): void {
         this.#x0 = extent[0][0]
         this.#x1 = extent[1][0]
         this.#y0 = extent[0][1]
         this.#y1 = extent[1][1]
-        this.#coord = coord
-
-        this.#setup()
-    }
-
-    get viewport(): Extent {
-        return this.#viewport
     }
 
     static getMapScale(scale: number): number {
         return 2 ** (Math.log2(scale) - maxTileZoom)
     }
 
-    #setup(): void {
+    setupSvg(): void {
         const svg = d3Select<SVGSVGElement, Event>("#na-map svg")
         this.#gMap = svg.insert("g", "#map").attr("class", "map-tiles")
     }
@@ -97,7 +88,7 @@ export default class TileMap {
         if (tiles.tiles.length > 0) {
             const tileZoomLevel = z0 + Math.abs(zoomDelta)
             const tilesPerZoomLevel = 2 ** tileZoomLevel
-            const tileCoverage = this.#coord.max / tilesPerZoomLevel
+            const tileCoverage = mapSize / tilesPerZoomLevel
             const scale = tileCoverage * 2 ** Math.abs(zoomDelta)
             const vx0 = xMin * scale
             const vx1 = xMax * scale
