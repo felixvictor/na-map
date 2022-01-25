@@ -228,7 +228,7 @@ export const notUsedExceptionalWoodIds = new Set([
     2379, // Virginia Pine Planking
 ])
 
-export const exceptionalWoodIds = new Set([
+export const rareWoodTrimFrameIds = new Set([
     2356, // African Oak Frame
     2357, // African Teak Frame
     2359, // Danzic Oak Frame

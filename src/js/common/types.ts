@@ -29,7 +29,7 @@ export interface FlagsPerNation {
     flags: FlagEntity[]
 }
 
-export const woodFamily = ["regular", "seasoned", "exceptional"]!
+export const woodFamily = ["regular", "seasoned", "rare"]!
 export type WoodFamily = typeof woodFamily[number]
 
 export const woodType = ["frame", "trim"]!

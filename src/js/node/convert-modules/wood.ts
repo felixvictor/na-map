@@ -5,7 +5,7 @@ import { saveJsonAsync } from "../../common/common-file"
 import { ModuleConvertEntity, WoodJsonData, WoodTrimOrFrame } from "../../common/gen-json"
 import { woodType } from "../../common/types"
 
-import { APIModifierName, exceptionalWoodIds, flipAmountForModule, modifiers, notPercentage } from "./common"
+import { APIModifierName, rareWoodTrimFrameIds, flipAmountForModule, modifiers, notPercentage } from "./common"
 
 const commonPaths = getCommonPaths()
 
@@ -63,8 +63,8 @@ export const setWood = (module: ModuleConvertEntity): boolean => {
 
     if (module.name.includes("(S)")) {
         wood.family = "seasoned"
-    } else if (exceptionalWoodIds.has(wood.id)) {
-        wood.family = "exceptional"
+    } else if (rareWoodTrimFrameIds.has(wood.id)) {
+        wood.family = "rare"
     } else {
         wood.family = "regular"
     }
