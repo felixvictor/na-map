@@ -42,6 +42,18 @@ interface Item {
     buyPrice: number
 }
 
+const rareWoodIds = new Set([
+    807, // Malabar Teak
+    863, // Rangoon Teak
+    1440, // Greenheart
+    1894, // Danzic Oak
+    1895, // African Oak
+    1896, // Riga Fir
+    1898, // New England Fir
+    1900, // African Teak
+    1901, // Italian Larch
+])
+
 const minProfit = 30_000
 const frontlinePorts = 2
 
@@ -112,7 +124,9 @@ const setPortFeaturePerServer = (apiPort: APIPort): void => {
             dropsNonTrading: [
                 ...new Set(
                     portShop.ResourcesAdded.filter((good) =>
-                        itemNames.get(good.Template) ? !itemNames.get(good.Template)?.trading : false
+                        !rareWoodIds.has(good.Template) && itemNames.get(good.Template)
+                            ? !itemNames.get(good.Template)?.trading
+                            : false
                     ).map((good) => good.Template)
                 ),
             ].sort(simpleNumberSort),
