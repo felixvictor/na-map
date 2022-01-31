@@ -15,7 +15,7 @@
         "build:push-prod": "git add --ignore-errors . && (git diff-index --quiet HEAD || git commit -m 'build: update public') && git push --quiet gitlab",
         "clean:src:js": "find ./src/js -name \"*.ts\" -type f -regextype posix-egrep -regex \".*/(browser|common|node)/.+\" -exec bash -c 'for file in \"${1%.ts}\".js \"${1%.ts}\".js.map; do [ -e \"$file\" ] && rm -f \"$file\"; done' - '{}' ';'",
         "deploy:netlify": "src/helper/deploy.sh --site regular",
-        "deploy:netlify-test": "src/helper/deploy.sh --site test",
+        "deploy:netlify-test": "src/helper/deploy.sh --site test1",
         "deploy:netlify-test2": "src/helper/deploy.sh --site test2",
         "docs": "run-p 'docs:*'",
         "docs:js": "documentation build src/js/**.js build/**.mjs -f html -o ./doc-js",
