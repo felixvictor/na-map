@@ -1,21 +1,23 @@
 import { default as BSTooltip } from "bootstrap/js/dist/tooltip"
 
 import { select as d3Select, Selection } from "d3-selection"
+import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import render from "preact-render-to-string"
 import htm from "htm"
 import { h, VNode } from "preact"
 
-import { PortBonus, portBonusType } from "common/types"
 import { formatInt, formatPercentHtml, formatSiCurrency, formatSiIntHtml } from "common/common-format"
 import { capitalizeFirstLetter, findNationByNationShortName, NationShortName, simpleStringSort } from "common/common"
 import { getPortBattleTimeHtml, loadJsonFile } from "common/common-browser"
 import { displayClanLitHtml } from "common/common-game-tools"
 import { defaultCircleSize } from "common/common-math"
+import { maxScale, maxTileScale, minScale } from "common/common-var"
 
 import { GoodList, PortWithTrades, TradeGoodProfit, TradeItem } from "common/gen-json"
 import { HtmlResult, HtmlString, SVGGDatum } from "common/interface"
+import { PortBonus, portBonusType } from "common/types"
 
-import { NAMap } from "../na-map"
+import ShowTrades from "../show-trades"
 
 import dayjs from "dayjs"
 import "dayjs/locale/en-gb"
@@ -74,17 +76,32 @@ interface PortForDisplay {
 
 export default class PortIcons {
     #gIcon = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #radiusScale = {} as ScaleLinear<number, number>
     #showRadius = ""
+    #showTrades = {} as ShowTrades
     #tooltip: BSTooltip | undefined = undefined
     #tradeItem = {} as Map<number, TradeItem>
     #tradePort = {} as TradePort
-    readonly #circleSize = defaultCircleSize
     readonly #serverName: string
 
-    constructor(serverName: string, readonly map: NAMap) {
+    constructor(serverName: string) {
         this.#serverName = serverName
 
-        this.#setupSVG()
+        this.#setupSvg()
+        this.#setupScales()
+    }
+
+    static #getAppendix(d: PortWithTrades): string {
+        const capital = d.nation === "FT" || d.nation === "NT" || d.capturable ? "" : "c"
+        const countyCapital = d.countyCapital && d.capturable ? "r" : ""
+        const availableForAll = d.availableForAll && d.nation !== "NT" ? "a" : ""
+
+        return capital + countyCapital + availableForAll
+    }
+
+    set showTrades(showTrades: ShowTrades) {
+        this.#showTrades = showTrades
+        console.log("PortIcons constructor showTrades", this.#showTrades, this.#showTrades.show)
     }
 
     getTradeItem(itemId: number): TradeItem | undefined {
@@ -104,11 +121,17 @@ export default class PortIcons {
         this.#tradeItem = new Map(tradeItems.map((item) => [item.id, item]))
     }
 
-    #setupSVG() {
+    #setupSvg() {
         this.#gIcon = d3Select<SVGGElement, SVGGDatum>("#ports")
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-icons")
             .attr("class", "click-circle")
+    }
+
+    #setupScales() {
+        this.#radiusScale = d3ScaleLinear()
+            .range([defaultCircleSize, defaultCircleSize >> 2, defaultCircleSize >> 5])
+            .domain([Math.log2(minScale), Math.log2(maxTileScale) - 1, Math.log2(maxScale)])
     }
 
     #formatItems(items: GoodList | undefined): string {
@@ -127,6 +150,7 @@ export default class PortIcons {
     static #sortByProfitPerTon(a: TradeGoodProfit, b: TradeGoodProfit): number {
         return b.profit.profitPerTon - a.profit.profitPerTon
     }
+
     #formatProfits(profits: TradeGoodProfit[]): HtmlResult {
         return html`${profits
             ?.sort(PortIcons.#sortByProfit)
@@ -449,20 +473,20 @@ export default class PortIcons {
         })
         this.#tooltip.show()
 
-        if (this.map.showTrades.show) {
-            if (this.map.showTrades.list.listType !== "inventory") {
-                this.map.showTrades.list.listType = "inventory"
+        if (this.#showTrades.show) {
+            if (this.#showTrades.list.listType !== "inventory") {
+                this.#showTrades.list.listType = "inventory"
             }
 
-            this.map.showTrades.update(this.#getInventory(d))
+            this.#showTrades.update(this.#getInventory(d))
         }
     }
 
     update(scale: number, showRadius: string, data: PortWithTrades[]) {
         this.#showRadius = showRadius
+        const circleSize = this.#radiusScale(Math.log2(scale))
 
-        const circleScale = scale < 0.5 ? scale * 2 : scale
-        const circleSize = this.#circleSize / circleScale
+        console.log("PortIcons update", data.length)
 
         this.#gIcon
             .selectAll<SVGCircleElement, PortWithTrades>("circle")
@@ -470,12 +494,7 @@ export default class PortIcons {
             .join((enter) =>
                 enter
                     .append("circle")
-                    .attr("fill", (d) => {
-                        const appendix = `${d.nation === "FT" || d.nation === "NT" || d.capturable ? "" : "c"}${
-                            d.countyCapital && d.capturable ? "r" : ""
-                        }${d.availableForAll && d.nation !== "NT" ? "a" : ""}`
-                        return `url(#${d.nation}${appendix})`
-                    })
+                    .attr("fill", (d) => `url(#${d.nation}${PortIcons.#getAppendix(d)})`)
                     .attr("cx", (d) => d.coordinates[0])
                     .attr("cy", (d) => d.coordinates[1])
                     .on("click", (event: Event, d: PortWithTrades) => {

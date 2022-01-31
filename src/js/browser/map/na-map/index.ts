@@ -9,11 +9,18 @@
  */
 
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
-import { D3ZoomEvent, zoom as d3Zoom, ZoomBehavior, zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
+import {
+    D3ZoomEvent,
+    zoom as d3Zoom,
+    ZoomBehavior,
+    zoomIdentity as d3ZoomIdentity,
+    zoomTransform,
+    ZoomTransform,
+} from "d3-zoom"
 
 import { registerEvent } from "../../analytics"
-import { defaultFontSize, Extent, nearestPow2 } from "common/common-math"
-import { mapSize, maxMapScale, minMapScale, tileSize } from "common/common-var"
+import { defaultFontSize, Extent, Point } from "common/common-math"
+import { initScale, labelScaleThreshold, mapSize, maxScale, minScale, pbZoneScaleThreshold } from "common/common-var"
 
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 import { ServerId } from "common/servers"
@@ -41,14 +48,12 @@ import About from "./about"
  * Display naval action map
  */
 class NAMap {
-    #currentMapScale = minMapScale
+    #currentMapScale = initScale
     #extent = [
         [0, 0],
         [mapSize, mapSize],
     ] as Extent
-    #initialMapScale = minMapScale
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
-    #overfillZoom = false
     #tileMap: TileMap
     #timeoutId = 0
     #windRose!: WindRose
@@ -70,13 +75,10 @@ class NAMap {
     private readonly _doubleClickActionRadios: RadioButton
     private readonly _doubleClickActionValues: string[]
     private readonly _searchParams: URLSearchParams
+    private readonly _showGridCheckbox: Checkbox
     private readonly _showGridCookie: Cookie
     private readonly _showGridId: string
-    private readonly _showGridCheckbox: Checkbox
     private readonly _showGridValues = [String(false), String(true)] // Possible values for show trade checkboxes (first is default value)
-    readonly #PBZoneZoomThreshold = 2
-    readonly #labelZoomThreshold = 0.25
-    readonly #wheelDelta = 1
     readonly gridOverlay: HTMLElement
     readonly rem = defaultFontSize // Font size in px
     serverName: ServerId
@@ -154,10 +156,9 @@ class NAMap {
 
         this.gridOverlay = document.querySelectorAll<HTMLElement>(".overlay")[0]
 
-        this.#tileMap = new TileMap()
         this._setHeightWidth()
+        this.#tileMap = new TileMap(this.width, this.height)
         this._setupSvg()
-        this._setSvgSize()
         this._setupListener()
     }
 
@@ -211,6 +212,7 @@ class NAMap {
 
         this.showTrades = new ShowTrades(this._ports, this.serverName)
         await this.showTrades.init()
+        this._ports.portIcons.showTrades = this.showTrades
         this.f11 = new ShowF11(this, this.coord)
 
         this._init()
@@ -231,7 +233,6 @@ class NAMap {
 
     #resize(): void {
         this._setHeightWidth()
-        this.#initialMapScale = this._getInitialMapScale()
         this._initialZoomAndPan()
         this._setFlexOverlayHeight()
     }
@@ -285,22 +286,15 @@ class NAMap {
     }
 
     _setupSvg(): void {
-        this.#zoom = d3Zoom<SVGSVGElement, Event>()
-            .scaleExtent([minMapScale, maxMapScale])
-            .wheelDelta((event: Event) => -this.#wheelDelta * Math.sign((event as WheelEvent).deltaY))
-            .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
-                this._naZoomed(event)
-            })
-
         this._svg = d3Select<SVGSVGElement, Event>("#na-map")
             .append<SVGSVGElement>("svg")
             .attr("id", "na-svg")
             .attr("class", "fill-empty stroke-empty bg-map")
-            .call(this.#zoom)
+            .attr("width", this.width)
+            .attr("height", this.height)
 
         this._svg.append<SVGDefsElement>("defs")
         this.#mainG = this._svg.append("g").attr("id", "map")
-
         this.#tileMap.setupSvg()
     }
 
@@ -343,15 +337,25 @@ class NAMap {
     }
 
     _setZoomLevelAndData(transform: ZoomTransform): void {
-        const scale = TileMap.getMapScale(transform.k)
+        const scale = transform.k
+        console.log(
+            "_setZoomLevelAndData anfang",
+            this.zoomLevel,
+            transform.k,
+            scale,
+            pbZoneScaleThreshold,
+            scale > pbZoneScaleThreshold,
+            labelScaleThreshold,
+            scale > labelScaleThreshold
+        )
 
         if (scale !== this.#currentMapScale) {
             this.#currentMapScale = scale
-            if (this.#currentMapScale > this.#PBZoneZoomThreshold) {
+            if (this.#currentMapScale > pbZoneScaleThreshold) {
                 if (this.zoomLevel !== "pbZone") {
                     this.zoomLevel = "pbZone"
                 }
-            } else if (this.#currentMapScale > this.#labelZoomThreshold) {
+            } else if (this.#currentMapScale > labelScaleThreshold) {
                 if (this.zoomLevel !== "portLabel") {
                     this.zoomLevel = "portLabel"
                 }
@@ -363,8 +367,62 @@ class NAMap {
             this._grid.update()
         }
 
+        console.log("_setZoomLevelAndData ende", this.zoomLevel)
+
         void this._pbZone.refresh()
         this._ports.update(this.#currentMapScale)
+    }
+
+    #getMapTransform(zoomTransform: ZoomTransform): ZoomTransform {
+        const tileMapTransform = this.#tileMap.mapTileTransform
+        const scale = 2 ** (Math.log2(zoomTransform.k) - Math.log2(mapSize))
+        const tx = tileMapTransform.x
+        const ty = tileMapTransform.y
+
+        return d3ZoomIdentity.translate(tx, ty).scale(scale)
+    }
+
+    #getDOMPoint(x: number, y: number, screen = true): DOMPoint {
+        const node = this.#mainG.node() as SVGGElement
+        const point = node.ownerSVGElement?.createSVGPoint()
+
+        if (point) {
+            point.x = x
+            point.y = y
+
+            const matrix = node.getScreenCTM()
+
+            if (matrix) {
+                return screen ? point.matrixTransform(matrix) : point.matrixTransform(matrix.inverse())
+            }
+        }
+
+        return {
+            x: 0,
+            y: 0,
+        } as DOMPoint
+    }
+
+    #getScreenCoordinate(x: number, y: number): Point {
+        const { x: wx, y: wy } = this.#getDOMPoint(x, y, true)
+
+        return [wx, wy]
+    }
+
+    #getWorldCoordinate(x: number, y: number): Point {
+        const { x: wx, y: wy } = this.#getDOMPoint(x, y, false)
+
+        return [wx, wy]
+    }
+
+    #getWorldCoordinates(): Extent {
+        // Limit coordinates to [0, 0] and [mapSize, mapSize]
+        const topLeft = this.#getWorldCoordinate(0, 0).map((coord) => Math.max(0, coord)) as Point
+        const bottomRight = this.#getWorldCoordinate(this.width, this.height).map((coord) =>
+            Math.min(coord, mapSize)
+        ) as Point
+
+        return [topLeft, bottomRight]
     }
 
     /**
@@ -372,19 +430,38 @@ class NAMap {
      */
     _naZoomed(event: D3ZoomEvent<SVGSVGElement, unknown>): void {
         const { transform: zoomTransform } = event
+        console.log("naZoomed event transform", zoomTransform)
 
         this.#tileMap.drawMap(zoomTransform)
 
-        this._ports.setBounds(this.#extent)
-        this._pbZone.setBounds(this.#extent)
-        this.showTrades.setBounds(this.#extent)
-
-        const mapTransform = this.#tileMap.getMapTransform(zoomTransform)
+        const mapTransform = this.#getMapTransform(zoomTransform)
+        console.log("naZoomed map transform", mapTransform)
         this._grid.transform(mapTransform)
         this.showTrades.transform(mapTransform)
         this.#mainG.attr("transform", mapTransform.toString())
 
+        this.#extent = this.#getWorldCoordinates()
+        console.log("naZoomed extent", this.#extent[0], this.#extent[1])
+        this._ports.setBounds(this.#extent)
+        this._pbZone.setBounds(this.#extent)
+        this.showTrades.setBounds(this.#extent)
+
         this._setZoomLevelAndData(zoomTransform)
+    }
+
+    #setupZoom(): void {
+        this.#zoom = d3Zoom<SVGSVGElement, Event>()
+            .extent([
+                [0, 0],
+                [this.width, this.height],
+            ])
+            .scaleExtent([minScale, maxScale])
+            .wheelDelta((event: Event) => -Math.sign((event as WheelEvent).deltaY))
+            .on("zoom", (event: D3ZoomEvent<SVGSVGElement, unknown>) => {
+                this._naZoomed(event)
+            })
+
+        this._svg.call(this.#zoom)
     }
 
     _checkF11Coord(): void {
@@ -396,6 +473,7 @@ class NAMap {
     _init(): void {
         this.zoomLevel = "initial"
 
+        this.#setupZoom()
         this.#resize()
         this._checkF11Coord()
 
@@ -441,80 +519,50 @@ class NAMap {
          * Height of map svg (screen coordinates)
          */
         this.height = this._getHeight()
-
-        this.#extent = [
-            [0, 0],
-            [this.width, this.height],
-        ]
-        this.#tileMap.setViewport(this.#extent)
-    }
-
-    _setSvgSize(): void {
-        this._svg.attr("width", this.width).attr("height", this.height)
     }
 
     _setFlexOverlayHeight(): void {
+        console.log("_setFlexOverlayHeight")
         const height = this.height - (this._grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0)
         document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${height}px`)
     }
 
-    _getInitialMapScale(): number {
-        let initialMapScale = nearestPow2(Math.min(this.height, this.width) / tileSize)
-        const screenArea = this.height * this.width
-        const mapAreaSmall = (tileSize * initialMapScale) ** 2
-        const mapAreaLarge = (tileSize * initialMapScale * 2) ** 2
-
-        if (screenArea - mapAreaSmall > mapAreaLarge - screenArea) {
-            const scaleFactor = 2
-            this.#overfillZoom = true
-            initialMapScale *= scaleFactor
-        }
-
-        return initialMapScale
-    }
-
-    /**
-     * {@link https://stackoverflow.com/a/57660500}
-     * @param transform - Transform
-     */
-    _setTranslateExtent(transform: ZoomTransform): void {
-        let newTransform = transform
-        if (this.#overfillZoom) {
-            const scaleFactor = 2
-            const scale = transform.k / scaleFactor
-            const { x, y } = transform
-            newTransform = d3ZoomIdentity.translate(x, y).scale(scale)
-        }
-
-        this.#zoom.translateExtent([
-            newTransform.invert(this.#extent[0] as [number, number]),
-            newTransform.invert(this.#extent[1] as [number, number]),
-        ])
-    }
-
     _initialZoomAndPan(): void {
-        const transform = this.zoomAndPan(this.coord.max / 2, this.coord.max / 2, true)
+        console.log("_initialZoomAndPan")
 
-        this._setTranslateExtent(transform)
+        const [x, y] = this.#getWorldCoordinate(this.width >> 1, this.height >> 1)
+        this.zoomAndPan(x, y, true)
     }
 
     /**
      * Zoom and pan to x,y coord
-     * @param x - x coord
-     * @param y - y coord
+     * @param x - x world coord
+     * @param y - y world coord
      * @param init - true if map zoomed to initial scale
      */
-    zoomAndPan(x: number, y: number, init = false): ZoomTransform {
-        const mapScale = init ? this.#initialMapScale : 32
-        const transform = d3ZoomIdentity
-            .scale(mapScale)
-            .translate(
-                Math.floor((-x + this.coord.max / 2 + this.width / 2) / mapScale),
-                Math.floor(-y + this.coord.max / 2 + this.height / 2) / mapScale
-            )
+    zoomAndPan(x: number, y: number, init = false): void {
+        const scale = init ? initScale : labelScaleThreshold
+        const screenCoordinate = this.#getScreenCoordinate(x, y)
+        const transform = zoomTransform(this._svg.node() as SVGSVGElement)
+        const tx = screenCoordinate[0] + transform.x / scale
+        const ty = screenCoordinate[1] + transform.y / scale
 
-        this._svg.call(this.#zoom.transform, transform)
-        return transform
+        console.log(
+            "zoomAndPan",
+            x,
+            y,
+            init,
+            screenCoordinate,
+            transform,
+            transform.x / scale,
+            transform.y / scale,
+            tx,
+            ty,
+            scale,
+            d3ZoomIdentity.translate(tx, ty).scale(scale)
+        )
+
+        this._svg.call(this.#zoom.transform, d3ZoomIdentity.translate(tx, ty).scale(scale))
     }
 
     goToPort(): void {

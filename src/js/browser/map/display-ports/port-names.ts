@@ -1,12 +1,8 @@
+import { ScaleLinear, scaleLinear as d3ScaleLinear } from "d3-scale"
 import { select as d3Select, Selection } from "d3-selection"
-import {
-    Coordinate,
-    defaultCircleSize,
-    defaultFontSize,
-    degreesHalfCircle,
-    degreesToRadians,
-    roundToThousands,
-} from "common/common-math"
+import { Coordinate, defaultCircleSize, degreesHalfCircle, degreesToRadians } from "common/common-math"
+import { maxScale, maxTileScale, minScale } from "common/common-var"
+
 import { PortWithTrades } from "common/gen-json"
 import { SVGGDatum, ZoomLevel } from "common/interface"
 
@@ -18,14 +14,14 @@ export interface CurrentPort {
 export default class PortNames {
     #currentPort: CurrentPort = { id: 366, coord: { x: 4396, y: 2494 } } // Shroud Cay
     #gPortNames = {} as Selection<SVGGElement, SVGGDatum, HTMLElement, unknown>
+    #radiusScale = {} as ScaleLinear<number, number>
     #scale = 1
     #zoomLevel!: ZoomLevel
-    readonly #circleSize = defaultCircleSize
-    readonly #fontSize = defaultFontSize
     readonly #showPBZones = "all"
 
     constructor() {
         this.#setupSVG()
+        this.#setupScales()
     }
 
     get currentPort(): CurrentPort {
@@ -41,6 +37,12 @@ export default class PortNames {
             .append<SVGGElement>("g")
             .attr("data-ui-component", "port-names")
             .attr("class", "fill-white")
+    }
+
+    #setupScales() {
+        this.#radiusScale = d3ScaleLinear()
+            .range([defaultCircleSize, defaultCircleSize >> 2, defaultCircleSize >> 5])
+            .domain([Math.log2(minScale), Math.log2(maxTileScale) - 1, Math.log2(maxScale)])
     }
 
     #updateTextsX(d: PortWithTrades, circleSize: number): number {
@@ -75,8 +77,8 @@ export default class PortNames {
     }
 
     #updateJoin(data: PortWithTrades[]) {
-        const circleSize = roundToThousands(this.#circleSize / this.#scale)
-        const fontSize = roundToThousands(this.#fontSize / this.#scale)
+        const circleSize = this.#radiusScale(Math.log2(this.#scale))
+        const fontSize = this.#radiusScale(Math.log2(this.#scale))
 
         this.#gPortNames
             .selectAll<SVGTextElement, PortWithTrades>("text")

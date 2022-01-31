@@ -7648,6 +7648,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"d3-tile@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "d3-tile@npm:1.0.0"
+  checksum: c2e9ff0430cd17483747e08631f2124b23e8dd932f8eb3d3c053d632a586c45bbe4f56aa7bbea9deeb5b3d4a5fe3eafa42a9b8917e598527fd859a9b6a26c303
+  languageName: node
+  linkType: hard
+
 "d3-time-format@npm:1 - 4":
   version: 4.1.0
   resolution: "d3-time-format@npm:4.1.0"
@@ -14086,6 +14093,7 @@ __metadata:
     d3-scale: ^4.0.2
     d3-selection: ^3.0.0
     d3-shape: ^3.1.0
+    d3-tile: ^1.0.0
     d3-timer: ^3.0.1
     d3-transition: ^3.0.1
     d3-voronoi-treemap: ^1.1.1

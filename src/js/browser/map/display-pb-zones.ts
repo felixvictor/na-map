@@ -112,6 +112,7 @@ export default class DisplayPbZones {
     }
 
     _update(): void {
+        console.log("pb-zones update", this._pbZonesFiltered.length)
         this._g
             .selectAll<SVGGElement, PbZoneBasic>("g.pb-zones")
             .data(this._pbZonesFiltered, (d) => String(d.id))
@@ -254,6 +255,14 @@ export default class DisplayPbZones {
     }
 
     async _setData(): Promise<void> {
+        console.log(
+            "pb-zones _setData",
+            this._ports.zoomLevel,
+            this.showPB,
+            this._ports.zoomLevel === "pbZone",
+            this.showPB !== "off",
+            this._ports.zoomLevel === "pbZone" && this.showPB !== "off"
+        )
         if (this._ports.zoomLevel === "pbZone" && this.showPB !== "off") {
             if (!this._isDataLoaded) {
                 await this._loadData()
@@ -298,6 +307,7 @@ export default class DisplayPbZones {
                 raidPoints: port.raidPoints,
             }))
         }
+        console.log("pb-zones _filterVisible", this._pbZonesFiltered.length, this.#lowerBound, this.#upperBound)
     }
 
     /**
