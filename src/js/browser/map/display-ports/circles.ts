@@ -247,7 +247,7 @@ export default class PortCircles {
         this.#portData = portDataFiltered
         this.#showRadius = showRadius
         this.#tradePortId = tradePortId
-        console.log("port circles update", scale, portDataFiltered.length, showRadius, tradePortId)
+
         this.#updateJoin()
     }
 }

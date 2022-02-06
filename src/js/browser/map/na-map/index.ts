@@ -61,6 +61,8 @@ class NAMap {
     coord: MinMaxCoord
     f11!: ShowF11
     height = 0
+    #marginLeft = 0
+    #marginTop = 0
     private _doubleClickAction: string
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
@@ -162,7 +164,7 @@ class NAMap {
         this._setupListener()
     }
 
-    static _stopProperty(event: Event): void {
+    static #stopProperty(event: Event): void {
         if (event.defaultPrevented) {
             event.stopPropagation()
         }
@@ -247,20 +249,6 @@ class NAMap {
     }
 
     _setupListener(): void {
-        this._svg
-            // eslint-disable-next-line unicorn/no-null
-            .on("dblclick.zoom", null)
-            .on(
-                "click",
-                (event: Event) => {
-                    NAMap._stopProperty(event)
-                },
-                true
-            )
-            .on("dblclick", (event: Event) => {
-                this._doDoubleClickAction(event)
-            })
-
         document.querySelector("#propertyDropdown")?.addEventListener("click", () => {
             registerEvent("Menu", "Select port on property")
         })
@@ -296,6 +284,11 @@ class NAMap {
         this._svg.append<SVGDefsElement>("defs")
         this.#mainG = this._svg.append("g").attr("id", "map")
         this.#tileMap.setupSvg()
+
+        const main = document.querySelector("main") as HTMLElement
+        const navbar = document.querySelector("nav") as HTMLElement
+        this.#marginLeft = Number.parseInt(window.getComputedStyle(main).getPropertyValue("padding-left"))
+        this.#marginTop = Number.parseInt(window.getComputedStyle(navbar).getPropertyValue("height"))
     }
 
     _doubleClickSelected(): void {
@@ -338,16 +331,6 @@ class NAMap {
 
     _setZoomLevelAndData(transform: ZoomTransform): void {
         const scale = transform.k
-        console.log(
-            "_setZoomLevelAndData anfang",
-            this.zoomLevel,
-            transform.k,
-            scale,
-            pbZoneScaleThreshold,
-            scale > pbZoneScaleThreshold,
-            labelScaleThreshold,
-            scale > labelScaleThreshold
-        )
 
         if (scale !== this.#currentMapScale) {
             this.#currentMapScale = scale
@@ -366,8 +349,6 @@ class NAMap {
             this._setFlexOverlayHeight()
             this._grid.update()
         }
-
-        console.log("_setZoomLevelAndData ende", this.zoomLevel)
 
         void this._pbZone.refresh()
         this._ports.update(this.#currentMapScale)
@@ -406,11 +387,11 @@ class NAMap {
     #getScreenCoordinate(x: number, y: number): Point {
         const { x: wx, y: wy } = this.#getDOMPoint(x, y, true)
 
-        return [wx, wy]
+        return [wx - this.#marginLeft, wy - this.#marginTop]
     }
 
     #getWorldCoordinate(x: number, y: number): Point {
-        const { x: wx, y: wy } = this.#getDOMPoint(x, y, false)
+        const { x: wx, y: wy } = this.#getDOMPoint(x - this.#marginLeft, y - this.#marginTop, false)
 
         return [wx, wy]
     }
@@ -461,7 +442,13 @@ class NAMap {
                 this._naZoomed(event)
             })
 
-        this._svg.call(this.#zoom)
+        this._svg
+            .call(this.#zoom)
+            .on("dblclick.zoom", () => ({}))
+            .on("click", () => ({}))
+            .on("dblclick", (event: Event) => {
+                this._doDoubleClickAction(event)
+            })
     }
 
     _checkF11Coord(): void {
@@ -527,42 +514,53 @@ class NAMap {
         document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${height}px`)
     }
 
-    _initialZoomAndPan(): void {
-        console.log("_initialZoomAndPan")
+    #transform(tx: number, ty: number, tk: number): void {
+        const transform = d3ZoomIdentity.translate(tx, ty).scale(tk)
 
-        const [x, y] = this.#getWorldCoordinate(this.width >> 1, this.height >> 1)
-        this.zoomAndPan(x, y, true)
+        console.log("transform", tx, ty, tk, transform)
+
+        this._svg.call(this.#zoom.transform, transform)
+    }
+
+    _initialZoomAndPan(): void {
+        console.log("_initialZoomAndPan", zoomTransform(this._svg.node() as SVGSVGElement))
+
+        this.#transform(this.width / 2, this.height / 2, initScale)
     }
 
     /**
-     * Zoom and pan to x,y coord
+     * Zoom and pan to world coord
      * @param x - x world coord
      * @param y - y world coord
-     * @param init - true if map zoomed to initial scale
      */
-    zoomAndPan(x: number, y: number, init = false): void {
-        const scale = init ? initScale : labelScaleThreshold
+    zoomAndPan(x: number, y: number): void {
+        const scale = labelScaleThreshold
         const screenCoordinate = this.#getScreenCoordinate(x, y)
         const transform = zoomTransform(this._svg.node() as SVGSVGElement)
-        const tx = screenCoordinate[0] + transform.x / scale
-        const ty = screenCoordinate[1] + transform.y / scale
+        //const transform = this.#getMapTransform(zoomTransform(this._svg.node() as SVGSVGElement))
+        const tx = x / transform.k
+        const ty = y / transform.k
+        const transformE = d3ZoomIdentity
+            .translate(this.width / 2, this.height / 2)
+            .scale(scale)
+            .translate(-tx, -ty)
 
         console.log(
             "zoomAndPan",
             x,
             y,
-            init,
-            screenCoordinate,
-            transform,
-            transform.x / scale,
-            transform.y / scale,
+            Math.log2(transform.k),
+            Math.log2(scale),
             tx,
             ty,
-            scale,
-            d3ZoomIdentity.translate(tx, ty).scale(scale)
+            screenCoordinate,
+            transform,
+            transformE
         )
 
-        this._svg.call(this.#zoom.transform, d3ZoomIdentity.translate(tx, ty).scale(scale))
+        //this.#transform(tx, ty, scale)
+        //this.#zoom.translateTo(this._svg, tx, ty)
+        this._svg.call(this.#zoom.transform, transformE, [x, y])
     }
 
     goToPort(): void {

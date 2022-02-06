@@ -101,7 +101,6 @@ export default class PortIcons {
 
     set showTrades(showTrades: ShowTrades) {
         this.#showTrades = showTrades
-        console.log("PortIcons constructor showTrades", this.#showTrades, this.#showTrades.show)
     }
 
     getTradeItem(itemId: number): TradeItem | undefined {
@@ -485,8 +484,6 @@ export default class PortIcons {
     update(scale: number, showRadius: string, data: PortWithTrades[]) {
         this.#showRadius = showRadius
         const circleSize = this.#radiusScale(Math.log2(scale))
-
-        console.log("PortIcons update", data.length)
 
         this.#gIcon
             .selectAll<SVGCircleElement, PortWithTrades>("circle")

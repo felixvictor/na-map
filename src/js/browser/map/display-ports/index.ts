@@ -210,7 +210,6 @@ export default class DisplayPorts {
                     port.coordinates[1] <= this.#upperBound[1]
             )
         }
-        console.log("_filterVisible", this.#portDataFiltered.length)
     }
 
     /**
