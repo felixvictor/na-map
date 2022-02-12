@@ -20,7 +20,15 @@ import {
 
 import { registerEvent } from "../../analytics"
 import { defaultFontSize, Extent, Point } from "common/common-math"
-import { initScale, labelScaleThreshold, mapSize, maxScale, minScale, pbZoneScaleThreshold } from "common/common-var"
+import {
+    initScale,
+    labelScaleThreshold,
+    mapSize,
+    maxScale,
+    maxZoom,
+    minScale,
+    pbZoneScaleThreshold,
+} from "common/common-var"
 
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 import { ServerId } from "common/servers"
@@ -61,8 +69,6 @@ class NAMap {
     coord: MinMaxCoord
     f11!: ShowF11
     height = 0
-    #marginLeft = 0
-    #marginTop = 0
     private _doubleClickAction: string
     private _grid!: DisplayGrid
     private _journey!: MakeJourney
@@ -284,11 +290,6 @@ class NAMap {
         this._svg.append<SVGDefsElement>("defs")
         this.#mainG = this._svg.append("g").attr("id", "map")
         this.#tileMap.setupSvg()
-
-        const main = document.querySelector("main") as HTMLElement
-        const navbar = document.querySelector("nav") as HTMLElement
-        this.#marginLeft = Number.parseInt(window.getComputedStyle(main).getPropertyValue("padding-left"))
-        this.#marginTop = Number.parseInt(window.getComputedStyle(navbar).getPropertyValue("height"))
     }
 
     _doubleClickSelected(): void {
@@ -371,7 +372,7 @@ class NAMap {
             point.x = x
             point.y = y
 
-            const matrix = node.getScreenCTM()
+            const matrix = node.getCTM()
 
             if (matrix) {
                 return screen ? point.matrixTransform(matrix) : point.matrixTransform(matrix.inverse())
@@ -387,11 +388,11 @@ class NAMap {
     #getScreenCoordinate(x: number, y: number): Point {
         const { x: wx, y: wy } = this.#getDOMPoint(x, y, true)
 
-        return [wx - this.#marginLeft, wy - this.#marginTop]
+        return [wx, wy]
     }
 
     #getWorldCoordinate(x: number, y: number): Point {
-        const { x: wx, y: wy } = this.#getDOMPoint(x - this.#marginLeft, y - this.#marginTop, false)
+        const { x: wx, y: wy } = this.#getDOMPoint(x, y, false)
 
         return [wx, wy]
     }
@@ -538,19 +539,24 @@ class NAMap {
         const screenCoordinate = this.#getScreenCoordinate(x, y)
         const transform = zoomTransform(this._svg.node() as SVGSVGElement)
         //const transform = this.#getMapTransform(zoomTransform(this._svg.node() as SVGSVGElement))
-        const tx = x / transform.k
-        const ty = y / transform.k
+        const tx = x * -scale + this.width / 2
+        const ty = y * -scale + this.height / 2
         const transformE = d3ZoomIdentity
-            .translate(this.width / 2, this.height / 2)
+            //.translate(this.width / 2, this.height / 2)
+            .translate(tx, ty)
             .scale(scale)
-            .translate(-tx, -ty)
 
         console.log(
             "zoomAndPan",
+            (this.#mainG.node() as SVGGElement).getCTM(),
+            transform,
             x,
             y,
-            Math.log2(transform.k),
-            Math.log2(scale),
+            scale,
+            labelScaleThreshold,
+            Math.log2(labelScaleThreshold),
+            minScale,
+            Math.log2(minScale),
             tx,
             ty,
             screenCoordinate,
@@ -558,9 +564,10 @@ class NAMap {
             transformE
         )
 
-        //this.#transform(tx, ty, scale)
+        this.#transform(tx, ty, scale)
+        //this._svg.call(this.#zoom.transform, transformE, [x, y])
         //this.#zoom.translateTo(this._svg, tx, ty)
-        this._svg.call(this.#zoom.transform, transformE, [x, y])
+        //this.#zoom.scaleTo(this._svg, scale)
     }
 
     goToPort(): void {
