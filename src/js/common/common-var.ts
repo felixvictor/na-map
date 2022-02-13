@@ -29,4 +29,5 @@ export const maxScale = minScale * Math.pow(2, maxZoom)
 export const maxTileScale = minScale * Math.pow(2, maxTileZoom)
 export const initScale = minScale << 3
 export const labelScaleThreshold = minScale << 4
+export const zoomAndPanScale = labelScaleThreshold
 export const pbZoneScaleThreshold = minScale << 6

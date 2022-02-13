@@ -39,9 +39,9 @@ import { ϕ } from "common/common-math"
 
 import { PortBasic } from "common/gen-json"
 import { DataSource, HtmlString, MinMaxCoord, PowerMapList } from "common/interface"
-
 import { ServerId } from "common/servers"
-import { NAMap } from "js/browser/map/na-map"
+
+import { NAMap } from "../map/na-map"
 
 interface JsonData {
     power: PowerMapList
