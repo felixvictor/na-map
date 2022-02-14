@@ -166,7 +166,7 @@
         "lzma-native": "^8.0.6",
         "mini-css-extract-plugin": "^2.5.3",
         "mini-svg-data-uri": "^1.4.3",
-        "netlify-cli": "^8.19.3",
+        "netlify-cli": "^9.4.0",
         "node-fetch": "^3.2.0",
         "npm-run-all": "^4.1.5",
         "pngjs": "^6.0.0",
