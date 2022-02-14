@@ -503,7 +503,6 @@ class NAMap {
     }
 
     #setFlexOverlayHeight(): void {
-        console.log("#setFlexOverlayHeight")
         const height = this.height - (this.#grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0)
         document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${height}px`)
     }
@@ -511,14 +510,10 @@ class NAMap {
     #transform(tx: number, ty: number, tk: number): void {
         const transform = d3ZoomIdentity.translate(tx, ty).scale(tk)
 
-        console.log("transform", tx, ty, tk, transform)
-
         this.#svg.call(this.#zoom.transform, transform)
     }
 
     #initialZoomAndPan(): void {
-        console.log("#initialZoomAndPan", zoomTransform(this.#svg.node() as SVGSVGElement))
-
         this.#transform(this.width / 2, this.height / 2, initScale)
     }
 
