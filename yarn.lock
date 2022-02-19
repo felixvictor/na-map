@@ -88,9 +88,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.17.4":
-  version: 7.17.4
-  resolution: "@babel/core@npm:7.17.4"
+"@babel/core@npm:^7.17.5":
+  version: 7.17.5
+  resolution: "@babel/core@npm:7.17.5"
   dependencies:
     "@ampproject/remapping": ^2.1.0
     "@babel/code-frame": ^7.16.7
@@ -107,7 +107,7 @@ __metadata:
     gensync: ^1.0.0-beta.2
     json5: ^2.1.2
     semver: ^6.3.0
-  checksum: d367259b188fde69493fea407a1c134d6bb7a0d859cbe2c0f0d1f2464143bdee0fdfd3c8d45a2cdabdf321b95dd392cbc4f55e2d0c41a842a581d37fee4cef64
+  checksum: c5e7dddb4feaacb91175d22a6edc8e93804242328a82b80732c6e84a0647bc0a9c9d5b05f3ce13138b8e59bf7aba4ff9f7b7446302f141f243ba51df02c318a5
   languageName: node
   linkType: hard
 
@@ -2598,7 +2598,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@netlify/build@npm:^26.3.2":
+"@netlify/build@npm:^26.3.3":
   version: 26.3.3
   resolution: "@netlify/build@npm:26.3.3"
   dependencies:
@@ -3054,7 +3054,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@netlify/zip-it-and-ship-it@npm:5.8.0, @netlify/zip-it-and-ship-it@npm:^5.7.5":
+"@netlify/zip-it-and-ship-it@npm:5.8.0, @netlify/zip-it-and-ship-it@npm:^5.8.0":
   version: 5.8.0
   resolution: "@netlify/zip-it-and-ship-it@npm:5.8.0"
   dependencies:
@@ -7195,10 +7195,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.21.0":
-  version: 3.21.0
-  resolution: "core-js@npm:3.21.0"
-  checksum: 87df49aa2c5d0a521c52102b6669842dd30b334742e86dd4e0173c51230bc48d610060ab6de0f149766d188325b8c1b84598f901cf455674fe6c03ccc5c8026f
+"core-js@npm:^3.21.1":
+  version: 3.21.1
+  resolution: "core-js@npm:3.21.1"
+  checksum: d68eddd831340ad5b24ac29c72fda022a43b17f194c4278b6b875a843283d316502cb4abd07f28631d6ebc4387f66aa06e2b1b3c8fd7e08096a751b5c63f6889
   languageName: node
   linkType: hard
 
@@ -7380,7 +7380,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-functions-list@npm:^3.0.0":
+"css-functions-list@npm:^3.0.1":
   version: 3.0.1
   resolution: "css-functions-list@npm:3.0.1"
   checksum: 8998406f9c6508180dad621bf91cfbf4649d922a57e2e5dd3fd909a2855e29d2f82cf176bd89a7598237b9e989126f8520e21479f2da51f37b1491a38fe72061
@@ -8970,7 +8970,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.9.0":
+"enhanced-resolve@npm:^5.8.3":
   version: 5.9.0
   resolution: "enhanced-resolve@npm:5.9.0"
   dependencies:
@@ -9161,14 +9161,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:^8.3.0":
-  version: 8.3.0
-  resolution: "eslint-config-prettier@npm:8.3.0"
+"eslint-config-prettier@npm:^8.4.0":
+  version: 8.4.0
+  resolution: "eslint-config-prettier@npm:8.4.0"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
     eslint-config-prettier: bin/cli.js
-  checksum: df4cea3032671995bb5ab07e016169072f7fa59f44a53251664d9ca60951b66cdc872683b5c6a3729c91497c11490ca44a79654b395dd6756beb0c3903a37196
+  checksum: ee8dc343f1fed15dc0658e190a966cc23644477f2331a7f56ae2bb79dd74892e3cde8ea5c142e7a3329a8291a1de041e13ca96e54d0c85ff4a2aba13390c5f10
   languageName: node
   linkType: hard
 
@@ -9197,9 +9197,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-unicorn@npm:^40.1.0":
-  version: 40.1.0
-  resolution: "eslint-plugin-unicorn@npm:40.1.0"
+"eslint-plugin-unicorn@npm:^41.0.0":
+  version: 41.0.0
+  resolution: "eslint-plugin-unicorn@npm:41.0.0"
   dependencies:
     "@babel/helper-validator-identifier": ^7.15.7
     ci-info: ^3.3.0
@@ -9216,8 +9216,8 @@ __metadata:
     semver: ^7.3.5
     strip-indent: ^3.0.0
   peerDependencies:
-    eslint: ">=7.32.0"
-  checksum: b15ffd075080e018da3e5fd2eee059f96fa9575d0218e0db28cc0c5584bc68600e20863f09991fe0a0cc35bf0fe96553cc8bcb844105f212c882808927cf1cb4
+    eslint: ">=8.8.0"
+  checksum: 661d572b244f9f61121806cb0b9b4914f37e978089633e8b401d95b736f5acb9ed70f398de9cebcdbb1456961e7360c2b196483a793f6f1613c2a4989a298488
   languageName: node
   linkType: hard
 
@@ -14421,7 +14421,7 @@ __metadata:
   resolution: "na-map@workspace:."
   dependencies:
     "@babel/cli": ^7.17.3
-    "@babel/core": ^7.17.4
+    "@babel/core": ^7.17.5
     "@babel/plugin-proposal-class-properties": ^7.16.7
     "@babel/plugin-proposal-private-methods": ^7.16.11
     "@babel/preset-env": ^7.16.11
@@ -14474,7 +14474,7 @@ __metadata:
     clean-webpack-plugin: ^4.0.0
     collections: ^5.1.13
     copy-webpack-plugin: ^10.2.4
-    core-js: ^3.21.0
+    core-js: ^3.21.1
     css: ^3.0.0
     css-loader: ^6.6.0
     css-minimizer-webpack-plugin: ^3.4.1
@@ -14502,10 +14502,10 @@ __metadata:
     dotenv: ^16.0.0
     ejs-lint: ^1.2.1
     eslint: ^8.9.0
-    eslint-config-prettier: ^8.3.0
+    eslint-config-prettier: ^8.4.0
     eslint-plugin-prettier: ^4.0.0
     eslint-plugin-tsdoc: ^0.2.14
-    eslint-plugin-unicorn: ^40.1.0
+    eslint-plugin-unicorn: ^41.0.0
     exceljs: ^4.3.0
     favicons: ^6.2.2
     favicons-webpack-plugin: ^5.0.2
@@ -14519,7 +14519,7 @@ __metadata:
     lzma-native: ^8.0.6
     mini-css-extract-plugin: ^2.5.3
     mini-svg-data-uri: ^1.4.3
-    netlify-cli: ^9.6.2
+    netlify-cli: ^9.6.5
     node-fetch: ^3.2.0
     npm-run-all: ^4.1.5
     pngjs: ^6.0.0
@@ -14534,14 +14534,14 @@ __metadata:
     prettier-plugin-sh: ^0.8.1
     recursive-readdir: ^2.2.2
     round-slider: ^1.6.1
-    sass: ^1.49.7
+    sass: ^1.49.8
     sass-loader: ^12.6.0
     seedrandom: ^3.0.5
     shellcheck: ^1.1.0
     simple-statistics: ^7.7.3
     sitemap-webpack-plugin: ^1.1.1
     standard-version: ^9.3.2
-    stylelint: ^14.5.0
+    stylelint: ^14.5.1
     stylelint-config-prettier: ^9.0.3
     stylelint-config-standard: ^25.0.0
     stylelint-config-standard-scss: ^3.0.0
@@ -14556,7 +14556,7 @@ __metadata:
     ts-node: ^10.5.0
     typescript: ^4.5.5
     utility-types: ^3.10.0
-    webpack: ^5.69.0
+    webpack: ^5.69.1
     webpack-bundle-analyzer: ^4.5.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.7.4
@@ -14654,18 +14654,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"netlify-cli@npm:^9.6.2":
-  version: 9.6.2
-  resolution: "netlify-cli@npm:9.6.2"
+"netlify-cli@npm:^9.6.5":
+  version: 9.6.5
+  resolution: "netlify-cli@npm:9.6.5"
   dependencies:
-    "@netlify/build": ^26.3.2
+    "@netlify/build": ^26.3.3
     "@netlify/config": ^17.0.9
     "@netlify/framework-info": ^9.0.0
     "@netlify/local-functions-proxy": ^1.1.1
     "@netlify/plugin-edge-handlers": ^3.0.6
     "@netlify/plugins-list": ^6.11.0
     "@netlify/routing-local-proxy": ^0.34.1
-    "@netlify/zip-it-and-ship-it": ^5.7.5
+    "@netlify/zip-it-and-ship-it": ^5.8.0
     "@octokit/rest": ^18.0.0
     "@sindresorhus/slugify": ^1.1.0
     ansi-escapes: ^5.0.0
@@ -14769,7 +14769,7 @@ __metadata:
   bin:
     netlify: bin/run
     ntl: bin/run
-  checksum: f41b3d28d2df62f8d72fb1f24d9218e0635a1f22933a23ab8f93ba1289b68e25a5b03eab31d533d4c5402d0d9f4962a2faea4ec059f9c2eba3c12bfb00ff88c2
+  checksum: a0e0592f7bd5dd5399c2e269f59dcc185c9f8718c64845cd16ad4e6ebe43e23c98430596a80a60ed695a04f8736261528a74dc5ca6284f300b14b0dc48cb0f52
   languageName: node
   linkType: hard
 
@@ -18111,16 +18111,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.49.7":
-  version: 1.49.7
-  resolution: "sass@npm:1.49.7"
+"sass@npm:^1.49.8":
+  version: 1.49.8
+  resolution: "sass@npm:1.49.8"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: 514d1abff594aa56afdc9eb7e40d1cbd9cf1ed6954c4e0ef494266d18965151c6f936e137cd118a138f7677a7bb98f2bbf2d1a485a3f5f66c78be0007506cc9b
+  checksum: ff4051c11223cb6e56ae62fa71448ed65b402949facfbd831f9781244eece9f1d22be45e61af8e0d0fbe186857de2613b07d9247b036ac2326c24e6ebd19bbbe
   languageName: node
   linkType: hard
 
@@ -19506,14 +19506,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:^14.5.0":
-  version: 14.5.0
-  resolution: "stylelint@npm:14.5.0"
+"stylelint@npm:^14.5.1":
+  version: 14.5.1
+  resolution: "stylelint@npm:14.5.1"
   dependencies:
     balanced-match: ^2.0.0
     colord: ^2.9.2
     cosmiconfig: ^7.0.1
-    css-functions-list: ^3.0.0
+    css-functions-list: ^3.0.1
     debug: ^4.3.3
     execall: ^2.0.0
     fast-glob: ^3.2.11
@@ -19550,10 +19550,10 @@ __metadata:
     svg-tags: ^1.0.0
     table: ^6.8.0
     v8-compile-cache: ^2.3.0
-    write-file-atomic: ^4.0.0
+    write-file-atomic: ^4.0.1
   bin:
     stylelint: bin/stylelint.js
-  checksum: b4244701f7a276528b2e3c262406514d85a023ec623547bc762dfa1db6ab910ba867e6e012c10937e5a750e61e5f0656ec6e66ffc4a368733c2f595b0dd19702
+  checksum: 200b25897e1561ef17ef31064971ba11f50afbd9cb9aa6e98bd66efc1a74bd06b91b9c64c307d7f96f5fff50d76531f3082f6680fed06bbc6933c503543c27e3
   languageName: node
   linkType: hard
 
@@ -21116,9 +21116,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.69.0":
-  version: 5.69.0
-  resolution: "webpack@npm:5.69.0"
+"webpack@npm:^5.69.1":
+  version: 5.69.1
+  resolution: "webpack@npm:5.69.1"
   dependencies:
     "@types/eslint-scope": ^3.7.3
     "@types/estree": ^0.0.51
@@ -21129,7 +21129,7 @@ __metadata:
     acorn-import-assertions: ^1.7.6
     browserslist: ^4.14.5
     chrome-trace-event: ^1.0.2
-    enhanced-resolve: ^5.9.0
+    enhanced-resolve: ^5.8.3
     es-module-lexer: ^0.9.0
     eslint-scope: 5.1.1
     events: ^3.2.0
@@ -21149,7 +21149,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 0b0fc2ffcb926fc7506ec56901ae9a69f1ae969a6afc63395a3ed56f938d385c1d16d1dea39fd56dbb9362189c05da49174219904e5a337040aed5a46080e926
+  checksum: 490a6e9e4cd9d0ed3b6c7ca08015da2628919fda8fcf9c36f0f6c0e3ad71eaaaf4b0d12753109f22a4faf79fe9a9063552d9708e0ee2352cf8568433b8e296a7
   languageName: node
   linkType: hard
 
@@ -21376,6 +21376,16 @@ __metadata:
     signal-exit: ^3.0.2
     typedarray-to-buffer: ^4.0.0
   checksum: c3f10342e5808f0c55f876fec5e5a1d1b341e4dd6a2ba83a44068b9ee2063453c12b5b5afab3d028437fea64a4c8f0cf527297429b9a4cb3545c9c026fdf6577
+  languageName: node
+  linkType: hard
+
+"write-file-atomic@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "write-file-atomic@npm:4.0.1"
+  dependencies:
+    imurmurhash: ^0.1.4
+    signal-exit: ^3.0.7
+  checksum: 8f780232533ca6223c63c9b9c01c4386ca8c625ebe5017a9ed17d037aec19462ae17109e0aa155bff5966ee4ae7a27b67a99f55caf3f32ffd84155e9da3929fc
   languageName: node
   linkType: hard
 
