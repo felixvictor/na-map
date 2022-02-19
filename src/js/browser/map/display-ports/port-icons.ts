@@ -15,7 +15,6 @@ import { maxScale, maxTileScale, minScale } from "common/common-var"
 
 import { GoodList, PortWithTrades, TradeGoodProfit, TradeItem } from "common/gen-json"
 import { HtmlResult, HtmlString, SVGGDatum } from "common/interface"
-import { PortBonus, portBonusType } from "common/types"
 
 import ShowTrades from "../show-trades"
 
@@ -71,7 +70,6 @@ interface PortForDisplay {
     tradePortName: string
     goodsToSellInTradePort: Profit
     goodsToBuyInTradePort: Profit
-    portBonus?: PortBonus
 }
 
 export default class PortIcons {
@@ -254,10 +252,6 @@ export default class PortIcons {
                 )}${cooldownTimeLocal}`
         }
 
-        if (portProperties.portBonus) {
-            port.portBonus = portProperties.portBonus
-        }
-
         return port
     }
 
@@ -277,17 +271,6 @@ export default class PortIcons {
 
     // eslint-disable-next-line complexity
     #tooltipData(port: PortForDisplay): VNode {
-        const getPortBonus = (): HtmlResult => {
-            return html`${portBonusType.map((bonus) => {
-                return html`${port?.portBonus?.[bonus]
-                    ? html`<div class="me-1">
-                          <i class="icon icon-light icon-${bonus}" role="img" aria-label="${bonus} bonus"></i>
-                          <div class="x-large text-lighter text-center">${port.portBonus[bonus]}</div>
-                      </div>`
-                    : html``}`
-            })}`
-        }
-
         const iconBorder = port.capital ? "flag-icon-border-middle" : port.countyCapital ? "flag-icon-border-light" : ""
 
         const h = html`
@@ -301,8 +284,6 @@ export default class PortIcons {
                         <div class="caps">${port.region}</div>
                     </div>
                 </div>
-
-                ${port.portBonus ? html`<div class="d-flex align-self-end me-1">${getPortBonus()}</div>` : html``}
 
                 <div class="d-flex flex-column justify-content-end align-self-center">
                     <div class="ms-auto">

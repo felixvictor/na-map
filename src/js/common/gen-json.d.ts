@@ -25,7 +25,7 @@ import {
     PortBattleNationShortName,
 } from "./common"
 import { ArrayIndex, ModifierName } from "./interface"
-import { FrontlinesType, LootType, PortBonus, WoodFamily, WoodType } from "./types"
+import { FrontlinesType, LootType, WoodFamily, WoodType } from "./types"
 
 /****************************
  * buildings.json
@@ -277,7 +277,6 @@ type PortIntersection =
     | GoodList
     | Point
     | Array<string | InventoryEntity | TradeGoodProfit>
-    | PortBonus
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export interface Port extends PortBasic, PortPerServer, PortBattlePerServer {
     [index: string]: PortIntersection
@@ -329,7 +328,6 @@ export interface PortPerServer {
     producesNonTrading?: GoodList
     dropsNonTrading?: GoodList
     inventory: InventoryEntity[]
-    portBonus?: PortBonus
 }
 export interface InventoryEntity {
     id: number

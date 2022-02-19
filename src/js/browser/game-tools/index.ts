@@ -18,7 +18,6 @@ import ListIngredients from "./list-ingredients"
 import ListLoot from "./list-loot"
 import ListModules from "./list-modules"
 import ListPortBattles from "./list-pb"
-import ListPortBonus from "./list-port-bonus"
 import ListRecipes from "./list-recipes"
 import ListShips from "./list-ships"
 import ListShipBlueprints from "./list-ship-blueprints"
@@ -44,7 +43,6 @@ const init = (serverId: ServerId, readParams?: ShipCompareSearchParamsRead): voi
     void new ListLoot()
     void new ListModules()
     void new ListPortBattles(serverId)
-    void new ListPortBonus(serverId)
     void new ListRecipes(serverId)
     void new ListShips()
     void new ListShipBlueprints()
