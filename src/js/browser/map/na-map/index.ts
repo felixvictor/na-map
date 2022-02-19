@@ -10,14 +10,7 @@
 
 import { pointer as d3Pointer, select as d3Select, Selection } from "d3-selection"
 import { scaleLinear as d3ScaleLinear } from "d3-scale"
-import {
-    D3ZoomEvent,
-    zoom as d3Zoom,
-    ZoomBehavior,
-    zoomIdentity as d3ZoomIdentity,
-    zoomTransform,
-    ZoomTransform,
-} from "d3-zoom"
+import { D3ZoomEvent, zoom as d3Zoom, ZoomBehavior, zoomIdentity as d3ZoomIdentity, ZoomTransform } from "d3-zoom"
 
 import { registerEvent } from "../../analytics"
 import { defaultFontSize, Extent, nearestPow2, Point } from "common/common-math"
@@ -34,12 +27,10 @@ import {
 import { MinMaxCoord, ZoomLevel } from "common/interface"
 import { ServerId } from "common/servers"
 
-import Checkbox from "util/checkbox"
 import Cookie from "util/cookie"
 import RadioButton from "util/radio-button"
 import Select from "util/select"
 
-import DisplayGrid from "../display-grid"
 import DisplayPbZones from "../display-pb-zones"
 import DisplayPorts from "../display-ports"
 import MakeJourney from "../make-journey"
@@ -50,8 +41,8 @@ import ShowTrades from "../show-trades"
 import TrilateratePosition from "../get-position"
 import WindRose from "../wind-rose"
 
-import TileMap from "./tile-map"
 import About from "./about"
+import TileMap from "./tile-map"
 
 /**
  * Display naval action map
@@ -63,13 +54,11 @@ class NAMap {
         [0, 0],
         [mapSize, mapSize],
     ] as Extent
-    #grid!: DisplayGrid
     #journey!: MakeJourney
     #mainG = {} as Selection<SVGGElement, Event, HTMLElement, unknown>
     #pbZone!: DisplayPbZones
     #portSelect!: SelectPorts
     #ports!: DisplayPorts
-    #showGrid!: boolean
     #svg!: Selection<SVGSVGElement, Event, HTMLElement, unknown>
     #tileMap: TileMap
     #timeoutId = 0
@@ -85,18 +74,10 @@ class NAMap {
     readonly #doubleClickActionRadios: RadioButton
     readonly #doubleClickActionValues: string[]
     readonly #searchParams: URLSearchParams
-    readonly #showGridCheckbox: Checkbox
-    readonly #showGridCookie: Cookie
-    readonly #showGridId: string
-    readonly #showGridValues = [String(false), String(true)] // Possible values for show trade checkboxes (first is default value)
-    readonly gridOverlay: HTMLElement
     readonly rem = defaultFontSize // Font size in px
     serverName: ServerId
-    showGrid: boolean
     showTrades!: ShowTrades
     width = 0
-    xGridBackgroundHeight: number
-    yGridBackgroundWidth: number
 
     /**
      * @param serverName - Naval action server name
@@ -108,16 +89,6 @@ class NAMap {
          */
         this.serverName = serverName
         this.#searchParams = searchParams
-
-        /**
-         * Left padding for brand icon
-         */
-        this.xGridBackgroundHeight = Math.floor(3 * this.rem)
-
-        /**
-         * Left padding for brand icon
-         */
-        this.yGridBackgroundWidth = Math.floor(4 * this.rem)
 
         /**
          * Outer bounds (world coordinates)
@@ -148,24 +119,6 @@ class NAMap {
          */
         this.#doubleClickAction = this.#getDoubleClickAction()
 
-        /**
-         * ShowGrid cookie name
-         */
-        this.#showGridId = "show-grid"
-
-        /**
-         * ShowGrid settings
-         */
-        this.#showGridCookie = new Cookie({ id: this.#showGridId, values: this.#showGridValues })
-        this.#showGridCheckbox = new Checkbox(this.#showGridId)
-
-        /**
-         * Get showGrid setting from cookie or use default value
-         */
-        this.showGrid = this.#getShowGridValue()
-
-        this.gridOverlay = document.querySelectorAll<HTMLElement>(".overlay")[0]
-
         this.#setHeightWidth()
         this.#tileMap = new TileMap(this.width, this.height)
         this.#setupSvg()
@@ -187,18 +140,6 @@ class NAMap {
         return r
     }
 
-    /**
-     * Read cookie for showGrid
-     * @returns showGrid
-     */
-    #getShowGridValue(): boolean {
-        const r = this.#showGridCookie.get() === "true"
-
-        this.#showGridCheckbox.set(r)
-
-        return r
-    }
-
     async #setupData(): Promise<void> {
         //        Const marks = [];
 
@@ -211,7 +152,6 @@ class NAMap {
         await this.#ports.init()
         this.#pbZone = new DisplayPbZones(this.#ports, this.serverName)
 
-        this.#grid = new DisplayGrid(this)
         this.#portSelect = new SelectPorts(this.#ports)
 
         this.showTrades = new ShowTrades(this.#ports, this.serverName)
@@ -279,9 +219,6 @@ class NAMap {
         document.querySelector("#double-click-action")?.addEventListener("change", () => {
             this.#doubleClickSelected()
         })
-        document.querySelector("#show-grid")?.addEventListener("change", () => {
-            this.#showGridSelected()
-        })
 
         window.addEventListener("resize", () => {
             this.#resizeTimer()
@@ -294,15 +231,6 @@ class NAMap {
         this.#doubleClickActionCookie.set(this.#doubleClickAction)
 
         this.#clearMap()
-    }
-
-    #showGridSelected(): void {
-        this.#showGrid = this.#showGridCheckbox.get()
-        this.#grid.show = this.#showGrid
-
-        this.#showGridCookie.set(String(this.#showGrid))
-
-        this.#grid.update()
     }
 
     #clearMap(): void {
@@ -342,9 +270,6 @@ class NAMap {
             } else if (this.zoomLevel !== "initial") {
                 this.zoomLevel = "initial"
             }
-
-            this.#setFlexOverlayHeight()
-            this.#grid.update()
         }
 
         void this.#pbZone.refresh()
@@ -412,7 +337,6 @@ class NAMap {
         this.#tileMap.drawMap(svgTransform)
 
         const mapTransform = this.#getMapTransform(svgTransform)
-        this.#grid.transform(mapTransform)
         this.showTrades.transform(mapTransform)
         this.#mainG.attr("transform", mapTransform.toString())
 
@@ -468,7 +392,6 @@ class NAMap {
     set zoomLevel(zoomLevel: ZoomLevel) {
         this.#zoomLevel = zoomLevel
         this.#ports.zoomLevel = zoomLevel
-        this.#grid.zoomLevel = zoomLevel
     }
 
     getDimensions(): DOMRect {
@@ -503,8 +426,7 @@ class NAMap {
     }
 
     #setFlexOverlayHeight(): void {
-        const height = this.height - (this.#grid.show && this.zoomLevel !== "initial" ? this.xGridBackgroundHeight : 0)
-        document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${height}px`)
+        document.querySelector<HTMLDivElement>("#summary-column")?.setAttribute("style", `height:${this.height}px`)
     }
 
     #transform(tx: number, ty: number, tk: number): void {
