@@ -48,7 +48,7 @@ import TileMap from "./tile-map"
  * Display naval action map
  */
 class NAMap {
-    #currentMapScale = initScale
+    #currentMapScale = 0
     #doubleClickAction: string
     #extent = [
         [0, 0],
