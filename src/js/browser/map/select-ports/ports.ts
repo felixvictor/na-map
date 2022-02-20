@@ -262,6 +262,7 @@ export default class SelectPortsSelectPorts {
         this._setTradePortPartners()
 
         this.#ports.showRadius = "tradePorts"
+        this.#ports.map.goToPort()
         this.#ports.update()
     }
 }
