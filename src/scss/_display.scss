@@ -73,6 +73,10 @@ text,
     font-size: x-small;
 }
 
+.lnum {
+    font-variant-numeric: lining-nums proportional-nums;
+}
+
 .tooltip-block {
     //max-width: 30rem;
     text-align: left;
