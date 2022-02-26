@@ -1,8 +1,32 @@
+/*
+ * This file is part of na-map.
+ *
+ * @file      Show trades.
+ * @module    map-tools/show-trades
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * JavaScript implementation of Trilateration to find the position of a
+ * point (P4) from three known points in 3D space (P1, P2, P3) and their
+ * distance from the point in question.
+ *
+ * The solution used here is based on the derivation found on the Wikipedia
+ * page of Trilateration: https://en.wikipedia.org/wiki/Trilateration
+ *
+ * This library does not need any 3rd party tools as all the non-basic
+ * geometric functions needed are declared inside the trilaterate() function.
+ *
+ * See the GitHub page: https://github.com/gheja/trilateration.js
+ */
+
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods ColumnBase class.
- * @module    game-tools/compare-woods/wood-base
+ * @file      Display map.
+ * @module    map/map
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -11,8 +35,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods ColumnCompare class.
- * @module    game-tools/compare-woods/wood-comparison
+ * @file      Display port battle zones.
+ * @module    map/display-pb-zones
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -21,8 +45,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods CompareWoods class.
- * @module    game-tools/compare-woods/compare-woods
+ * @file      Display ports.
+ * @module    map/display-ports
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -31,8 +55,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods Wood class.
- * @module    game-tools/compare-woods/wood
+ * @file      Get position.
+ * @module    get-position
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -41,8 +65,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Compare woods.
- * @module    game-tools/compare-woods
+ * @file      Journey labels.
+ * @module    map-tools/make-journey/labels
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -51,8 +75,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Income map.
- * @module    game-tools/show-income-map
+ * @file      Journey summary.
+ * @module    map-tools/make-journey/summary
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -61,8 +85,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      List buildings.
- * @module    game-tools/list-buildings
+ * @file      Make a journey.
+ * @module    map-tools/make-journey
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -71,98 +95,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      List cannons.
- * @module    game-tools/list-cannons
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List conquest flags.
- * @module    game-tools/list-flags
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List ingredients.
- * @module    game-tools/list-ingredients
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List loot and chests.
- * @module    game-tools/list-loot
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List modules.
- * @module    game-tools/list-modules
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List port battles.
- * @module    game-tools/list-pb
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List port bonus.
- * @module    game-tools/list-port-bonus
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List recipes.
- * @module    game-tools/list-recipes
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List ship blueprints.
- * @module    game-tools/list-ship-blueprints
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
- * @file      List woods.
- * @module    game-tools/list-woods
+ * @file      Make journey modal.
+ * @module    map-tools/make-journey/modal
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -172,7 +106,7 @@
  * This file is part of na-map.
  *
  * @file      Port ownership list.
- * @module    game-tools/show-port-ownerships
+ * @module    game-tools/list-port-ownerships
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -181,8 +115,8 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Wood compare modal.
- * @module    map-tools/compare-woods/modal
+ * @file      Predict wind cookies.
+ * @module    map-tools/wind-rose/cookie
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
@@ -191,8 +125,108 @@
 /*!
  * This file is part of na-map.
  *
- * @file      ship list.
- * @module    ship-list
+ * @file      Predict wind modal.
+ * @module    map-tools/wind-rose/modal
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Select port battle time window.
+ * @module    map/select-ports/pb-time
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Select ports clan select.
+ * @module    map/select-ports/clan
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Select ports inventory select.
+ * @module    map/select-ports/inventory
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Select ports select goods.
+ * @module    map/select-ports/goods
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Select ports select ports.
+ * @module    map/select-ports/ports
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Select ports.
+ * @module    map/select-ports
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Show F11 coordinates.
+ * @module    map-tools/show-f11
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Show wind rose continuously.
+ * @module    map-tools/wind-rose
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Toast.
+ * @module    util/toast
+ * @author    iB aka Felix Victor
+ * @copyright Felix Victor 2017 to 2022
+ * @license   http://www.gnu.org/licenses/gpl.html
+ */
+
+/*!
+ * This file is part of na-map.
+ *
+ * @file      Wind input per slider.
+ * @module    util/wind-input
  * @author    iB aka Felix Victor
  * @copyright Felix Victor 2017 to 2022
  * @license   http://www.gnu.org/licenses/gpl.html
