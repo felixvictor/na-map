@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.0.0](///compare/v13.8.1...v14.0.0) (2022-02-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* junicode two 1.041
+
+### Features
+
+* grid removed 1eed1fa
+* junicode two 1.041 5fa7225
+* port bonuses removed d76e62a
+* **select ports:** nation select with icons f827078
+* **trade:** dark background 1d26efc
+
+
+### Bug Fixes
+
+* **deploy:** netlify test f93184b
+* **display grid:** show on/off 2fb011e
+* exceptional -> rare wood 0bff880
+* **map tiles:** viewport updates fc60ac0
+* rare woods are not dropped in ports anymore 0b6c75e
+* **show pb zones:** lnum 73e870c
+* **show trades:** inventory select 2bfa51b
+* **show trades:** map clear 5800e75
+* **show trades:** map clear 6fbfe94
+* **show trades:** show on/off 93f2c7e
+
 ### [13.8.1](///compare/v13.8.0...v13.8.1) (2022-01-14)
 
 ## [13.8.0](///compare/v13.7.0...v13.8.0) (2022-01-12)
