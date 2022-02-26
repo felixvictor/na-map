@@ -271,35 +271,14 @@ export default class TradeData {
 
     reset(): void {
         this.#selectNation.selectAll()
-        this.resetFilter()
     }
 
     resetFilter(): void {
-        console.log(
-            "resetFilter anfang",
-            this.#dataFiltered.length,
-            this.#portIdVisiblePorts.size,
-            this.#lowerBound,
-            this.#upperBound
-        )
         this.resetData()
-        console.log("resetFilter resetData", this.#dataFiltered.length, this.#portIdVisiblePorts.size)
         this.#filterPortsBySelectedNations()
-        console.log(
-            "resetFilter filterPortsBySelectedNations",
-            this.#dataFiltered.length,
-            this.#portIdVisiblePorts.size
-        )
         this.#filterTradesBySelectedNations()
-        console.log(
-            "resetFilter filterTradesBySelectedNations",
-            this.#dataFiltered.length,
-            this.#portIdVisiblePorts.size
-        )
         this.filterTradesByVisiblePorts()
-        console.log("resetFilter filterTradesByVisiblePorts", this.#dataFiltered.length, this.#portIdVisiblePorts.size)
         this.#sortByProfit()
-        console.log("resetFilter sortByProfit", this.#dataFiltered.length, this.#portIdVisiblePorts.size)
     }
 
     emptyLinkDataFiltered() {

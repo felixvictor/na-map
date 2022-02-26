@@ -139,13 +139,15 @@ export default class ShowTrades {
     }
 
     clearMap(): void {
-        this.list.listType = "tradeList"
+        if (this.show) {
+            this.list.listType = "tradeList"
 
-        if (this.#inventorySelect) {
-            this.#inventorySelect.reset()
+            if (this.#inventorySelect) {
+                this.#inventorySelect.reset()
+            }
+            this.#tradeData.reset()
+            this.update()
         }
-        this.#tradeData.reset()
-        this.update()
     }
 
     /**
