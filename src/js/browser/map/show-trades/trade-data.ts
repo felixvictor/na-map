@@ -271,7 +271,6 @@ export default class TradeData {
 
     reset(): void {
         this.#selectNation.selectAll()
-        this.resetFilter()
     }
 
     resetFilter(): void {

@@ -27,7 +27,7 @@ import TradeData from "./trade-data"
  */
 export default class ShowTrades {
     #graphs = {} as Graphs
-    #inventorySelect = {} as SelectPortsSelectInventory
+    #inventorySelect: SelectPortsSelectInventory | undefined = undefined
     #isDataLoaded = false
     #ports: DisplayPorts
     #scale = 1
@@ -105,7 +105,7 @@ export default class ShowTrades {
         this.#showCookie.set(String(this.show))
 
         await this.init()
-        this.#inventorySelect.show(this.show)
+        this.#inventorySelect?.show(this.show)
 
         if (this.show) {
             showElem(this.list.tradeDetailsDiv)
@@ -124,8 +124,10 @@ export default class ShowTrades {
     }
 
     update(info?: string): void {
-        this.list.update(this.#inventorySelect.isInventorySelected, info)
-        this.#graphs.update(this.#inventorySelect.isInventorySelected, this.#scale)
+        if (this.#inventorySelect) {
+            this.list.update(this.#inventorySelect.isInventorySelected, info)
+            this.#graphs.update(this.#inventorySelect.isInventorySelected, this.#scale)
+        }
     }
 
     transform(transform: ZoomTransform): void {
@@ -137,11 +139,15 @@ export default class ShowTrades {
     }
 
     clearMap(): void {
-        this.list.listType = "tradeList"
+        if (this.show) {
+            this.list.listType = "tradeList"
 
-        this.#inventorySelect.reset()
-        this.#tradeData.reset()
-        this.update()
+            if (this.#inventorySelect) {
+                this.#inventorySelect.reset()
+            }
+            this.#tradeData.reset()
+            this.update()
+        }
     }
 
     /**

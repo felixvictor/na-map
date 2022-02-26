@@ -18,7 +18,16 @@ export const flagValidity = 7 // in days
 
 export const mapSize = 8192
 export const distanceMapSize = 8192
-export const maxMapScale = 256
-export const maxTileZoom = 5
 export const minMapScale = 1
+export const maxMapScale = 256
+
+export const maxTileZoom = 5
+export const maxZoom = 8
 export const tileSize = 256
+export const minScale = tileSize
+export const maxScale = minScale * Math.pow(2, maxZoom)
+export const maxTileScale = minScale * Math.pow(2, maxTileZoom)
+export const initScale = minScale << 3
+export const labelScaleThreshold = minScale << 4
+export const zoomAndPanScale = labelScaleThreshold
+export const pbZoneScaleThreshold = minScale << 6

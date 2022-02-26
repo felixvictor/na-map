@@ -9,6 +9,7 @@ import { colourScaleCounty } from "./map-data"
 
 import { PortWithTrades } from "common/gen-json"
 import { SVGGDatum } from "common/interface"
+import { maxScale, maxTileScale, minScale } from "common/common-var"
 
 type PortCircleStringF = (d: PortWithTrades) => string
 type PortCircleNumberF = (d: PortWithTrades) => number
@@ -28,11 +29,11 @@ export default class PortCircles {
     #minTaxIncome = 0
     #portData = [] as PortWithTrades[]
     #portRadius = {} as ScaleLinear<number, number>
+    #radiusScale = {} as ScaleLinear<number, number>
     #scale = 1
     #showRadius = ""
     #tradePortId = 0
 
-    readonly #circleSize = defaultCircleSize
     readonly #incomeThreshold = 100_000
     readonly #maxRadiusFactor = ϕ * 4
     readonly #minRadiusFactor = ϕ
@@ -78,6 +79,10 @@ export default class PortCircles {
             .domain([this.#minPortPoints, this.#maxPortPoints])
             .range([colourLight, colourGreenDark])
             .interpolate(d3InterpolateHcl)
+
+        this.#radiusScale = d3ScaleLinear()
+            .range([defaultCircleSize, defaultCircleSize >> 2, defaultCircleSize >> 5])
+            .domain([Math.log2(minScale), Math.log2(maxTileScale) - 1, Math.log2(maxScale)])
     }
 
     #getTradePortMarker(port: PortWithTrades): string {
@@ -118,8 +123,7 @@ export default class PortCircles {
     }
 
     #getData() {
-        const circleScale = this.#scale < 0.5 ? this.#scale * 2 : this.#scale
-        const scaledCircleSize = this.#circleSize / circleScale
+        const scaledCircleSize = this.#radiusScale(Math.log2(this.#scale))
         const rMin = roundToThousands(scaledCircleSize * this.#minRadiusFactor)
         const rMax = roundToThousands(scaledCircleSize * this.#maxRadiusFactor)
 

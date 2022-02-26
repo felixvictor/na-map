@@ -109,7 +109,7 @@ export default class DisplayPorts {
         this._setupSvg()
         this.#summary = new Summary()
         this.#portCircles = new PortCircles(this.#portDataDefault)
-        this.portIcons = new PortIcons(this.#serverName, this.map)
+        this.portIcons = new PortIcons(this.#serverName)
         await this.portIcons.loadData()
         this.#portNames = new PortNames()
         this.#counties = new Counties()
@@ -189,7 +189,7 @@ export default class DisplayPorts {
         this.#scale = scale ?? this.#scale
 
         this._filterVisible()
-        this.portIcons.update(this.#scale, this.showRadius, this.#portData)
+        this.portIcons.update(this.#scale, this.showRadius, this.#portDataFiltered)
         this.#portCircles.update(this.#scale, this.#portDataFiltered, this.showRadius, this.portIcons.tradePort.id)
         this.portNamesUpdate()
         this.#counties.update(this.zoomLevel, this.#lowerBound, this.#upperBound, this.showRadius)

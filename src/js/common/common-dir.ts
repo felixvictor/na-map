@@ -42,8 +42,6 @@ interface DirList {
     filePbSheet: string
     filePbZone: string
     filePort: string
-    filePortBonus: string
-    filePortBonusCSV: string
     filePrices: string
     fileRecipe: string
     fileRepair: string
@@ -76,9 +74,6 @@ export function getCommonPaths(appRoot = process.env.PWD ?? ""): DirList {
         dirOutput,
         dirSrc,
         dirWebpack,
-
-        filePortBonusCSV: buildPath(dirGenServer, "eu1-port-bonus.csv"),
-        filePortBonus: buildPath(dirGenServer, "eu1-port-bonus.json"),
 
         fileBuilding: buildPath(dirGenGeneric, "buildings.json"),
         fileCannon: buildPath(dirGenGeneric, "cannons.json"),

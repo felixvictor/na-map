@@ -130,7 +130,6 @@ export interface APIItemGeneric {
     GunsPerDeck?: number[]
     ShipType?: number
     HiddenModulesCount?: number
-    PortBonusModulesCount?: number
     PersistentModulesCount?: number
     PermanentModulesLimit?: Limit[]
     UpgradeModulesCount?: number
@@ -201,7 +200,6 @@ export interface APIItemGeneric {
     Hidden2?: number[]
     ShipPermanentSlotsCount?: MinMax<number>
     ShipPersistentModuleSlotsCount?: MinMax<number>
-    PortBonusesCount?: MinMax<number>
 }
 interface PriceModifier {
     x: number
@@ -690,7 +688,6 @@ export interface APIShip {
     GunsPerDeck: number[]
     ShipType: number
     HiddenModulesCount: number
-    PortBonusModulesCount: number
     PersistentModulesCount: number
     PermanentModulesLimit: Limit[]
     UpgradeModulesCount: number
