@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.0.5](///compare/v14.0.4...v14.0.5) (2022-04-16)
+
+
+### Bug Fixes
+
+* **ship compare:** "Water pump health" removed a028f12
+
 ### [14.0.4](///compare/v14.0.3...v14.0.4) (2022-03-31)
 
 ### [14.0.3](///compare/v14.0.2...v14.0.3) (2022-03-22)
