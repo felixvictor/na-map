@@ -65,7 +65,7 @@ export const moduleAndWoodChanges = new Map<ModifierName, Property>([
     ["Splinter resistance", { properties: ["resistance.splinter"], isBaseValueAbsolute: false }],
     ["Turn acceleration", { properties: ["ship.turnAcceleration"], isBaseValueAbsolute: true }],
     ["Turn speed", { properties: ["ship.turnSpeed"], isBaseValueAbsolute: true }],
-    ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
+    // ["Water pump health", { properties: ["pump.armour"], isBaseValueAbsolute: true }],
 ])
 
 export const moduleAndWoodCaps = new Map<ModifierName, PropertyWithCap>([
