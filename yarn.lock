@@ -4807,17 +4807,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn-node@npm:^1.2.0":
-  version: 1.8.2
-  resolution: "acorn-node@npm:1.8.2"
-  dependencies:
-    acorn: ^7.0.0
-    acorn-walk: ^7.0.0
-    xtend: ^4.0.2
-  checksum: 02e1564a1ccf8bd1fcefcd01235398af4a9effaf032c5397994ddd275590a72894cb3e26e4b82579ccdda1e48ade7486aef61e771ddae3563ca452b927f443d8
-  languageName: node
-  linkType: hard
-
 "acorn-private-class-elements@npm:^1.0.0":
   version: 1.0.0
   resolution: "acorn-private-class-elements@npm:1.0.0"
@@ -4838,26 +4827,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn-walk@npm:^7.0.0":
-  version: 7.2.0
-  resolution: "acorn-walk@npm:7.2.0"
-  checksum: 9252158a79b9d92f1bc0dd6acc0fcfb87a67339e84bcc301bb33d6078936d27e35d606b4d35626d2962cd43c256d6f27717e70cbe15c04fff999ab0b2260b21f
-  languageName: node
-  linkType: hard
-
 "acorn-walk@npm:^8.0.0, acorn-walk@npm:^8.1.1":
   version: 8.2.0
   resolution: "acorn-walk@npm:8.2.0"
   checksum: 1715e76c01dd7b2d4ca472f9c58968516a4899378a63ad5b6c2d668bba8da21a71976c14ec5f5b75f887b6317c4ae0b897ab141c831d741dc76024d8745f1ad1
-  languageName: node
-  linkType: hard
-
-"acorn@npm:^7.0.0":
-  version: 7.4.1
-  resolution: "acorn@npm:7.4.1"
-  bin:
-    acorn: bin/acorn
-  checksum: 1860f23c2107c910c6177b7b7be71be350db9e1080d814493fae143ae37605189504152d1ba8743ba3178d0b37269ce1ffc42b101547fdc1827078f82671e407
   languageName: node
   linkType: hard
 
@@ -5418,13 +5391,6 @@ __metadata:
   version: 2.0.0
   resolution: "astral-regex@npm:2.0.0"
   checksum: 876231688c66400473ba505731df37ea436e574dd524520294cc3bbc54ea40334865e01fa0d074d74d036ee874ee7e62f486ea38bc421ee8e6a871c06f011766
-  languageName: node
-  linkType: hard
-
-"async@npm:0.9.x":
-  version: 0.9.2
-  resolution: "async@npm:0.9.2"
-  checksum: 87dbf129292b8a6c32a4e07f43f462498162aa86f404a7e11f978dbfdf75cfb163c26833684bb07b9d436083cd604cbbf730a57bfcbe436c6ae1ed266cdc56bb
   languageName: node
   linkType: hard
 
@@ -8972,42 +8938,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs-include-regex@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "ejs-include-regex@npm:1.0.0"
-  checksum: d4b936270d340111e07051bc5acdc7300f3ca456528779f2815c0107e321a4b212cf4e289d1e0f209b06261b004850769010e498a9cc2a424503f915316c6cb4
-  languageName: node
-  linkType: hard
-
-"ejs-lint@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "ejs-lint@npm:1.2.1"
-  dependencies:
-    chalk: ^4.0.0
-    ejs: 3.1.6
-    ejs-include-regex: ^1.0.0
-    globby: ^11.0.0
-    read-input: ^0.3.1
-    slash: ^3.0.0
-    syntax-error: ^1.1.6
-    yargs: ^16.0.0
-  bin:
-    ejslint: cli.js
-  checksum: e897b859e0f2c7fda8a0370ab04e01bfad8b9f6bda976431ceb358ebce0704fe893bfe3b857eab23eff00b183950e8d43a897181f9ee40b3582a98e4fd214c85
-  languageName: node
-  linkType: hard
-
-"ejs@npm:3.1.6":
-  version: 3.1.6
-  resolution: "ejs@npm:3.1.6"
-  dependencies:
-    jake: ^10.6.1
-  bin:
-    ejs: ./bin/cli.js
-  checksum: 81a9cdea0b4ded3b5a4b212b7c17e20bb07468f08394e2d519708d367957a70aef3d282a6d5d38bf6ad313ba25802b9193d4227f29b084d2ee0f28d115141d48
-  languageName: node
-  linkType: hard
-
 "electron-to-chromium@npm:^1.4.118":
   version: 1.4.136
   resolution: "electron-to-chromium@npm:1.4.136"
@@ -10139,15 +10069,6 @@ __metadata:
   version: 1.0.0
   resolution: "file-uri-to-path@npm:1.0.0"
   checksum: b648580bdd893a008c92c7ecc96c3ee57a5e7b6c4c18a9a09b44fb5d36d79146f8e442578bc0e173dc027adf3987e254ba1dfd6e3ec998b7c282873010502144
-  languageName: node
-  linkType: hard
-
-"filelist@npm:^1.0.1":
-  version: 1.0.2
-  resolution: "filelist@npm:1.0.2"
-  dependencies:
-    minimatch: ^3.0.4
-  checksum: 4d6953cb6f76c5345a52fc50222949e244946f485462ab6bae977176fff64fe5200cc1f44db175c27fc887f91cead401504c22eefcdcc064012ee44759947561
   languageName: node
   linkType: hard
 
@@ -12744,20 +12665,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jake@npm:^10.6.1":
-  version: 10.8.2
-  resolution: "jake@npm:10.8.2"
-  dependencies:
-    async: 0.9.x
-    chalk: ^2.4.2
-    filelist: ^1.0.1
-    minimatch: ^3.0.4
-  bin:
-    jake: ./bin/cli.js
-  checksum: b604c51863260e374ccd62cd0cfe0b659f72cb71beb7d5fb5137dd65b04cf9d5603abd01f9f6eaaac8f4182f396d6cfae01e0b0844c2215c9c1e200572307cf9
-  languageName: node
-  linkType: hard
-
 "jest-get-type@npm:^25.2.6":
   version: 25.2.6
   resolution: "jest-get-type@npm:25.2.6"
@@ -14694,7 +14601,6 @@ __metadata:
     dayjs: ^1.11.1
     diff2html-cli: ^5.2.2
     dotenv: ^16.0.0
-    ejs-lint: ^1.2.1
     eslint: ^8.14.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-prettier: ^4.0.0
@@ -17528,13 +17434,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"read-input@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "read-input@npm:0.3.1"
-  checksum: 334563e7ba162d56da2329b8e72766de124b0e14ba992c380883f3ee3af20d2fe6018c73ebdd10254dcc8fc5ea93ddf3ec8c3c53f21afda6a22ad55a8ef0811d
-  languageName: node
-  linkType: hard
-
 "read-package-json-fast@npm:^2.0.2":
   version: 2.0.3
   resolution: "read-package-json-fast@npm:2.0.3"
@@ -19931,15 +19830,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"syntax-error@npm:^1.1.6":
-  version: 1.4.0
-  resolution: "syntax-error@npm:1.4.0"
-  dependencies:
-    acorn-node: ^1.2.0
-  checksum: c1c3f048fed1948865fda5e79e11b02addb32da323c9c9fb214d3a933f9fda668e55c848f7c4082514ea4f1cf3dcfab0c7b9c762bfad1306271753c0fcc4b14f
-  languageName: node
-  linkType: hard
-
 "table@npm:^6.8.0":
   version: 6.8.0
   resolution: "table@npm:6.8.0"
@@ -21761,7 +21651,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xtend@npm:^4.0.0, xtend@npm:^4.0.2, xtend@npm:~4.0.0, xtend@npm:~4.0.1":
+"xtend@npm:^4.0.0, xtend@npm:~4.0.0, xtend@npm:~4.0.1":
   version: 4.0.2
   resolution: "xtend@npm:4.0.2"
   checksum: ac5dfa738b21f6e7f0dd6e65e1b3155036d68104e67e5d5d1bde74892e327d7e5636a076f625599dc394330a731861e87343ff184b0047fef1360a7ec0a5a36a
