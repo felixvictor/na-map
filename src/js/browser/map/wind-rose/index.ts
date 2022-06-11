@@ -66,9 +66,7 @@ export default class WindRose {
 
         this._setupArrow()
         this._setupListener()
-        if (Number.isNaN(this.#currentWindDegrees)) {
-            void new Toast("Hint", "Get the wind direction:<br>Use <em>In-game wind</em> under <em>Map tools</em>.")
-        } else {
+        if (!Number.isNaN(this.#currentWindDegrees)) {
             this._initShowCurrentWind()
         }
     }
