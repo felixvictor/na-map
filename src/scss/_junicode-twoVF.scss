@@ -1,0 +1,15 @@
+$font-name: "JunicodeTwoVF";
+$font-family: $font-name;
+$font-path: "../fonts/#{$font-name}/";
+
+$font-list: normal italic;
+@each $font-style in $font-list {
+    @font-face {
+        font-family: "#{$font-family}";
+        font-style: $font-style;
+        font-weight: 300 700;
+        font-stretch: 75% 125%;
+        src: url("#{$font-path}#{$font-name}-#{$font-style}.woff2") format("woff2");
+        font-display: swap;
+    }
+}
