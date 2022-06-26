@@ -83,6 +83,7 @@ export default class Flags {
         this.#svgDefNode.append(patternAvail)
 
         patternRegionCapitalAvail.id = `${nation}ra`
+        patternRegionCapitalAvail.append(Flags.#getRectAvail())
         patternRegionCapitalAvail.append(this.#getCircleRegionCapital())
         this.#svgDefNode.append(patternRegionCapitalAvail)
     }
