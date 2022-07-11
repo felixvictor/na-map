@@ -106,9 +106,9 @@ export default class GetPositionModal extends Modal {
                     liveSearch: true,
                     liveSearchNormalize: true,
                     liveSearchPlaceholder: "Search ...",
-                    title: "Select port",
+                    placeholder: "Select port",
                     virtualScroll: true,
-                })
+                } as Partial<BootstrapSelectOptions>)
             }
         }
     }

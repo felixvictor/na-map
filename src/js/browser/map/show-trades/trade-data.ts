@@ -132,7 +132,7 @@ export default class TradeData {
                 return `${text} nations`
             },
             selectedTextFormat: "count > 1",
-            title: "Select nations",
+            placeholder: "Select nations",
             width: "fit",
         }
 

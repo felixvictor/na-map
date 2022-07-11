@@ -130,7 +130,7 @@ export class CompareShipsSelect {
             liveSearch: true,
             maxOptions: moduleType.startsWith("Ship trim") ? 6 : 5,
             selectedTextFormat: "count > 1",
-            title: `${moduleType}`,
+            placeholder: `${moduleType}`,
             width: "170px",
         }
 
@@ -146,7 +146,12 @@ export class CompareShipsSelect {
     _initShipSelect(columnId: string, divBaseId: string, shipOptions: HtmlString): void {
         const divSelectsShipId = this.#modal.getBaseIdSelectsShip(columnId)
 
-        this.#selectShip[columnId] = new Select(`${divBaseId}-ship`, divSelectsShipId, { title: "Ship" }, shipOptions)
+        this.#selectShip[columnId] = new Select(
+            `${divBaseId}-ship`,
+            divSelectsShipId,
+            { placeholder: "Ship" },
+            shipOptions
+        )
         if (columnId !== "base") {
             this.#selectShip[columnId].disable()
         }
@@ -160,7 +165,7 @@ export class CompareShipsSelect {
             this.#selectWood[columnId][type] = new Select(
                 `${divBaseId}-${type}`,
                 divSelectsWoodsId,
-                { title: `Wood ${type}`, width: "170px" },
+                { placeholder: `Wood ${type}`, width: "170px" },
                 woodData.getOptions(type)
             )
             this.#selectWood[columnId][type].disable()

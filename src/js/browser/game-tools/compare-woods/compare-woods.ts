@@ -65,7 +65,7 @@ export class CompareWoods {
             this.#select[columnId][type] = new Select(
                 `${this.#baseId}-${columnId}-${type}`,
                 divOutputId,
-                { title: `Select ${type}` },
+                { placeholder: `Select ${type}` },
                 this.#woodData.getOptions(type)
             )
         }

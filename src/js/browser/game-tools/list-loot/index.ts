@@ -162,7 +162,7 @@ export default class ListLoot {
             const selectOptions: Partial<SelectOptions> = {
                 dropupAuto: false,
                 liveSearch: true,
-                title: `Select ${title}`,
+                placeholder: `Select ${title}`,
                 virtualScroll: true,
             }
 
