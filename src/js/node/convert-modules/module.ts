@@ -71,7 +71,7 @@ const getModuleProperties = (APImodifiers: ModifiersEntity[]): ModulePropertiesE
     return APImodifiers.filter((modifier) => {
         const apiModifierName = getModifierName(modifier)
         if (!modifiers.has(apiModifierName)) {
-            console.log(`${apiModifierName} modifier not defined`)
+            console.log(`${apiModifierName} modifier not defined`, modifier)
             return true
         }
 

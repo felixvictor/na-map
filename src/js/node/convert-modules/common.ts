@@ -86,6 +86,7 @@ export const modifiers = new Map<APIModifierName, ModifierName>([
     ["NONE MARINES_LEVEL", "Marines level"],
     ["NONE MARINES_MELEE_MODIFIER", "Marines melee attack"],
     ["NONE MARINES_PERCENTAGE", "Marines percentage"],
+    ["NONE MAST_DAMAGE_MODIFIER", "Mast damage"],
     ["NONE MAST_PHYSICS_JIB_SAIL_FORCE_BONUS", "Staysails power"],
     ["NONE MAST_PHYSICS_MAIN_SAIL_FORCE_BONUS", "Square sails power"],
     ["NONE MAST_PHYSICS_MAIN_SAIL_TORQUE_BONUS", "Square sails torque"],

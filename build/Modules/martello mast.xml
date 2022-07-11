@@ -4,7 +4,7 @@
     <Pair>
       <Key>MAST_BOTTOM_SECTION_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>2000</Value>
+        <Value>0</Value>
       </Value>
     </Pair>
     <Pair>

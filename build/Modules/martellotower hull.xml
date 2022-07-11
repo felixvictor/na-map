@@ -138,7 +138,7 @@
     <Pair>
       <Key>SHIP_ROLL_ANGLE_AIMING_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.7</Value>
+        <Value>0.75</Value>
       </Value>
     </Pair>
     <Pair>
@@ -273,8 +273,8 @@
     </Pair>
     <Pair>
       <Key>SHIP_TURNING_SPEED_RHEAS</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
-        <Value>1</Value>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
+        <Value>1.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -465,7 +465,7 @@
     </Pair>
     <Pair>
       <Key>SHIP_CLASS_TYPE</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
         <Value>1</Value>
       </Value>
     </Pair>
@@ -669,7 +669,7 @@
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>9</Value>
+        <Value>1</Value>
       </Value>
     </Pair>
     <Pair>
@@ -681,25 +681,25 @@
     <Pair>
       <Key>SHIP_RHEAS_DRIFT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.12</Value>
+        <Value>0.1</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_STAYSAILS_DRIFT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1.27</Value>
+        <Value>1.25</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_SPEED_YARD_POWER_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>2.5</Value>
+        <Value>2.8</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_SPEED_DRIFT_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>2</Value>
+        <Value>2.8</Value>
       </Value>
     </Pair>
     <Pair>

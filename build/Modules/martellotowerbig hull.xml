@@ -273,7 +273,7 @@
     </Pair>
     <Pair>
       <Key>SHIP_TURNING_SPEED_RHEAS</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
         <Value>3.7</Value>
       </Value>
     </Pair>
@@ -465,7 +465,7 @@
     </Pair>
     <Pair>
       <Key>SHIP_CLASS_TYPE</Key>
-      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
         <Value>3</Value>
       </Value>
     </Pair>
