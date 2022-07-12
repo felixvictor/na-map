@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Rookie Snow L ARMOR" Type="ARMOR">
+  <Attributes>
+    <Pair>
+      <Key>MODULE_DESCRIPTION</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>left armor</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MODULE_BASE_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>1300</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>HIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DAMAGE_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>RAM_DAMAGE_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_THICKNESS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>45</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>DAMAGE_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_LEFT_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="false" IsNegative="false">
+        <Value>1300</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>REPAIR_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>REPAIR_MODULE_TIME</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>120</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CREW_HIT_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0.07</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>FIRE_PROBABILITY</Key>
+      <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ENABLE_ANGLE_PENETRATION</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>1</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>EXPLOSION_DAMAGE_ABSORB_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.8</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>4</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_DAMAGE_ABSORB_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.75</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>ARMOR_BONUS_THICKNESS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+  </Attributes>
+</ModuleTemplate>

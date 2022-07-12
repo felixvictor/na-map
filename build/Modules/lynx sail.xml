@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2200</Value>
+        <Value>900</Value>
       </Value>
     </Pair>
     <Pair>
@@ -45,7 +45,7 @@
     <Pair>
       <Key>SHIP_MAX_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>13</Value>
+        <Value>14</Value>
       </Value>
     </Pair>
     <Pair>
@@ -141,7 +141,7 @@
     <Pair>
       <Key>MAST_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>100</Value>
+        <Value>201</Value>
       </Value>
     </Pair>
     <Pair>

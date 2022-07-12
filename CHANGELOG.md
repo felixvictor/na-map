@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.2.0](///compare/v14.1.3...v14.2.0) (2022-07-11)
+
+
+### Features
+
+* July 2022 patches 555705f
+
+
+### Bug Fixes
+
+* **bootstrap-select:** entry duplication 75db3d3
+
 ### [14.1.3](///compare/v14.1.2...v14.1.3) (2022-06-29)
 
 ### [14.1.2](///compare/v14.1.1...v14.1.2) (2022-06-26)

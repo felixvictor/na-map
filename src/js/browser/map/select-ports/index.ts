@@ -40,7 +40,6 @@ export default class SelectPorts {
         void new SelectPortsSelectPorts(ports)
         void new SelectPortsSelectGoods(ports)
         this.#nationClan = new SelectPortsNationClan(ports)
-        void new SelectPBTimeWindow(ports)
 
         this._setupListener()
     }

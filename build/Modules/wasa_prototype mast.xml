@@ -4,19 +4,19 @@
     <Pair>
       <Key>MAST_BOTTOM_SECTION_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>1373</Value>
+        <Value>60</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>MAST_MIDDLE_SECTION_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>877</Value>
+        <Value>36</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>MAST_TOP_SECTION_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>259</Value>
+        <Value>9</Value>
       </Value>
     </Pair>
     <Pair>

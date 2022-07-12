@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>896</Value>
+        <Value>1000</Value>
       </Value>
     </Pair>
     <Pair>
@@ -88,7 +88,7 @@
     <Pair>
       <Key>CANNON_RELOAD_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>65</Value>
+        <Value>100</Value>
       </Value>
     </Pair>
     <Pair>
@@ -100,7 +100,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>14</Value>
+        <Value>1000</Value>
       </Value>
     </Pair>
     <Pair>

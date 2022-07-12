@@ -99,7 +99,7 @@ export default class ListRecipes {
         const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: true,
-            title: "Select item",
+            placeholder: "Select item",
             virtualScroll: true,
             width: "fit",
         }

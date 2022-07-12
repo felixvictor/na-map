@@ -4,7 +4,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4235</Value>
+        <Value>2160</Value>
       </Value>
     </Pair>
     <Pair>

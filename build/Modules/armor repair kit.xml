@@ -34,7 +34,7 @@
     <Pair>
       <Key>REPAIR_VOLUME_PER_ITEM</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>300</Value>
+        <Value>150</Value>
       </Value>
     </Pair>
   </Attributes>

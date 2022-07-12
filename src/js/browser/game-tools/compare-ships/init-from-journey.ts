@@ -9,7 +9,7 @@ export const initFromJourney = async (): Promise<{
     const shipCompare = new CompareShips(baseId)
     await shipCompare.loadAndSetupData()
 
-    const select = new Select(baseId, baseId, { title: "Ship" }, shipCompare.getShipOptions())
+    const select = new Select(baseId, baseId, { placeholder: "Ship" }, shipCompare.getShipOptions())
     const shipNameAndSpeed = shipCompare.getShipNameAndSpeed()
 
     return { select, shipNameAndSpeed }

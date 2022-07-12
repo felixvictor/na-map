@@ -46,7 +46,7 @@ export interface SelectOptions {
     //     style: string | null
     //     styleBase: string | null
     //     tickIcon: string
-    title: string | null
+    placeholder: string | null
     virtualScroll: boolean | number
     width: string | false
     //     windowPadding: number | [number, number, number, number]
@@ -167,18 +167,14 @@ export default class Select {
     }
 
     setOptions(options: HtmlString): void {
-        this.select$.empty()
-        this.select$.append(options)
+        this.#select$.empty()
+        this.#select$.append(options)
     }
 
     #injectSelects(): void {
         const div = this.#selectsDiv!.append("div").attr("class", "mb-1")
 
-        div.append("select")
-            .attr("name", this.#id)
-            .attr("id", this.#id)
-            .property("multiple", this.#isMultiple)
-            .attr("class", "selectpicker")
+        div.append("select").attr("name", this.#id).attr("id", this.#id).property("multiple", this.#isMultiple)
         div.append("label").attr("for", this.#id)
     }
 
@@ -190,10 +186,9 @@ export default class Select {
         if (this.#selectsDiv) {
             this.#injectSelects()
         }
-
         this.#select$ = $(`#${this.#id}`)
-        this.setOptions(options)
         this.#construct()
-        this.reset()
+        this.setOptions(options)
+        this.refresh()
     }
 }

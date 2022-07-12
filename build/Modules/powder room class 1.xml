@@ -64,7 +64,7 @@
     <Pair>
       <Key>POWDER_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>3646</Value>
+        <Value>1823</Value>
       </Value>
     </Pair>
     <Pair>
