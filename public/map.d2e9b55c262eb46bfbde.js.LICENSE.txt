@@ -135,16 +135,6 @@
 /*!
  * This file is part of na-map.
  *
- * @file      Select port battle time window.
- * @module    map/select-ports/pb-time
- * @author    iB aka Felix Victor
- * @copyright Felix Victor 2017 to 2022
- * @license   http://www.gnu.org/licenses/gpl.html
- */
-
-/*!
- * This file is part of na-map.
- *
  * @file      Select ports clan select.
  * @module    map/select-ports/clan
  * @author    iB aka Felix Victor
