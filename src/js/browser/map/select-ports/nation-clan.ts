@@ -109,7 +109,7 @@ export default class SelectPortsNationClan {
         const options = this._getClanOptions()
 
         this._capsOff()
-        this.#selectClan.setOptions(options)
+        this.#selectClan.setSelectOptions(options)
         this.#selectClan.reset()
 
         if (options === "") {

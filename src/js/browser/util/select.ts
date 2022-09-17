@@ -56,11 +56,12 @@ export interface SelectOptions {
 export type SelectValue = string | number | string[] | undefined
 
 export default class Select {
-    #select$ = {} as JQuery<HTMLSelectElement>
-    readonly #bsSelectOptions: Partial<BootstrapSelectOptions>
-    readonly #id: HtmlString
-    readonly #isMultiple: boolean
-    readonly #selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown> | undefined
+    private _select$ = {} as JQuery<HTMLSelectElement>
+    private readonly bsSelectOptions: Partial<BootstrapSelectOptions>
+    private readonly id: HtmlString
+    private readonly options: HtmlString
+    private readonly isMultiple: boolean
+    private readonly selectsDiv: Selection<HTMLDivElement, unknown, HTMLElement, unknown> | undefined
 
     // eslint-disable-next-line max-params
     constructor(
@@ -70,15 +71,16 @@ export default class Select {
         options: HtmlString,
         isMultiple = false
     ) {
-        this.#id = `${id}-select`
-        this.#selectsDiv = selectsDivId ? d3Select(`#${selectsDivId}`) : undefined
-        this.#bsSelectOptions = this.getOptions(selectOptions)
-        this.#isMultiple = isMultiple
+        this.id = `${id}-select`
+        this.selectsDiv = selectsDivId ? d3Select(`#${selectsDivId}`) : undefined
+        this.bsSelectOptions = this.getBSSelectOptions(selectOptions)
+        this.options = options
+        this.isMultiple = isMultiple
 
-        this.#init(options)
+        this.init()
     }
 
-    static #getSelectValueAsArray<T>(value: unknown, conversionFunction: (value: unknown) => T): T[] {
+    private static getSelectValueAsArray<T>(value: unknown, conversionFunction: (value: unknown) => T): T[] {
         if (Array.isArray(value)) {
             // Multiple selects
             return value.map((element) => conversionFunction(element))
@@ -88,34 +90,34 @@ export default class Select {
         return value ? [conversionFunction(value)] : []
     }
 
-    static getSelectValueAsNumberArray(value: SelectValue): number[] {
-        return this.#getSelectValueAsArray<number>(value, Number)
+    public static getSelectValueAsNumberArray(value: SelectValue): number[] {
+        return this.getSelectValueAsArray<number>(value, Number)
     }
 
-    static getSelectValueAsStringArray(value: unknown): string[] {
-        return this.#getSelectValueAsArray<string>(value, String)
+    public static getSelectValueAsStringArray(value: unknown): string[] {
+        return this.getSelectValueAsArray<string>(value, String)
     }
 
-    static resetAll(): void {
-        $(".selectpicker").val("default").selectpicker("refresh")
+    public static resetElement(element$ = $(".selectpicker") as JQuery<HTMLSelectElement>): void {
+        element$.val("default").selectpicker("refresh")
     }
 
-    static resetAllExcept(selectWhiteList$: JQuery<HTMLSelectElement>[]): void {
+    public static resetAllExcept(selectWhiteList$: JQuery<HTMLSelectElement>[]): void {
         // Set of selects that should not be refreshed
         const selectWhiteList = new Set(selectWhiteList$.map((select) => select[0]))
 
-        $(".selectpicker").each(function (index, element) {
+        $(".selectpicker").each((index, element) => {
             if (!selectWhiteList.has(element as HTMLSelectElement)) {
-                $(this).val("default").selectpicker("refresh")
+                Select.resetElement($(element as HTMLSelectElement))
             }
         })
     }
 
-    get select$(): JQuery<HTMLSelectElement> {
-        return this.#select$
+    public get select$(): JQuery<HTMLSelectElement> {
+        return this._select$
     }
 
-    getOptions(selectOptions: Partial<SelectOptions>): Partial<BootstrapSelectOptions> {
+    private getBSSelectOptions(selectOptions: Partial<SelectOptions>): Partial<BootstrapSelectOptions> {
         const bsSelectOptions: Partial<BootstrapSelectOptions> = selectOptions
 
         if (selectOptions.liveSearch) {
@@ -126,69 +128,71 @@ export default class Select {
         return bsSelectOptions
     }
 
-    getValues(): SelectValue {
-        return this.#select$.val()
+    public getValues(): SelectValue {
+        return this._select$.val()
     }
 
-    setSelectValues(ids: unknown): void {
+    public setSelectValues(ids: unknown): void {
         const value = Select.getSelectValueAsStringArray(ids)
 
         if (value.length > 0) {
-            this.#select$.val(value)
+            this._select$.val(value)
         }
 
         this.refresh()
     }
 
-    disable(): void {
-        this.#select$.prop("disabled", true)
+    public disable(): void {
+        this._select$.prop("disabled", true)
         this.refresh()
     }
 
-    enable(): void {
-        this.#select$.removeAttr("disabled").selectpicker("refresh")
+    public enable(): void {
+        this._select$.removeAttr("disabled")
         this.refresh()
     }
 
-    render(): void {
-        this.#select$.selectpicker("render")
+    public render(): void {
+        this._select$.selectpicker("render")
     }
 
-    refresh(): void {
-        this.#select$.selectpicker("refresh")
+    public refresh(): void {
+        this._select$.selectpicker("refresh")
     }
 
-    reset(value: SelectValue = "default"): void {
-        this.#select$.val(value).selectpicker("refresh")
+    public reset(value: SelectValue = "default"): void {
+        this._select$.val(value)
+        this.refresh()
     }
 
-    selectAll(): void {
-        this.#select$.selectpicker("selectAll")
+    public selectAll(): void {
+        this._select$.selectpicker("selectAll")
     }
 
-    setOptions(options: HtmlString): void {
-        this.#select$.empty()
-        this.#select$.append(options)
+    public setSelectOptions(options = this.options): void {
+        this._select$.empty()
+        this._select$.append(options)
     }
 
-    #injectSelects(): void {
-        const div = this.#selectsDiv!.append("div").attr("class", "mb-1")
+    private injectSelects(): void {
+        const div = this.selectsDiv!.append("div").attr("class", "mb-1")
 
-        div.append("select").attr("name", this.#id).attr("id", this.#id).property("multiple", this.#isMultiple)
-        div.append("label").attr("for", this.#id)
+        div.append("select").attr("name", this.id).attr("id", this.id).property("multiple", this.isMultiple)
+        div.append("label").attr("for", this.id)
     }
 
-    #construct(): void {
-        this.#select$.selectpicker(this.#bsSelectOptions)
+    private construct(): void {
+        this._select$.selectpicker(this.bsSelectOptions)
     }
 
-    #init(options: HtmlString): void {
-        if (this.#selectsDiv) {
-            this.#injectSelects()
+    private init(): void {
+        if (this.selectsDiv) {
+            this.injectSelects()
         }
-        this.#select$ = $(`#${this.#id}`)
-        this.#construct()
-        this.setOptions(options)
+        this._select$ = $(`#${this.id}`)
+
+        this.construct()
+        this.setSelectOptions()
         this.refresh()
     }
 }

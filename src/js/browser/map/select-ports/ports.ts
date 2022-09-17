@@ -74,7 +74,7 @@ export default class SelectPortsSelectPorts {
 
     _setupListener(): void {
         this.#select.select$.one("show.bs.select", () => {
-            this.#select.setOptions(this._getOptions())
+            this.#select.setSelectOptions(this._getOptions())
             this.#select.reset()
         })
         this.#select.select$.one("change", async () => {

@@ -129,7 +129,7 @@ export const plugins = [
         $: "jquery",
         jQuery: "jquery",
         "window.jQuery": "jquery",
-        "bootstrap.Dropdown": "bootstrap/js/dist/dropdown",
+        "window.Dropdown": "bootstrap/js/dist/dropdown",
     }),
     new CopyPlugin({
         patterns: [

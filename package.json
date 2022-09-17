@@ -53,7 +53,7 @@
         "@d3fc/d3fc-label-layout": "^7.0.3",
         "@popperjs/core": "^2.11.6",
         "bootstrap": "^5.2.1",
-        "bootstrap-select": "https://github.com/felixvictor/bootstrap-select#dev",
+        "bootstrap-select": "https://github.com/snapappointments/bootstrap-select#dev",
         "d3-area-label": "^1.5.0",
         "d3-array": "^3.2.0",
         "d3-axis": "^3.0.0",

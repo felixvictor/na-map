@@ -46,7 +46,7 @@ export default class SelectPortsSelectInventory {
         if (show) {
             selectSel.classList.remove("d-none")
             ;(selectSel.parentNode as HTMLSelectElement).classList.remove("d-none")
-            this.#select.setOptions(this._getOptions())
+            this.#select.setSelectOptions(this._getOptions())
             this.#select.reset()
         } else {
             selectSel.classList.add("d-none")
@@ -75,7 +75,7 @@ export default class SelectPortsSelectInventory {
         const selectOptions: Partial<SelectOptions> = {
             dropupAuto: false,
             liveSearch: true,
-            title: this.#baseName,
+            placeholder: this.#baseName,
             virtualScroll: true,
         }
 
