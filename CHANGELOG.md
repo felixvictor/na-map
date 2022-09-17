@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.2.1](///compare/v14.2.0...v14.2.1) (2022-09-17)
+
+
+### Bug Fixes
+
+* **convert modules:** data structure updates 46cd924
+* **convert ships:** compare b11aa89
+
 ## [14.2.0](///compare/v14.1.3...v14.2.0) (2022-07-11)
 
 
