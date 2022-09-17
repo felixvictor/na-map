@@ -566,7 +566,7 @@ const convertAddShipData = (ships: ShipData[]): ShipData[] => {
         const shipId = getShipId(baseFileName)
         const masterBaseFileName = getShipMaster(baseFileName)
 
-        if (masterBaseFileName !== []) {
+        if (masterBaseFileName.length > 0) {
             for (const master of masterBaseFileName) {
                 getAndAddAdditionalData(master, shipId)
             }
