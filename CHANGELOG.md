@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.2.2](///compare/v14.2.1...v14.2.2) (2022-10-07)
+
+
+### Bug Fixes
+
+* **bootstrap-select:** workaround for github.com/snapappointments/bootstrap-select/issues/2738 07fe725
+
 ### [14.2.1](///compare/v14.2.0...v14.2.1) (2022-09-17)
 
 
