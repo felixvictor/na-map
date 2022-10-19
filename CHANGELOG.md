@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.3.0](///compare/v14.2.2...v14.3.0) (2022-10-19)
+
+
+### Features
+
+* server "main" (free-to-play) added afad5fe
+
 ### [14.2.2](///compare/v14.2.1...v14.2.2) (2022-10-07)
 
 
