@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-export const serverIds = ["eu1", "eu2"]!
+export const serverIds = ["eu1", "eu2", "eu3"]!
 export type ServerId = typeof serverIds[number]
 export type ServerType = "PVE" | "PVP"
 
@@ -23,6 +23,7 @@ export interface Server {
 export const servers: Server[] = [
     { id: "eu1", name: "War", type: "PVP", icon: "war" },
     { id: "eu2", name: "Peace", type: "PVE", icon: "peace" },
+    { id: "eu3", name: "Main", type: "PVP", icon: "free" },
 ]
 
 /* testbed
