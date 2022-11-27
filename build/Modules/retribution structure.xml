@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModuleTemplate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Retribution Structure" Type="INTERNAL_STRUCTURE">
+  <Attributes>
+    <Pair>
+      <Key>MODULE_BASE_HP</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>11400</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>MODULE_DESCRIPTION</Key>
+      <Value xsi:type="StringAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>structure</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>REPAIR_TYPE</Key>
+      <Value xsi:type="IntegerAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>0</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>REPAIR_MODULE_TIME</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>120</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>STRUCTURE_FLOODING_CURVE</Key>
+      <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>
+          <Time>0</Time>
+          <Value>3</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>-170.000015</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.01</Time>
+          <Value>1.3</Value>
+          <TangentIn>-170.000015</TangentIn>
+          <TangentOut>-5.27472448</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.101</Time>
+          <Value>0.82</Value>
+          <TangentIn>-5.27472448</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.3</Time>
+          <Value>0.82</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>-8.11881351</TangentOut>
+        </Value>
+        <Value>
+          <Time>0.401</Time>
+          <Value>0</Value>
+          <TangentIn>-8.11881351</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+        <Value>
+          <Time>1.00000036</Time>
+          <Value>0</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>STRUCTURE_MAST_CURVE</Key>
+      <Value xsi:type="CurveAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>
+          <Time>0</Time>
+          <Value>1</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+        <Value>
+          <Time>1</Time>
+          <Value>1</Value>
+          <TangentIn>0</TangentIn>
+          <TangentOut>0</TangentOut>
+        </Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>EXPLOSION_DAMAGE_ABSORB_MULTIPLIER</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
+        <Value>0.8</Value>
+      </Value>
+    </Pair>
+  </Attributes>
+</ModuleTemplate>

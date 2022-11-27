@@ -46,7 +46,7 @@
     <Pair>
       <Key>PUMP_REQUIRED_CREW</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4</Value>
+        <Value>6</Value>
       </Value>
     </Pair>
     <Pair>
