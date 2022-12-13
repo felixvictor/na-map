@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.5.0](///compare/v14.4.1...v14.5.0) (2022-12-13)
+
+
+### Features
+
+* Dec patch 7f990a1
+
 ### [14.4.1](///compare/v14.4.0...v14.4.1) (2022-11-27)
 
 ## [14.4.0](///compare/v14.3.1...v14.4.0) (2022-11-27)
