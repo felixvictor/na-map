@@ -16,7 +16,7 @@
     <Pair>
       <Key>REPAIR_PERCENT</Key>
       <Value xsi:type="FloatAttribute" Action="Relative" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>0.4</Value>
+        <Value>0.25</Value>
       </Value>
     </Pair>
     <Pair>

@@ -347,5 +347,17 @@
         </Value>
       </Value>
     </Pair>
+    <Pair>
+      <Key>ARMOR_THICKNESS</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>60</Value>
+      </Value>
+    </Pair>
+    <Pair>
+      <Key>CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW</Key>
+      <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
+        <Value>100</Value>
+      </Value>
+    </Pair>
   </Attributes>
 </ModuleTemplate>

@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>48</Value>
+        <Value>9</Value>
       </Value>
     </Pair>
     <Pair>
@@ -88,7 +88,7 @@
     <Pair>
       <Key>CANNON_RELOAD_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>70</Value>
+        <Value>45</Value>
       </Value>
     </Pair>
     <Pair>
@@ -100,7 +100,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>48</Value>
+        <Value>45</Value>
       </Value>
     </Pair>
     <Pair>
@@ -357,7 +357,7 @@
     <Pair>
       <Key>CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>2.5</Value>
+        <Value>0.9</Value>
       </Value>
     </Pair>
     <Pair>

@@ -46,7 +46,7 @@
     <Pair>
       <Key>CANNON_BASIC_DAMAGE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>56</Value>
+        <Value>18</Value>
       </Value>
     </Pair>
     <Pair>
@@ -70,13 +70,13 @@
     <Pair>
       <Key>CANNON_DISPERSION_PER100M</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4</Value>
+        <Value>2</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>CANNON_DISPERSION_VERTICAL_PER100M</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>11</Value>
+        <Value>8</Value>
       </Value>
     </Pair>
     <Pair>
@@ -88,7 +88,7 @@
     <Pair>
       <Key>CANNON_RELOAD_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>82.5</Value>
+        <Value>55</Value>
       </Value>
     </Pair>
     <Pair>
@@ -100,7 +100,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>112</Value>
+        <Value>90</Value>
       </Value>
     </Pair>
     <Pair>
@@ -351,7 +351,7 @@
     <Pair>
       <Key>CANNON_BALL_ARMOR_SPLINTERS_DAMAGE_FOR_CREW</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>7</Value>
+        <Value>1.8</Value>
       </Value>
     </Pair>
     <Pair>

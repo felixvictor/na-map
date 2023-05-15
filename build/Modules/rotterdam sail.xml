@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>9500</Value>
+        <Value>2000</Value>
       </Value>
     </Pair>
     <Pair>
@@ -22,7 +22,7 @@
     <Pair>
       <Key>SHIP_MAX_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>8.5</Value>
+        <Value>11.1</Value>
       </Value>
     </Pair>
     <Pair>
@@ -75,13 +75,13 @@
     <Pair>
       <Key>SAIL_RISING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>2.7</Value>
+        <Value>3.5</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>RHEA_TURN_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>11</Value>
+        <Value>13</Value>
       </Value>
     </Pair>
     <Pair>
@@ -123,7 +123,7 @@
     <Pair>
       <Key>SAILING_CREW_REQUIRED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>218</Value>
+        <Value>117</Value>
       </Value>
     </Pair>
     <Pair>
@@ -141,7 +141,7 @@
     <Pair>
       <Key>SAIL_DECREASING_SPEED</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1.4</Value>
+        <Value>1.7</Value>
       </Value>
     </Pair>
   </Attributes>

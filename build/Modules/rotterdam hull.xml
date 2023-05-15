@@ -10,7 +10,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4000</Value>
+        <Value>2200</Value>
       </Value>
     </Pair>
     <Pair>
@@ -97,13 +97,13 @@
     <Pair>
       <Key>SHIP_ACCELERATION</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.6</Value>
+        <Value>0.75</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_MAX_ROLL_ANGLE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>22.5</Value>
+        <Value>25</Value>
       </Value>
     </Pair>
     <Pair>
@@ -150,7 +150,7 @@
     <Pair>
       <Key>SHIP_MASS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>4281</Value>
+        <Value>1688</Value>
       </Value>
     </Pair>
     <Pair>
@@ -162,13 +162,13 @@
     <Pair>
       <Key>SHIP_WATERLINE_HEIGHT</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>-0.15</Value>
+        <Value>-0.1</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>FIREZONE_HORIZONTAL_WIDTH</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>40</Value>
+        <Value>30</Value>
       </Value>
     </Pair>
     <Pair>
@@ -204,7 +204,7 @@
     <Pair>
       <Key>SINKING_MAX_PROBES_OFFSET</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>5</Value>
+        <Value>3.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -262,7 +262,7 @@
     <Pair>
       <Key>SHIP_TURNING_SPEED_RHEAS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1.4</Value>
+        <Value>1.8</Value>
       </Value>
     </Pair>
     <Pair>
@@ -346,7 +346,7 @@
     <Pair>
       <Key>SHIP_STRUCTURE_LEAKS_PER_SECOND</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="false" IsNegative="false">
-        <Value>69.965</Value>
+        <Value>38.481</Value>
       </Value>
     </Pair>
     <Pair>
@@ -454,7 +454,7 @@
     <Pair>
       <Key>SHIP_CLASS_TYPE</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>1</Value>
+        <Value>2</Value>
       </Value>
     </Pair>
     <Pair>
@@ -562,13 +562,13 @@
     <Pair>
       <Key>SHIP_PHYSICS_DEC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.23</Value>
+        <Value>0.4</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_PHYSICS_ACC_COEF</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.23</Value>
+        <Value>0.4</Value>
       </Value>
     </Pair>
     <Pair>
@@ -645,13 +645,13 @@
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>7</Value>
+        <Value>6</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_TURNING_ACCELERATION_TIME_RHEAS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>7</Value>
+        <Value>5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -669,13 +669,13 @@
     <Pair>
       <Key>SHIP_SPEED_YARD_POWER_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>2.6</Value>
+        <Value>2.5</Value>
       </Value>
     </Pair>
     <Pair>
       <Key>SHIP_SPEED_DRIFT_MODIFIER</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>2.6</Value>
+        <Value>2.5</Value>
       </Value>
     </Pair>
     <Pair>
@@ -723,7 +723,7 @@
     <Pair>
       <Key>SHIP_PHYSICS_ACC_TURN_PENALTY</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="false" IsPermanent="true" IsNegative="false">
-        <Value>0.046</Value>
+        <Value>0.12</Value>
       </Value>
     </Pair>
   </Attributes>
