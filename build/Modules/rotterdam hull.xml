@@ -72,19 +72,19 @@
           <Time>0.1</Time>
           <Value>0.1</Value>
           <TangentIn>1</TangentIn>
-          <TangentOut>2.25</TangentOut>
+          <TangentOut>9</TangentOut>
         </Value>
         <Value>
-          <Time>0.5</Time>
+          <Time>0.2</Time>
           <Value>1</Value>
-          <TangentIn>2.25</TangentIn>
+          <TangentIn>9</TangentIn>
           <TangentOut>0</TangentOut>
         </Value>
         <Value>
           <Time>1</Time>
           <Value>1</Value>
           <TangentIn>0</TangentIn>
-          <TangentOut>0</TangentOut>
+          <TangentOut>1.0999999</TangentOut>
         </Value>
       </Value>
     </Pair>
