@@ -17,8 +17,8 @@ dayjs.extend(utc)
 import { serverMaintenanceHour } from "./common-var"
 import { HtmlString } from "./interface"
 
-export const minDeepWaterBR = 80
-export const maxShallowWaterBR = 120
+export const minDeepWaterBR = 22
+export const maxShallowWaterBR = 40
 
 export const cannonType = ["medium", "long", "carronade"]!
 export type CannonType = typeof cannonType[number]
