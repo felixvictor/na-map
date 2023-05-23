@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.8.1](///compare/v14.8.0...v14.8.1) (2023-05-23)
+
+
+### Bug Fixes
+
+* **battle rating:** lowered 71e8734
+
 ## [14.8.0](///compare/v14.7.2...v14.8.0) (2023-05-23)
 
 
