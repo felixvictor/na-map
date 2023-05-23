@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "na-map",
-    "version": "14.7.2",
+    "version": "14.8.0",
     "description": "Naval Action map",
     "license": "ISC",
     "scripts": {
