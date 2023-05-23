@@ -88,7 +88,9 @@ const blueprintsNotUsed = new Set([
     2381, // Diana (i)
     2382, // Victory1765
     2484, // Travel Balloon
-    2541, // Santa Ana (i)
+    2487, // San Predro (i)
+    2892, // Santa Ana (i)
+    2895, // Rotterdam (i)
 ])
 
 // noinspection SpellCheckingInspection
@@ -122,10 +124,10 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["hamburg", { id: 970, master: [] }],
     ["hercules", { id: 1675, master: [] }],
     ["hermione", { id: 592, master: [] }],
+    ["implacable", { id: 2235, master: [] }],
     ["indefatiable", { id: 787, master: [] }],
     ["indiaman", { id: 425, master: [] }],
     ["ingermanland", { id: 395, master: [] }],
-    ["implacable", { id: 2235, master: [] }],
     ["leopard", { id: 2078, master: [] }],
     ["lhermione", { id: 986, master: [] }],
     ["lynx", { id: 274, master: [] }],
@@ -143,6 +145,8 @@ const shipNames: Map<string, { id: number; master: string[] }> = new Map([
     ["rattlesnakeheavy", { id: 284, master: [] }],
     ["renommee", { id: 285, master: [] }],
     ["requin", { id: 1676, master: [] }],
+    ["rotterdam", { id: 2895, master: [] }],
+    ["santa_ana", { id: 2892, master: [] }],
     ["santisima", { id: 286, master: [] }],
     ["snow", { id: 287, master: [] }],
     ["surprise", { id: 288, master: [] }],
