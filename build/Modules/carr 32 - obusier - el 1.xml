@@ -100,7 +100,7 @@
     <Pair>
       <Key>MODULE_BASE_HP</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>120</Value>
+        <Value>240</Value>
       </Value>
     </Pair>
     <Pair>
@@ -417,7 +417,7 @@
     <Pair>
       <Key>ARMOR_THICKNESS</Key>
       <Value xsi:type="FloatAttribute" Action="Absolute" IsLocal="true" IsPermanent="true" IsNegative="false">
-        <Value>60</Value>
+        <Value>72</Value>
       </Value>
     </Pair>
     <Pair>
