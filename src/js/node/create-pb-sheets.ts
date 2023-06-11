@@ -12,7 +12,7 @@ import path from "path"
 
 import css, { Declaration, Rule } from "css"
 import Excel from "exceljs"
-import sass from "sass"
+import * as sass from "sass"
 
 import { currentServerStartDate, maxShallowWaterBR, minDeepWaterBR, range, sortBy } from "../common/common"
 import { getCommonPaths } from "../common/common-dir"
