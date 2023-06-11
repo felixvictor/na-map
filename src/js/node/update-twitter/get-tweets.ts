@@ -152,6 +152,7 @@ const getTweetsPartial = async (): Promise<void> => {
  * Get tweets
  */
 export const getTweets = async (): Promise<string[]> => {
+    /*
     // eslint-disable-next-line unicorn/prefer-ternary
     if (runType.startsWith("full")) {
         await getTweetsFull()
@@ -160,4 +161,7 @@ export const getTweets = async (): Promise<string[]> => {
     }
 
     return tweets.reverse()
+    */
+
+    return []
 }
