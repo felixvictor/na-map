@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.8.3](///compare/v14.8.2...v14.8.3) (2023-06-11)
+
+
+### Bug Fixes
+
+* 5 June patch ac84f53
+* **sass:** import 72b858c
+* **twitter:** due to paid API access, empty twitter search 3eb5b06
+
 ### [14.8.2](///compare/v14.8.1...v14.8.2) (2023-06-01)
 
 
